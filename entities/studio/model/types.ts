@@ -52,3 +52,25 @@ export interface StudioInfo {
   hours: string;
   instagram: string;
 }
+
+export interface CustomerProfile {
+  name: string;
+  membership: MembershipTierName | null;
+  joined: number;
+  palette: readonly [string, string];
+}
+
+export type VisitStatus = "upcoming" | "past";
+
+export interface Visit {
+  id: string;
+  serviceId: string;
+  /** ISO date (yyyy-mm-dd). The view formats this via Intl.DateTimeFormat. */
+  date: string;
+  /** Display time in HH:mm (24h). */
+  time: string;
+  price: number;
+  status: VisitStatus;
+  /** Days from "today" to the visit. Present only when status === "upcoming". */
+  daysAway?: number;
+}

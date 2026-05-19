@@ -208,5 +208,25 @@
       "Lace": "Lace",
       "Bridal": "Bridal"
     }
+  },
+  "Profile": {
+    "meta_title": "Account",
+    "plate_title": "Account",
+    "member_tag": "Member · {tier}",
+    "joined": "Joined in {year}",
+    "next_visit_eyebrow": "Next visit",
+    "countdown": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "in_days": "In {n} days"
+    },
+    "quick_links_aria": "Account links",
+    "quick_links": {
+      "bookings": "My bookings",
+      "membership": "Member card",
+      "aftercare": "Aftercare & menu",
+      "studio": "The studio"
+    },
+    "history_eyebrow": "Visit history"
   }
 }

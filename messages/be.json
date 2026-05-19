@@ -208,5 +208,25 @@
       "Lace": "Карункі",
       "Bridal": "Вясельны"
     }
+  },
+  "Profile": {
+    "meta_title": "Аккаўнт",
+    "plate_title": "Аккаўнт",
+    "member_tag": "Сябар · {tier}",
+    "joined": "Далучылася ў {year}",
+    "next_visit_eyebrow": "Наступны візіт",
+    "countdown": {
+      "today": "Сёння",
+      "tomorrow": "Заўтра",
+      "in_days": "Праз {n} дн."
+    },
+    "quick_links_aria": "Спасылкі акаўнта",
+    "quick_links": {
+      "bookings": "Мае запісы",
+      "membership": "Карта сябра",
+      "aftercare": "Догляд і меню",
+      "studio": "Студыя"
+    },
+    "history_eyebrow": "Гісторыя візітаў"
   }
 }
