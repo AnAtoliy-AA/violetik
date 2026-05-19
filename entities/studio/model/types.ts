@@ -1,11 +1,6 @@
 export type Category = "Care" | "Gel" | "Design" | "Form";
 
-export type GalleryTag =
-  | "Editorial"
-  | "Gel"
-  | "Chrome"
-  | "Lace"
-  | "Bridal";
+export type GalleryTag = "Editorial" | "Gel" | "Chrome" | "Lace" | "Bridal";
 
 export type MembershipTierName = "Petale" | "Violette" | "Atelier";
 
@@ -33,4 +28,27 @@ export interface MembershipTier {
   cadence: string;
   perks: string[];
   featured: boolean;
+}
+
+export interface Artist {
+  name: string;
+  role: string;
+  years: number;
+  bio: string;
+  quote: string;
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  text: string;
+}
+
+export interface StudioInfo {
+  name: string;
+  tagline: string;
+  address: string;
+  hours: string;
+  instagram: string;
 }

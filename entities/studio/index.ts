@@ -1,9 +1,12 @@
 export { STUDIO_DATA } from "./model/data";
 export type {
-  Service,
-  GalleryItem,
-  MembershipTier,
+  Artist,
   Category,
+  GalleryItem,
   GalleryTag,
+  MembershipTier,
   MembershipTierName,
+  Service,
+  StudioInfo,
+  Testimonial,
 } from "./model/types";
