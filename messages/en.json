@@ -277,5 +277,15 @@
     "description": "A private nail atelier — one chair, one hour, one quiet ritual at a time.",
     "tagline": "A private nail atelier",
     "og_title": "Violetta Beauty"
+  },
+  "Error": {
+    "meta_title": "Something slipped",
+    "eyebrow": "Off menu",
+    "plate": "PLATE 5XX",
+    "title": "Something slipped<br/>off the menu.",
+    "paragraph": "A short tremor in the kitchen. Try again — most courses come back on their feet.",
+    "cta_retry": "Try again",
+    "cta_home": "Return to the atelier",
+    "digest_label": "Reference"
   }
 }
