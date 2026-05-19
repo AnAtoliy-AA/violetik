@@ -1,0 +1,64 @@
+"use client";
+
+import { motion, useReducedMotion } from "motion/react";
+import type { NailTilePalette, NailTileVariant } from "@/shared/ui/nail-tile";
+import { Eyebrow } from "@/shared/ui/eyebrow";
+import { NailFan } from "@/shared/ui/nail-fan";
+import { NailTile } from "@/shared/ui/nail-tile";
+
+export interface OnboardingSlideProps {
+  palette: NailTilePalette;
+  variant: NailTileVariant;
+  active: boolean;
+  eyebrow: string;
+  title: string;
+  body: string;
+}
+
+export function OnboardingSlide({
+  palette,
+  variant,
+  active,
+  eyebrow,
+  title,
+  body,
+}: OnboardingSlideProps) {
+  const reduceMotion = useReducedMotion();
+  const fanPalette: NailTilePalette = [palette[0], "#14091a"];
+
+  return (
+    <div className="flex h-full w-full shrink-0 flex-col">
+      <div className="relative h-[60%] overflow-hidden">
+        <NailTile palette={palette} variant={variant} className="size-full" />
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-[20%] -right-[10%] h-[60%] w-[70%]"
+          initial={false}
+          animate={{
+            y: active || reduceMotion ? 0 : 40,
+            rotate: -8,
+            opacity: 0.92,
+          }}
+          transition={{ duration: reduceMotion ? 0 : 0.9, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <NailFan palette={fanPalette} count={4} className="size-full" />
+        </motion.div>
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, transparent 50%, color-mix(in oklab, var(--color-surface) 80%, transparent))",
+          }}
+        />
+      </div>
+      <div className="flex flex-1 flex-col justify-center bg-surface p-6">
+        <Eyebrow gold>{eyebrow}</Eyebrow>
+        <h2 className="mb-3 mt-2.5 font-display text-[36px] font-normal italic">
+          {title}
+        </h2>
+        <p className="m-0 text-[15px] leading-[1.55] text-text-2">{body}</p>
+      </div>
+    </div>
+  );
+}
