@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Cormorant_Garamond, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
@@ -50,6 +50,10 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+export const viewport: Viewport = {
+  themeColor: "#100612",
+};
+
 export async function generateMetadata({
   params,
 }: {
@@ -64,6 +68,7 @@ export async function generateMetadata({
     metadataBase: new URL(SITE_URL),
     title: name,
     description,
+    manifest: "/manifest.webmanifest",
     openGraph: {
       title: name,
       description,
