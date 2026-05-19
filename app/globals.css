@@ -42,11 +42,9 @@
   --animate-float-in: floatIn var(--duration-DEFAULT) var(--ease-out) both;
   --animate-mask-up: maskUp 900ms var(--ease-out) both;
   --animate-letter-in: letterIn 1.1s var(--ease-out) both;
-}
 
-/* Non-utility token: gold gradient (used in helper classes + ad-hoc styles) */
-:root {
-  --gold-grad: linear-gradient(
+  /* Gold gradient as a bg-image utility token (generates `bg-gold`) */
+  --background-image-gold: linear-gradient(
     135deg,
     #b8956a 0%,
     #e8cf99 25%,
@@ -54,6 +52,11 @@
     #d4b27a 65%,
     #a07b48 100%
   );
+}
+
+/* Alias so existing :root-style references to --gold-grad keep working */
+:root {
+  --gold-grad: var(--background-image-gold);
 }
 
 @keyframes shimmer {
