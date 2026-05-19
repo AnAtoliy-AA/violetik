@@ -30,6 +30,16 @@
     "membership_link": "Посмотреть тарифы",
     "footer_copyright": "© MMXXVI · Все права защищены"
   },
+  "Master": {
+    "meta_title": "Мастер",
+    "plate_title": "Мастер",
+    "frame_mark": "Виолетта · MMXIV",
+    "voices_eyebrow": "Голоса",
+    "stat_years": "Лет",
+    "stat_chair": "Кресло",
+    "stat_sets": "Сетов",
+    "cta_reserve": "Записаться к Виолетте"
+  },
   "Booking": {
     "meta_title": "Бронирование",
     "step_counter": "Шаг {current} из {total}",

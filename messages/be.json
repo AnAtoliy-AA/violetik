@@ -30,6 +30,16 @@
     "membership_link": "Паглядзець тарыфы",
     "footer_copyright": "© MMXXVI · Усе правы абароненыя"
   },
+  "Master": {
+    "meta_title": "Майстар",
+    "plate_title": "Майстар",
+    "frame_mark": "Віалета · MMXIV",
+    "voices_eyebrow": "Галасы",
+    "stat_years": "Гадоў",
+    "stat_chair": "Крэсла",
+    "stat_sets": "Сэтаў",
+    "cta_reserve": "Запісацца да Віалеты"
+  },
   "Booking": {
     "meta_title": "Браніраванне",
     "step_counter": "Крок {current} з {total}",
