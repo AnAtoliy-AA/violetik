@@ -7,9 +7,13 @@ test("renders the membership hero and three tier cards at /en/membership", async
   await expect(
     page.getByRole("heading", { level: 1, name: /Become a member/i }),
   ).toBeVisible();
-  await expect(page.getByText("Petale")).toBeVisible();
-  await expect(page.getByText("Violette")).toBeVisible();
-  await expect(page.getByText("Atelier")).toBeVisible();
+  // Tier names appear both in the cards and in the CTA links ("Join Violette"),
+  // so scope assertions to the cards themselves (rendered as <article>).
+  const cards = page.getByRole("article");
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0)).toContainText("Petale");
+  await expect(cards.nth(1)).toContainText("Violette");
+  await expect(cards.nth(2)).toContainText("Atelier");
   await expect(page.getByText(/Most chosen/i)).toBeVisible();
 });
 

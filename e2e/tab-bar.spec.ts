@@ -20,7 +20,7 @@ test.describe("TabBar — appears on tab-bar routes", () => {
 test("the tab matching the current route is aria-current", async ({ page }) => {
   await page.goto("/en/gallery");
   const nav = page.getByRole("navigation", { name: /Primary navigation/i });
-  const current = nav.getByRole("link", { current: "page" });
+  const current = nav.locator('[aria-current="page"]');
   await expect(current).toHaveAttribute("href", /\/en\/gallery$/);
 });
 
@@ -29,7 +29,7 @@ test("clicking a tab navigates and updates aria-current", async ({ page }) => {
   const nav = page.getByRole("navigation", { name: /Primary navigation/i });
   await nav.getByRole("link", { name: /Gallery/i }).click();
   await expect(page).toHaveURL(/\/en\/gallery$/);
-  const current = nav.getByRole("link", { current: "page" });
+  const current = nav.locator('[aria-current="page"]');
   await expect(current).toHaveAttribute("href", /\/en\/gallery$/);
 });
 
