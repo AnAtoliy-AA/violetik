@@ -1,0 +1,68 @@
+"use client";
+
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import type { Service } from "@/entities/studio";
+import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
+import { Plate } from "@/shared/ui/plate";
+
+export interface DetailHeroProps {
+  service: Service;
+  plateNumber: number;
+  variant: NailTileVariant;
+  palette: readonly [string, string];
+  durationLabel: string;
+}
+
+export function DetailHero({
+  service,
+  plateNumber,
+  variant,
+  palette,
+  durationLabel,
+}: DetailHeroProps) {
+  const reduceMotion = useReducedMotion();
+  const { scrollY } = useScroll();
+
+  const heroY = useTransform(scrollY, [0, 500], [0, -225]);
+  const heroScale = useTransform(scrollY, [0, 600], [1, 1.2]);
+
+  const heroStyle = reduceMotion
+    ? undefined
+    : { y: heroY, scale: heroScale };
+
+  return (
+    <div className="relative h-[440px] overflow-hidden">
+      <motion.div
+        className="absolute inset-0"
+        style={heroStyle}
+        aria-hidden
+      >
+        <NailTile palette={palette} variant={variant} className="size-full" />
+      </motion.div>
+
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to bottom, color-mix(in oklab, var(--color-bg) 40%, transparent) 0%, transparent 30%, var(--color-bg) 100%)",
+        }}
+      />
+
+      <div className="absolute inset-x-[22px] bottom-[22px]">
+        <Plate number={plateNumber} label={service.category.toUpperCase()} />
+        <h1 className="my-3 mb-1 font-display text-[56px] font-light italic leading-[0.95] tracking-[-0.025em]">
+          {service.name}.
+        </h1>
+        <div className="mt-3.5 flex items-baseline justify-between border-t-[0.5px] border-line-strong pt-3.5">
+          <span className="font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
+            {durationLabel}
+          </span>
+          <span className="font-display text-[24px] italic leading-none text-gold">
+            €{service.price}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
