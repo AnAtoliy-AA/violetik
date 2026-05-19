@@ -208,5 +208,25 @@
       "Lace": "Кружево",
       "Bridal": "Свадебный"
     }
+  },
+  "Profile": {
+    "meta_title": "Аккаунт",
+    "plate_title": "Аккаунт",
+    "member_tag": "Член · {tier}",
+    "joined": "Присоединилась в {year}",
+    "next_visit_eyebrow": "Следующий визит",
+    "countdown": {
+      "today": "Сегодня",
+      "tomorrow": "Завтра",
+      "in_days": "Через {n} дн."
+    },
+    "quick_links_aria": "Ссылки аккаунта",
+    "quick_links": {
+      "bookings": "Мои записи",
+      "membership": "Карта члена",
+      "aftercare": "Уход и меню",
+      "studio": "Студия"
+    },
+    "history_eyebrow": "История визитов"
   }
 }

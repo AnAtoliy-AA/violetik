@@ -1,10 +1,12 @@
 import type {
   Artist,
+  CustomerProfile,
   GalleryItem,
   MembershipTier,
   Service,
   StudioInfo,
   Testimonial,
+  Visit,
 } from "./types";
 
 const studio: StudioInfo = {
@@ -187,6 +189,57 @@ const membership: MembershipTier[] = [
   },
 ];
 
+const profile: CustomerProfile = {
+  name: "Lara K.",
+  membership: "Violette",
+  joined: 2024,
+  palette: ["#d9a3b6", "#7d3a6f"],
+};
+
+const visits: Visit[] = [
+  {
+    id: "v-next",
+    serviceId: "gel",
+    date: "2026-06-07",
+    time: "16:30",
+    price: 145,
+    status: "upcoming",
+    daysAway: 4,
+  },
+  {
+    id: "v-1",
+    serviceId: "signature",
+    date: "2026-05-12",
+    time: "11:00",
+    price: 95,
+    status: "past",
+  },
+  {
+    id: "v-2",
+    serviceId: "editorial",
+    date: "2026-04-22",
+    time: "14:00",
+    price: 195,
+    status: "past",
+  },
+  {
+    id: "v-3",
+    serviceId: "pedi",
+    date: "2026-03-30",
+    time: "10:30",
+    price: 110,
+    status: "past",
+  },
+  {
+    id: "v-4",
+    serviceId: "gel",
+    date: "2026-03-04",
+    time: "17:00",
+    price: 145,
+    status: "past",
+  },
+];
+
 export const STUDIO_DATA = {
   studio,
   artist,
@@ -194,4 +247,6 @@ export const STUDIO_DATA = {
   gallery,
   testimonials,
   membership,
+  profile,
+  visits,
 } as const;
