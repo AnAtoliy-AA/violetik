@@ -30,6 +30,23 @@
     "membership_link": "Паглядзець тарыфы",
     "footer_copyright": "© MMXXVI · Усе правы абароненыя"
   },
+  "Membership": {
+    "meta_title": "Сяброўства",
+    "plate_title": "Сяброўства",
+    "eyebrow": "Па запрашэнні · Вузкі круг",
+    "hero_title": "Станьце <em>сябрам</em>.",
+    "hero_paragraph": "Невялікі круг сталых гасцей. Тры узроўні, адно крэсла, поўная ўвага.",
+    "billing_aria": "Перыядычнасць аплаты",
+    "billing_monthly": "Штомесяц",
+    "billing_annual": "Гадавая · 2 мес бясплатна",
+    "cadence_month": "/ месяц",
+    "cadence_year": "/ год",
+    "price_free": "Бясплатна",
+    "most_chosen": "Часцей за ўсё",
+    "cta_stay_free": "Застацца бясплатным",
+    "cta_join": "Далучыцца да {tier}",
+    "footnote": "Сяброўства можна паставіць на паўзу ў любы момант. Адмена ў адзін клік — без званкоў і формаў."
+  },
   "Master": {
     "meta_title": "Майстар",
     "plate_title": "Майстар",
