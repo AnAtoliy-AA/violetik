@@ -1,94 +1,197 @@
-// TODO: replace with VIOLETTA_DATA extracted from `Violetta Beauty.html`
-// prototype's `src/components.jsx`. Shape is final; values are placeholders.
+import type {
+  Artist,
+  GalleryItem,
+  MembershipTier,
+  Service,
+  StudioInfo,
+  Testimonial,
+} from "./types";
 
-import type { GalleryItem, MembershipTier, Service } from "./types";
+const studio: StudioInfo = {
+  name: "Violetta Beauty",
+  tagline: "A private nail atelier",
+  address: "By appointment · Verbena Lane 14, Studio B",
+  hours: "Tue – Sat · 10:00 – 19:00",
+  instagram: "@violetta.atelier",
+};
+
+const artist: Artist = {
+  name: "Violetta Marchenko",
+  role: "Master nail artist & founder",
+  years: 11,
+  bio:
+    "Trained in Milan and Kyiv, Violetta runs a one-chair atelier — one guest at a time, by appointment only. " +
+    "Specialising in editorial nail design, glass shapes and Japanese gel.",
+  quote:
+    "A manicure is the smallest piece of jewellery a woman wears every day.",
+};
 
 const services: Service[] = [
   {
-    id: "care-classic",
-    name: "Classic Care",
+    id: "signature",
+    name: "Signature Manicure",
     category: "Care",
-    duration: "60 min",
-    price: 65,
-    blurb: "Shape, cuticle, and a quiet hand polish.",
-    includes: ["File and shape", "Cuticle care", "Hand massage", "Polish"],
-    hero: "care-classic",
-  },
-  {
-    id: "gel-signature",
-    name: "Signature Gel",
-    category: "Gel",
     duration: "75 min",
     price: 95,
-    blurb: "Long-wear gel with a museum-grade finish.",
-    includes: ["Prep and shape", "Gel base", "2 colour coats", "Top seal"],
-    hero: "gel-signature",
+    blurb:
+      "Russian dry technique, cuticle work, hydration ritual & gloss finish.",
+    includes: [
+      "Hand soak in rose & milk",
+      "Russian e-file manicure",
+      "Cuticle reconstruction",
+      "Bespoke gloss",
+    ],
+    hero: "manicure",
   },
   {
-    id: "design-couture",
-    name: "Couture Design",
-    category: "Design",
+    id: "gel",
+    name: "Couture Gel",
+    category: "Gel",
     duration: "120 min",
-    price: 180,
-    blurb: "Hand-painted accents, foils, or chrome.",
-    includes: ["Consultation", "Hand-painted accents", "Foil or chrome"],
-    hero: "design-couture",
+    price: 145,
+    blurb:
+      "Long-wear Japanese gel in a single tone or a curated nude palette.",
+    includes: [
+      "Signature prep",
+      "Japanese gel application",
+      "Edge sculpt & shape",
+      "Two-week guarantee",
+    ],
+    hero: "gel",
   },
   {
-    id: "form-extension",
-    name: "Form Extension",
-    category: "Form",
+    id: "editorial",
+    name: "Editorial Art",
+    category: "Design",
     duration: "150 min",
-    price: 220,
-    blurb: "Sculpted extensions with a structural finish.",
-    includes: ["Form prep", "Sculpted apex", "Refined finish"],
-    hero: "form-extension",
+    price: 195,
+    blurb:
+      "Bespoke nail design — chrome, lace, hand-painted miniatures.",
+    includes: [
+      "Mood consultation",
+      "Hand-painted artwork",
+      "3D detailing on request",
+      "Photography of the set",
+    ],
+    hero: "editorial",
+  },
+  {
+    id: "extensions",
+    name: "Glass Extensions",
+    category: "Form",
+    duration: "180 min",
+    price: 240,
+    blurb:
+      "Sculpted soft-gel extensions in glass, almond or ballerina silhouettes.",
+    includes: [
+      "Form sculpting",
+      "Architectural shape",
+      "Strength layer",
+      "Mirror buff & seal",
+    ],
+    hero: "extensions",
+  },
+  {
+    id: "pedi",
+    name: "Spa Pedicure",
+    category: "Care",
+    duration: "90 min",
+    price: 110,
+    blurb:
+      "Foot bath in violet salts, gentle exfoliation and lacquered finish.",
+    includes: [
+      "Violet salt bath",
+      "Heel restoration",
+      "Massage with cassis oil",
+      "Lacquer or gel finish",
+    ],
+    hero: "pedi",
+  },
+  {
+    id: "removal",
+    name: "Gentle Removal",
+    category: "Care",
+    duration: "45 min",
+    price: 40,
+    blurb: "Soak-off, nail rehab and a single coat of strengthener.",
+    includes: ["Soak-off", "Nail rehab", "Strengthener", "Cuticle oil"],
+    hero: "removal",
   },
 ];
 
 const gallery: GalleryItem[] = [
-  { id: "g1", tag: "Editorial", palette: ["#7d3a6f", "#100612"], h: 280 },
-  { id: "g2", tag: "Gel", palette: ["#c9a96e", "#1f0e25"], h: 240 },
-  { id: "g3", tag: "Chrome", palette: ["#e8cf99", "#2a1432"], h: 260 },
-  { id: "g4", tag: "Lace", palette: ["#d9a3b6", "#18091c"], h: 220 },
-  { id: "g5", tag: "Bridal", palette: ["#fff5d6", "#100612"], h: 300 },
-  { id: "g6", tag: "Editorial", palette: ["#9d7bc7", "#18091c"], h: 240 },
+  { id: "g1", tag: "Chrome", palette: ["#c9a96e", "#7d3a6f"], h: 220 },
+  { id: "g2", tag: "Editorial", palette: ["#d9a3b6", "#1a0f1f"], h: 280 },
+  { id: "g3", tag: "Gel", palette: ["#9d7bc7", "#3a2050"], h: 200 },
+  { id: "g4", tag: "Lace", palette: ["#f3ead8", "#7d3a6f"], h: 260 },
+  { id: "g5", tag: "Chrome", palette: ["#e8cf99", "#2a1a30"], h: 240 },
+  { id: "g6", tag: "Editorial", palette: ["#7d3a6f", "#14091a"], h: 300 },
+  { id: "g7", tag: "Bridal", palette: ["#f3ead8", "#d9a3b6"], h: 220 },
+  { id: "g8", tag: "Gel", palette: ["#9d7bc7", "#c9a96e"], h: 250 },
+];
+
+const testimonials: Testimonial[] = [
+  {
+    id: "t1",
+    name: "Lara K.",
+    role: "Member · 3y",
+    text:
+      "It's a ritual, not a manicure. The studio smells of fig and amber. I never go anywhere else.",
+  },
+  {
+    id: "t2",
+    name: "Iris M.",
+    role: "Member · 1y",
+    text:
+      "Violetta's hands are a museum. I came for nails and left with art on my fingertips.",
+  },
+  {
+    id: "t3",
+    name: "Joelle P.",
+    role: "Member · 2y",
+    text: "Quiet, private, exquisite. The kind of hour you don't share — you keep.",
+  },
 ];
 
 const membership: MembershipTier[] = [
   {
     tier: "Petale",
-    price: 60,
-    cadence: "per month",
-    perks: ["One signature gel per month", "Booking priority"],
+    price: 0,
+    cadence: "Open",
+    perks: ["Online booking", "Two reminders", "Gallery access"],
     featured: false,
   },
   {
     tier: "Violette",
-    price: 120,
-    cadence: "per month",
+    price: 180,
+    cadence: "/ month",
     perks: [
-      "Two signature gels per month",
-      "10% off design upgrades",
-      "Booking priority",
+      "Two visits per month",
+      "Priority calendar",
+      "Welcome flute & ritual",
+      "10% on art & extensions",
     ],
     featured: true,
   },
   {
     tier: "Atelier",
-    price: 220,
-    cadence: "per month",
+    price: 420,
+    cadence: "/ month",
     perks: [
-      "Unlimited care + 2 design sessions",
-      "Early access to new finishes",
-      "Companion treatment per quarter",
+      "Unlimited visits",
+      "After-hours access",
+      "Travel kit & home care",
+      "First look at collections",
     ],
     featured: false,
   },
 ];
 
 export const STUDIO_DATA = {
+  studio,
+  artist,
   services,
   gallery,
+  testimonials,
   membership,
 } as const;

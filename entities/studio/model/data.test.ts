@@ -24,9 +24,9 @@ describe("STUDIO_DATA", () => {
     expect(STUDIO_DATA.membership.filter((m) => m.featured)).toHaveLength(1);
   });
 
-  it("gallery item heights are within the masonry range (220–300)", () => {
+  it("gallery item heights are within the masonry range (200–300)", () => {
     for (const item of STUDIO_DATA.gallery) {
-      expect(item.h).toBeGreaterThanOrEqual(220);
+      expect(item.h).toBeGreaterThanOrEqual(200);
       expect(item.h).toBeLessThanOrEqual(300);
     }
   });

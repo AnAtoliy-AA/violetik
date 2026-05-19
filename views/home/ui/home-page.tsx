@@ -1,0 +1,29 @@
+import { AppHeader } from "@/widgets/app-header";
+import { AnnouncementCapsule } from "./sections/announcement-capsule";
+import { GalleryStrip } from "./sections/gallery-strip";
+import { HomeFooter } from "./sections/home-footer";
+import { HomeHero } from "./sections/home-hero";
+import { MagazineHeader } from "./sections/magazine-header";
+import { MasterStrip } from "./sections/master-strip";
+import { MembershipCard } from "./sections/membership-card";
+import { SignaturesList } from "./sections/signatures-list";
+import { TestimonialCard } from "./sections/testimonial-card";
+
+export function HomePage() {
+  return (
+    <div className="pb-10">
+      <AppHeader />
+      <section className="relative px-[22px] pb-9 pt-2.5">
+        <MagazineHeader />
+        <HomeHero />
+      </section>
+      <AnnouncementCapsule />
+      <SignaturesList />
+      <MasterStrip />
+      <GalleryStrip />
+      <TestimonialCard />
+      <MembershipCard />
+      <HomeFooter />
+    </div>
+  );
+}
