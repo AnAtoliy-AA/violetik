@@ -1,14 +1,23 @@
 import { test, expect } from "@playwright/test";
 
-test("renders English greeting at default locale", async ({ page }) => {
+test("/ redirects to the default-locale welcome screen", async ({ page }) => {
   await page.goto("/");
-  await expect(page).toHaveURL(/\/en\b/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Hello");
+  await expect(page).toHaveURL(/\/en\/welcome\b/);
+  await expect(page.getByLabel("Violetta")).toBeVisible();
 });
 
-test("switches to Belarusian via locale switcher", async ({ page }) => {
-  await page.goto("/en");
-  await page.getByLabel("Language").selectOption("be");
-  await expect(page).toHaveURL(/\/be\b/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Прывітанне");
+test("renders the English tagline and CTAs at /en/welcome", async ({ page }) => {
+  await page.goto("/en/welcome");
+  await expect(page.getByText(/A private nail atelier/i)).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Enter the atelier/i }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /I already have an account/i }),
+  ).toBeVisible();
+});
+
+test("renders the Belarusian tagline at /be/welcome", async ({ page }) => {
+  await page.goto("/be/welcome");
+  await expect(page.getByText(/Прыватнае атэлье манікюру/i)).toBeVisible();
 });
