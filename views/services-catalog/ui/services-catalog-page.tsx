@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { ServiceMenuItem } from "@/entities/service";
 import { STUDIO_DATA, type Category } from "@/entities/studio";
 import { AppHeader } from "@/widgets/app-header";
+import { TabBar } from "@/widgets/tab-bar";
 import type { NailTileVariant } from "@/shared/ui/nail-tile";
 import { CategoryChips, type ChipValue } from "./category-chips";
 
@@ -37,7 +38,7 @@ export function ServicesCatalogPage() {
   );
 
   return (
-    <div className="pb-10">
+    <div className="pb-28">
       <AppHeader />
 
       <section className="px-[22px] pb-[18px]">
@@ -83,6 +84,7 @@ export function ServicesCatalogPage() {
           ))
         )}
       </div>
+      <TabBar />
     </div>
   );
 }

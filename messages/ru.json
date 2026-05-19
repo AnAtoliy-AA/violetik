@@ -228,5 +228,20 @@
       "studio": "Студия"
     },
     "history_eyebrow": "История визитов"
+  },
+  "TabBar": {
+    "aria_label": "Основная навигация",
+    "home": {
+      "label": "Дом"
+    },
+    "services": {
+      "label": "Меню"
+    },
+    "gallery": {
+      "label": "Галерея"
+    },
+    "profile": {
+      "label": "Вы"
+    }
   }
 }

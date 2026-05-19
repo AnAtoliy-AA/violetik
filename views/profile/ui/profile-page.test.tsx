@@ -14,6 +14,7 @@ vi.mock("@/i18n/navigation", () => ({
       {children}
     </a>
   ),
+  usePathname: () => "/profile",
 }));
 
 import { ProfilePage } from "./profile-page";

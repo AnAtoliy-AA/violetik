@@ -228,5 +228,20 @@
       "studio": "The studio"
     },
     "history_eyebrow": "Visit history"
+  },
+  "TabBar": {
+    "aria_label": "Primary navigation",
+    "home": {
+      "label": "Home"
+    },
+    "services": {
+      "label": "Menu"
+    },
+    "gallery": {
+      "label": "Gallery"
+    },
+    "profile": {
+      "label": "You"
+    }
   }
 }

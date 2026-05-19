@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { STUDIO_DATA, type GalleryTag } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { AppHeader } from "@/widgets/app-header";
+import { TabBar } from "@/widgets/tab-bar";
 import { GalleryCard } from "./gallery-card";
 import { GalleryLightbox } from "./gallery-lightbox";
 import { TagFilter, type TagFilterValue } from "./tag-filter";
@@ -54,7 +55,7 @@ export function GalleryPage() {
     : 0;
 
   return (
-    <div className="pb-10">
+    <div className="pb-28">
       <AppHeader back="/home" title={t("plate_title")} />
 
       <section className="px-[22px] pb-[18px]">
@@ -119,6 +120,8 @@ export function GalleryPage() {
           />
         ) : null}
       </AnimatePresence>
+
+      <TabBar />
     </div>
   );
 }

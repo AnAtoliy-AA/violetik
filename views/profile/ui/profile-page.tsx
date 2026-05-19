@@ -6,6 +6,7 @@ import { STUDIO_DATA, type Visit } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { AppHeader } from "@/widgets/app-header";
+import { TabBar } from "@/widgets/tab-bar";
 
 const QUICK_LINKS: ReadonlyArray<{ key: string; href: string }> = [
   { key: "bookings", href: "/booking/service" },
@@ -52,7 +53,7 @@ export function ProfilePage() {
   };
 
   return (
-    <div className="pb-10">
+    <div className="pb-28">
       <AppHeader title={t("plate_title")} />
 
       <section className="px-[22px] pt-4 pb-7">
@@ -151,6 +152,8 @@ export function ProfilePage() {
           ))}
         </ul>
       </section>
+
+      <TabBar />
     </div>
   );
 }
