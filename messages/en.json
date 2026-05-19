@@ -30,6 +30,14 @@
     "membership_link": "See the tiers",
     "footer_copyright": "© MMXXVI · All rights reserved"
   },
+  "ServiceDetail": {
+    "meta_subtitle": "Ritual",
+    "plate_prefix": "Plate",
+    "includes_eyebrow": "—— What it includes",
+    "recent_eyebrow": "—— Recent in this style",
+    "from": "From",
+    "cta_reserve": "Reserve a chair"
+  },
   "Services": {
     "meta_title": "The menu",
     "plate_alacarte": "A la carte",
