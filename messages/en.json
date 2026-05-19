@@ -30,6 +30,23 @@
     "membership_link": "See the tiers",
     "footer_copyright": "© MMXXVI · All rights reserved"
   },
+  "Membership": {
+    "meta_title": "Membership",
+    "plate_title": "Membership",
+    "eyebrow": "By invitation · Limited circle",
+    "hero_title": "Become a <em>member</em>.",
+    "hero_paragraph": "A small ring of regulars. Three tiers, one chair, complete attention.",
+    "billing_aria": "Billing cadence",
+    "billing_monthly": "Monthly",
+    "billing_annual": "Annual · 2 mo free",
+    "cadence_month": "/ month",
+    "cadence_year": "/ year",
+    "price_free": "Free",
+    "most_chosen": "Most chosen",
+    "cta_stay_free": "Stay free",
+    "cta_join": "Join {tier}",
+    "footnote": "Memberships pause anytime. Cancel by message — no calls, no forms."
+  },
   "Master": {
     "meta_title": "The master",
     "plate_title": "The master",
