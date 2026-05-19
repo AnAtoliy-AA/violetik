@@ -185,5 +185,28 @@
     "en": "Английский",
     "ru": "Русский",
     "be": "Белорусский"
+  },
+  "Gallery": {
+    "meta_title": "Портфолио",
+    "plate_title": "Галерея",
+    "plate_portfolio": "Портфолио",
+    "plate_count": "08 работ",
+    "eyebrow": "Том XXIV · Свежие работы",
+    "hero_title": "Свежие работы.",
+    "hero_paragraph": "Восемь сетов прошлого сезона — гель, хром, кружево, свадебный. Нажмите, чтобы рассмотреть.",
+    "filter_aria": "Фильтр по тегу",
+    "category_all": "Все",
+    "empty": "Под фильтр ничего не подходит.",
+    "lightbox_eyebrow": "Сет {number} · {tag}",
+    "lightbox_title": "Этюд: {tag}.",
+    "lightbox_caption": "Сделано Виалетой — финиш {tag}.",
+    "lightbox_close": "Закрыть",
+    "category": {
+      "Editorial": "Эдиториал",
+      "Gel": "Гель",
+      "Chrome": "Хром",
+      "Lace": "Кружево",
+      "Bridal": "Свадебный"
+    }
   }
 }

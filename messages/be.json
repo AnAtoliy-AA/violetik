@@ -185,5 +185,28 @@
     "en": "Англійская",
     "ru": "Руская",
     "be": "Беларуская"
+  },
+  "Gallery": {
+    "meta_title": "Партфоліа",
+    "plate_title": "Галерэя",
+    "plate_portfolio": "Партфоліа",
+    "plate_count": "08 працаў",
+    "eyebrow": "Том XXIV · Свежыя працы",
+    "hero_title": "Свежыя працы.",
+    "hero_paragraph": "Восем сэтаў мінулага сезона — гель, хром, карункі, вясельны. Націсніце, каб разгледзець.",
+    "filter_aria": "Фільтр па тэгу",
+    "category_all": "Усе",
+    "empty": "Пад фільтр нічога не падыходзіць.",
+    "lightbox_eyebrow": "Сэт {number} · {tag}",
+    "lightbox_title": "Этуд: {tag}.",
+    "lightbox_caption": "Зроблена Віалетай — фініш {tag}.",
+    "lightbox_close": "Закрыць",
+    "category": {
+      "Editorial": "Эдыторыял",
+      "Gel": "Гель",
+      "Chrome": "Хром",
+      "Lace": "Карункі",
+      "Bridal": "Вясельны"
+    }
   }
 }
