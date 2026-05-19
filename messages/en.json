@@ -262,5 +262,14 @@
     "hero_title": "Palette.",
     "hero_paragraph": "Pick the studio colourway. The selection persists in a cookie and applies for everyone visiting from this device.",
     "persistence_note": "Stored locally in the vio-palette cookie · 1 year"
+  },
+  "NotFound": {
+    "meta_title": "Lost in the atelier",
+    "eyebrow": "Off menu",
+    "plate_404": "PLATE 404",
+    "title": "This page<br/>is not on the menu.",
+    "paragraph": "You may have followed an old card from a past collection. Step back into the atelier — your chair is waiting.",
+    "cta_home": "Return to the atelier",
+    "cta_services": "Browse the menu"
   }
 }
