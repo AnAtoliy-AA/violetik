@@ -29,7 +29,7 @@ Run a single Vitest file: `npx vitest run path/to/file.test.tsx`. Run a single P
 - **next-themes** — class strategy, system + light + dark
 - **Vitest** + Testing Library + jsdom — config in [vitest.config.ts](vitest.config.ts) uses two projects: the default jsdom project and the `storybook` project (browser-based, via `@storybook/addon-vitest` + Playwright Chromium) that runs every story as a test
 - **Playwright** for e2e
-- **Storybook** (`@storybook/nextjs-vite`) — config in [.storybook/](.storybook/), scans `shared/`, `entities/`, `features/`, `widgets/` for `*.stories.tsx`; Tailwind globals imported in [.storybook/preview.tsx](.storybook/preview.tsx)
+- **Storybook** (`@storybook/nextjs-vite`) — config in [.storybook/](.storybook/), scans `shared/`, `entities/`, `features/`, `widgets/`, `views/` for `*.stories.tsx`; Tailwind globals imported in [.storybook/preview.tsx](.storybook/preview.tsx)
 - **Husky** git hooks: `pre-commit` runs `lint` + `test`; `pre-push` runs `build` ([.husky/](.husky/))
 
 ## Architecture — Feature-Sliced Design (FSD)
@@ -39,7 +39,7 @@ This project follows **[Feature-Sliced Design](https://feature-sliced.github.io/
 | Layer | Purpose |
 |---|---|
 | `app/` | Next.js App Router routes + global init (providers, root layout). Also the FSD `app` layer. |
-| `pages/` | Page-level compositions when Next.js route files need more than a thin wrapper. |
+| `views/` | Page-level compositions (FSD `pages` layer renamed to avoid clashing with Next's legacy `pages/` Pages Router directory). |
 | `widgets/` | Large self-contained UI blocks composed of features + entities. |
 | `features/` | User-facing actions / interactive units (e.g. `theme-switcher`, `locale-switcher`). |
 | `entities/` | Business entities (user, post, …). |

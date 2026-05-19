@@ -48,6 +48,7 @@ storybook-static
 /test-results
 /blob-report
 /playwright/.cache
+/.playwright-mcp
 
 # vitest
 /.vitest-reports
