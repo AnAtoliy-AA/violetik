@@ -15,6 +15,7 @@ vi.mock("@/i18n/navigation", () => ({
       {children}
     </a>
   ),
+  usePathname: () => "/services",
 }));
 
 import { ServicesCatalogPage } from "./services-catalog-page";

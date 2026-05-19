@@ -16,6 +16,7 @@ vi.mock("@/i18n/navigation", () => ({
       {children}
     </a>
   ),
+  usePathname: () => "/gallery",
 }));
 
 vi.mock("motion/react", async (importOriginal) => {

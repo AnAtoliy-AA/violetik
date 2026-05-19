@@ -1,4 +1,5 @@
 import { AppHeader } from "@/widgets/app-header";
+import { TabBar } from "@/widgets/tab-bar";
 import { AnnouncementCapsule } from "./sections/announcement-capsule";
 import { GalleryStrip } from "./sections/gallery-strip";
 import { HomeFooter } from "./sections/home-footer";
@@ -11,7 +12,7 @@ import { TestimonialCard } from "./sections/testimonial-card";
 
 export function HomePage() {
   return (
-    <div className="pb-10">
+    <div className="pb-28">
       <AppHeader />
       <section className="relative px-[22px] pb-9 pt-2.5">
         <MagazineHeader />
@@ -24,6 +25,7 @@ export function HomePage() {
       <TestimonialCard />
       <MembershipCard />
       <HomeFooter />
+      <TabBar />
     </div>
   );
 }

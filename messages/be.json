@@ -228,5 +228,20 @@
       "studio": "Студыя"
     },
     "history_eyebrow": "Гісторыя візітаў"
+  },
+  "TabBar": {
+    "aria_label": "Асноўная навігацыя",
+    "home": {
+      "label": "Дом"
+    },
+    "services": {
+      "label": "Меню"
+    },
+    "gallery": {
+      "label": "Галерэя"
+    },
+    "profile": {
+      "label": "Вы"
+    }
   }
 }
