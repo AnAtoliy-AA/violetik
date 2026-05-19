@@ -1,0 +1,44 @@
+import { Suspense } from "react";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { setRequestLocale, getTranslations } from "next-intl/server";
+import { routing } from "@/i18n/routing";
+import {
+  BookingPage,
+  BOOKING_STEPS,
+  isBookingStep,
+} from "@/views/booking";
+
+type Params = { locale: string; step: string };
+
+export function generateStaticParams() {
+  return routing.locales.flatMap((locale) =>
+    BOOKING_STEPS.map((step) => ({ locale, step })),
+  );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { locale, step } = await params;
+  if (!isBookingStep(step)) return { title: "Violetta" };
+  const t = await getTranslations({ locale, namespace: "Booking" });
+  return { title: `Violetta — ${t("meta_title")} · ${t(`steps.${step}`)}` };
+}
+
+export default async function BookingRoute({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { locale, step } = await params;
+  setRequestLocale(locale);
+  if (!isBookingStep(step)) notFound();
+  return (
+    <Suspense fallback={null}>
+      <BookingPage step={step} />
+    </Suspense>
+  );
+}
