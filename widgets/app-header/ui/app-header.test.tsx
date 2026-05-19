@@ -1,5 +1,19 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import type { AnchorHTMLAttributes } from "react";
 import { render, screen } from "@testing-library/react";
+
+vi.mock("@/i18n/navigation", () => ({
+  Link: ({
+    href,
+    children,
+    ...rest
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+
 import { AppHeader } from "./app-header";
 
 describe("AppHeader", () => {
@@ -24,6 +38,25 @@ describe("AppHeader", () => {
     expect(
       screen.getByRole("button", { name: /show navigation/i }),
     ).toBeInTheDocument();
+  });
+
+  it("renders a back link instead of the wordmark when back is set", () => {
+    render(<AppHeader back="/services" />);
+    expect(screen.queryByText("Violetta")).not.toBeInTheDocument();
+    const back = screen.getByRole("link", { name: /go back/i });
+    expect(back).toHaveAttribute("href", "/services");
+  });
+
+  it("uses a custom ariaBackLabel when provided", () => {
+    render(<AppHeader back="/services" ariaBackLabel="Back to catalog" />);
+    expect(
+      screen.getByRole("link", { name: /back to catalog/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("centres a title when provided", () => {
+    render(<AppHeader title="PLATE · 02" />);
+    expect(screen.getByText("PLATE · 02")).toBeInTheDocument();
   });
 
   it("allows replacing the menu button entirely via the menuButton slot", () => {

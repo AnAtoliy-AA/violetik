@@ -22,3 +22,15 @@ type Story = StoryObj<typeof AppHeader>;
 export const Default: Story = {};
 
 export const WithoutStatusBar: Story = { args: { showStatusBar: false } };
+
+export const DetailScreen: Story = {
+  args: { back: "/services", title: "PLATE · 02" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Detail-screen variant: back arrow replaces the wordmark on the left, a centred mono-caps title replaces nothing visually (it's absolutely positioned over the row). Used by the Service detail screen and any future detail/edit views.",
+      },
+    },
+  },
+};

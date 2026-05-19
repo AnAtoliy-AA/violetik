@@ -1,11 +1,20 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/cn";
 import { StatusBar } from "@/shared/ui/status-bar";
 import { Wordmark } from "@/shared/ui/wordmark";
 
 export interface AppHeaderProps extends HTMLAttributes<HTMLElement> {
   showStatusBar?: boolean;
+  /** If set, replaces the default Wordmark with a centred mono caps title. */
+  title?: string;
+  /** If set, replaces the wordmark slot with a round back-arrow Link to this locale-aware href. */
+  back?: string;
+  /** A11y label for the default back arrow. */
+  ariaBackLabel?: string;
+  /** Slot to override the right-hand menu button entirely. */
   menuButton?: ReactNode;
+  /** A11y label for the default hamburger button. */
   ariaMenuLabel?: string;
 }
 
@@ -26,22 +35,56 @@ function HamburgerIcon() {
   );
 }
 
+function BackIcon() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      width={14}
+      height={14}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+    >
+      <path d="M19 12H5M11 6l-6 6 6 6" />
+    </svg>
+  );
+}
+
+const circleButtonClass = cn(
+  "inline-flex size-[38px] items-center justify-center rounded-full border-[0.5px] border-line-strong bg-transparent text-text",
+  "transition-colors duration-fast ease-out hover:bg-surface/60",
+  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+);
+
 export function AppHeader({
   showStatusBar = true,
+  title,
+  back,
+  ariaBackLabel = "Go back",
   menuButton,
   ariaMenuLabel = "Open menu",
   className,
   ...rest
 }: AppHeaderProps) {
+  const left = back ? (
+    <Link
+      href={back}
+      aria-label={ariaBackLabel}
+      className={circleButtonClass}
+    >
+      <BackIcon />
+    </Link>
+  ) : (
+    <Wordmark size="xs" />
+  );
+
   const menu = menuButton ?? (
     <button
       type="button"
       aria-label={ariaMenuLabel}
-      className={cn(
-        "inline-flex size-[38px] items-center justify-center rounded-full border-[0.5px] border-line-strong bg-transparent text-text",
-        "transition-colors duration-fast ease-out hover:bg-surface/60",
-        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-      )}
+      className={circleButtonClass}
     >
       <HamburgerIcon />
     </button>
@@ -50,8 +93,13 @@ export function AppHeader({
   return (
     <header className={cn(className)} {...rest}>
       {showStatusBar ? <StatusBar /> : null}
-      <div className="flex items-center justify-between px-[22px] pb-2 pt-[10px]">
-        <Wordmark size="xs" />
+      <div className="relative flex items-center justify-between px-[22px] pb-2 pt-[10px]">
+        {left}
+        {title ? (
+          <span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[9px] uppercase tracking-[0.32em] text-text-2">
+            {title}
+          </span>
+        ) : null}
         {menu}
       </div>
     </header>
