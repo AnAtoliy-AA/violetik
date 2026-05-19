@@ -185,5 +185,28 @@
     "en": "English",
     "ru": "Russian",
     "be": "Belarusian"
+  },
+  "Gallery": {
+    "meta_title": "Portfolio",
+    "plate_title": "Gallery",
+    "plate_portfolio": "Portfolio",
+    "plate_count": "08 Works",
+    "eyebrow": "Vol XXIV · Recent works",
+    "hero_title": "Recent works.",
+    "hero_paragraph": "Eight sets from the past season — gel, chrome, lace, bridal. Tap a tile to look closer.",
+    "filter_aria": "Filter by tag",
+    "category_all": "All",
+    "empty": "No works match this filter yet.",
+    "lightbox_eyebrow": "Set {number} · {tag}",
+    "lightbox_title": "A study in {tag}.",
+    "lightbox_caption": "Sculpted by Violetta — {tag} finish.",
+    "lightbox_close": "Close",
+    "category": {
+      "Editorial": "Editorial",
+      "Gel": "Gel",
+      "Chrome": "Chrome",
+      "Lace": "Lace",
+      "Bridal": "Bridal"
+    }
   }
 }
