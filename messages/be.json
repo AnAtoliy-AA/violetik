@@ -30,6 +30,24 @@
     "membership_link": "Паглядзець тарыфы",
     "footer_copyright": "© MMXXVI · Усе правы абароненыя"
   },
+  "Onboarding": {
+    "meta_title": "Знаёмства",
+    "skip": "Прапусціць",
+    "cta_continue": "Далей",
+    "cta_begin": "Пачаць",
+    "aria_carousel": "Карусель знаёмства",
+    "aria_dots": "Індыкатар слайдаў",
+    "aria_dot": "Слайд {n} з {total}",
+    "atelier_eyebrow": "01 / АТЭЛЬЕ",
+    "atelier_title": "Студыя на аднаго",
+    "atelier_body": "У студыі ў любы час толькі адзін госць. Ніякіх чэргаў, ніякіх падслуханых размоў, ніякай спешкі — толькі ваша гадзіна.",
+    "ritual_eyebrow": "02 / РЫТУАЛ",
+    "ritual_title": "Зроблена як кутюр",
+    "ritual_body": "Кожны сэт пачынаецца з гутаркі пра настрой. Кожны фінал — фотаздымкам вашых рук.",
+    "membership_eyebrow": "03 / СЯБРОЎСТВА",
+    "membership_title": "Ваша, па запісе",
+    "membership_body": "Станьце сябрам Violette — два візіты на месяц, прыярытэтны доступ і каляндар пасля зачынення."
+  },
   "Welcome": {
     "established": "ЗАСН · MMXIV",
     "volume": "ВЫП · 24",

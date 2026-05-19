@@ -30,6 +30,24 @@
     "membership_link": "See the tiers",
     "footer_copyright": "© MMXXVI · All rights reserved"
   },
+  "Onboarding": {
+    "meta_title": "Onboarding",
+    "skip": "Skip",
+    "cta_continue": "Continue",
+    "cta_begin": "Begin",
+    "aria_carousel": "Welcome carousel",
+    "aria_dots": "Slide indicator",
+    "aria_dot": "Slide {n} of {total}",
+    "atelier_eyebrow": "01 / ATELIER",
+    "atelier_title": "A studio of one",
+    "atelier_body": "Only one guest is in the studio at a time. No queues, no overhearing, no rush — just your hour.",
+    "ritual_eyebrow": "02 / RITUAL",
+    "ritual_title": "Designed like couture",
+    "ritual_body": "Every set begins with a mood conversation. Every finish ends with photography of your hands.",
+    "membership_eyebrow": "03 / MEMBERSHIP",
+    "membership_title": "Yours, by appointment",
+    "membership_body": "Become a Violette member for two visits a month, priority access, and the after-hours calendar."
+  },
   "Welcome": {
     "established": "EST · MMXIV",
     "volume": "VOL · 24",
