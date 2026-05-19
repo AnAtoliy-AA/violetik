@@ -174,12 +174,6 @@
     "cta_enter": "Enter the atelier",
     "cta_returning": "I already have an account"
   },
-  "ThemeSwitcher": {
-    "label": "Theme",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System"
-  },
   "LocaleSwitcher": {
     "label": "Language",
     "en": "English",
@@ -243,5 +237,30 @@
     "profile": {
       "label": "You"
     }
+  },
+  "PaletteSwitcher": {
+    "label": "Palette",
+    "palettes": {
+      "aubergine": "Aubergine",
+      "rose": "Rose",
+      "lilac": "Lilac",
+      "mono": "Mono",
+      "ink": "Ink",
+      "moss": "Moss",
+      "bronze": "Bronze",
+      "pearl": "Pearl",
+      "emerald": "Emerald",
+      "sapphire": "Sapphire",
+      "ruby": "Ruby",
+      "obsidian": "Obsidian"
+    }
+  },
+  "Admin": {
+    "meta_title": "Atelier admin",
+    "plate_title": "Atelier admin",
+    "eyebrow": "Private · Studio admin",
+    "hero_title": "Palette.",
+    "hero_paragraph": "Pick the studio colourway. The selection persists in a cookie and applies for everyone visiting from this device.",
+    "persistence_note": "Stored locally in the vio-palette cookie · 1 year"
   }
 }

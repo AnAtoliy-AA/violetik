@@ -174,12 +174,6 @@
     "cta_enter": "Войти в ателье",
     "cta_returning": "У меня уже есть аккаунт"
   },
-  "ThemeSwitcher": {
-    "label": "Тема",
-    "light": "Светлая",
-    "dark": "Тёмная",
-    "system": "Системная"
-  },
   "LocaleSwitcher": {
     "label": "Язык",
     "en": "Английский",
@@ -243,5 +237,30 @@
     "profile": {
       "label": "Вы"
     }
+  },
+  "PaletteSwitcher": {
+    "label": "Палитра",
+    "palettes": {
+      "aubergine": "Aubergine",
+      "rose": "Rose",
+      "lilac": "Lilac",
+      "mono": "Mono",
+      "ink": "Ink",
+      "moss": "Moss",
+      "bronze": "Bronze",
+      "pearl": "Pearl",
+      "emerald": "Emerald",
+      "sapphire": "Sapphire",
+      "ruby": "Ruby",
+      "obsidian": "Obsidian"
+    }
+  },
+  "Admin": {
+    "meta_title": "Админка ателье",
+    "plate_title": "Админка ателье",
+    "eyebrow": "Приватно · Админ-панель",
+    "hero_title": "Палитра.",
+    "hero_paragraph": "Выберите цветовую схему студии. Выбор сохраняется в cookie и применяется для всех посетителей с этого устройства.",
+    "persistence_note": "Хранится в cookie vio-palette · 1 год"
   }
 }
