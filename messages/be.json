@@ -30,6 +30,22 @@
     "membership_link": "Паглядзець тарыфы",
     "footer_copyright": "© MMXXVI · Усе правы абароненыя"
   },
+  "Services": {
+    "meta_title": "Меню",
+    "plate_alacarte": "А-ля-карт",
+    "plate_rituals": "06 рытуалаў",
+    "hero_title": "Меню.",
+    "hero_paragraph": "Шэсць рытуалаў, адточаных гадамі. У цану ўваходзяць кансультацыя, частаванне і пост-догляд.",
+    "category_all": "Усе",
+    "filter_aria": "Фільтр па катэгорыі",
+    "empty": "Пакуль ніводны рытуал не падыходзіць пад фільтр.",
+    "category": {
+      "Care": "Догляд",
+      "Gel": "Гель",
+      "Design": "Дызайн",
+      "Form": "Форма"
+    }
+  },
   "Onboarding": {
     "meta_title": "Знаёмства",
     "skip": "Прапусціць",

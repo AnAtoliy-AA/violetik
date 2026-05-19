@@ -30,6 +30,22 @@
     "membership_link": "See the tiers",
     "footer_copyright": "© MMXXVI · All rights reserved"
   },
+  "Services": {
+    "meta_title": "The menu",
+    "plate_alacarte": "A la carte",
+    "plate_rituals": "06 Rituals",
+    "hero_title": "The menu.",
+    "hero_paragraph": "Six rituals, each shaped over years. Prices include consultation, refreshment and aftercare.",
+    "category_all": "All",
+    "filter_aria": "Filter by category",
+    "empty": "No rituals match this filter yet.",
+    "category": {
+      "Care": "Care",
+      "Gel": "Gel",
+      "Design": "Design",
+      "Form": "Form"
+    }
+  },
   "Onboarding": {
     "meta_title": "Onboarding",
     "skip": "Skip",
