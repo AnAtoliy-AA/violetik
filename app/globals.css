@@ -42,6 +42,7 @@
   --animate-float-in: floatIn var(--duration-DEFAULT) var(--ease-out) both;
   --animate-mask-up: maskUp 900ms var(--ease-out) both;
   --animate-letter-in: letterIn 1.1s var(--ease-out) both;
+  --animate-soft-pulse: softPulse 2.2s ease-in-out infinite;
 
   /* Gold gradient as a bg-image utility token (generates `bg-gold`) */
   --background-image-gold: linear-gradient(
@@ -96,6 +97,18 @@
   to {
     opacity: 1;
     transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes softPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.4);
   }
 }
 
