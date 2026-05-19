@@ -1,0 +1,17 @@
+{
+  "Home": {
+    "greeting": "Hello"
+  },
+  "ThemeSwitcher": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "LocaleSwitcher": {
+    "label": "Language",
+    "en": "English",
+    "ru": "Russian",
+    "be": "Belarusian"
+  }
+}
