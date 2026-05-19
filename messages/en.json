@@ -30,6 +30,73 @@
     "membership_link": "See the tiers",
     "footer_copyright": "© MMXXVI · All rights reserved"
   },
+  "Booking": {
+    "meta_title": "Booking",
+    "step_counter": "Step {current} of {total}",
+    "progress_aria": "Booking progress",
+    "back_aria": "Go back",
+    "cta_continue": "Continue",
+    "cta_confirm": "Confirm appointment",
+    "cta_pick_service": "Pick a ritual",
+    "cta_pick_date": "Pick a day",
+    "cta_pick_time": "Pick a time",
+    "steps": {
+      "service": "Service",
+      "date": "Date",
+      "time": "Time",
+      "confirm": "Confirm"
+    },
+    "service": {
+      "eyebrow": "Step 01 / Ritual",
+      "title": "Choose your <em>ritual</em>.",
+      "paragraph": "Pick one. You can change it any time before payment."
+    },
+    "date": {
+      "eyebrow": "Step 02 / Date",
+      "title": "Pick a <em>day</em>.",
+      "paragraph": "Studio open <gold>Tuesday – Saturday</gold>.",
+      "hours_eyebrow": "Studio hours",
+      "hours": "Tue – Sat · 10:00 – 19:00 · By appointment only"
+    },
+    "time": {
+      "eyebrow": "Step 03 / Time",
+      "title": "Choose your <em>hour</em>.",
+      "no_date": "Pick a date first to see availability.",
+      "zone_suffix": "Times in studio local time.",
+      "reserved": "Reserved",
+      "available": "Available"
+    },
+    "confirm": {
+      "eyebrow": "Step 04 / Confirm",
+      "title": "A quiet <em>review</em>.",
+      "paragraph": "Confirm and you'll receive an email invitation.",
+      "row_ritual": "Ritual",
+      "row_master": "Master",
+      "row_date": "Date",
+      "row_time": "Time",
+      "row_location": "Location",
+      "total": "Total",
+      "charge_label": "Charge",
+      "charge_value": "At the studio",
+      "missing_date": "—",
+      "missing_time": "—"
+    }
+  },
+  "Confirmation": {
+    "meta_title": "Reserved",
+    "reserved_eyebrow": "Reserved · #{code}",
+    "title": "Your chair<br/>awaits.",
+    "subtitle": "A small invitation is on its way. Bring nothing but your hands and a feeling.",
+    "card_eyebrow": "Your appointment",
+    "row_date": "Date",
+    "row_time": "Time",
+    "row_where": "Where",
+    "row_duration": "Duration",
+    "missing_date": "—",
+    "missing_time": "—",
+    "cta_calendar": "Add to calendar",
+    "cta_return": "Return to the atelier"
+  },
   "ServiceDetail": {
     "meta_subtitle": "Ritual",
     "plate_prefix": "Plate",

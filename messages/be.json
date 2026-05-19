@@ -30,6 +30,73 @@
     "membership_link": "Паглядзець тарыфы",
     "footer_copyright": "© MMXXVI · Усе правы абароненыя"
   },
+  "Booking": {
+    "meta_title": "Браніраванне",
+    "step_counter": "Крок {current} з {total}",
+    "progress_aria": "Прагрэс браніравання",
+    "back_aria": "Назад",
+    "cta_continue": "Далей",
+    "cta_confirm": "Пацвердзіць запіс",
+    "cta_pick_service": "Абярыце рытуал",
+    "cta_pick_date": "Абярыце дзень",
+    "cta_pick_time": "Абярыце час",
+    "steps": {
+      "service": "Рытуал",
+      "date": "Дата",
+      "time": "Час",
+      "confirm": "Пацвярджэнне"
+    },
+    "service": {
+      "eyebrow": "Крок 01 / Рытуал",
+      "title": "Абярыце <em>рытуал</em>.",
+      "paragraph": "Абярыце адзін. Да аплаты можна перадумаць."
+    },
+    "date": {
+      "eyebrow": "Крок 02 / Дата",
+      "title": "Абярыце <em>дзень</em>.",
+      "paragraph": "Студыя працуе <gold>з аўторка па суботу</gold>.",
+      "hours_eyebrow": "Гадзіны працы",
+      "hours": "Аўт – Сб · 10:00 – 19:00 · Толькі па запісе"
+    },
+    "time": {
+      "eyebrow": "Крок 03 / Час",
+      "title": "Абярыце <em>гадзіну</em>.",
+      "no_date": "Спачатку абярыце дату.",
+      "zone_suffix": "Час па часавым поясе студыі.",
+      "reserved": "Занята",
+      "available": "Вольна"
+    },
+    "confirm": {
+      "eyebrow": "Крок 04 / Пацвярджэнне",
+      "title": "Ціхі <em>агляд</em>.",
+      "paragraph": "Пацвердзіце — мы дашлём запрашэнне на пошту.",
+      "row_ritual": "Рытуал",
+      "row_master": "Майстар",
+      "row_date": "Дата",
+      "row_time": "Час",
+      "row_location": "Месца",
+      "total": "Усяго",
+      "charge_label": "Аплата",
+      "charge_value": "У студыі",
+      "missing_date": "—",
+      "missing_time": "—"
+    }
+  },
+  "Confirmation": {
+    "meta_title": "Забраніравана",
+    "reserved_eyebrow": "Забраніравана · #{code}",
+    "title": "Ваша крэсла<br/>чакае.",
+    "subtitle": "Запрашэнне ўжо ў дарозе. Вазьміце толькі рукі і настрой.",
+    "card_eyebrow": "Ваш запіс",
+    "row_date": "Дата",
+    "row_time": "Час",
+    "row_where": "Дзе",
+    "row_duration": "Працягласць",
+    "missing_date": "—",
+    "missing_time": "—",
+    "cta_calendar": "Дадаць у каляндар",
+    "cta_return": "Вярнуцца ў атэлье"
+  },
   "ServiceDetail": {
     "meta_subtitle": "Рытуал",
     "plate_prefix": "Плэйт",

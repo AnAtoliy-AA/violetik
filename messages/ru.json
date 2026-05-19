@@ -30,6 +30,73 @@
     "membership_link": "Посмотреть тарифы",
     "footer_copyright": "© MMXXVI · Все права защищены"
   },
+  "Booking": {
+    "meta_title": "Бронирование",
+    "step_counter": "Шаг {current} из {total}",
+    "progress_aria": "Прогресс бронирования",
+    "back_aria": "Назад",
+    "cta_continue": "Дальше",
+    "cta_confirm": "Подтвердить запись",
+    "cta_pick_service": "Выберите ритуал",
+    "cta_pick_date": "Выберите день",
+    "cta_pick_time": "Выберите время",
+    "steps": {
+      "service": "Ритуал",
+      "date": "Дата",
+      "time": "Время",
+      "confirm": "Подтверждение"
+    },
+    "service": {
+      "eyebrow": "Шаг 01 / Ритуал",
+      "title": "Выберите <em>ритуал</em>.",
+      "paragraph": "Выберите один. До оплаты вы сможете передумать."
+    },
+    "date": {
+      "eyebrow": "Шаг 02 / Дата",
+      "title": "Выберите <em>день</em>.",
+      "paragraph": "Студия работает <gold>со вторника по субботу</gold>.",
+      "hours_eyebrow": "Часы работы",
+      "hours": "Вт – Сб · 10:00 – 19:00 · Только по записи"
+    },
+    "time": {
+      "eyebrow": "Шаг 03 / Время",
+      "title": "Выберите <em>час</em>.",
+      "no_date": "Сначала выберите дату.",
+      "zone_suffix": "Время по часовому поясу студии.",
+      "reserved": "Занято",
+      "available": "Свободно"
+    },
+    "confirm": {
+      "eyebrow": "Шаг 04 / Подтверждение",
+      "title": "Тихий <em>обзор</em>.",
+      "paragraph": "Подтвердите запись — мы пришлём приглашение на почту.",
+      "row_ritual": "Ритуал",
+      "row_master": "Мастер",
+      "row_date": "Дата",
+      "row_time": "Время",
+      "row_location": "Место",
+      "total": "Итого",
+      "charge_label": "Оплата",
+      "charge_value": "В студии",
+      "missing_date": "—",
+      "missing_time": "—"
+    }
+  },
+  "Confirmation": {
+    "meta_title": "Забронировано",
+    "reserved_eyebrow": "Забронировано · #{code}",
+    "title": "Ваше кресло<br/>ждёт.",
+    "subtitle": "Приглашение уже в пути. Возьмите только свои руки и настроение.",
+    "card_eyebrow": "Ваша запись",
+    "row_date": "Дата",
+    "row_time": "Время",
+    "row_where": "Где",
+    "row_duration": "Длительность",
+    "missing_date": "—",
+    "missing_time": "—",
+    "cta_calendar": "Добавить в календарь",
+    "cta_return": "Вернуться в ателье"
+  },
   "ServiceDetail": {
     "meta_subtitle": "Ритуал",
     "plate_prefix": "Плейт",
