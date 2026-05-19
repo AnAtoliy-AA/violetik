@@ -271,5 +271,11 @@
     "paragraph": "You may have followed an old card from a past collection. Step back into the atelier — your chair is waiting.",
     "cta_home": "Return to the atelier",
     "cta_services": "Browse the menu"
+  },
+  "Site": {
+    "name": "Violetta Beauty",
+    "description": "A private nail atelier — one chair, one hour, one quiet ritual at a time.",
+    "tagline": "A private nail atelier",
+    "og_title": "Violetta Beauty"
   }
 }
