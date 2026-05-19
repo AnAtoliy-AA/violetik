@@ -30,6 +30,22 @@
     "membership_link": "Посмотреть тарифы",
     "footer_copyright": "© MMXXVI · Все права защищены"
   },
+  "Services": {
+    "meta_title": "Меню",
+    "plate_alacarte": "А-ля-карт",
+    "plate_rituals": "06 ритуалов",
+    "hero_title": "Меню.",
+    "hero_paragraph": "Шесть ритуалов, отточенных годами. В цену входят консультация, угощение и пост-уход.",
+    "category_all": "Все",
+    "filter_aria": "Фильтр по категории",
+    "empty": "Пока ни один ритуал не подходит под фильтр.",
+    "category": {
+      "Care": "Уход",
+      "Gel": "Гель",
+      "Design": "Дизайн",
+      "Form": "Форма"
+    }
+  },
   "Onboarding": {
     "meta_title": "Знакомство",
     "skip": "Пропустить",
