@@ -4,8 +4,16 @@ import { Cormorant_Garamond, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { Providers } from "@/app/providers";
+import { DEFAULT_PALETTE_ID, PALETTE_COOKIE } from "@/shared/config/palettes";
 import "../globals.css";
+
+/**
+ * Inline init script. Runs synchronously before the body paints to swap
+ * <html data-palette="…"> from the cookie value when present. Keeps the
+ * locale layout fully static (no cookies() on the server) while avoiding
+ * a flash of the wrong palette on returning admin sessions.
+ */
+const PALETTE_INIT_SCRIPT = `(function(){try{var m=document.cookie.match(/${PALETTE_COOKIE}=([^;]+)/);if(m&&m[1]){document.documentElement.setAttribute("data-palette",m[1])}}catch(e){}})()`;
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -52,13 +60,15 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
+      data-palette={DEFAULT_PALETTE_ID}
       suppressHydrationWarning
       className={`${cormorant.variable} ${dmSans.variable} ${jetBrains.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: PALETTE_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider>
-          <Providers>{children}</Providers>
-        </NextIntlClientProvider>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
   );

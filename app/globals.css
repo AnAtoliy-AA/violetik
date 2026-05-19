@@ -60,6 +60,238 @@
   --gold-grad: var(--background-image-gold);
 }
 
+/*
+ * Palette overrides.
+ *
+ * Each block flips the runtime CSS variables that the @theme defaults
+ * declare for Aubergine. Tailwind utilities (bg-bg, text-accent, …) all
+ * read these via var(), so switching <html data-palette="…"> instantly
+ * re-themes the entire app — no rebuild, no re-render needed.
+ *
+ * Text + line colors are constant alphas of #f4ead8 across every palette
+ * so we don't repeat them; the gold gradient is palette-tinted per scheme.
+ */
+
+:root[data-palette="rose"] {
+  --color-bg: #1e0d18;
+  --color-bg-2: #260f1c;
+  --color-surface: #2a1226;
+  --color-surface-2: #371732;
+  --color-accent: #e8b08c;
+  --color-accent-2: #f3cdae;
+  --color-plum: #a8456d;
+  --color-violet: #c97aa3;
+  --color-rose: #f0c0c8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #b56e57 0%,
+    #f3cdae 30%,
+    #fff0e0 50%,
+    #d99478 70%,
+    #9a4f3a 100%
+  );
+}
+
+:root[data-palette="lilac"] {
+  --color-bg: #1a1226;
+  --color-bg-2: #221530;
+  --color-surface: #2a1838;
+  --color-surface-2: #371e48;
+  --color-accent: #e0c4f3;
+  --color-accent-2: #f0dffb;
+  --color-plum: #8a6cc4;
+  --color-violet: #b598dc;
+  --color-rose: #d9c2e8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #8a6cc4 0%,
+    #e0c4f3 30%,
+    #fbeafe 50%,
+    #c2a3e8 70%,
+    #6b4ba0 100%
+  );
+}
+
+:root[data-palette="mono"] {
+  --color-bg: #0d0a0f;
+  --color-bg-2: #13101a;
+  --color-surface: #1a1620;
+  --color-surface-2: #221d2a;
+  --color-accent: #d4c9b8;
+  --color-accent-2: #e8e0d0;
+  --color-plum: #3a2a3a;
+  --color-violet: #6a5d6e;
+  --color-rose: #a89c9c;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #8a8276 0%,
+    #d4c9b8 30%,
+    #f3ecdc 50%,
+    #b7ad9c 70%,
+    #6a614f 100%
+  );
+}
+
+:root[data-palette="ink"] {
+  --color-bg: #0a0f1f;
+  --color-bg-2: #0f1729;
+  --color-surface: #152033;
+  --color-surface-2: #1f2c44;
+  --color-accent: #9fb4d8;
+  --color-accent-2: #c1d2ec;
+  --color-plum: #2e3e5a;
+  --color-violet: #6a82ad;
+  --color-rose: #b3c7e4;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #5a6e94 0%,
+    #9fb4d8 30%,
+    #e0e9f5 50%,
+    #8094bd 70%,
+    #3d4f70 100%
+  );
+}
+
+:root[data-palette="moss"] {
+  --color-bg: #0d130f;
+  --color-bg-2: #131c16;
+  --color-surface: #172218;
+  --color-surface-2: #1f2e22;
+  --color-accent: #a8c098;
+  --color-accent-2: #c5d8b6;
+  --color-plum: #3a4632;
+  --color-violet: #6d8060;
+  --color-rose: #c2d3b8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #6a7d54 0%,
+    #a8c098 30%,
+    #e6f0d8 50%,
+    #8aa478 70%,
+    #4f6038 100%
+  );
+}
+
+:root[data-palette="bronze"] {
+  --color-bg: #150e08;
+  --color-bg-2: #1c1410;
+  --color-surface: #241a10;
+  --color-surface-2: #2f2418;
+  --color-accent: #d4a574;
+  --color-accent-2: #e8c498;
+  --color-plum: #6b4424;
+  --color-violet: #b08660;
+  --color-rose: #d9b390;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #8a5a30 0%,
+    #d4a574 30%,
+    #f5dcbc 50%,
+    #b88450 70%,
+    #5a3a1a 100%
+  );
+}
+
+:root[data-palette="pearl"] {
+  --color-bg: #1a1612;
+  --color-bg-2: #221d18;
+  --color-surface: #28221c;
+  --color-surface-2: #342d25;
+  --color-accent: #f0e3cf;
+  --color-accent-2: #f8efe0;
+  --color-plum: #6a5848;
+  --color-violet: #b4a08a;
+  --color-rose: #d8c8b0;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #b09878 0%,
+    #f0e3cf 30%,
+    #fffaf0 50%,
+    #d0bca0 70%,
+    #786650 100%
+  );
+}
+
+:root[data-palette="emerald"] {
+  --color-bg: #06120c;
+  --color-bg-2: #0a1a12;
+  --color-surface: #0f2018;
+  --color-surface-2: #142c20;
+  --color-accent: #7ec699;
+  --color-accent-2: #a5dcba;
+  --color-plum: #1f4030;
+  --color-violet: #5a9072;
+  --color-rose: #bce0c8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #3a8055 0%,
+    #7ec699 30%,
+    #d6f0e0 50%,
+    #54a075 70%,
+    #1f4530 100%
+  );
+}
+
+:root[data-palette="sapphire"] {
+  --color-bg: #06101c;
+  --color-bg-2: #0a1828;
+  --color-surface: #0f1c30;
+  --color-surface-2: #142840;
+  --color-accent: #7da3d0;
+  --color-accent-2: #a8c5e4;
+  --color-plum: #1f3a5c;
+  --color-violet: #5870a0;
+  --color-rose: #b8d0e4;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #3a6094 0%,
+    #7da3d0 30%,
+    #d8e8f5 50%,
+    #5880b8 70%,
+    #1c3a5c 100%
+  );
+}
+
+:root[data-palette="ruby"] {
+  --color-bg: #1a070b;
+  --color-bg-2: #220a10;
+  --color-surface: #2b0f15;
+  --color-surface-2: #3a1620;
+  --color-accent: #d97b8a;
+  --color-accent-2: #ec9fac;
+  --color-plum: #6e2030;
+  --color-violet: #a0526b;
+  --color-rose: #ecb5c0;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #8a3040 0%,
+    #d97b8a 30%,
+    #fad4dc 50%,
+    #b85868 70%,
+    #5a1c28 100%
+  );
+}
+
+:root[data-palette="obsidian"] {
+  --color-bg: #050505;
+  --color-bg-2: #0c0c0c;
+  --color-surface: #121212;
+  --color-surface-2: #1c1c1c;
+  --color-accent: #c2c2c2;
+  --color-accent-2: #e0e0e0;
+  --color-plum: #2a2a2a;
+  --color-violet: #6a6a6a;
+  --color-rose: #c8c8c8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #707070 0%,
+    #c2c2c2 30%,
+    #f0f0f0 50%,
+    #909090 70%,
+    #404040 100%
+  );
+}
+
 @keyframes shimmer {
   0% {
     background-position: 0% 50%;
