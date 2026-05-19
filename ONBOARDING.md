@@ -1,0 +1,106 @@
+# Onboarding
+
+A private nail-atelier web app — Next.js 16 · React 19 · Tailwind v4 · TypeScript · next-intl path-prefix routing across `en` / `ru` / `be`. Built top-down from a static design spec ([docs/handsoff/start.md](docs/handsoff/start.md)); everything visible on the site is a port of that handoff.
+
+## Quick start
+
+```bash
+git clone https://github.com/AnAtoliy-AA/violetik.git
+cd violetik
+npm ci                # NOT npm install — lockfile is pinned, see notes
+npm run dev           # http://localhost:3000
+```
+
+Open `/` and you'll be redirected to `/en/welcome`. From there the four tab-bar screens (`/home`, `/services`, `/gallery`, `/profile`) are wired together; everything else (`/welcome`, `/onboarding`, `/master`, `/membership`, `/booking/*`, `/admin`) is reachable from the in-app navigation.
+
+## Daily commands
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Next.js dev server on port 3000 |
+| `npm run build` | Production build (also runs the TypeScript checker — no separate `tsc` needed) |
+| `npm run start` | Run the production build locally |
+| `npm run lint` | ESLint flat config |
+| `npm test` | Vitest, single pass. Runs **both** the jsdom unit suite and the Storybook addon-vitest browser project (every story is a test) |
+| `npm run test:watch` | Vitest in watch mode |
+| `npm run e2e` | Playwright e2e — **stop any running `next dev` first**, Next.js 16 enforces one dev server per project and `playwright.config.ts` boots its own on port 3100 |
+| `npm run e2e:ui` | Playwright UI mode |
+| `npm run storybook` | Storybook dev on port 6006 |
+| `npm run build-storybook` | Storybook static build |
+
+Single Vitest file: `npx vitest run path/to/file.test.tsx`.
+Single Playwright spec: `npx playwright test e2e/home.spec.ts`.
+
+## Architecture — Feature-Sliced Design
+
+Imports may only point **downward**:
+
+| Layer | Folder | Purpose |
+|---|---|---|
+| app | `app/` | Next.js App Router routes + global init (root layout, providers, generateMetadata, opengraph-image) |
+| views | `views/` | Page-level compositions (FSD `pages` renamed to avoid Next's legacy Pages Router clash) |
+| widgets | `widgets/` | Large self-contained UI blocks (e.g. `app-header`, `tab-bar`, `booking-stepper`) |
+| features | `features/` | User actions / interactive units (`locale-switcher`, `palette-switcher`) |
+| entities | `entities/` | Business entities (`studio`, `service`) |
+| shared | `shared/` | UI primitives, utility libs, config — no business logic |
+
+Every slice exposes a single public API via `index.ts`. Inside a slice, organize by segment: `ui/`, `model/`, `lib/`, `api/`. **Never deep-import another slice's internals** — go through its root.
+
+## Routing & i18n
+
+- Locale lives in the URL: `/en/...`, `/ru/...`, `/be/...`. Locale list and defaults in [i18n/routing.ts](i18n/routing.ts).
+- Middleware-equivalent is [proxy.ts](proxy.ts) (Next.js 16 renamed `middleware.ts` → `proxy.ts`).
+- Translations in [messages/](messages/) — flat namespaced JSON, one file per locale, identical key sets across all three.
+- **Use the wrappers in [i18n/navigation.ts](i18n/navigation.ts)** (`Link`, `useRouter`, `usePathname`) instead of `next/link` / `next/navigation`. The wrappers preserve locale.
+
+Server components: call `setRequestLocale(locale)` first, then `getTranslations`. Client components: `useTranslations`.
+
+## Theming
+
+Twelve dark palettes — Aubergine (default), Rose, Lilac, Mono, Ink, Moss, Bronze, Pearl, Emerald, Sapphire, Ruby, Obsidian.
+
+- Registry: [shared/config/palettes/palettes.ts](shared/config/palettes/palettes.ts)
+- Each palette is a `:root[data-palette="…"]` block in [app/globals.css](app/globals.css) overriding the @theme color tokens
+- Active palette: `vio-palette` cookie. Server emits `data-palette="aubergine"`, an inline script in the locale layout flips the attribute before paint based on the cookie. **Static rendering stays intact** — we never read cookies on the server.
+- Pick palettes at `/[locale]/admin` (no auth gate yet — gated when real auth lands)
+
+## Branch + PR workflow
+
+- `main` is production. `develop` is integration. Feature branches off `develop`.
+- Husky enforces locally: `pre-commit` runs `lint` + `test`; `pre-push` runs `build`. **Don't `--no-verify`** — fix the underlying issue.
+- CI on every push to `main`/`develop` and every PR runs three jobs in [.github/workflows/ci.yml](.github/workflows/ci.yml): `verify` (lint + Vitest + build), `e2e` (Playwright), and `lighthouse` (perf budgets on three URLs). The last two run in parallel after `verify`.
+- PRs target `develop`, not `main`. Use the [commit](.claude/skills/commit/SKILL.md) and [pr-description](.claude/skills/pr-description/SKILL.md) project skills for message shape.
+
+## Adding things
+
+Use the project skills under [.claude/skills/](.claude/skills/) — they're written for this codebase, not generic FSD or Next.js docs:
+
+- [new-ui-component](.claude/skills/new-ui-component/SKILL.md) — primitives in `shared/ui/`, features in `features/<name>/ui/`. Tailwind only, mandatory Storybook story, mandatory Vitest test.
+- [new-web-page](.claude/skills/new-web-page/SKILL.md) — locale-prefixed route + `setRequestLocale` + translations in all three locale files + e2e spec.
+- [commit](.claude/skills/commit/SKILL.md) — Conventional Commits with FSD-scoped scopes.
+- [pr-description](.claude/skills/pr-description/SKILL.md) — PR body shape.
+
+The reference primitive is [shared/ui/button/](shared/ui/button/) — copy its structure for new primitives.
+
+## Deploy notes
+
+The repo is environment-agnostic but expects a few env vars in production:
+
+- `NEXT_PUBLIC_SITE_URL` — absolute origin (e.g. `https://violetta.studio`). Used by [app/sitemap.ts](app/sitemap.ts), [app/robots.ts](app/robots.ts), the OG metadata in [app/[locale]/layout.tsx](app/[locale]/layout.tsx), and the canonical/hreflang alternates. Without it, those URLs publish a placeholder host (`https://violetta.example.com`) and crawlers won't find the real domain.
+
+## Notes & pitfalls
+
+- **Next.js 16 is past most training data.** When uncertain about an API (route handlers, caching, `params`/`searchParams` shape, server actions, config, the `proxy` file convention), read the relevant guide in `node_modules/next/dist/docs/` before writing code. Heed deprecation notices.
+- **Tailwind v4 has no JS config.** All design tokens live in [app/globals.css](app/globals.css) inside `@theme {}`. The dark-mode `@custom-variant` is still wired even though every palette is dark — it's there for forward compatibility.
+- **`params` is a Promise.** Next 15+ async params; always `await` them.
+- **`STUDIO_DATA` is stub content** ([entities/studio/model/data.ts](entities/studio/model/data.ts)), waiting for the prototype HTML to land. Shape is final; values are placeholders.
+- **Tab bar is absent** on detail / booking / onboarding / welcome / master / membership / confirmation screens — that's by spec, not an oversight.
+- **`npm ci` vs `npm install`**: prefer `npm ci` in CI / fresh clones — the lockfile is platform-aware and pins transitives (`@swc/helpers`, etc.) we ran into across macOS arm64 / Linux x64.
+- Tests for components that pull `usePathname` from `@/i18n/navigation` need a mock — see [views/profile/ui/profile-page.test.tsx](views/profile/ui/profile-page.test.tsx) for the canonical pattern.
+
+## More
+
+- [CLAUDE.md](CLAUDE.md) — codebase guide for AI sessions (also useful as a more detailed reference for humans)
+- [AGENTS.md](AGENTS.md) — short note about Next.js 16 breaking changes
+- [docs/handsoff/start.md](docs/handsoff/start.md) — the design spec the whole site builds against
+- [docs/superpowers/plans/](docs/superpowers/plans/) — implementation plans (Plan 1: foundation design system landed)

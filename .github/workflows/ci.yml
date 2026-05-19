@@ -14,6 +14,13 @@ concurrency:
 permissions:
   contents: read
 
+# Force JavaScript actions onto Node 24. actions/{checkout,setup-node,cache,
+# upload-artifact}@v4 still ship Node 20, which GitHub deprecates on
+# 2026-06-02 and removes on 2026-09-16. Until v5s land we opt in early.
+# https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   verify:
     name: Lint · Vitest · Build
