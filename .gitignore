@@ -52,3 +52,7 @@ storybook-static
 
 # vitest
 /.vitest-reports
+
+# lighthouse-ci
+/.lighthouseci
+/.lighthouseci-local
