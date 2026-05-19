@@ -1,13 +1,14 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "@/shared/lib/cn";
 
-type Size = "sm" | "md" | "lg";
+type Size = "xs" | "sm" | "md" | "lg";
 
 export interface WordmarkProps extends HTMLAttributes<HTMLDivElement> {
   size?: Size;
 }
 
 const sizeClass: Record<Size, string> = {
+  xs: "text-xl",
   sm: "text-3xl",
   md: "text-5xl",
   lg: "text-7xl",
