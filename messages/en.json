@@ -30,6 +30,16 @@
     "membership_link": "See the tiers",
     "footer_copyright": "© MMXXVI · All rights reserved"
   },
+  "Master": {
+    "meta_title": "The master",
+    "plate_title": "The master",
+    "frame_mark": "Violetta · MMXIV",
+    "voices_eyebrow": "Voices",
+    "stat_years": "Years",
+    "stat_chair": "Chair",
+    "stat_sets": "Sets",
+    "cta_reserve": "Reserve with Violetta"
+  },
   "Booking": {
     "meta_title": "Booking",
     "step_counter": "Step {current} of {total}",
