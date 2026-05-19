@@ -30,6 +30,14 @@
     "membership_link": "Паглядзець тарыфы",
     "footer_copyright": "© MMXXVI · Усе правы абароненыя"
   },
+  "ServiceDetail": {
+    "meta_subtitle": "Рытуал",
+    "plate_prefix": "Плэйт",
+    "includes_eyebrow": "—— Што ўваходзіць",
+    "recent_eyebrow": "—— Свежыя працы ў гэтым стылі",
+    "from": "Ад",
+    "cta_reserve": "Забраніраваць крэсла"
+  },
   "Services": {
     "meta_title": "Меню",
     "plate_alacarte": "А-ля-карт",
