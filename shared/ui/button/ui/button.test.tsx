@@ -21,4 +21,24 @@ describe("Button", () => {
     await userEvent.click(screen.getByRole("button", { name: "Press" }));
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it("applies gold variant styling", () => {
+    render(<Button variant="gold">Reserve</Button>);
+    expect(screen.getByRole("button")).toHaveClass("bg-gold");
+  });
+
+  it("applies outline variant styling", () => {
+    render(<Button variant="outline">More</Button>);
+    expect(screen.getByRole("button")).toHaveClass("border");
+  });
+
+  it("renders full-width when block is true", () => {
+    render(<Button block>Full</Button>);
+    expect(screen.getByRole("button")).toHaveClass("w-full");
+  });
+
+  it("renders an icon node before children when icon prop is set", () => {
+    render(<Button icon={<svg data-testid="ic" aria-hidden />}>Save</Button>);
+    expect(screen.getByTestId("ic")).toBeInTheDocument();
+  });
 });
