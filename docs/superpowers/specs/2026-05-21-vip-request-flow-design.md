@@ -1,7 +1,7 @@
 # VIP Request Flow — Design Spec
 
 **Date:** 2026-05-21
-**Status:** Draft (pending user + spec-reviewer approval)
+**Status:** Reviewed (spec-reviewer approved 2026-05-21; pending user approval)
 **Owner:** Violetta Beauty (violetik)
 **Predecessors:** Membership tier rename (Petale/Violette/Atelier → Member/VIP) on branch
 `fix/ensure-user-row-on-booking`. Booking flow architecture in
@@ -165,9 +165,9 @@ A single function in `db/vip-requests.ts`:
 
 ```ts
 export type CurrentTier =
-  | { tier: "member" }
-  | { tier: "member"; pendingRequestId: string }
-  | { tier: "vip"; activeRequestId: string; expiresAt: Date };
+  | { state: "member" }
+  | { state: "member-pending"; pendingRequestId: string }
+  | { state: "vip"; activeRequestId: string; expiresAt: Date };
 
 export async function getCurrentTier(userId: string): Promise<CurrentTier> {
   // Single query: pull the user's most-recent approved-not-expired OR pending row.
@@ -175,6 +175,10 @@ export async function getCurrentTier(userId: string): Promise<CurrentTier> {
   // Returns the appropriate variant.
 }
 ```
+
+Consumers narrow via the `state` discriminator: `if (current.state === 'vip') …`.
+Both the `"member"` and `"member-pending"` states render the same tier label
+("Member"); the latter adds the pending pill.
 
 Implementation note: one SELECT with `status IN ('approved','pending')` and
 `(status='pending' OR expires_at > now())`, ORDER BY priority (`approved` >
@@ -203,8 +207,12 @@ All endpoints are `POST`, accept JSON, return JSON, and live under `/api/vip-req
 - Body: `{ note?: string }`
 - 200: `{ id, status: 'pending', createdAt }`
 - 401: not signed in
-- 409: user already has a pending row (returns the existing one's id)
-- 409: user already has an active VIP (returns the active row's expiresAt)
+- 409 `{ reason: 'pending-exists', id }` — user already has a pending row
+- 409 `{ reason: 'already-vip', expiresAt }` — user already has an active VIP
+
+The `reason` field lets the client render distinct copy ("You already have a
+pending request" vs "You're already a VIP") without inspecting which optional
+field is present.
 
 ### 5.2 `POST /api/vip-requests/cancel` — user cancel
 
@@ -386,7 +394,7 @@ All new copy is added to `messages/en.json`, `messages/ru.json`,
 | API routes | Vitest + Next.js route testing | 401 / 403 / 409 paths; happy paths return shape |
 | Components | Vitest + Testing Library | `VipCardCta` state machine (visitor / member / pending / vip variants); admin `RequestActions` button wiring |
 | Admin page | Vitest | Renders 3 sections, sorts active by expires_at, paginates expired correctly |
-| E2E | Playwright | `e2e/vip-request.spec.ts`: visitor → /sign-in → submit → admin approves → profile shows VIP. Plus expiry path via DB time-mock or explicit downgrade. |
+| E2E | Playwright | `e2e/vip-request.spec.ts`: visitor → /sign-in → submit → admin approves → profile shows VIP. Expiry path tested via the explicit Downgrade action (sets `expires_at = now()`) — no DB clock mocking. |
 
 ## 11. Migration & rollout
 
