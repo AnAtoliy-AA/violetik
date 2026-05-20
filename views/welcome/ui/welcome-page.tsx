@@ -45,7 +45,7 @@ export function WelcomePage() {
         transition={{ duration: reduceMotion ? 0 : 1.8, ease: EASE_OUT, delay: 0.55 }}
       />
 
-      <div className="flex min-h-dvh flex-col justify-between">
+      <div className="mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
           <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)]">
             <LetterReveal text="Violetta" />
