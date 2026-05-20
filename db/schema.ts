@@ -115,6 +115,45 @@ export const bookings = pgTable(
   }),
 );
 
+export const vipRequestStatus = pgEnum("vip_request_status", [
+  "pending",
+  "approved",
+  "declined",
+  "cancelled",
+]);
+
+export const vipRequests = pgTable(
+  "vip_requests",
+  {
+    id: text("id").primaryKey(), // "vipreq_" + 16 hex
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: vipRequestStatus("status").notNull().default("pending"),
+    note: text("note"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    decidedBy: text("decided_by").references(() => users.id),
+    declineReason: text("decline_reason"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => ({
+    userIdx: index("vip_requests_user_idx").on(table.userId),
+    statusIdx: index("vip_requests_status_idx").on(table.status),
+    pendingUniq: uniqueIndex("vip_requests_one_pending_per_user")
+      .on(table.userId)
+      .where(sql`status = 'pending'`),
+    activeExpiryIdx: index("vip_requests_active_expiry_idx")
+      .on(table.expiresAt)
+      .where(sql`status = 'approved'`),
+  }),
+);
+
+export type VipRequest = typeof vipRequests.$inferSelect;
+export type NewVipRequest = typeof vipRequests.$inferInsert;
+
 /**
  * One row per admin who has connected their Google Calendar via OAuth.
  * v1 ships single-admin only; the table supports multi-admin already
