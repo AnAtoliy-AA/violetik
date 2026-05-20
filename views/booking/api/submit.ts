@@ -15,6 +15,7 @@ import {
   createBooking,
   setBookingGcalEventId,
 } from "@/db/bookings";
+import { ensureUserRow } from "@/db/ensure-user";
 import { STUDIO_DATA } from "@/entities/studio";
 
 const DEFAULT_DURATION_MIN = 60;
@@ -90,6 +91,20 @@ export async function submitBooking(
   const tz = bookingTimeZone();
   const scheduledFor = localToUtc(input.date, input.time, tz);
   const durationMin = parseDurationMin(service.duration);
+
+  // Safety net: the Auth.js signIn callback is supposed to upsert
+  // the user row, but it swallows errors. Re-assert here so the
+  // foreign key on bookings.user_id always has something to reference.
+  try {
+    await ensureUserRow(session);
+  } catch (err) {
+    console.error(
+      "[submitBooking] ensureUserRow failed for userId=%s: %o",
+      session.user.id,
+      err,
+    );
+    return { ok: false, error: "db_unavailable" };
+  }
 
   let booking;
   try {
