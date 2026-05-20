@@ -120,16 +120,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             // Sign-in only — the calendar.events scope used by
             // /admin/integrations/google is a separate OAuth flow.
             authorization: { params: { scope: "openid email profile" } },
-            // Prefix the id at the source so it matches the
-            // "google:<sub>" PK in our users table. Without this the
-            // foreign key on bookings.user_id rejects every insert
-            // from Google-authenticated customers.
-            profile: (raw) => ({
-              id: `google:${raw.sub}`,
-              name: raw.name ?? null,
-              email: raw.email ?? null,
-              image: typeof raw.picture === "string" ? raw.picture : null,
-            }),
+            // Don't override profile() — Auth.js v5 deliberately
+            // overwrites the returned `id` with crypto.randomUUID()
+            // for OAuth providers (see @auth/core/lib/actions/
+            // callback/oauth/callback.js). We reconstruct the
+            // "google:<sub>" id inside the jwt callback below where
+            // `profile.sub` is still available.
           }),
         ]
       : []),
@@ -154,11 +150,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
       return true;
     },
-    jwt: ({ token, user }) => {
-      // user.id is already prefixed: "tg:<id>" from the Credentials
-      // authorize() callback, "google:<sub>" from the Google provider
-      // profile() mapping above.
-      if (user?.id) token.sub = user.id;
+    jwt: ({ token, user, account, profile }) => {
+      // First sign-in via Google: Auth.js has already replaced
+      // user.id with a UUID, so reconstruct the prefixed id from
+      // profile.sub (the original Google subject). For subsequent
+      // requests `account` and `profile` are undefined and token.sub
+      // is already correct from a previous run.
+      if (account?.provider === "google" && profile?.sub) {
+        token.sub = `google:${profile.sub}`;
+      } else if (user?.id) {
+        // Credentials provider (Telegram): authorize() returns the
+        // already-prefixed "tg:<id>" and Auth.js preserves it on
+        // user.id, so we can use it directly.
+        token.sub = user.id;
+      }
       return token;
     },
     session: ({ session, token }) => {
