@@ -82,6 +82,37 @@ Use the project skills under [.claude/skills/](.claude/skills/) — they're writ
 
 The reference primitive is [shared/ui/button/](shared/ui/button/) — copy its structure for new primitives.
 
+## Database (Supabase + Drizzle)
+
+Postgres on Supabase; Drizzle ORM for the schema + a tiny CLI for migrations. Three tables today: `users` (one row per Telegram signer), `bookings`, `availability_rules`. See [db/schema.ts](db/schema.ts) for the canonical declaration.
+
+Daily commands:
+
+```bash
+npm run db:generate   # diff schema.ts vs db/migrations/*, emit a new SQL file
+npm run db:migrate    # apply pending migrations to DIRECT_URL
+npm run db:studio     # open Drizzle Studio web UI to inspect rows
+```
+
+`db:generate` is purely local (reads `db/schema.ts`, no DB connection). `db:migrate` and `db:studio` connect to the Postgres at `DIRECT_URL`. All three load env from `.env.local` via [drizzle.config.ts](drizzle.config.ts).
+
+First-time setup after cloning:
+
+```bash
+# 1. paste DATABASE_URL + DIRECT_URL from Supabase into .env.local
+# 2. apply the existing migrations
+npm run db:migrate
+```
+
+When you change `db/schema.ts`:
+
+```bash
+npm run db:generate   # creates db/migrations/NNNN_<name>.sql — commit it
+npm run db:migrate    # apply to your dev DB
+```
+
+The client at [db/index.ts](db/index.ts) returns `null` when `DATABASE_URL` is unset, so the codebase degrades gracefully in environments without a DB (CI, local dev pre-Supabase). On every sign-in the Telegram authorize callback calls [db/users.ts](db/users.ts) `upsertTelegramUser()` — idempotent, no-op when `db === null`.
+
 ## Auth (Telegram)
 
 Sign-in is via Telegram Login Widget. The gate on `/admin` activates the moment `TELEGRAM_BOT_TOKEN` is set; without it (local dev / CI) the admin page stays open.
