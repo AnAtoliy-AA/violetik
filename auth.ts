@@ -45,7 +45,18 @@ function verifyTelegramAuth(
   return true;
 }
 
+// In non-prod (local dev, CI) provide a fallback secret so the handlers
+// don't 500 on missing AUTH_SECRET. Production still throws on startup
+// if AUTH_SECRET isn't set — Auth.js handles that when `secret` is
+// undefined.
+const SECRET =
+  process.env.AUTH_SECRET ??
+  (process.env.NODE_ENV !== "production"
+    ? "dev-only-insecure-secret-do-not-ship"
+    : undefined);
+
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  secret: SECRET,
   providers: [
     Credentials({
       id: "telegram",
