@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { upsertTelegramUser } from "@/db/users";
 
 const ONE_DAY_SECONDS = 60 * 60 * 24;
 
@@ -76,13 +77,30 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         const creds = raw as Record<string, string | undefined>;
         if (!verifyTelegramAuth(creds, botToken)) return null;
 
+        const telegramId = Number(creds.id);
+        if (!Number.isFinite(telegramId)) return null;
+
         const displayName =
           [creds.first_name, creds.last_name].filter(Boolean).join(" ") ||
           creds.username ||
-          `tg:${creds.id}`;
+          `tg:${telegramId}`;
+
+        // Best-effort persistence — if the DB isn't configured the
+        // upsert is a no-op and we still issue a session token.
+        try {
+          await upsertTelegramUser({
+            telegramId,
+            username: creds.username ?? null,
+            firstName: creds.first_name ?? null,
+            lastName: creds.last_name ?? null,
+            photoUrl: creds.photo_url ?? null,
+          });
+        } catch (error) {
+          console.error("[auth] upsertTelegramUser failed:", error);
+        }
 
         return {
-          id: `tg:${creds.id}`,
+          id: `tg:${telegramId}`,
           name: displayName,
           image: typeof creds.photo_url === "string" ? creds.photo_url : null,
         };
