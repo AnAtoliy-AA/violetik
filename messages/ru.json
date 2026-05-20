@@ -287,5 +287,15 @@
     "cta_retry": "Попробовать снова",
     "cta_home": "Вернуться в ателье",
     "digest_label": "Код"
+  },
+  "SignIn": {
+    "meta_title": "Вход",
+    "plate_title": "Вход",
+    "eyebrow": "Ателье · Только для членов",
+    "title": "Войти в ателье.",
+    "paragraph": "Войдите через Telegram, чтобы управлять визитами, палитрой и записями.",
+    "not_configured": "TELEGRAM-ВХОД ПОКА НЕ НАСТРОЕН",
+    "cta_sign_out": "Выйти",
+    "signed_in_as": "Вы вошли как"
   }
 }
