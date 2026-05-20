@@ -287,5 +287,15 @@
     "cta_retry": "Try again",
     "cta_home": "Return to the atelier",
     "digest_label": "Reference"
+  },
+  "SignIn": {
+    "meta_title": "Sign in",
+    "plate_title": "Sign in",
+    "eyebrow": "Atelier · Members only",
+    "title": "Step inside.",
+    "paragraph": "Sign in with Telegram to manage your visits, palette, and bookings.",
+    "not_configured": "TELEGRAM LOGIN NOT YET CONFIGURED",
+    "cta_sign_out": "Sign out",
+    "signed_in_as": "Signed in as"
   }
 }

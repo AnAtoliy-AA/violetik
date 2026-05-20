@@ -82,11 +82,33 @@ Use the project skills under [.claude/skills/](.claude/skills/) — they're writ
 
 The reference primitive is [shared/ui/button/](shared/ui/button/) — copy its structure for new primitives.
 
+## Auth (Telegram)
+
+Sign-in is via Telegram Login Widget. The gate on `/admin` activates the moment `TELEGRAM_BOT_TOKEN` is set; without it (local dev / CI) the admin page stays open.
+
+Setup, one-time:
+
+1. **Create a bot** — Telegram → @BotFather → `/newbot`. Pick a name (e.g. "Violetta Beauty Studio") and a username ending in `bot`. Copy the token.
+2. **Authorize the domain** — same chat: `/setdomain` → pick the bot → send `localhost` (add the prod domain via the same command after deploying).
+3. **Generate a JWT secret** — `openssl rand -base64 32`.
+4. **Populate `.env.local`** — copy from [.env.example](.env.example) and fill `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`, `AUTH_SECRET`, `AUTH_TRUST_HOST=true`. Already-set `DATABASE_URL` and `DIRECT_URL` are for the next phase (DB).
+
+Implementation:
+
+- [auth.ts](auth.ts) — Auth.js v5 with a `Credentials` provider for Telegram. `authorize()` verifies the HMAC against the bot token per [Telegram's spec](https://core.telegram.org/widgets/login#checking-authorization) (data-check string, sha256(bot_token) as HMAC key, 24-hour replay window).
+- [app/api/auth/[...nextauth]/route.ts](app/api/auth/[...nextauth]/route.ts) — Auth.js handlers.
+- [features/telegram-login/](features/telegram-login/) — client widget (`TelegramLogin`) + server-action sign-out (`SignOutButton`).
+- [app/[locale]/sign-in/page.tsx](app/[locale]/sign-in/page.tsx) — sign-in screen.
+- Sessions are JWT-only (no DB yet); user `id` is `tg:<telegram_user_id>`.
+
 ## Deploy notes
 
-The repo is environment-agnostic but expects a few env vars in production:
+The repo is environment-agnostic but expects these env vars in production. See [.env.example](.env.example) for the full list with comments.
 
 - `NEXT_PUBLIC_SITE_URL` — absolute origin (e.g. `https://violetta.studio`). Used by [app/sitemap.ts](app/sitemap.ts), [app/robots.ts](app/robots.ts), the OG metadata in [app/[locale]/layout.tsx](app/[locale]/layout.tsx), and the canonical/hreflang alternates. Without it, those URLs publish a placeholder host (`https://violetta.example.com`) and crawlers won't find the real domain.
+- `AUTH_SECRET`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME` — required for the auth gate to activate.
+- `AUTH_TRUST_HOST=true` — required on non-Vercel hosts.
+- `DATABASE_URL`, `DIRECT_URL` — Supabase Postgres (used by upcoming bookings + availability work).
 
 ## Notes & pitfalls
 
