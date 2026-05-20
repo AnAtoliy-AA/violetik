@@ -24,8 +24,10 @@ export const userRole = pgEnum("user_role", ["customer", "admin"]);
 export const users = pgTable(
   "users",
   {
-    id: text("id").primaryKey(), // "tg:<telegram_id>"
-    telegramId: bigint("telegram_id", { mode: "number" }).notNull().unique(),
+    id: text("id").primaryKey(), // "tg:<telegram_id>" or "google:<sub>"
+    telegramId: bigint("telegram_id", { mode: "number" }).unique(),
+    googleSub: text("google_sub").unique(),
+    email: text("email"),
     username: text("username"),
     firstName: text("first_name"),
     lastName: text("last_name"),
@@ -38,6 +40,7 @@ export const users = pgTable(
   },
   (table) => ({
     telegramIdx: index("users_telegram_id_idx").on(table.telegramId),
+    googleSubIdx: index("users_google_sub_idx").on(table.googleSub),
   }),
 );
 

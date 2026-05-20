@@ -15,6 +15,13 @@
       "when": 1779274125635,
       "tag": "0001_round_hannibal_king",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779279231814,
+      "tag": "0002_dapper_monster_badoon",
+      "breakpoints": true
     }
   ]
 }

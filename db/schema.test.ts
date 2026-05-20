@@ -40,6 +40,12 @@ describe("db/schema", () => {
       id: "tg:1",
       telegramId: 1,
     };
+    const _gu: NewUser = {
+      id: "google:abc123",
+      googleSub: "abc123",
+      email: "v@example.com",
+    };
+    expect(_gu.id).toBe("google:abc123");
     const _b: NewBooking = {
       id: "bk_1",
       userId: "tg:1",
