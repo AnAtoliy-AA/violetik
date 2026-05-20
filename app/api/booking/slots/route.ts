@@ -9,6 +9,7 @@ import {
   getActiveGoogleToken,
   updateLastRefresh,
 } from "@/db/google-tokens";
+import { listActiveBookingsFrom } from "@/db/bookings";
 import { STUDIO_DATA } from "@/entities/studio";
 import { slotCache } from "./cache";
 
@@ -39,11 +40,24 @@ export async function GET(req: Request): Promise<Response> {
     return Response.json({ source: "cache", slots: cached });
   }
 
+  // Bookings in the DB also block their slot — covers the window
+  // between submitBooking() inserting the row and the GCal event
+  // syncing (or the case where GCal sync fails entirely).
+  const dayStart = new Date(`${dayISO}T00:00:00Z`);
+  const dayEnd = new Date(`${dayISO}T23:59:59Z`);
+  const dbBookings = (await listActiveBookingsFrom(dayStart)).filter(
+    (b) => b.scheduledFor <= dayEnd,
+  );
+  const dbBusy = dbBookings.map((b) => ({
+    start: b.scheduledFor,
+    end: new Date(b.scheduledFor.getTime() + b.durationMinutes * 60_000),
+  }));
+
   const token = await getActiveGoogleToken();
   if (!token) {
     const slots = computeAvailableSlots({
       workingHours: WEEKLY_DEFAULT_HOURS,
-      busy: [],
+      busy: dbBusy,
       serviceDurationMin: durationMin,
       dayISO,
       timeZone: tz,
@@ -81,7 +95,7 @@ export async function GET(req: Request): Promise<Response> {
 
     const slots = computeAvailableSlots({
       workingHours: WEEKLY_DEFAULT_HOURS,
-      busy,
+      busy: [...busy, ...dbBusy],
       serviceDurationMin: durationMin,
       dayISO,
       timeZone: tz,
@@ -92,7 +106,7 @@ export async function GET(req: Request): Promise<Response> {
     console.warn("[booking/slots] falling back to static:", err);
     const slots = computeAvailableSlots({
       workingHours: WEEKLY_DEFAULT_HOURS,
-      busy: [],
+      busy: dbBusy,
       serviceDurationMin: durationMin,
       dayISO,
       timeZone: tz,

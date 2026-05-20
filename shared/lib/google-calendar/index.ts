@@ -1,5 +1,6 @@
 export { computeAvailableSlots } from "./slots";
 export { fetchBusyWindows } from "./free-busy";
+export { createCalendarEvent, deleteCalendarEvent } from "./events";
 export {
   buildAuthUrl,
   exchangeCode,

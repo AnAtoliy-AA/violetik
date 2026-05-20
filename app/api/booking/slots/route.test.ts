@@ -4,6 +4,9 @@ vi.mock("@/db/google-tokens", () => ({
   getActiveGoogleToken: vi.fn(async () => null),
   updateLastRefresh: vi.fn(async () => undefined),
 }));
+vi.mock("@/db/bookings", () => ({
+  listActiveBookingsFrom: vi.fn(async () => []),
+}));
 
 import { GET } from "./route";
 import { slotCache } from "./cache";
