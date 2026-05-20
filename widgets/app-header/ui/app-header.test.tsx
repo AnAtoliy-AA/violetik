@@ -17,16 +17,6 @@ vi.mock("@/i18n/navigation", () => ({
 import { AppHeader } from "./app-header";
 
 describe("AppHeader", () => {
-  it("renders the status bar by default", () => {
-    render(<AppHeader />);
-    expect(screen.getByText("VIOLETTA · OPEN")).toBeInTheDocument();
-  });
-
-  it("hides the status bar when showStatusBar is false", () => {
-    render(<AppHeader showStatusBar={false} />);
-    expect(screen.queryByText("VIOLETTA · OPEN")).not.toBeInTheDocument();
-  });
-
   it("renders the wordmark and a labelled menu button", () => {
     render(<AppHeader />);
     expect(screen.getByText("Violetta")).toBeInTheDocument();

@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/cn";
 import { buttonClassName } from "@/shared/ui/button";
-import { StatusBar } from "@/shared/ui/status-bar";
 import { Wordmark } from "@/shared/ui/wordmark";
 import type { NailTilePalette, NailTileVariant } from "@/shared/ui/nail-tile";
 import { OnboardingSlide } from "./onboarding-slide";
@@ -38,7 +37,6 @@ export function OnboardingPage() {
 
   return (
     <div className="relative px-[22px]">
-      <StatusBar />
       <header className="flex items-center justify-between py-[6px] pb-6">
         <Wordmark size="xs" />
         <Link
