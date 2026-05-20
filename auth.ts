@@ -1,7 +1,9 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { upsertTelegramUser } from "@/db/users";
+import { upsertGoogleUser } from "@/db/google-users";
 
 const ONE_DAY_SECONDS = 60 * 60 * 24;
 
@@ -56,6 +58,12 @@ const SECRET =
     ? "dev-only-insecure-secret-do-not-ship"
     : undefined);
 
+// Google provider is only included when its env vars are configured —
+// keeps CI / local dev without OAuth secrets healthy.
+const googleConfigured = Boolean(
+  process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
+);
+
 export const { auth, handlers, signIn, signOut } = NextAuth({
   secret: SECRET,
   providers: [
@@ -85,8 +93,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           creds.username ||
           `tg:${telegramId}`;
 
-        // Best-effort persistence — if the DB isn't configured the
-        // upsert is a no-op and we still issue a session token.
         try {
           await upsertTelegramUser({
             telegramId,
@@ -106,12 +112,45 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         };
       },
     }),
+    ...(googleConfigured
+      ? [
+          Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            // Sign-in only — the calendar.readonly scope used by
+            // /admin/integrations/google is a separate OAuth flow.
+            authorization: { params: { scope: "openid email profile" } },
+          }),
+        ]
+      : []),
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    jwt: ({ token, user }) => {
-      if (user) {
+    signIn: async ({ account, profile }) => {
+      if (account?.provider !== "google") return true;
+      const sub = profile?.sub;
+      if (!sub) return false;
+      const [firstName, ...rest] = (profile.name ?? "").split(" ");
+      try {
+        await upsertGoogleUser({
+          sub,
+          email: profile.email ?? null,
+          firstName: firstName || null,
+          lastName: rest.join(" ") || null,
+          photoUrl: typeof profile.picture === "string" ? profile.picture : null,
+        });
+      } catch (error) {
+        console.error("[auth] upsertGoogleUser failed:", error);
+      }
+      return true;
+    },
+    jwt: ({ token, user, account, profile }) => {
+      // First sign-in: rewrite token.sub to our internal id so all
+      // downstream code can rely on the `tg:` / `google:` prefix.
+      if (user?.id) {
         token.sub = user.id;
+      } else if (account?.provider === "google" && profile?.sub) {
+        token.sub = `google:${profile.sub}`;
       }
       return token;
     },
