@@ -146,7 +146,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           photoUrl: typeof profile.picture === "string" ? profile.picture : null,
         });
       } catch (error) {
-        console.error("[auth] upsertGoogleUser failed:", error);
+        // Don't silently swallow — future foreign-key failures on
+        // bookings.user_id were impossible to debug because this
+        // error was hidden. Log loudly. The booking submit has its
+        // own ensureUserRow() safety net so missing rows still heal
+        // on the next interaction.
+        console.error(
+          "[auth.signIn] upsertGoogleUser failed (user will be signed in but the users row is missing — ensureUserRow will retry on first booking):",
+          error,
+        );
       }
       return true;
     },
