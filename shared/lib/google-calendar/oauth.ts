@@ -2,10 +2,15 @@ const AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const REVOKE_ENDPOINT = "https://oauth2.googleapis.com/revoke";
 
+// `calendar.events` lets us both read free/busy AND write booking
+// events. Replaces the narrower `calendar.readonly` scope from PR 24.
+// Existing token holders need to disconnect + reconnect once to grant
+// the broader scope; the slots route detects the 403 and falls back to
+// the static grid until that happens.
 const SCOPES = [
   "openid",
   "email",
-  "https://www.googleapis.com/auth/calendar.readonly",
+  "https://www.googleapis.com/auth/calendar.events",
 ].join(" ");
 
 export function buildAuthUrl(args: {

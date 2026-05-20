@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { buttonClassName } from "@/shared/ui/button";
 import { AppHeader } from "@/widgets/app-header";
@@ -16,6 +16,7 @@ import {
   prevStep,
 } from "@/views/booking/lib/booking-steps";
 import { useBookingStore } from "@/views/booking/model/booking-store";
+import { submitBooking } from "@/views/booking/api/submit";
 import { ConfirmStep } from "./steps/confirm-step";
 import { DateStep } from "./steps/date-step";
 import { ServiceStep } from "./steps/service-step";
@@ -47,15 +48,19 @@ export interface BookingPageProps {
 export function BookingPage({ step }: BookingPageProps) {
   const t = useTranslations("Booking");
   const tSteps = useTranslations("Booking.steps");
+  const tErr = useTranslations("Booking.errors");
   const reduceMotion = useReducedMotion();
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const setService = useBookingStore((s) => s.setService);
   const serviceId = useBookingStore((s) => s.serviceId);
   const date = useBookingStore((s) => s.date);
   const time = useBookingStore((s) => s.time);
 
-  // Seed the store from `?selected=` when arriving from a service detail page.
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
   useEffect(() => {
     const selected = searchParams.get("selected");
     if (selected && !serviceId) setService(selected);
@@ -71,11 +76,25 @@ export function BookingPage({ step }: BookingPageProps) {
     (step === "service" && !!serviceId) ||
     (step === "date" && !!date) ||
     (step === "time" && !!time) ||
-    step === "confirm";
+    (step === "confirm" && !!serviceId && !!date && !!time);
 
   const handleAdvance = () => {
     if (step === "confirm") {
-      router.push("/booking/confirmation");
+      if (!serviceId || !date || !time) return;
+      setSubmitError(null);
+      startTransition(async () => {
+        const result = await submitBooking({
+          serviceId,
+          date,
+          time,
+          locale,
+        });
+        // On success the server action redirects; we only reach here
+        // when it returned an error.
+        if (result && !result.ok) {
+          setSubmitError(result.error);
+        }
+      });
       return;
     }
     if (next) router.push(`/booking/${next}`);
@@ -122,19 +141,30 @@ export function BookingPage({ step }: BookingPageProps) {
         }}
       >
         {canAdvance ? (
-          <button
-            type="button"
-            onClick={handleAdvance}
-            className={buttonClassName({
-              variant: "gold",
-              size: "lg",
-              block: true,
-              className: "gap-2",
-            })}
-          >
-            {step === "confirm" ? t("cta_confirm") : t("cta_continue")}
-            <ArrowRight />
-          </button>
+          <>
+            {submitError ? (
+              <p
+                role="alert"
+                className="mb-3 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-accent"
+              >
+                {tErr(submitError)}
+              </p>
+            ) : null}
+            <button
+              type="button"
+              onClick={handleAdvance}
+              disabled={pending}
+              className={buttonClassName({
+                variant: "gold",
+                size: "lg",
+                block: true,
+                className: "gap-2",
+              })}
+            >
+              {step === "confirm" ? t("cta_confirm") : t("cta_continue")}
+              <ArrowRight />
+            </button>
+          </>
         ) : (
           <Link
             href={`/booking/${step}`}

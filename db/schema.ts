@@ -7,6 +7,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -105,6 +106,12 @@ export const bookings = pgTable(
     userIdx: index("bookings_user_idx").on(table.userId),
     scheduledIdx: index("bookings_scheduled_idx").on(table.scheduledFor),
     statusIdx: index("bookings_status_idx").on(table.status),
+    // One active booking per slot. Partial unique so 'cancelled'
+    // bookings can pile up at the same scheduled_for without blocking
+    // the slot.
+    scheduledActiveUniq: uniqueIndex("bookings_scheduled_for_active_uniq")
+      .on(table.scheduledFor)
+      .where(sql`status <> 'cancelled'`),
   }),
 );
 

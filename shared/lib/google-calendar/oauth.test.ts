@@ -21,7 +21,7 @@ describe("buildAuthUrl", () => {
     expect(url.searchParams.get("access_type")).toBe("offline");
     expect(url.searchParams.get("prompt")).toBe("consent");
     expect(url.searchParams.get("state")).toBe("csrf123");
-    expect(url.searchParams.get("scope")).toContain("calendar.readonly");
+    expect(url.searchParams.get("scope")).toContain("calendar.events");
     expect(url.searchParams.get("scope")).toContain("email");
   });
 });
