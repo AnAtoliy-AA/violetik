@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { exchangeCode } from "@/shared/lib/google-calendar";
 import { upsertGoogleToken } from "@/db/google-tokens";
-import { GCAL_CSRF_COOKIE } from "@/features/google-calendar-connect/api/start";
+import { GCAL_CSRF_COOKIE } from "@/features/google-calendar-connect/api/constants";
 
 function readCookie(req: Request, name: string): string | null {
   const header = req.headers.get("cookie");

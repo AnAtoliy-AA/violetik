@@ -1,4 +1,5 @@
 export { ConnectButton } from "./ui/connect-button";
 export { ConnectionStatus } from "./ui/connection-status";
-export { startGoogleOAuth, GCAL_CSRF_COOKIE } from "./api/start";
+export { startGoogleOAuth } from "./api/start";
+export { GCAL_CSRF_COOKIE } from "./api/constants";
 export { disconnectGoogleCalendar } from "./api/disconnect";

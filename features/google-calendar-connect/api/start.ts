@@ -5,8 +5,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { buildAuthUrl } from "@/shared/lib/google-calendar";
+import { GCAL_CSRF_COOKIE } from "./constants";
 
-const CSRF_COOKIE = "gcal_oauth_state";
 const CSRF_TTL_S = 600;
 
 /**
@@ -27,7 +27,7 @@ export async function startGoogleOAuth(): Promise<void> {
   }
   const state = randomBytes(24).toString("base64url");
   const c = await cookies();
-  c.set(CSRF_COOKIE, state, {
+  c.set(GCAL_CSRF_COOKIE, state, {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
@@ -36,5 +36,3 @@ export async function startGoogleOAuth(): Promise<void> {
   });
   redirect(buildAuthUrl({ clientId, redirectUri, state }));
 }
-
-export const GCAL_CSRF_COOKIE = CSRF_COOKIE;

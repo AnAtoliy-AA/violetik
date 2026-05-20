@@ -3,7 +3,6 @@ import { describe, it, expect, vi } from "vitest";
 
 vi.mock("../api/start", () => ({
   startGoogleOAuth: vi.fn(),
-  GCAL_CSRF_COOKIE: "gcal_oauth_state",
 }));
 
 import { ConnectButton } from "./connect-button";
