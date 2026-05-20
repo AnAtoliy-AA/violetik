@@ -98,7 +98,7 @@ export function WelcomePage() {
             {t("cta_enter")}
           </Link>
           <Link
-            href="/home"
+            href="/booking/service"
             className={buttonClassName({ variant: "ghost", size: "lg", block: true })}
           >
             {t("cta_returning")}

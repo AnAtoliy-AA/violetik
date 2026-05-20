@@ -24,8 +24,8 @@
     "gallery_title_a": "Recent",
     "gallery_title_b": "work",
     "gallery_view_all": "View all",
-    "membership_title_lead": "Become a",
-    "membership_title_word": "Violette",
+    "membership_title_lead": "Become a member or",
+    "membership_title_word": "VIP",
     "membership_blurb": "Two visits a month, priority calendar, the welcome ritual, and ten percent on extensions & art.",
     "membership_link": "See the tiers",
     "footer_copyright": "© MMXXVI · All rights reserved"
@@ -34,7 +34,7 @@
     "meta_title": "Membership",
     "plate_title": "Membership",
     "eyebrow": "By invitation · Limited circle",
-    "hero_title": "Become a <em>member</em>.",
+    "hero_title": "Become a member or <em>VIP</em>.",
     "hero_paragraph": "A small ring of regulars. Three tiers, one chair, complete attention.",
     "billing_aria": "Billing cadence",
     "billing_monthly": "Monthly",
@@ -172,12 +172,12 @@
     "ritual_body": "Every set begins with a mood conversation. Every finish ends with photography of your hands.",
     "membership_eyebrow": "03 / MEMBERSHIP",
     "membership_title": "Yours, by appointment",
-    "membership_body": "Become a Violette member for two visits a month, priority access, and the after-hours calendar."
+    "membership_body": "Become a member or VIP for two visits a month, priority access, and the after-hours calendar."
   },
   "Welcome": {
     "tagline": "A private nail atelier — one chair, one hour, one quiet ritual at a time.",
-    "cta_enter": "Enter the atelier",
-    "cta_returning": "I already have an account"
+    "cta_enter": "I'm new here",
+    "cta_returning": "Start booking"
   },
   "LocaleSwitcher": {
     "label": "Language",

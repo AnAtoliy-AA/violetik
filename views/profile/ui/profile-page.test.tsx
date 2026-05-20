@@ -33,7 +33,7 @@ describe("ProfilePage", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: /Lara K\./ }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Member · Violette/)).toBeInTheDocument();
+    expect(screen.getByText(/Member · VIP/)).toBeInTheDocument();
     expect(screen.getByText(/Joined in 2024/)).toBeInTheDocument();
   });
 

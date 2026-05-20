@@ -2,7 +2,7 @@ export type Category = "Care" | "Gel" | "Design" | "Form";
 
 export type GalleryTag = "Editorial" | "Gel" | "Chrome" | "Lace" | "Bridal";
 
-export type MembershipTierName = "Petale" | "Violette" | "Atelier";
+export type MembershipTierName = "Member" | "VIP";
 
 export interface Service {
   id: string;

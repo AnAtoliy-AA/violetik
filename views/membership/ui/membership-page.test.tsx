@@ -28,16 +28,15 @@ function renderPage() {
 }
 
 describe("MembershipPage", () => {
-  it("renders three tier cards in canonical order", () => {
+  it("renders two tier cards in canonical order", () => {
     renderPage();
     const articles = screen.getAllByRole("article");
-    expect(articles).toHaveLength(3);
-    expect(within(articles[0]).getByText("Petale")).toBeInTheDocument();
-    expect(within(articles[1]).getByText("Violette")).toBeInTheDocument();
-    expect(within(articles[2]).getByText("Atelier")).toBeInTheDocument();
+    expect(articles).toHaveLength(2);
+    expect(within(articles[0]).getByText("Member")).toBeInTheDocument();
+    expect(within(articles[1]).getByText("VIP")).toBeInTheDocument();
   });
 
-  it("marks the Violette tier as featured with the Most chosen tag", () => {
+  it("marks the VIP tier as featured with the Most chosen tag", () => {
     renderPage();
     expect(screen.getByText(/Most chosen/i)).toBeInTheDocument();
   });
@@ -45,31 +44,28 @@ describe("MembershipPage", () => {
   it("shows monthly prices by default and switches to annual ×10", async () => {
     const user = userEvent.setup();
     renderPage();
-    const violetteArticle = screen.getAllByRole("article")[1];
-    expect(within(violetteArticle).getByText("€180")).toBeInTheDocument();
-    expect(within(violetteArticle).getByText("/ month")).toBeInTheDocument();
+    const vipArticle = screen.getAllByRole("article")[1];
+    expect(within(vipArticle).getByText("€180")).toBeInTheDocument();
+    expect(within(vipArticle).getByText("/ month")).toBeInTheDocument();
 
     await user.click(screen.getByRole("tab", { name: /Annual/i }));
-    expect(within(violetteArticle).getByText("€1800")).toBeInTheDocument();
-    expect(within(violetteArticle).getByText("/ year")).toBeInTheDocument();
+    expect(within(vipArticle).getByText("€1800")).toBeInTheDocument();
+    expect(within(vipArticle).getByText("/ year")).toBeInTheDocument();
   });
 
   it("free tier renders Free instead of a price and a Stay free CTA", () => {
     renderPage();
-    const petale = screen.getAllByRole("article")[0];
-    expect(within(petale).getByText(/^Free$/)).toBeInTheDocument();
+    const memberCard = screen.getAllByRole("article")[0];
+    expect(within(memberCard).getByText(/^Free$/)).toBeInTheDocument();
     expect(
-      within(petale).getByRole("link", { name: /Stay free/i }),
+      within(memberCard).getByRole("link", { name: /Stay free/i }),
     ).toBeInTheDocument();
   });
 
   it("paid tier CTAs interpolate the tier name", () => {
     renderPage();
     expect(
-      screen.getByRole("link", { name: /Join Violette/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /Join Atelier/i }),
+      screen.getByRole("link", { name: /Join VIP/i }),
     ).toBeInTheDocument();
   });
 });
