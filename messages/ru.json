@@ -293,8 +293,10 @@
     "plate_title": "Вход",
     "eyebrow": "Ателье · Только для членов",
     "title": "Войти в ателье.",
-    "paragraph": "Войдите через Telegram, чтобы управлять визитами, палитрой и записями.",
-    "not_configured": "TELEGRAM-ВХОД ПОКА НЕ НАСТРОЕН",
+    "paragraph": "Войдите через Google или Telegram, чтобы управлять визитами, палитрой и записями.",
+    "cta_google": "Продолжить с Google",
+    "divider_or": "или",
+    "not_configured": "ВХОД ПОКА НЕ НАСТРОЕН",
     "cta_sign_out": "Выйти",
     "signed_in_as": "Вы вошли как"
   },

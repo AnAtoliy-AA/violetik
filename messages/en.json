@@ -293,9 +293,23 @@
     "plate_title": "Sign in",
     "eyebrow": "Atelier · Members only",
     "title": "Step inside.",
-    "paragraph": "Sign in with Telegram to manage your visits, palette, and bookings.",
-    "not_configured": "TELEGRAM LOGIN NOT YET CONFIGURED",
+    "paragraph": "Sign in with Google or Telegram to manage your visits, palette, and bookings.",
+    "cta_google": "Continue with Google",
+    "divider_or": "or",
+    "not_configured": "SIGN-IN NOT YET CONFIGURED",
     "cta_sign_out": "Sign out",
     "signed_in_as": "Signed in as"
+  },
+  "AdminGoogle": {
+    "meta_title": "Google Calendar",
+    "eyebrow": "Integrations · Google",
+    "hero_title": "Connect the studio calendar",
+    "hero_paragraph": "Sign in once with the Google account that hosts the studio's working calendar. We read free/busy windows to show real availability on the booking page — we do not create or modify events.",
+    "cta_connect": "Connect Google Calendar",
+    "status_connected": "Connected",
+    "status_disconnect": "Disconnect",
+    "error_csrf": "Connection request expired. Please try again.",
+    "error_exchange": "Google rejected the connection. Please retry.",
+    "not_configured": "Google OAuth is not configured on the server."
   }
 }

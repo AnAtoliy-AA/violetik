@@ -13,13 +13,15 @@ test("sign-in page renders the hero copy on /en/sign-in", async ({ page }) => {
   // Either the TG widget container OR the not-configured notice — one
   // of them must be present.
   const widget = page.locator("script[data-telegram-login]");
-  const notice = page.getByText(/TELEGRAM LOGIN NOT YET CONFIGURED/i);
-  await expect(widget.or(notice).first()).toBeVisible({ visible: true })
+  const googleBtn = page.getByRole("button", { name: /continue with google/i });
+  const notice = page.getByText(/SIGN-IN NOT YET CONFIGURED/i);
+  await expect(widget.or(googleBtn).or(notice).first())
+    .toBeVisible({ visible: true })
     .catch(async () => {
-      // If `visible` semantics differ for <script>, just assert attachment.
       const widgetCount = await widget.count();
+      const googleCount = await googleBtn.count();
       const noticeCount = await notice.count();
-      expect(widgetCount + noticeCount).toBeGreaterThan(0);
+      expect(widgetCount + googleCount + noticeCount).toBeGreaterThan(0);
     });
 });
 
