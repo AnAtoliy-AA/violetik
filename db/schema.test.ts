@@ -3,13 +3,16 @@ import {
   availabilityRules,
   bookings,
   bookingStatus,
+  googleOauthTokens,
   userRole,
   users,
 } from "./schema";
 import type {
   AvailabilityRule,
   Booking,
+  GoogleOauthToken,
   NewBooking,
+  NewGoogleOauthToken,
   NewUser,
   User,
 } from "./schema";
@@ -65,5 +68,25 @@ describe("db/schema", () => {
     expect(_selUser.role).toBe("customer");
     expect(_selBooking.status).toBe("pending");
     expect(_selRule.dayOfWeek).toBe(2);
+  });
+
+  it("declares the google_oauth_tokens table with the expected shape", () => {
+    expect(googleOauthTokens).toBeDefined();
+    const _insert: NewGoogleOauthToken = {
+      userId: "tg:1",
+      email: "v@example.com",
+      refreshToken: "1//xxx",
+      scope: "openid email https://www.googleapis.com/auth/calendar.readonly",
+    };
+    const _select: Pick<
+      GoogleOauthToken,
+      "userId" | "calendarId" | "connectedAt"
+    > = {
+      userId: "tg:1",
+      calendarId: "primary",
+      connectedAt: new Date(),
+    };
+    expect(_insert.userId).toBe("tg:1");
+    expect(_select.calendarId).toBe("primary");
   });
 });

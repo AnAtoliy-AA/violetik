@@ -1,16 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import {
   BOOKING_TIMES,
-  RESERVED_TIMES,
   formatLongDate,
 } from "@/views/booking/lib/booking-steps";
 import { useBookingStore } from "@/views/booking/model/booking-store";
 
-const RESERVED = new Set<string>(RESERVED_TIMES);
+const STATIC_FALLBACK: readonly string[] = BOOKING_TIMES;
 
 export function TimeStep() {
   const t = useTranslations("Booking.time");
@@ -18,6 +18,25 @@ export function TimeStep() {
   const selected = useBookingStore((s) => s.time);
   const setTime = useBookingStore((s) => s.setTime);
   const date = useBookingStore((s) => s.date);
+  const serviceId = useBookingStore((s) => s.serviceId);
+
+  const [slots, setSlots] = useState<readonly string[]>(STATIC_FALLBACK);
+
+  useEffect(() => {
+    if (!date || !serviceId) return;
+    const controller = new AbortController();
+    fetch(`/api/booking/slots?date=${date}&serviceId=${serviceId}`, {
+      signal: controller.signal,
+    })
+      .then((r) => r.json())
+      .then((json: { slots?: string[] }) => {
+        if (Array.isArray(json.slots)) setSlots(json.slots);
+      })
+      .catch(() => {
+        /* keep STATIC_FALLBACK */
+      });
+    return () => controller.abort();
+  }, [date, serviceId]);
 
   const dateLabel = date ? formatLongDate(date, locale) : null;
 
@@ -38,32 +57,28 @@ export function TimeStep() {
       </p>
 
       <div className="grid grid-cols-2 gap-2.5">
-        {BOOKING_TIMES.map((slot) => {
-          const reserved = RESERVED.has(slot);
-          const isSelected = !reserved && selected === slot;
+        {slots.map((slot) => {
+          const isSelected = selected === slot;
           return (
             <button
               key={slot}
               type="button"
-              disabled={reserved}
               aria-pressed={isSelected}
               onClick={() => setTime(slot)}
               className={cn(
                 "rounded-[18px] border-[0.5px] px-4 py-5 text-left",
                 "transition-colors duration-fast ease-out",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-                reserved
-                  ? "cursor-not-allowed border-transparent bg-surface/40 text-text-3 opacity-40"
-                  : isSelected
-                    ? "border-accent bg-[color-mix(in_oklab,var(--color-accent)_16%,var(--color-surface))] text-accent"
-                    : "border-line bg-surface text-text hover:border-line-strong",
+                isSelected
+                  ? "border-accent bg-[color-mix(in_oklab,var(--color-accent)_16%,var(--color-surface))] text-accent"
+                  : "border-line bg-surface text-text hover:border-line-strong",
               )}
             >
               <div className="font-display text-[26px] font-normal italic leading-none">
                 {slot}
               </div>
               <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] opacity-70">
-                {reserved ? t("reserved") : t("available")}
+                {t("available")}
               </div>
             </button>
           );
