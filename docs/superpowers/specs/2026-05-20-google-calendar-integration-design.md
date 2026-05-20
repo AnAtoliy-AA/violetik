@@ -115,12 +115,14 @@ views/booking/ui/steps/time-step.tsx
 2. Route handler:
    - Looks up service duration from `entities/studio/model/data.ts` (60min default if not found).
    - Cache key = `${calendarId}:${dateISO}:${serviceDurationMin}`. Hit → return.
-   - Loads first active token row (single-admin assumption; multi-admin would pick by role).
-   - If none → return `computeAvailableSlots(WEEKLY_DEFAULT_HOURS, [], service, tz)` — pure static fallback.
-   - Else: refresh access token if `lastRefreshAt` > 50 min ago (Google access tokens live 1h).
+   - Loads the active token row via `getActiveToken()` which selects `ORDER BY connectedAt DESC LIMIT 1`. (v1 assumes one admin; the ordering is deterministic so a future multi-admin upgrade only changes the query.)
+   - If no row → return `computeAvailableSlots(WEEKLY_DEFAULT_HOURS, [], service, tz)` — pure static fallback.
+   - Else: refresh access token if `lastRefreshAt IS NULL` or `lastRefreshAt < now() - 50 min` (Google access tokens live 1h; null means we've never refreshed yet).
    - Calls `POST https://www.googleapis.com/calendar/v3/freeBusy` with `[startOfDay, endOfDay]` in salon TZ.
    - Calls `computeAvailableSlots(WEEKLY_DEFAULT_HOURS, busy, service, tz)`.
    - Cache + return `{ slots: ["10:00","10:30",...], source: "gcal" | "static" }`.
+
+**API contract:** The endpoint is intentionally per-day. The booking UI's time step already operates on a single selected date, so a per-day call is the natural shape. A future range endpoint can be added if the date strip ever needs pre-warmed slot counts; that's out of scope for PR 3.
 
 ### 4.3 Disconnect flow
 
@@ -150,7 +152,12 @@ export type NewGoogleOauthToken = typeof googleOauthTokens.$inferInsert;
 ```
 
 One row per connected admin. Cascade-deletes if the user is removed. No index
-needed beyond the PK — lookup is always by `userId`.
+needed beyond the PK — lookup is always by `userId` or "most recent
+`connectedAt`".
+
+`db/google-tokens.ts` follows the existing convention set by `db/users.ts`:
+one file per logical table, exporting the typed query/upsert helpers. The
+helper module is the only place that reads/writes this table.
 
 ## 6. Slot computation
 
@@ -194,7 +201,7 @@ export function computeAvailableSlots(args: {
 
 ## 8. Security
 
-- Refresh token stored plaintext; relies on Supabase Row-Level Security + Postgres SSL. Supabase service role bypasses RLS, so the API route uses the service role. Customer-facing API never returns the token. Document this in `ONBOARDING.md`.
+- Refresh token stored plaintext; relies on Supabase Row-Level Security + Postgres SSL. The DB connection in `db/index.ts` already uses the Supabase service role (the only mode that bypasses RLS), so *every* route that touches `google_oauth_tokens` — callback, disconnect, and `/api/booking/slots` — uses that connection. The token value is never serialized into a response body or rendered to the client. Document this in `ONBOARDING.md`.
 - CSRF state is short-lived (10 min), HMAC'd via random bytes, single-use.
 - Callback route validates Auth.js session before exchanging code — prevents an attacker from completing a connect flow for someone else.
 - Only `calendar.readonly` scope. No write access. We cannot create events, modify events, or read attachments.
