@@ -105,9 +105,33 @@ export const bookings = pgTable(
   }),
 );
 
+/**
+ * One row per admin who has connected their Google Calendar via OAuth.
+ * v1 ships single-admin only; the table supports multi-admin already
+ * (PK is userId, queries pick "most recent connectedAt"). Refresh
+ * token is stored plaintext — relies on Supabase RLS + service-role-
+ * only access. See docs/superpowers/specs/2026-05-20-google-calendar-
+ * integration-design.md §8.
+ */
+export const googleOauthTokens = pgTable("google_oauth_tokens", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  refreshToken: text("refresh_token").notNull(),
+  calendarId: text("calendar_id").notNull().default("primary"),
+  scope: text("scope").notNull(),
+  connectedAt: timestamp("connected_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  lastRefreshAt: timestamp("last_refresh_at", { withTimezone: true }),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Booking = typeof bookings.$inferSelect;
 export type NewBooking = typeof bookings.$inferInsert;
 export type AvailabilityRule = typeof availabilityRules.$inferSelect;
 export type NewAvailabilityRule = typeof availabilityRules.$inferInsert;
+export type GoogleOauthToken = typeof googleOauthTokens.$inferSelect;
+export type NewGoogleOauthToken = typeof googleOauthTokens.$inferInsert;
