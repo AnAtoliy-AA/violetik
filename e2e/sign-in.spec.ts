@@ -33,7 +33,10 @@ test("sign-in page renders Belarusian copy at /be/sign-in", async ({ page }) => 
 test("Auth.js handlers respond on /api/auth/session", async ({ request }) => {
   const res = await request.get("/api/auth/session");
   expect(res.status()).toBe(200);
-  const body = await res.json();
-  // No session in CI (no token) — body is `{}` or null user.
-  expect(body).toBeTruthy();
+  // Auth.js returns `null` when there's no active session (CI: no signed
+  // payload), or a `{ user, expires }` object when there is one. Either
+  // is a healthy response — what we want to catch is the 500 that
+  // Auth.js throws when AUTH_SECRET is missing.
+  const body = (await res.json()) as null | { user?: unknown };
+  expect(body === null || typeof body === "object").toBe(true);
 });
