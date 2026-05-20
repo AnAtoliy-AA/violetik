@@ -117,9 +117,19 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           Google({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            // Sign-in only — the calendar.readonly scope used by
+            // Sign-in only — the calendar.events scope used by
             // /admin/integrations/google is a separate OAuth flow.
             authorization: { params: { scope: "openid email profile" } },
+            // Prefix the id at the source so it matches the
+            // "google:<sub>" PK in our users table. Without this the
+            // foreign key on bookings.user_id rejects every insert
+            // from Google-authenticated customers.
+            profile: (raw) => ({
+              id: `google:${raw.sub}`,
+              name: raw.name ?? null,
+              email: raw.email ?? null,
+              image: typeof raw.picture === "string" ? raw.picture : null,
+            }),
           }),
         ]
       : []),
@@ -144,14 +154,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
       return true;
     },
-    jwt: ({ token, user, account, profile }) => {
-      // First sign-in: rewrite token.sub to our internal id so all
-      // downstream code can rely on the `tg:` / `google:` prefix.
-      if (user?.id) {
-        token.sub = user.id;
-      } else if (account?.provider === "google" && profile?.sub) {
-        token.sub = `google:${profile.sub}`;
-      }
+    jwt: ({ token, user }) => {
+      // user.id is already prefixed: "tg:<id>" from the Credentials
+      // authorize() callback, "google:<sub>" from the Google provider
+      // profile() mapping above.
+      if (user?.id) token.sub = user.id;
       return token;
     },
     session: ({ session, token }) => {

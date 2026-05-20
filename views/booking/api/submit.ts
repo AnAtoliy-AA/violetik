@@ -104,7 +104,13 @@ export async function submitBooking(
     if (msg.includes("bookings_scheduled_for_active_uniq")) {
       return { ok: false, error: "slot_taken" };
     }
-    console.error("[submitBooking] createBooking failed:", err);
+    console.error(
+      "[submitBooking] createBooking failed for userId=%s serviceId=%s scheduledFor=%s: %o",
+      session.user.id,
+      input.serviceId,
+      scheduledFor.toISOString(),
+      err,
+    );
     return { ok: false, error: "unknown" };
   }
 
