@@ -107,11 +107,19 @@
       "charge_value": "At the studio",
       "missing_date": "—",
       "missing_time": "—"
+    },
+    "errors": {
+      "slot_taken": "That slot was just taken. Please pick another.",
+      "db_unavailable": "Bookings are temporarily offline. Please try again in a moment.",
+      "invalid_input": "Pick a service, date and time before confirming.",
+      "unknown": "Something slipped. Please try again."
     }
   },
   "Confirmation": {
     "meta_title": "Reserved",
     "reserved_eyebrow": "Reserved · #{code}",
+    "pending_eyebrow": "Pending approval · #{code}",
+    "cancelled_eyebrow": "Cancelled · #{code}",
     "title": "Your chair<br/>awaits.",
     "subtitle": "A small invitation is on its way. Bring nothing but your hands and a feeling.",
     "card_eyebrow": "Your appointment",
@@ -299,6 +307,21 @@
     "not_configured": "SIGN-IN NOT YET CONFIGURED",
     "cta_sign_out": "Sign out",
     "signed_in_as": "Signed in as"
+  },
+  "AdminBookings": {
+    "meta_title": "Bookings",
+    "eyebrow": "Private · Studio admin",
+    "hero_title": "Booking requests",
+    "hero_paragraph": "Confirm or decline pending requests. Declining frees the slot back to the calendar.",
+    "empty": "NO BOOKINGS YET",
+    "cta_confirm": "Confirm",
+    "cta_decline": "Decline",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    }
   },
   "AdminGoogle": {
     "meta_title": "Google Calendar",

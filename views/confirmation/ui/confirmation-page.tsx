@@ -24,27 +24,40 @@ function buildReservationCode(seed: string): string {
   return `VB-${four}`;
 }
 
-export function ConfirmationPage() {
+export interface ConfirmationPageProps {
+  bookingId?: string;
+  serviceId?: string;
+  date?: string;
+  time?: string;
+  status?: "pending" | "confirmed" | "cancelled" | "completed";
+}
+
+export function ConfirmationPage(props: ConfirmationPageProps = {}) {
   const t = useTranslations("Confirmation");
   const locale = useLocale();
   const reduceMotion = useReducedMotion();
 
-  const serviceId = useBookingStore((s) => s.serviceId);
-  const date = useBookingStore((s) => s.date);
-  const time = useBookingStore((s) => s.time);
+  const storeServiceId = useBookingStore((s) => s.serviceId);
+  const storeDate = useBookingStore((s) => s.date);
+  const storeTime = useBookingStore((s) => s.time);
+
+  const serviceId = props.serviceId ?? storeServiceId;
+  const date = props.date ?? storeDate;
+  const time = props.time ?? storeTime;
 
   const service =
     STUDIO_DATA.services.find((s) => s.id === serviceId) ??
     STUDIO_DATA.services[0];
   const dateLabel = date ? formatLongDate(date, locale) : t("missing_date");
   const timeLabel = time ?? t("missing_time");
-  const code = useMemo(
-    () =>
-      buildReservationCode(
-        `${serviceId ?? "x"}|${date ?? "x"}|${time ?? "x"}`,
-      ),
-    [serviceId, date, time],
-  );
+  const code = useMemo(() => {
+    if (props.bookingId) {
+      return `VB-${props.bookingId.replace(/^bk_/, "").slice(0, 4).toUpperCase()}`;
+    }
+    return buildReservationCode(
+      `${serviceId ?? "x"}|${date ?? "x"}|${time ?? "x"}`,
+    );
+  }, [props.bookingId, serviceId, date, time]);
 
   const rows: readonly [string, string][] = [
     [t("row_date"), dateLabel],
@@ -67,7 +80,11 @@ export function ConfirmationPage() {
           className="mt-7"
         >
           <Eyebrow gold>
-            {t("reserved_eyebrow", { code })}
+            {props.status === "pending"
+              ? t("pending_eyebrow", { code })
+              : props.status === "cancelled"
+                ? t("cancelled_eyebrow", { code })
+                : t("reserved_eyebrow", { code })}
           </Eyebrow>
           <h1 className="my-3 mb-1.5 font-display text-[44px] font-normal italic leading-tight tracking-[-0.02em]">
             {t.rich("title", { br: () => <br /> })}
