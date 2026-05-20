@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "bookings_scheduled_for_active_uniq" ON "bookings" USING btree ("scheduled_for") WHERE status <> 'cancelled';
