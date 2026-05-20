@@ -132,6 +132,28 @@ Implementation:
 - [app/[locale]/sign-in/page.tsx](app/[locale]/sign-in/page.tsx) — sign-in screen.
 - Sessions are JWT-only (no DB yet); user `id` is `tg:<telegram_user_id>`.
 
+## Google Calendar (admin)
+
+The admin connects her Google Calendar from `/admin/integrations/google`. We read free/busy windows to compute booking slots — we do **not** create, modify, or delete events. Scope is `calendar.readonly` only.
+
+Setup, one-time:
+
+1. **Cloud project** — [console.cloud.google.com](https://console.cloud.google.com) → create project. Enable the **Google Calendar API** under APIs & Services → Library.
+2. **OAuth consent screen** — APIs & Services → OAuth consent screen → External. Add scopes `openid`, `email`, `https://www.googleapis.com/auth/calendar.readonly`. Add Violetta's Google address as a test user while the app is in testing.
+3. **OAuth Client ID** — APIs & Services → Credentials → Create credentials → OAuth client → Web application. Authorized redirect URI: `https://<your-host>/api/integrations/google/callback`. Copy Client ID + Client Secret.
+4. **Vercel env vars** — set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_OAUTH_REDIRECT_URI` (matches step 3 exactly), and optionally `GOOGLE_CALENDAR_ID` (default `primary`) and `NEXT_PUBLIC_BOOKING_TIMEZONE` (default `Europe/Minsk`). Redeploy.
+5. **Connect** — sign in as the admin, visit `/admin/integrations/google`, click "Connect Google Calendar", complete the Google consent. After redirect the page shows the connected email.
+
+Implementation:
+
+- [shared/lib/google-calendar/](shared/lib/google-calendar/) — pure: OAuth helpers (`buildAuthUrl`, `exchangeCode`, `refreshAccessToken`, `revokeToken`), `fetchBusyWindows`, `computeAvailableSlots` (DST-safe).
+- [db/google-tokens.ts](db/google-tokens.ts) — only place that reads/writes `google_oauth_tokens`.
+- [features/google-calendar-connect/](features/google-calendar-connect/) — admin UI + `startGoogleOAuth` / `disconnectGoogleCalendar` server actions.
+- [app/api/integrations/google/callback/route.ts](app/api/integrations/google/callback/route.ts) — OAuth redirect target with CSRF + Auth.js session check.
+- [app/api/booking/slots/route.ts](app/api/booking/slots/route.ts) — `GET ?date=YYYY-MM-DD&serviceId=...`, 60s in-memory LRU cache, static fallback when no token row exists.
+
+Security note: refresh tokens are stored plaintext in `google_oauth_tokens`. They never leave the server (the slot endpoint returns only computed slot strings). Access goes through the Supabase service-role connection; Row-Level Security keeps client SQL out. Rotate by clicking "Disconnect" → "Connect" again.
+
 ## Deploy notes
 
 The repo is environment-agnostic but expects these env vars in production. See [.env.example](.env.example) for the full list with comments.
