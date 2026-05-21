@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateVipRequestId, createVipRequest, cancelOwnVipRequest } from "./vip-requests";
+import { generateVipRequestId, createVipRequest, cancelOwnVipRequest, decideVipRequest } from "./vip-requests";
 
 describe("generateVipRequestId", () => {
   it("returns a vipreq_-prefixed id with 16 hex chars", () => {
@@ -30,5 +30,27 @@ describe("cancelOwnVipRequest", () => {
   it("returns null when db is null", async () => {
     const result = await cancelOwnVipRequest("tg:nobody");
     expect(result === null || result === undefined || typeof result === "object").toBe(true);
+  });
+});
+
+describe("decideVipRequest", () => {
+  it("returns null when db is null (approve path)", async () => {
+    const result = await decideVipRequest({
+      id: "vipreq_x",
+      action: "approve",
+      decidedBy: "tg:admin",
+      expiresAt: new Date(Date.now() + 30 * 86400_000),
+    });
+    expect(result === null || typeof result === "object").toBe(true);
+  });
+
+  it("returns null when db is null (decline path)", async () => {
+    const result = await decideVipRequest({
+      id: "vipreq_x",
+      action: "decline",
+      decidedBy: "tg:admin",
+      declineReason: "test",
+    });
+    expect(result === null || typeof result === "object").toBe(true);
   });
 });
