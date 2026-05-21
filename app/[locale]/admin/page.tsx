@@ -33,9 +33,9 @@ export default async function AdminRoute({
   const { locale } = await params;
 
   // Auth gate is only active when TELEGRAM_BOT_TOKEN is set. Local dev /
-  // CI (no token) keep the admin page open so the existing palette
-  // tests work without secrets. The gate activates as soon as the env
-  // var is populated in any environment.
+  // CI (no token) keep the admin page open so route-level tests can run
+  // without secrets. The gate activates as soon as the env var is
+  // populated in any environment.
   const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
 
   if (AUTH_REQUIRED) {
