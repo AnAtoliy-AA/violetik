@@ -30,7 +30,7 @@ export interface MembershipPageClientProps {
     cadenceMonth: string;
     cadenceYear: string;
     ctaStayFree: string;
-    ctaJoin: (tierName: string) => string;
+    ctaJoinByTier: Record<string, string>;
     mostChosen: string;
   };
   vipCardCta: ReactNode;
@@ -72,7 +72,9 @@ export function MembershipPageClient({
               priceLabel={priceLabel}
               cadenceLabel={cadenceLabel}
               ctaLabel={
-                tier.price === 0 ? labels.ctaStayFree : labels.ctaJoin(tier.tier)
+                tier.price === 0
+                  ? labels.ctaStayFree
+                  : labels.ctaJoinByTier[tier.tier] ?? ""
               }
               mostChosenLabel={labels.mostChosen}
               ctaSlot={isVip ? vipCardCta : undefined}

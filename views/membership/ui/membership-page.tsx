@@ -63,7 +63,12 @@ export async function MembershipPage() {
           cadenceMonth: t("cadence_month"),
           cadenceYear: t("cadence_year"),
           ctaStayFree: t("cta_stay_free"),
-          ctaJoin: (tierName) => t("cta_join", { tier: tierName }),
+          ctaJoinByTier: Object.fromEntries(
+            STUDIO_DATA.membership.map((m) => [
+              m.tier,
+              t("cta_join", { tier: m.tier }),
+            ]),
+          ),
           mostChosen: t("most_chosen"),
         }}
         vipCardCta={<VipCardCta state={vipState} labels={cardLabels} />}
