@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "@/shared/lib/cn";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
 import type { Service } from "@/entities/studio";
 
@@ -28,13 +29,13 @@ export function ServiceMenuItem({
       className={cn(
         "group/menu border-b-[0.5px] border-line-strong py-[22px] transition-transform duration-fast ease-out",
         topRule && "border-t-[0.5px]",
-        "hover:translate-x-1",
+        "hover:translate-x-1 motion-reduce:hover:translate-x-0",
         className,
       )}
       {...rest}
     >
       <div className="flex items-start gap-4">
-        <div className="h-[98px] w-[78px] shrink-0 overflow-hidden rounded-lg">
+        <div className="gilded glass-top h-[98px] w-[78px] shrink-0 overflow-hidden rounded-lg">
           <NailTile
             palette={palette}
             variant={variant}
@@ -43,20 +44,19 @@ export function ServiceMenuItem({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-[0.32em] text-accent">
+            <span className="font-display text-[18px] italic leading-none tracking-[-0.02em] text-gold">
               {padded}
             </span>
-            <span
-              aria-hidden
-              className="mb-1 h-0 flex-1 border-b-[0.5px] border-dotted border-line-strong"
-            />
+            <LetterpressRule className="mb-1 flex-1" />
           </div>
           <div className="mt-1.5 flex items-baseline justify-between gap-3">
             <h3 className="font-display text-[28px] font-normal italic leading-[1.05] tracking-[-0.01em]">
               {service.name}
             </h3>
-            <span className="shrink-0 font-mono text-[15px] text-gold">
-              €{service.price}
+            <span className="gilded inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5">
+              <span className="font-mono text-[14px] text-gold">
+                €{service.price}
+              </span>
             </span>
           </div>
           <div className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
