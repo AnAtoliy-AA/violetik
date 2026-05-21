@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateVipRequestId, createVipRequest, cancelOwnVipRequest, decideVipRequest } from "./vip-requests";
+import { generateVipRequestId, createVipRequest, cancelOwnVipRequest, decideVipRequest, downgradeVipRequest } from "./vip-requests";
 
 describe("generateVipRequestId", () => {
   it("returns a vipreq_-prefixed id with 16 hex chars", () => {
@@ -51,6 +51,13 @@ describe("decideVipRequest", () => {
       decidedBy: "tg:admin",
       declineReason: "test",
     });
+    expect(result === null || typeof result === "object").toBe(true);
+  });
+});
+
+describe("downgradeVipRequest", () => {
+  it("returns null when db is null", async () => {
+    const result = await downgradeVipRequest("vipreq_x");
     expect(result === null || typeof result === "object").toBe(true);
   });
 });

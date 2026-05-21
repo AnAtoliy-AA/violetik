@@ -88,3 +88,21 @@ export async function decideVipRequest(
     .returning();
   return rows[0] ?? null;
 }
+
+export async function downgradeVipRequest(
+  id: string,
+): Promise<schema.VipRequest | null> {
+  if (!db) return null;
+  const now = new Date();
+  const rows = await db
+    .update(schema.vipRequests)
+    .set({ expiresAt: now })
+    .where(
+      and(
+        eq(schema.vipRequests.id, id),
+        eq(schema.vipRequests.status, "approved"),
+      ),
+    )
+    .returning();
+  return rows[0] ?? null;
+}
