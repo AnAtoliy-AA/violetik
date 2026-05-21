@@ -1,5 +1,5 @@
 export interface Palette {
-  /** Stable id used as the `data-palette` attribute value and cookie value. */
+  /** Stable id used as the `data-palette` attribute value. */
   id: string;
   /** Display name (English; switcher translates via PaletteSwitcher.palettes.<id>). */
   name: string;

@@ -107,7 +107,6 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       data-palette={settings.defaultPalette}
-      suppressHydrationWarning
       className={`${cormorant.variable} ${dmSans.variable} ${jetBrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
