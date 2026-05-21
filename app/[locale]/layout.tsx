@@ -4,7 +4,8 @@ import { Cormorant_Garamond, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { DEFAULT_PALETTE_ID, PALETTE_COOKIE } from "@/shared/config/palettes";
+import { PALETTE_COOKIE } from "@/shared/config/palettes";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import "../globals.css";
 
 const SITE_URL =
@@ -109,10 +110,12 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
+  const settings = await getSiteSettingsServer();
+
   return (
     <html
       lang={locale}
-      data-palette={DEFAULT_PALETTE_ID}
+      data-palette={settings.defaultPalette}
       suppressHydrationWarning
       className={`${cormorant.variable} ${dmSans.variable} ${jetBrains.variable} h-full antialiased`}
     >
