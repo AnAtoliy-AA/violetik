@@ -19,6 +19,9 @@ const eslintConfig = defineConfig([
     "storybook-static/**",
     // Design-prototype reference (not part of the production build).
     "docs/**",
+    // Git worktrees (each is a separate checkout with its own .next/
+    // build artifacts; linting them re-lints generated JS).
+    ".claude/worktrees/**",
   ]),
   ...storybook.configs["flat/recommended"]
 ]);
