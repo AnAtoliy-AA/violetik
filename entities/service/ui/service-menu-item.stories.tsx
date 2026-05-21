@@ -11,7 +11,7 @@ const meta: Meta<typeof ServiceMenuItem> = {
     docs: {
       description: {
         component:
-          "Catalog-row layout used on /services. Larger thumbnail than the Home Signatures `ServiceCard`, with a plate-number prefix, italic title + gold price, a `{duration} · {category}` mark, and the blurb below. Hover translates 4px right.",
+          "Catalog-row layout used on /services. Gilded nail-tile thumbnail, gold display-serif folio plate number, hanging letterpress rule, italic title, and a gilded foil-stamp price pill. Hover translates 4px right (no-op with reduced motion).",
       },
     },
   },
