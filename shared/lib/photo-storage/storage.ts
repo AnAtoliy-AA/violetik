@@ -35,6 +35,17 @@ export interface UploadPhotoResult {
 }
 
 /**
+ * Detail surfaced to the admin UI when the upload fails. Holds the raw
+ * @vercel/blob (or network) error message — server logs already get the
+ * stack via console.error, but the UI shows the message so the admin can
+ * see "Invalid token" / "Permission denied" / etc. without opening the
+ * dev console.
+ */
+export interface PhotoUploadErrorDetail {
+  message: string;
+}
+
+/**
  * True when the `BLOB_READ_WRITE_TOKEN` env var is present. The admin form
  * uses this to disable the upload control and surface an explanatory message
  * in local dev / CI without a Vercel Blob store provisioned.
@@ -92,7 +103,7 @@ export async function uploadPhotoToStorage(
   input: UploadPhotoInput,
 ): Promise<
   | { ok: true; value: UploadPhotoResult }
-  | { ok: false; error: PhotoUploadError }
+  | { ok: false; error: PhotoUploadError; detail?: PhotoUploadErrorDetail }
 > {
   if (!isPhotoStorageConfigured()) {
     return { ok: false, error: "not_configured" };
@@ -115,8 +126,18 @@ export async function uploadPhotoToStorage(
         sizeBytes: input.file.size,
       },
     };
-  } catch {
-    return { ok: false, error: "upload_failed" };
+  } catch (error) {
+    // Surface the real reason — auth, network, region, etc. — so we don't
+    // have to debug from a generic "upload_failed". Server log gets the
+    // full error; the caller gets the message string.
+    console.error("[photo-storage] upload failed", { key, error });
+    const message =
+      error instanceof Error ? error.message : String(error ?? "unknown");
+    return {
+      ok: false,
+      error: "upload_failed",
+      detail: { message },
+    };
   }
 }
 

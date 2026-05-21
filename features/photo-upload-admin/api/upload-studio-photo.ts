@@ -36,7 +36,12 @@ const uploadSchema = z.object({
 
 export type UploadStudioPhotoResult =
   | { ok: true; src: string }
-  | { ok: false; error: PhotoUploadError | "auth" | "validation" };
+  | {
+      ok: false;
+      error: PhotoUploadError | "auth" | "validation";
+      /** Underlying provider message — shown alongside the translated error. */
+      detail?: string;
+    };
 
 /**
  * Server action that powers `/admin/photos`. Auth-gates, validates the
@@ -83,7 +88,11 @@ export async function uploadStudioPhotoAction(
     file,
   });
   if (!uploaded.ok) {
-    return { ok: false, error: uploaded.error };
+    return {
+      ok: false,
+      error: uploaded.error,
+      detail: uploaded.detail?.message,
+    };
   }
 
   const upsert = await upsertStudioPhoto({

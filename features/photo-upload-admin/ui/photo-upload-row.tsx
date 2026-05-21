@@ -73,6 +73,8 @@ export function PhotoUploadRow({
     uploadState && !uploadState.ok
       ? t(`upload_error_${uploadState.error}` as const)
       : null;
+  const errorDetail =
+    uploadState && !uploadState.ok ? uploadState.detail : null;
 
   return (
     <article
@@ -114,131 +116,109 @@ export function PhotoUploadRow({
           )}
         </div>
 
-        <form
-          ref={formRef}
-          action={uploadAction}
-          className="flex flex-col gap-3"
-        >
-          <input type="hidden" name="slotKind" value={slot.kind} />
-          <input type="hidden" name="slotId" value={slot.id} />
-          <input
-            type="hidden"
-            name="width"
-            value={pending?.width ?? current?.width ?? ""}
-          />
-          <input
-            type="hidden"
-            name="height"
-            value={pending?.height ?? current?.height ?? ""}
-          />
-
-          <FloatingInput
-            label={t("alt_label")}
-            name="alt"
-            required
-            value={alt}
-            onChange={(event) => setAlt(event.target.value)}
-            hint={t("alt_hint")}
-          />
-
-          <label className="block">
-            <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
-              {t("file_label")}
-            </span>
+        <div className="flex flex-col gap-3">
+          <form
+            ref={formRef}
+            action={uploadAction}
+            className="flex flex-col gap-3"
+          >
+            <input type="hidden" name="slotKind" value={slot.kind} />
+            <input type="hidden" name="slotId" value={slot.id} />
             <input
-              type="file"
-              name="file"
-              accept="image/jpeg,image/png,image/webp,image/avif"
-              onChange={onFileChange}
-              disabled={!storageConfigured}
-              required
-              className="mt-1.5 block w-full text-[13px] text-text-2 file:mr-3 file:cursor-pointer file:rounded-full file:border file:border-line-strong file:bg-transparent file:px-3 file:py-1.5 file:text-text file:hover:bg-surface/60 disabled:cursor-not-allowed disabled:opacity-40"
+              type="hidden"
+              name="width"
+              value={pending?.width ?? current?.width ?? ""}
             />
-          </label>
+            <input
+              type="hidden"
+              name="height"
+              value={pending?.height ?? current?.height ?? ""}
+            />
 
-          {!storageConfigured ? (
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
-              {t("storage_not_configured")}
-            </p>
-          ) : null}
+            <FloatingInput
+              label={t("alt_label")}
+              name="alt"
+              required
+              value={alt}
+              onChange={(event) => setAlt(event.target.value)}
+              hint={t("alt_hint")}
+            />
 
-          {errorMessage ? (
-            <p
-              role="alert"
-              className="font-mono text-[10px] uppercase tracking-[0.16em] text-rose"
-            >
-              {errorMessage}
-            </p>
-          ) : null}
+            <label className="block">
+              <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+                {t("file_label")}
+              </span>
+              <input
+                type="file"
+                name="file"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                onChange={onFileChange}
+                disabled={!storageConfigured}
+                required
+                className="mt-1.5 block w-full text-[13px] text-text-2 file:mr-3 file:cursor-pointer file:rounded-full file:border file:border-line-strong file:bg-transparent file:px-3 file:py-1.5 file:text-text file:hover:bg-surface/60 disabled:cursor-not-allowed disabled:opacity-40"
+              />
+            </label>
 
-          {uploadState && uploadState.ok ? (
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
-              {t("upload_success")}
-            </p>
-          ) : null}
+            {!storageConfigured ? (
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+                {t("storage_not_configured")}
+              </p>
+            ) : null}
 
-          <div className="flex items-center gap-2">
+            {errorMessage ? (
+              <div role="alert" className="space-y-1">
+                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-rose">
+                  {errorMessage}
+                </p>
+                {errorDetail ? (
+                  <p className="break-all font-mono text-[10px] text-text-3">
+                    {errorDetail}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+
+            {uploadState && uploadState.ok ? (
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+                {t("upload_success")}
+              </p>
+            ) : null}
+
             <button
               type="submit"
-              disabled={
-                !storageConfigured || uploadPending || pending === null
-              }
+              disabled={!storageConfigured || uploadPending || pending === null}
               className={cn(
                 buttonClassName({ variant: "solid", size: "sm" }),
-                "min-w-[120px]",
+                "self-start min-w-[120px]",
               )}
             >
               {uploadPending ? t("uploading") : t("upload")}
             </button>
-            {current ? (
-              <DeleteForm
-                slot={slot}
-                action={deleteAction}
-                pending={deletePending}
-                label={t("remove")}
-                deletedLabel={
-                  deleteState && deleteState.ok
-                    ? t("removed")
-                    : null
-                }
-              />
-            ) : null}
-          </div>
-        </form>
+          </form>
+
+          {current ? (
+            <form
+              action={deleteAction}
+              className="inline-flex items-center gap-2"
+            >
+              <input type="hidden" name="slotKind" value={slot.kind} />
+              <input type="hidden" name="slotId" value={slot.id} />
+              <button
+                type="submit"
+                disabled={deletePending}
+                className={buttonClassName({ variant: "ghost", size: "sm" })}
+              >
+                {deletePending ? "…" : t("remove")}
+              </button>
+              {deleteState && deleteState.ok ? (
+                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-3">
+                  {t("removed")}
+                </span>
+              ) : null}
+            </form>
+          ) : null}
+        </div>
       </div>
     </article>
-  );
-}
-
-function DeleteForm({
-  slot,
-  action,
-  pending,
-  label,
-  deletedLabel,
-}: {
-  slot: PhotoSlot;
-  action: (formData: FormData) => void;
-  pending: boolean;
-  label: string;
-  deletedLabel: string | null;
-}) {
-  return (
-    <form action={action} className="inline-flex items-center gap-2">
-      <input type="hidden" name="slotKind" value={slot.kind} />
-      <input type="hidden" name="slotId" value={slot.id} />
-      <button
-        type="submit"
-        disabled={pending}
-        className={buttonClassName({ variant: "ghost", size: "sm" })}
-      >
-        {pending ? "…" : label}
-      </button>
-      {deletedLabel ? (
-        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-3">
-          {deletedLabel}
-        </span>
-      ) : null}
-    </form>
   );
 }
