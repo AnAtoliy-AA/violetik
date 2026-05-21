@@ -45,6 +45,8 @@ export function ServiceCard({
         <NailTile
           palette={palette}
           variant={variant}
+          image={service.image}
+          imageSizes="68px"
           className="size-full"
         />
       </div>

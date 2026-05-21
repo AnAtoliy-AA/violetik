@@ -69,6 +69,8 @@ export function GalleryLightbox({
           <NailTile
             palette={item.palette}
             variant={(setNumber % 6) as NailTileVariant}
+            image={item.image}
+            imageSizes="(max-width: 420px) 100vw, 420px"
             className="size-full"
           />
         </motion.div>

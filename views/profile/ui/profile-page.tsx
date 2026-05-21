@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA, type Visit } from "@/entities/studio";
@@ -67,15 +68,29 @@ export async function ProfilePage() {
         <Aurora intensity="subtle" />
         <PaperGrain />
         <div className="relative z-10 flex items-center gap-4">
-          <div
-            aria-hidden
-            className="gilded glass-top grid size-[68px] place-items-center rounded-full font-display text-[24px] italic text-bg"
-            style={{
-              background: `linear-gradient(135deg, ${profile.palette[0]}, ${profile.palette[1]})`,
-            }}
-          >
-            {initialsOf(profile.name)}
-          </div>
+          {profile.avatar ? (
+            <div className="gilded glass-top relative size-[68px] overflow-hidden rounded-full">
+              <Image
+                src={profile.avatar.src}
+                alt={profile.avatar.alt ?? profile.name}
+                fill
+                sizes="68px"
+                placeholder={profile.avatar.blurDataURL ? "blur" : undefined}
+                blurDataURL={profile.avatar.blurDataURL}
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <div
+              aria-hidden
+              className="gilded glass-top grid size-[68px] place-items-center rounded-full font-display text-[24px] italic text-bg"
+              style={{
+                background: `linear-gradient(135deg, ${profile.palette[0]}, ${profile.palette[1]})`,
+              }}
+            >
+              {initialsOf(profile.name)}
+            </div>
+          )}
           <div>
             {tier.state === "vip" && (
               <span className="gilded inline-flex items-center rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
