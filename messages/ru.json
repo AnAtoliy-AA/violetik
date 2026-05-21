@@ -326,6 +326,25 @@
       "completed": "Завершено"
     }
   },
+  "AdminVipRequests": {
+    "meta_title": "Заявки на VIP",
+    "expired_page_title": "Истёкшие VIP",
+    "eyebrow": "Админ",
+    "hero_title": "Заявки на VIP-членство",
+    "hero_paragraph": "Ожидающие заявки, активные VIP по близости истечения, а также недавние истечения.",
+    "section_pending": "Ожидают ({n})",
+    "section_active": "Активные VIP ({n})",
+    "section_expired": "Истёкшие ({shown} из {total})",
+    "empty_pending": "Сейчас нет заявок.",
+    "empty_active": "Сейчас нет активных VIP.",
+    "empty_expired": "Истёкших нет.",
+    "cta_approve": "Одобрить",
+    "cta_decline": "Отклонить",
+    "cta_downgrade": "Понизить",
+    "cta_show_all_expired": "Показать все {total}",
+    "expires_in_days": "истекает через {n}д",
+    "expired_ago_days": "истекло {n}д назад"
+  },
   "AdminGoogle": {
     "meta_title": "Google Календарь",
     "eyebrow": "Интеграции · Google",

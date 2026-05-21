@@ -326,6 +326,25 @@
       "completed": "Завершана"
     }
   },
+  "AdminVipRequests": {
+    "meta_title": "Заяўкі на VIP",
+    "expired_page_title": "Заканчаныя VIP",
+    "eyebrow": "Адмін",
+    "hero_title": "Заяўкі на VIP-сяброўства",
+    "hero_paragraph": "Заяўкі на разглядзе, актыўныя VIP па набліжэнні тэрміну, а таксама нядаўнія заканчэнні.",
+    "section_pending": "Чакаюць ({n})",
+    "section_active": "Актыўныя VIP ({n})",
+    "section_expired": "Заканчаныя ({shown} з {total})",
+    "empty_pending": "Зараз заяўак няма.",
+    "empty_active": "Зараз актыўных VIP няма.",
+    "empty_expired": "Заканчаных яшчэ няма.",
+    "cta_approve": "Зацвердзіць",
+    "cta_decline": "Адхіліць",
+    "cta_downgrade": "Зніжыць",
+    "cta_show_all_expired": "Паказаць усе {total}",
+    "expires_in_days": "заканчваецца праз {n}д",
+    "expired_ago_days": "закончылася {n}д таму"
+  },
   "AdminGoogle": {
     "meta_title": "Google Каляндар",
     "eyebrow": "Інтэграцыі · Google",

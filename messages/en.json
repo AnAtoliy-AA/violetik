@@ -326,6 +326,25 @@
       "completed": "Completed"
     }
   },
+  "AdminVipRequests": {
+    "meta_title": "VIP requests",
+    "expired_page_title": "Expired VIP",
+    "eyebrow": "Admin",
+    "hero_title": "VIP membership requests",
+    "hero_paragraph": "Pending requests, active VIPs sorted by upcoming expiry, and recent expirations.",
+    "section_pending": "Pending ({n})",
+    "section_active": "Active VIPs ({n})",
+    "section_expired": "Expired ({shown} of {total})",
+    "empty_pending": "No requests right now.",
+    "empty_active": "No active VIPs right now.",
+    "empty_expired": "No expirations yet.",
+    "cta_approve": "Approve",
+    "cta_decline": "Decline",
+    "cta_downgrade": "Downgrade",
+    "cta_show_all_expired": "Show all {total}",
+    "expires_in_days": "expires in {n}d",
+    "expired_ago_days": "expired {n}d ago"
+  },
   "AdminGoogle": {
     "meta_title": "Google Calendar",
     "eyebrow": "Integrations · Google",
