@@ -3,8 +3,10 @@
 import { motion, useReducedMotion } from "motion/react";
 import type { NailTilePalette, NailTileVariant } from "@/shared/ui/nail-tile";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { NailTile } from "@/shared/ui/nail-tile";
+import { PaperGrain } from "@/shared/ui/paper-grain";
 
 export interface OnboardingSlideProps {
   palette: NailTilePalette;
@@ -30,6 +32,7 @@ export function OnboardingSlide({
     <div className="flex h-full w-full shrink-0 flex-col">
       <div className="relative h-[60%] overflow-hidden">
         <NailTile palette={palette} variant={variant} className="size-full" />
+        <PaperGrain className="opacity-[0.06]" />
         <motion.div
           aria-hidden
           className="pointer-events-none absolute -bottom-[20%] -right-[10%] h-[60%] w-[70%]"
@@ -57,6 +60,7 @@ export function OnboardingSlide({
         <h2 className="mb-3 mt-2.5 font-display text-[36px] font-normal italic">
           {title}
         </h2>
+        <LetterpressRule className="mb-3 max-w-[160px]" />
         <p className="m-0 text-[15px] leading-[1.55] text-text-2">{body}</p>
       </div>
     </div>
