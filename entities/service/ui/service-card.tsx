@@ -38,7 +38,10 @@ export function ServiceCard({
       )}
       {...rest}
     >
-      <div className="size-[68px] h-[84px] w-[68px] shrink-0 overflow-hidden rounded-lg">
+      <div
+        className="size-[68px] h-[84px] w-[68px] shrink-0 overflow-hidden rounded-lg"
+        style={{ viewTransitionName: `service-hero-${service.id}` }}
+      >
         <NailTile
           palette={palette}
           variant={variant}

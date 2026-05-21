@@ -32,7 +32,14 @@ export function DetailHero({
   const heroY = useTransform(scrollY, [0, 320], [0, -40]);
   const heroScale = useTransform(scrollY, [0, 320], [1, 1.18]);
 
-  const heroStyle = reduceMotion ? undefined : { y: heroY, scale: heroScale };
+  // Combine the scroll-driven motion transform with the view-transition-name
+  // that pairs this hero with the source thumbnail on /services or /home.
+  // The name lives on the same element as the NailTile so the browser snapshot
+  // captures the right rectangle.
+  const viewTransitionName = `service-hero-${service.id}`;
+  const heroStyle = reduceMotion
+    ? { viewTransitionName }
+    : { y: heroY, scale: heroScale, viewTransitionName };
 
   return (
     <div className="relative h-[440px] overflow-hidden">
