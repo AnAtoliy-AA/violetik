@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import {
+  loadArtistWithPhoto,
+  loadTestimonialsWithPhotos,
+} from "@/entities/studio/api/load-with-photos";
 import { MasterPage } from "@/views/master";
 
 type Params = { locale: string };
@@ -21,5 +25,9 @@ export default async function MasterRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <MasterPage />;
+  const [artist, testimonials] = await Promise.all([
+    loadArtistWithPhoto(),
+    loadTestimonialsWithPhotos(),
+  ]);
+  return <MasterPage artist={artist} testimonials={testimonials} />;
 }

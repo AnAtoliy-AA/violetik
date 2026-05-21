@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import { loadGalleryWithPhotos } from "@/entities/studio/api/load-with-photos";
 import { GalleryPage } from "@/views/gallery";
 
 type Params = { locale: string };
@@ -21,5 +22,6 @@ export default async function GalleryRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <GalleryPage />;
+  const items = await loadGalleryWithPhotos();
+  return <GalleryPage items={items} />;
 }

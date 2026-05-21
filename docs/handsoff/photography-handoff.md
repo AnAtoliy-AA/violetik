@@ -1,114 +1,101 @@
 # Photography handoff
 
-The app is wired to render real photographs everywhere a `NailTile` gradient
-currently stands in. This doc tells the photographer / asset deliverer
-exactly where to drop files and how to register them.
+The studio uploads its own photographs through `/admin/photos`. Files go to
+**Vercel Blob**, metadata persists in the `studio_photos` Postgres table, and
+the customer pages render the photographs immediately on next visit. Nothing
+ever lands in this repository — the public `public/studio/` directory stays
+empty by design.
 
-## TL;DR
+## For Violetta (the admin)
 
-1. Drop image files under `public/studio/…` (paths below).
-2. Open `entities/studio/model/data.ts`, set the optional `image` (or `avatar`,
-   or `video`) field on the matching entity to point at the dropped file.
-3. Refresh the page — the gradient placeholder is replaced by the photograph.
+1. Sign in with Telegram at `/sign-in` (you need the `admin` role — ask the
+   developer to flip it the first time).
+2. Open `/admin` → **Photography**.
+3. For each slot, pick a JPEG/PNG/WebP/AVIF file (≤ 8 MB), write a one-line
+   alt text describing what the photograph shows, click **Upload**.
+4. Replace an existing photo by uploading a new one — the old asset is
+   deleted automatically. Press **Remove** to clear a slot back to the
+   gradient placeholder.
 
-No code changes beyond `data.ts` are needed for the swap.
+That's it. The catalog, detail hero, gallery, master portrait, testimonial
+avatars and atelier-motion posters all update on the next page load.
 
-## Directory layout
+## For the developer setting it up
 
-All assets live under `public/studio/`. The `public/` directory is otherwise
-intentionally empty (CLAUDE.md tracks this).
+### Provision Vercel Blob
 
-| Slot | File path | Aspect | Used by |
-|---|---|---|---|
-| Service thumbnail + hero | `public/studio/services/{id}.jpg` | 5:6 (portrait) | `ServiceCard`, `ServiceMenuItem`, `DetailHero` |
-| Gallery tile | `public/studio/gallery/{id}.jpg` | natural | `GalleryCard`, `GalleryLightbox` |
-| Master portrait | `public/studio/master.jpg` | 1:1.2 | `MasterPage` hero |
-| Testimonial avatar | `public/studio/testimonials/{id}.jpg` | 1:1 | testimonial cards |
-| Profile avatar | `public/studio/profile.jpg` | 1:1 | `ProfilePage` |
-| Atelier-motion clip | `public/studio/atelier/{key}.mp4` | 3:4 | `AtelierMotion` |
-| Atelier-motion poster | `public/studio/atelier/{key}-poster.jpg` | 3:4 | `AtelierMotion` poster frame |
-
-`{id}` matches the entity id in `data.ts`. For services, that's `signature`,
-`gel`, `editorial`, `extensions`, `pedi`, `removal`. For the gallery,
-`g1`–`g8`. Testimonials: `t1`, `t2`, `t3`. Atelier clip keys: `buff`,
-`polish`, `design`.
-
-## Sizing + format
-
-- **JPEG** is fine for photographs. Use 80% quality, sRGB.
-- **AVIF/WebP** also work — `next/image` will serve the optimal format per
-  browser. Author in JPG; Next handles conversion at build time.
-- Target the **largest** size the slot ever displays (e.g. service hero at
-  ~420px wide on mobile, ~840px on retina = export at ~1200px wide). Next
-  will downscale at request time.
-- Atelier clips: H.264 MP4, ≤ 4 seconds, ≤ 800KB each. Loop seamlessly.
-
-## Registering a new asset
-
-Edit `entities/studio/model/data.ts`. Example for the Signature Manicure
-service:
-
-```ts
-{
-  id: "signature",
-  name: "Signature Manicure",
-  // …existing fields…
-  image: {
-    src: "/studio/services/signature.jpg",
-    alt: "Signature Manicure — close-up of finished nails",
-    width: 1200,
-    height: 1440, // optional but helps next/image
-    // Optional blur-up placeholder, e.g. generated via plaiceholder:
-    // blurDataURL: "data:image/jpeg;base64,…",
-  },
-},
+```bash
+# In the Vercel dashboard:
+# Storage → Create → Blob → name it (e.g. "violetik-studio")
+# Copy the BLOB_READ_WRITE_TOKEN it generates.
 ```
 
-For gallery items, the field is `image`. For the artist, `image`. For
-testimonials, `avatar`. For the customer profile, `avatar`. For atelier
-clips, the field is `video`:
+Set the env var locally:
 
-```ts
-{
-  key: "buff",
-  palette: ["#7d3a6f", "#c9a96e"],
-  video: {
-    src: "/studio/atelier/buff.mp4",
-    posterSrc: "/studio/atelier/buff-poster.jpg",
-    alt: "Buffing a nail with the studio's e-file",
-  },
-},
+```bash
+echo 'BLOB_READ_WRITE_TOKEN="vercel_blob_rw_…"' >> .env.local
 ```
 
-## Blur-up placeholders (optional)
+In production, set it in the project's environment variables. Without it,
+the admin form disables itself and shows a banner — uploads can't happen
+but the rest of the app keeps working.
 
-For above-the-fold images (service detail hero, master portrait), generating
-a base64 `blurDataURL` gives the smoothest perceived load. The easiest path
-is the [`plaiceholder`](https://plaiceholder.co) package, but any tool that
-emits a base64 LQIP works. Drop the resulting string into
-`image.blurDataURL` and `next/image` switches to `placeholder="blur"`
-automatically.
+### Database migration
 
-## CDN / remote URLs
+The `studio_photos` table ships with migration `0006_studio_photos.sql`.
+Apply it via:
 
-If imagery lives off the origin (e.g. an S3 bucket or Cloudinary), set
-`image.src` to the absolute URL and add a matching entry to
-`next.config.ts`'s `images.remotePatterns`. The wiring otherwise stays
-identical.
+```bash
+npm run db:migrate
+```
 
-## Verification
+### Schema
 
-After dropping assets and editing `data.ts`:
+```ts
+studioPhotos {
+  id            text  PRIMARY KEY
+  slotKind      enum  // service | gallery | atelier | master | testimonial | profile
+  slotId        text  // matches the entity id, e.g. "signature", "g3", "t1"
+  src           text  // public Vercel Blob URL
+  alt           text  // for next/image
+  width / height int  // natural dimensions read client-side before upload
+  blurDataUrl   text  // reserved for a future plaiceholder pass — nullable
+  uploadedAt    ts
+  uploadedBy    -> users.id
+}
+UNIQUE (slotKind, slotId)
+```
 
-- `npm run lint` — should be clean (only data changed).
-- `npm test` — existing tests cover the conditional render in NailTile.
-- `npm run dev` — visit each affected page; the gradient is replaced by
-  the photograph.
-- `npm run build` — Next inlines image dimensions at build time.
+One row per slot — the second upload replaces the first row and the old
+Blob is deleted server-side.
+
+### Slot kinds the admin can target
+
+| Slot kind | Slot ids | Where it renders |
+|---|---|---|
+| `service` | `signature`, `gel`, `editorial`, `extensions`, `pedi`, `removal` | ServiceCard (home signatures), ServiceMenuItem (catalog rows), DetailHero |
+| `gallery` | `g1`–`g8` | Gallery grid + lightbox |
+| `master`  | `violetta` | Master page portrait |
+| `testimonial` | `t1`, `t2`, `t3` | Master testimonial avatars |
+| `atelier` | `buff`, `polish`, `design` | AtelierMotion poster frames |
+| `profile` | the demo customer id | Profile page avatar |
+
+The full roster is generated from `entities/studio/model/data.ts` at
+runtime by `listAllPhotoSlots()` — adding a new service or testimonial
+automatically surfaces a new upload row in `/admin/photos`.
+
+## CDN-only path (if you skip Vercel Blob)
+
+If the studio prefers Cloudinary / R2 / S3 / its own CDN, swap out the
+storage adapter at [`shared/lib/photo-storage/storage.ts`](../shared/lib/photo-storage/storage.ts).
+The contract is two functions — `uploadPhotoToStorage` and
+`deletePhotoFromStorage`. Add the new host to
+`next.config.ts` `images.remotePatterns` and update the
+`BLOB_READ_WRITE_TOKEN` check to whatever env var your provider needs.
 
 ## What stays as a gradient
 
-Any entity that doesn't carry an `image` / `avatar` / `video` field falls
-back to the existing gradient placeholder. So you can ship photography
-incrementally — one service at a time, the gallery alone, just the master
-portrait — and the rest of the app keeps working.
+Any entity that doesn't have a `studio_photos` row keeps rendering the
+existing `NailTile` gradient. So photography can ship incrementally — one
+service at a time, the gallery alone, just the master portrait — and the
+rest of the app keeps working.

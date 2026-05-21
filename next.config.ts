@@ -14,6 +14,17 @@ const nextConfig: NextConfig = {
   experimental: {
     viewTransition: true,
   },
+  // Allow next/image to optimize photographs served from Vercel Blob.
+  // The wildcard matches both `<store>.public.blob.vercel-storage.com` and
+  // `<store>.<region>.public.blob.vercel-storage.com` per Blob's CDN layout.
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);

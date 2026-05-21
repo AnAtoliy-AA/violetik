@@ -5,7 +5,11 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ServiceMenuItem } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
-import { STUDIO_DATA, type Category } from "@/entities/studio";
+import {
+  STUDIO_DATA,
+  type Category,
+  type Service,
+} from "@/entities/studio";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
 import { Aurora } from "@/shared/ui/aurora";
@@ -26,9 +30,18 @@ export interface ServicesCatalogPageProps {
    * back to the catalog price — keeps tests/stories simple.
    */
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
+  /**
+   * Optional service list with `image` populated from `studio_photos`.
+   * When omitted, falls back to the in-memory STUDIO_DATA so existing
+   * tests / stories don't need to thread a DB.
+   */
+  services?: readonly Service[];
 }
 
-export function ServicesCatalogPage({ pricedServices }: ServicesCatalogPageProps = {}) {
+export function ServicesCatalogPage({
+  pricedServices,
+  services,
+}: ServicesCatalogPageProps = {}) {
   const t = useTranslations("Services");
   const tCat = useTranslations("Services.category");
   const [active, setActive] = useState<ChipValue>("All");
@@ -45,12 +58,13 @@ export function ServicesCatalogPage({ pricedServices }: ServicesCatalogPageProps
     [t, tCat],
   );
 
+  const source = services ?? STUDIO_DATA.services;
   const filtered = useMemo(
     () =>
       active === "All"
-        ? STUDIO_DATA.services
-        : STUDIO_DATA.services.filter((s) => s.category === active),
-    [active],
+        ? source
+        : source.filter((s) => s.category === active),
+    [active, source],
   );
 
   return (

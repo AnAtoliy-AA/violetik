@@ -1,7 +1,11 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { STUDIO_DATA } from "@/entities/studio";
+import {
+  STUDIO_DATA,
+  type Artist,
+  type Testimonial,
+} from "@/entities/studio";
 import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
@@ -28,9 +32,20 @@ function ArrowRight() {
   );
 }
 
-export function MasterPage() {
+export interface MasterPageProps {
+  /** Override the master record (with DB-loaded photo) at the route level. */
+  artist?: Artist;
+  /** Override the testimonials list (with DB-loaded avatars). */
+  testimonials?: readonly Testimonial[];
+}
+
+export function MasterPage({
+  artist: artistProp,
+  testimonials: testimonialsProp,
+}: MasterPageProps = {}) {
   const t = useTranslations("Master");
-  const { artist, testimonials } = STUDIO_DATA;
+  const artist = artistProp ?? STUDIO_DATA.artist;
+  const testimonials = testimonialsProp ?? STUDIO_DATA.testimonials;
   const [firstName, ...rest] = artist.name.split(" ");
   const lastName = rest.join(" ");
 
