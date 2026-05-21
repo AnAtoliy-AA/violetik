@@ -29,8 +29,8 @@ export function DetailHero({
   const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
 
-  const heroY = useTransform(scrollY, [0, 500], [0, -225]);
-  const heroScale = useTransform(scrollY, [0, 600], [1, 1.2]);
+  const heroY = useTransform(scrollY, [0, 320], [0, -40]);
+  const heroScale = useTransform(scrollY, [0, 320], [1, 1.18]);
 
   const heroStyle = reduceMotion ? undefined : { y: heroY, scale: heroScale };
 

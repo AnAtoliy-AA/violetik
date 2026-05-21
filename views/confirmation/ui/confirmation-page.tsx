@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -17,6 +17,46 @@ import { ConfettiBurst } from "./confetti-burst";
 import { GoldenSeal } from "./golden-seal";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const HEADLINE_START = 1.1;
+
+/** Splits a headline that uses `<br/>` line breaks into per-word motion spans. */
+function HeadlineTypeOn({
+  text,
+  reduceMotion,
+}: {
+  text: string;
+  reduceMotion: boolean;
+}) {
+  const lines = text.split(/<br\s*\/?\s*>/i);
+  let wordIndex = 0;
+  return (
+    <>
+      {lines.map((line, lineIdx) => (
+        <Fragment key={lineIdx}>
+          {line.split(/\s+/).filter(Boolean).map((word) => {
+            const i = wordIndex++;
+            return (
+              <motion.span
+                key={`${lineIdx}-${i}`}
+                className="inline-block whitespace-pre"
+                initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: reduceMotion ? 0 : 0.55,
+                  ease: EASE_OUT,
+                  delay: reduceMotion ? 0 : HEADLINE_START + i * 0.06,
+                }}
+              >
+                {word}{" "}
+              </motion.span>
+            );
+          })}
+          {lineIdx < lines.length - 1 ? <br /> : null}
+        </Fragment>
+      ))}
+    </>
+  );
+}
 
 function buildReservationCode(seed: string): string {
   let hash = 0;
@@ -69,10 +109,25 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
     [t("row_duration"), service.duration],
   ];
 
+  const titleRaw = t.raw("title") as string;
+
   return (
     <div className="relative overflow-hidden px-[22px] pb-9">
       <Aurora intensity="subtle" />
       <PaperGrain />
+      {/* Curtain — the seal scales into a black overlay that clears in 1.6s. */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-20 bg-bg"
+        initial={reduceMotion ? false : { opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{
+          duration: reduceMotion ? 0 : 0.4,
+          ease: EASE_OUT,
+          delay: 0.1,
+        }}
+        style={{ filter: "blur(14px)" }}
+      />
       <ConfettiBurst />
       <div className="relative z-10 pt-10 text-center">
         <GoldenSeal />
@@ -91,7 +146,7 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
                 : t("reserved_eyebrow", { code })}
           </Eyebrow>
           <h1 className="my-3 mb-1.5 font-display text-[44px] font-normal italic leading-tight tracking-[-0.02em]">
-            {t.rich("title", { br: () => <br /> })}
+            <HeadlineTypeOn text={titleRaw} reduceMotion={reduceMotion ?? false} />
           </h1>
           <LetterpressRule className="mx-auto mt-3 max-w-[160px]" />
           <p className="mx-auto mt-3.5 max-w-[320px] text-[14px] text-text-2">
@@ -141,7 +196,11 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
           <MagneticButton className="block w-full">
             <Link
               href="/profile"
-              className={buttonClassName({ variant: "solid", size: "lg", block: true })}
+              className={buttonClassName({
+                variant: "gold",
+                size: "lg",
+                block: true,
+              })}
             >
               {t("cta_calendar")}
             </Link>

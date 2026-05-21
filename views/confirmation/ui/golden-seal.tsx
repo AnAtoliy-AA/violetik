@@ -23,7 +23,9 @@ export function GoldenSeal() {
             "0 20px 40px -10px color-mix(in oklab, var(--color-accent) 40%, transparent)",
         }}
       />
-      <div className="absolute inset-3 rounded-full border-[0.5px] border-white/45" />
+      <div
+        className="absolute inset-3 rounded-full border-[0.5px] border-white/45 motion-safe:[animation:sealRotate_60s_linear_infinite_reverse]"
+      />
       <motion.svg
         viewBox="0 0 60 60"
         className="absolute inset-0 m-auto size-10"
