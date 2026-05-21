@@ -45,6 +45,11 @@
     "most_chosen": "Часцей за ўсё",
     "cta_stay_free": "Застацца бясплатным",
     "cta_join": "Далучыцца да {tier}",
+    "cta_sign_in": "Увайсці, каб падаць заяўку",
+    "cta_join_vip": "Стаць VIP",
+    "cta_cancel_request": "Адмяніць заяўку",
+    "cta_youre_member": "Вы Member",
+    "cta_youre_vip": "Вы VIP · да {date}",
     "footnote": "Сяброўства можна паставіць на паўзу ў любы момант. Адмена ў адзін клік — без званкоў і формаў."
   },
   "Master": {

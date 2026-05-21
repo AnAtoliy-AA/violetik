@@ -45,6 +45,11 @@
     "most_chosen": "Чаще всего",
     "cta_stay_free": "Остаться бесплатным",
     "cta_join": "Присоединиться к {tier}",
+    "cta_sign_in": "Войти, чтобы подать заявку",
+    "cta_join_vip": "Стать VIP",
+    "cta_cancel_request": "Отменить заявку",
+    "cta_youre_member": "Вы Member",
+    "cta_youre_vip": "Вы VIP · до {date}",
     "footnote": "Членство можно поставить на паузу в любой момент. Отмена в один клик — без звонков и форм."
   },
   "Master": {

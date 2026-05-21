@@ -45,6 +45,11 @@
     "most_chosen": "Most chosen",
     "cta_stay_free": "Stay free",
     "cta_join": "Join {tier}",
+    "cta_sign_in": "Sign in to apply",
+    "cta_join_vip": "Join VIP",
+    "cta_cancel_request": "Cancel request",
+    "cta_youre_member": "You're a Member",
+    "cta_youre_vip": "You're a VIP · expires {date}",
     "footnote": "Memberships pause anytime. Cancel by message — no calls, no forms."
   },
   "Master": {
