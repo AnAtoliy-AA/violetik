@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile } from "@/shared/ui/nail-tile";
 import { Price } from "@/shared/ui/price";
 import { formatLongDate } from "@/views/booking/lib/booking-steps";
@@ -42,11 +43,12 @@ export function ConfirmStep({ pricedServices }: ConfirmStepProps = {}) {
       <h2 className="my-2.5 mb-1.5 font-display text-[36px] font-normal italic leading-tight tracking-[-0.02em]">
         {t.rich("title", { em: (c) => <em>{c}</em> })}
       </h2>
+      <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
       <p className="m-0 mb-5 text-sm text-text-2">{t("paragraph")}</p>
 
-      <div className="overflow-hidden rounded-[18px] border-[0.5px] border-line bg-surface">
+      <div className="gilded glass-top overflow-hidden rounded-[18px]">
         <div className="flex gap-3.5 border-b-[0.5px] border-line p-5">
-          <div className="h-20 w-16 shrink-0 overflow-hidden rounded-[10px]">
+          <div className="gilded h-20 w-16 shrink-0 overflow-hidden rounded-[10px]">
             <NailTile
               palette={HERO_PALETTE}
               variant={1}
@@ -91,7 +93,7 @@ export function ConfirmStep({ pricedServices }: ConfirmStepProps = {}) {
             <div className="font-mono text-[11px] uppercase tracking-[0.1em] text-text-3">
               {t("total")}
             </div>
-            <div className="font-display text-[30px] font-normal italic text-gold">
+            <div className="font-display text-[30px] font-normal italic text-gold-shimmer">
               {pricedServices?.[service.id] ? (
                 <Price resolved={pricedServices[service.id]} />
               ) : (

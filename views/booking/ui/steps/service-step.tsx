@@ -5,6 +5,7 @@ import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
 import { Price } from "@/shared/ui/price";
 import { useBookingStore } from "@/views/booking/model/booking-store";
@@ -39,6 +40,7 @@ export function ServiceStep({ pricedServices }: ServiceStepProps = {}) {
       <h2 className="my-2.5 mb-1.5 font-display text-[36px] font-normal italic leading-tight tracking-[-0.02em]">
         {t.rich("title", { em: (c) => <em>{c}</em> })}
       </h2>
+      <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
       <p className="m-0 mb-5 text-sm text-text-2">{t("paragraph")}</p>
 
       <div className="flex flex-col gap-2.5">
@@ -52,15 +54,13 @@ export function ServiceStep({ pricedServices }: ServiceStepProps = {}) {
               aria-checked={active}
               onClick={() => setService(s.id)}
               className={cn(
-                "flex items-center gap-3.5 rounded-[18px] p-3.5 text-left text-text",
-                "border-[0.5px] transition-colors duration-fast ease-out",
+                "gilded flex items-center gap-3.5 rounded-[18px] p-3.5 text-left text-text",
+                "transition-colors duration-fast ease-out",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-                active
-                  ? "border-accent bg-surface-2"
-                  : "border-line bg-surface hover:bg-surface-2",
+                active ? "glass-top" : "hover:bg-surface-2",
               )}
             >
-              <div className="h-[70px] w-14 shrink-0 overflow-hidden rounded-lg">
+              <div className="gilded h-[70px] w-14 shrink-0 overflow-hidden rounded-lg">
                 <NailTile
                   palette={["#c9a96e", "#7d3a6f"]}
                   variant={(i % 6) as NailTileVariant}
@@ -84,10 +84,10 @@ export function ServiceStep({ pricedServices }: ServiceStepProps = {}) {
               <span
                 className={cn(
                   "inline-flex size-[22px] shrink-0 items-center justify-center self-center rounded-full",
-                  "border-[0.5px] transition-colors duration-fast ease-out",
+                  "transition-colors duration-fast ease-out",
                   active
-                    ? "border-accent bg-accent"
-                    : "border-line-strong bg-transparent",
+                    ? "bg-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]"
+                    : "border-[0.5px] border-line-strong bg-transparent",
                 )}
               >
                 {active ? <CheckIcon /> : null}

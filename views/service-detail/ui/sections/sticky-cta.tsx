@@ -40,7 +40,7 @@ export function StickyCta({ serviceId, resolvedPrice }: StickyCtaProps) {
           <div className="font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
             {t("from")}
           </div>
-          <div className="font-display text-[28px] font-normal italic leading-none text-gold">
+          <div className="font-display text-[28px] font-normal italic leading-none text-gold-shimmer">
             <Price resolved={resolvedPrice} />
           </div>
         </div>

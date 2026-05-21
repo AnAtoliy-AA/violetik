@@ -12,6 +12,14 @@ export interface TagFilterProps {
   ariaLabel: string;
 }
 
+const baseChip =
+  "shrink-0 rounded-full px-3.5 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.14em] transition-colors duration-fast ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
+
+const selectedChip =
+  "bg-gold text-bg bg-[length:200%_100%] bg-[position:0%_50%] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]";
+
+const unselectedChip = "gilded text-text-2 hover:text-text";
+
 export function TagFilter({
   tags,
   active,
@@ -34,14 +42,7 @@ export function TagFilter({
             role="tab"
             aria-selected={selected}
             onClick={() => onChange(tag)}
-            className={cn(
-              "shrink-0 rounded-full border-[0.5px] px-3.5 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.14em]",
-              "transition-colors duration-fast ease-out",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-              selected
-                ? "border-text bg-text text-bg"
-                : "border-line-strong bg-transparent text-text-2 hover:text-text",
-            )}
+            className={cn(baseChip, selected ? selectedChip : unselectedChip)}
           >
             {labels[tag] ?? tag}
           </button>

@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import {
   BOOKING_START_ISO,
   buildDateStrip,
@@ -30,6 +31,7 @@ export function DateStep() {
       <h2 className="my-2.5 mb-1.5 font-display text-[36px] font-normal italic leading-tight tracking-[-0.02em]">
         {t.rich("title", { em: (c) => <em>{c}</em> })}
       </h2>
+      <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
       <p className="m-0 mb-5 text-sm text-text-2">
         {t.rich("paragraph", {
           gold: (c) => <span className="text-gold">{c}</span>,
@@ -52,21 +54,21 @@ export function DateStep() {
               aria-label={`${d.dow} ${d.day}`}
               onClick={() => setDate(d.iso)}
               className={cn(
-                "relative aspect-[1/1.15] rounded-[12px] border-[0.5px]",
+                "relative aspect-[1/1.15] rounded-[12px]",
                 "flex flex-col items-center justify-center gap-0.5",
                 "transition-colors duration-fast ease-out",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                 d.disabled
-                  ? "cursor-not-allowed border-transparent bg-surface/40 text-text-3 opacity-40"
+                  ? "cursor-not-allowed border-[0.5px] border-transparent bg-surface/40 text-text-3 opacity-40"
                   : isSelected
-                    ? "border-accent text-bg"
-                    : "border-line bg-surface text-text hover:border-line-strong",
+                    ? "text-bg"
+                    : "gilded text-text hover:bg-surface-2",
               )}
             >
               {isSelected ? (
                 <motion.span
                   layoutId="date-pill"
-                  className="absolute inset-0 rounded-[12px] bg-accent"
+                  className="absolute inset-0 rounded-[12px] bg-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]"
                   transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                   style={{ zIndex: -1 }}
                 />
@@ -82,7 +84,7 @@ export function DateStep() {
         })}
       </div>
 
-      <div className="mt-5 rounded-[18px] border-[0.5px] border-line bg-surface p-3.5">
+      <div className="gilded glass-top mt-5 rounded-[18px] p-3.5">
         <Eyebrow>{t("hours_eyebrow")}</Eyebrow>
         <div className="mt-2 text-[13px] text-text-2">{t("hours")}</div>
       </div>

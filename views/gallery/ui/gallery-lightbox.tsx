@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "motion/react";
 import type { GalleryItem } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
 
 export interface GalleryLightboxProps {
@@ -61,7 +62,7 @@ export function GalleryLightbox({
       >
         <motion.div
           layoutId={`gallery-image-${item.id}`}
-          className="overflow-hidden rounded-[28px] border-[0.5px] border-accent"
+          className="gilded overflow-hidden rounded-[28px]"
           style={{ aspectRatio: "3 / 4" }}
           transition={{ duration: reduceMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
@@ -76,6 +77,7 @@ export function GalleryLightbox({
           <div className="my-2 mb-1.5 font-display text-[26px] font-normal italic">
             {title}
           </div>
+          <LetterpressRule className="mb-2 max-w-[140px]" />
           <p className="m-0 text-[13px] text-text-2">{caption}</p>
         </div>
         <button

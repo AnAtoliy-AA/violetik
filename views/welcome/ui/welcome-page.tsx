@@ -4,8 +4,10 @@ import { motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { buttonClassName } from "@/shared/ui/button";
+import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { Ornament } from "@/shared/ui/ornament";
+import { PaperGrain } from "@/shared/ui/paper-grain";
 import { LetterReveal } from "./letter-reveal";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -28,6 +30,7 @@ export function WelcomePage() {
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
+      <PaperGrain />
       <motion.div
         aria-hidden
         className="pointer-events-none absolute -right-[120px] -top-[100px] size-[360px] rounded-full blur-[60px]"
@@ -45,8 +48,14 @@ export function WelcomePage() {
         transition={{ duration: reduceMotion ? 0 : 1.8, ease: EASE_OUT, delay: 0.55 }}
       />
 
-      <div className="mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
+      <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
+          <motion.div
+            className="mb-6 flex justify-center"
+            {...fade(0.3)}
+          >
+            <MonogramSeal letter="V" className="size-12 text-[22px]" />
+          </motion.div>
           <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)]">
             <LetterReveal text="Violetta" />
           </div>

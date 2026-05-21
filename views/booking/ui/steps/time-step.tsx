@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import {
   BOOKING_TIMES,
   formatLongDate,
@@ -46,6 +47,7 @@ export function TimeStep() {
       <h2 className="my-2.5 mb-1.5 font-display text-[36px] font-normal italic leading-tight tracking-[-0.02em]">
         {t.rich("title", { em: (c) => <em>{c}</em> })}
       </h2>
+      <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
       <p className="m-0 mb-5 text-sm text-text-2">
         {dateLabel ? (
           <>
@@ -66,12 +68,12 @@ export function TimeStep() {
               aria-pressed={isSelected}
               onClick={() => setTime(slot)}
               className={cn(
-                "rounded-[18px] border-[0.5px] px-4 py-5 text-left",
+                "gilded rounded-[18px] px-4 py-5 text-left",
                 "transition-colors duration-fast ease-out",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                 isSelected
-                  ? "border-accent bg-[color-mix(in_oklab,var(--color-accent)_16%,var(--color-surface))] text-accent"
-                  : "border-line bg-surface text-text hover:border-line-strong",
+                  ? "glass-top text-gold-shimmer"
+                  : "text-text hover:bg-surface-2",
               )}
             >
               <div className="font-display text-[26px] font-normal italic leading-none">

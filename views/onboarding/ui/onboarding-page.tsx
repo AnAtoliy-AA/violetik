@@ -50,7 +50,7 @@ export function OnboardingPage() {
       <div
         aria-roledescription="carousel"
         aria-label={t("aria_carousel")}
-        className="relative h-[480px] overflow-hidden rounded-[28px] border-[0.5px] border-line-strong"
+        className="gilded glass-top relative h-[480px] overflow-hidden rounded-[28px]"
       >
         <motion.div
           className="flex h-full"
@@ -88,7 +88,7 @@ export function OnboardingPage() {
               className={cn(
                 "h-1 rounded-full transition-all duration-fast ease-out",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-                i === index ? "w-[22px] bg-accent" : "w-1.5 bg-line-strong",
+                i === index ? "w-[22px] bg-gold" : "w-1.5 bg-line-strong",
               )}
             />
           ))}

@@ -3,6 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA } from "@/entities/studio";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
+import { PaperGrain } from "@/shared/ui/paper-grain";
 import { AppHeader } from "@/widgets/app-header";
 
 function ArrowRight() {
@@ -39,7 +41,7 @@ export function MasterPage() {
       <AppHeader back="/home" title={t("plate_title")} />
 
       <div className="px-[22px]">
-        <div className="relative aspect-[1/1.2] overflow-hidden rounded-[28px]">
+        <div className="gilded glass-top relative aspect-[1/1.2] overflow-hidden rounded-[28px]">
           <div
             aria-hidden
             className="absolute inset-0"
@@ -48,6 +50,7 @@ export function MasterPage() {
                 "radial-gradient(ellipse 65% 60% at 50% 35%, #f3ead8 0%, #c9a96e 30%, #7d3a6f 70%, #14091a 100%)",
             }}
           />
+          <PaperGrain className="opacity-[0.06]" />
           <div
             aria-hidden
             className="absolute inset-0"
@@ -71,50 +74,57 @@ export function MasterPage() {
 
       <section className="px-[22px] pb-4 pt-[30px]">
         <Eyebrow gold>{artist.role.toUpperCase()}</Eyebrow>
-        <p className="m-0 mt-3 text-[15px] leading-[1.6] text-text-2">
+        <LetterpressRule className="mt-3 max-w-[180px]" />
+        <p className="dropcap m-0 mt-4 text-[15px] leading-[1.6] text-text-2">
           {artist.bio}
         </p>
       </section>
 
       <section className="px-[22px] pb-7 pt-2.5">
-        <blockquote className="m-0 rounded-r-[18px] border-l border-accent bg-[color-mix(in_oklab,var(--color-surface)_70%,transparent)] py-[22px] pl-[22px] pr-[22px]">
-          <p className="m-0 font-display text-[24px] font-normal italic leading-[1.25]">
-            &ldquo;{artist.quote}&rdquo;
+        <blockquote className="gilded glass-top relative m-0 overflow-hidden rounded-[28px] px-7 py-8">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-3 top-1 select-none font-display text-[120px] font-light italic leading-none text-gold"
+          >
+            &ldquo;
+          </span>
+          <p className="m-0 pl-10 font-display text-[24px] font-normal italic leading-[1.3]">
+            {artist.quote}
           </p>
         </blockquote>
       </section>
 
       <section className="px-[22px] pb-7">
-        <div className="grid grid-cols-3 border-y-[0.5px] border-line-strong">
+        <LetterpressRule className="mb-5" />
+        <div className="grid grid-cols-3">
           {stats.map(([n, label], i) => (
             <div
               key={label}
-              className={`px-1 py-5 text-center ${
+              className={`px-1 py-2 text-center ${
                 i < stats.length - 1 ? "border-r-[0.5px] border-line" : ""
               }`}
             >
-              <div className="font-display text-[34px] font-normal italic leading-none text-gold">
+              <div className="font-display text-[40px] font-normal italic leading-none text-gold-shimmer">
                 {n}
               </div>
-              <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-text-3">
+              <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
                 {label}
               </div>
             </div>
           ))}
         </div>
+        <LetterpressRule className="mt-5" />
       </section>
 
       <section className="px-[22px] pb-7">
         <Eyebrow>{t("voices_eyebrow")}</Eyebrow>
         <div className="mt-4 flex flex-col gap-3.5">
           {testimonials.map((tm) => (
-            <div
-              key={tm.id}
-              className="rounded-[18px] border-[0.5px] border-line bg-surface p-[18px]"
-            >
+            <div key={tm.id} className="gilded glass-top rounded-[18px] p-[18px]">
               <p className="m-0 mb-3 font-display text-[18px] font-normal italic leading-[1.35]">
                 &ldquo;{tm.text}&rdquo;
               </p>
+              <LetterpressRule className="mb-3 max-w-[140px]" />
               <div className="flex items-center gap-2.5">
                 <span
                   aria-hidden
@@ -126,7 +136,7 @@ export function MasterPage() {
                 />
                 <div className="text-[12px]">
                   <span className="font-medium">{tm.name}</span>
-                  <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.1em] text-text-3">
+                  <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.16em] text-text-3">
                     {tm.role}
                   </span>
                 </div>
