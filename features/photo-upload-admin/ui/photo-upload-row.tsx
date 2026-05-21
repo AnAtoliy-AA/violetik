@@ -73,6 +73,8 @@ export function PhotoUploadRow({
     uploadState && !uploadState.ok
       ? t(`upload_error_${uploadState.error}` as const)
       : null;
+  const errorDetail =
+    uploadState && !uploadState.ok ? uploadState.detail : null;
 
   return (
     <article
@@ -163,12 +165,16 @@ export function PhotoUploadRow({
           ) : null}
 
           {errorMessage ? (
-            <p
-              role="alert"
-              className="font-mono text-[10px] uppercase tracking-[0.16em] text-rose"
-            >
-              {errorMessage}
-            </p>
+            <div role="alert" className="space-y-1">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-rose">
+                {errorMessage}
+              </p>
+              {errorDetail ? (
+                <p className="break-all font-mono text-[10px] text-text-3">
+                  {errorDetail}
+                </p>
+              ) : null}
+            </div>
           ) : null}
 
           {uploadState && uploadState.ok ? (
