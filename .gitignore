@@ -57,3 +57,6 @@ storybook-static
 # lighthouse-ci
 /.lighthouseci
 /.lighthouseci-local
+
+# claude worktrees
+/.claude/worktrees/
