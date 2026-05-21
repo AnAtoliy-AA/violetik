@@ -1,6 +1,8 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { STUDIO_DATA } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
+import { PaperGrain } from "@/shared/ui/paper-grain";
 import { AppHeader } from "@/widgets/app-header";
 import { getCurrentTier } from "@/db/vip-requests";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
@@ -43,14 +45,18 @@ export async function MembershipPage() {
     <div className="pb-10">
       <AppHeader back="/home" title={t("plate_title")} />
 
-      <section className="px-[22px] pb-4">
-        <Eyebrow gold>{t("eyebrow")}</Eyebrow>
-        <h1 className="my-2.5 mt-2 font-display text-[44px] font-normal leading-tight tracking-[-0.02em]">
-          {t.rich("hero_title", { em: (c) => <em>{c}</em> })}
-        </h1>
-        <p className="m-0 max-w-[320px] text-[14px] text-text-2">
-          {t("hero_paragraph")}
-        </p>
+      <section className="relative overflow-hidden px-[22px] pb-4 pt-3">
+        <PaperGrain />
+        <div className="relative z-10">
+          <Eyebrow gold>{t("eyebrow")}</Eyebrow>
+          <h1 className="my-2.5 mt-3 font-display text-[44px] font-normal leading-tight tracking-[-0.02em]">
+            {t.rich("hero_title", { em: (c) => <em>{c}</em> })}
+          </h1>
+          <LetterpressRule className="mt-3 max-w-[260px]" />
+          <p className="dropcap m-0 mt-4 max-w-[320px] text-[14px] text-text-2">
+            {t("hero_paragraph")}
+          </p>
+        </div>
       </section>
 
       <MembershipPageClient

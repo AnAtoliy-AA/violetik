@@ -12,6 +12,14 @@ export interface BillingToggleProps {
   ariaLabel: string;
 }
 
+const baseToggle =
+  "rounded-full border-0 px-4 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.12em] transition-colors duration-fast ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
+
+const selectedToggle =
+  "bg-gold text-bg bg-[length:200%_100%] bg-[position:0%_50%] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]";
+
+const unselectedToggle = "bg-transparent text-text-2 hover:text-text";
+
 export function BillingToggle({
   value,
   onChange,
@@ -23,7 +31,7 @@ export function BillingToggle({
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className="inline-flex rounded-full border-[0.5px] border-line-strong bg-surface p-1"
+      className="gilded inline-flex rounded-full p-1"
     >
       {(
         [
@@ -39,14 +47,7 @@ export function BillingToggle({
             role="tab"
             aria-selected={selected}
             onClick={() => onChange(id)}
-            className={cn(
-              "rounded-full border-0 px-4 py-2 font-mono text-[11px] font-medium uppercase tracking-[0.12em]",
-              "transition-colors duration-fast ease-out",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-              selected
-                ? "bg-text text-bg"
-                : "bg-transparent text-text-2 hover:text-text",
-            )}
+            className={cn(baseToggle, selected ? selectedToggle : unselectedToggle)}
           >
             {label}
           </button>

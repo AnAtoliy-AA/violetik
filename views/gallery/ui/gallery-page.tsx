@@ -4,7 +4,10 @@ import { useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
 import { STUDIO_DATA, type GalleryTag } from "@/entities/studio";
-import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
+import { Ornament } from "@/shared/ui/ornament";
+import { PaperGrain } from "@/shared/ui/paper-grain";
+import { Plate } from "@/shared/ui/plate";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
 import { GalleryCard } from "./gallery-card";
@@ -58,20 +61,23 @@ export function GalleryPage() {
     <div className="pb-28">
       <AppHeader back="/home" title={t("plate_title")} />
 
-      <section className="px-[22px] pb-[18px]">
-        <div className="flex justify-between border-b-[0.5px] border-line-strong pb-3.5 font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
-          <span>{t("plate_portfolio")}</span>
-          <span className="text-accent">{t("plate_count")}</span>
+      <section className="relative overflow-hidden px-[22px] pb-[18px] pt-3">
+        <PaperGrain />
+        <div className="relative z-10">
+          <div className="flex items-end justify-between">
+            <Plate folio number={0} label={t("plate_portfolio").toUpperCase()} />
+            <span className="pb-2 font-mono text-[10px] uppercase tracking-[0.32em] text-accent">
+              {t("plate_count")}
+            </span>
+          </div>
+          <h1 className="mt-3 font-display text-[56px] font-light italic leading-[0.95] tracking-[-0.025em]">
+            {t("hero_title")}
+          </h1>
+          <LetterpressRule className="mt-3.5 max-w-[260px]" />
+          <p className="dropcap mt-4 max-w-[320px] text-[14px] text-text-2">
+            {t("hero_paragraph")}
+          </p>
         </div>
-        <Eyebrow gold className="mt-6">
-          {t("eyebrow")}
-        </Eyebrow>
-        <h1 className="mb-1.5 mt-2 font-display text-[56px] font-light italic leading-[0.95] tracking-[-0.025em]">
-          {t("hero_title")}
-        </h1>
-        <p className="mt-3.5 max-w-[320px] text-[14px] text-text-2">
-          {t("hero_paragraph")}
-        </p>
       </section>
 
       <TagFilter
@@ -84,7 +90,12 @@ export function GalleryPage() {
 
       <div className="px-[22px] pb-7 pt-[22px]">
         {filtered.length === 0 ? (
-          <p className="py-12 text-center text-sm text-text-3">{t("empty")}</p>
+          <div className="py-12 text-center">
+            <Ornament className="mx-auto max-w-[160px]" />
+            <p className="mt-6 font-display text-[18px] italic text-text-2">
+              {t("empty")}
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-2 gap-2.5">
             {filtered.map((item, index) => (

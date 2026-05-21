@@ -2,7 +2,9 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA, type Visit } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailFan } from "@/shared/ui/nail-fan";
+import { PaperGrain } from "@/shared/ui/paper-grain";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
 import { getCurrentTier } from "@/db/vip-requests";
@@ -59,11 +61,12 @@ export async function ProfilePage() {
     <div className="pb-28">
       <AppHeader title={t("plate_title")} />
 
-      <section className="px-[22px] pt-4 pb-7">
-        <div className="flex items-center gap-4">
+      <section className="relative overflow-hidden px-[22px] pt-4 pb-7">
+        <PaperGrain />
+        <div className="relative z-10 flex items-center gap-4">
           <div
             aria-hidden
-            className="grid size-[68px] place-items-center rounded-full font-display text-[24px] italic text-bg"
+            className="gilded glass-top grid size-[68px] place-items-center rounded-full font-display text-[24px] italic text-bg"
             style={{
               background: `linear-gradient(135deg, ${profile.palette[0]}, ${profile.palette[1]})`,
             }}
@@ -72,7 +75,7 @@ export async function ProfilePage() {
           </div>
           <div>
             {tier.state === "vip" && (
-              <span className="rounded-full border-[0.5px] border-accent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+              <span className="gilded inline-flex items-center rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
                 {t("badge_vip")}
               </span>
             )}
@@ -95,7 +98,7 @@ export async function ProfilePage() {
         <section className="px-[22px] pb-7">
           <article
             aria-label={t("next_visit_eyebrow")}
-            className="relative overflow-hidden rounded-[28px] border-[0.5px] border-line-strong bg-surface px-5 py-5"
+            className="gilded glass-top relative overflow-hidden rounded-[28px] px-5 py-5"
           >
             <div
               aria-hidden
@@ -111,7 +114,7 @@ export async function ProfilePage() {
               {formatDate(upcoming.date, locale)} · {upcoming.time}
             </p>
             {upcoming.daysAway !== undefined ? (
-              <span className="mt-3.5 inline-flex rounded-full border-[0.5px] border-line-strong px-3 py-1 font-mono text-[10px] uppercase tracking-[0.32em] text-accent">
+              <span className="gilded mt-3.5 inline-flex rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.32em] text-accent">
                 {countdownLabel(upcoming.daysAway)}
               </span>
             ) : null}
@@ -120,7 +123,8 @@ export async function ProfilePage() {
       ) : null}
 
       <nav aria-label={t("quick_links_aria")} className="px-[22px]">
-        <ul className="divide-y divide-line border-y-[0.5px] border-line">
+        <LetterpressRule />
+        <ul className="divide-y divide-line">
           {QUICK_LINKS.map((row) => (
             <li key={row.key}>
               <Link
@@ -135,10 +139,12 @@ export async function ProfilePage() {
             </li>
           ))}
         </ul>
+        <LetterpressRule />
       </nav>
 
       <section className="px-[22px] pt-9">
         <Eyebrow>{t("history_eyebrow")}</Eyebrow>
+        <LetterpressRule className="mt-3" />
         <ul className="mt-3 divide-y divide-line">
           {history.map((visit) => (
             <li
@@ -153,7 +159,7 @@ export async function ProfilePage() {
                   {formatDate(visit.date, locale)} · {visit.time}
                 </p>
               </div>
-              <span className="font-display text-[20px] italic text-gold">
+              <span className="font-display text-[20px] italic text-gold-shimmer">
                 €{visit.price}
               </span>
             </li>
