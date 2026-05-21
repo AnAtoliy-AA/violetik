@@ -216,7 +216,8 @@
   "Profile": {
     "meta_title": "Account",
     "plate_title": "Account",
-    "member_tag": "Member · {tier}",
+    "badge_vip": "VIP",
+    "badge_pending_vip": "Pending VIP",
     "joined": "Joined in {year}",
     "next_visit_eyebrow": "Next visit",
     "countdown": {

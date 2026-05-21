@@ -5,7 +5,7 @@ test("renders the profile hero at /en/profile", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 1, name: /Lara K\./ }),
   ).toBeVisible();
-  await expect(page.getByText(/Member · VIP/i)).toBeVisible();
+  await expect(page.getByText(/Joined in 2024/)).toBeVisible();
 });
 
 test("shows next-visit card with service and countdown", async ({ page }) => {
@@ -31,6 +31,6 @@ test("renders the Belarusian profile labels at /be/profile", async ({
   page,
 }) => {
   await page.goto("/be/profile");
-  await expect(page.getByText(/Сябар · VIP/i)).toBeVisible();
+  await expect(page.getByText(/Далучылася ў/i)).toBeVisible();
   await expect(page.getByText(/Наступны візіт/i)).toBeVisible();
 });

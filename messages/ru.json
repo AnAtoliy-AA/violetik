@@ -216,7 +216,8 @@
   "Profile": {
     "meta_title": "Аккаунт",
     "plate_title": "Аккаунт",
-    "member_tag": "Член · {tier}",
+    "badge_vip": "VIP",
+    "badge_pending_vip": "VIP в обработке",
     "joined": "Присоединилась в {year}",
     "next_visit_eyebrow": "Следующий визит",
     "countdown": {
