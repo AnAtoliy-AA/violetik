@@ -52,7 +52,7 @@ export async function MembershipPage() {
         <PaperGrain />
         <div className="relative z-10">
           <Eyebrow gold>{t("eyebrow")}</Eyebrow>
-          <h1 className="my-2.5 mt-3 font-display text-[44px] font-normal leading-tight tracking-[-0.02em]">
+          <h1 className="my-2.5 mt-3 font-display text-h1 font-normal leading-tight tracking-[-0.02em]">
             {t.rich("hero_title", { em: (c) => <em>{c}</em> })}
           </h1>
           <LetterpressRule className="mt-3 max-w-[260px]" />

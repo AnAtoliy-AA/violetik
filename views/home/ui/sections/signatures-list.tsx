@@ -38,7 +38,7 @@ export function SignaturesList() {
           {t("signatures_all_link")} <ArrowRight />
         </Link>
       </div>
-      <h2 className="mt-1 font-display text-[40px] font-normal italic leading-[1.05] tracking-[-0.02em]">
+      <h2 className="mt-1 font-display text-h2 font-normal italic leading-[1.05] tracking-[-0.02em]">
         {t("signatures_title")}
       </h2>
       <LetterpressRule className="mb-[22px] mt-3" />

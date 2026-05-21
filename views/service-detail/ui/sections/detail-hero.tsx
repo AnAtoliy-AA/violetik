@@ -57,7 +57,7 @@ export function DetailHero({
 
       <div className="absolute inset-x-[22px] bottom-[22px]">
         <Plate folio number={plateNumber} label={service.category.toUpperCase()} />
-        <h1 className="mt-3 font-display text-[56px] font-light italic leading-[0.95] tracking-[-0.025em]">
+        <h1 className="mt-3 font-display text-h1 font-light italic leading-[0.95] tracking-[-0.025em]">
           {service.name}.
         </h1>
         <LetterpressRule className="mt-3.5" />

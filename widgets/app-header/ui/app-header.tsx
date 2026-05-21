@@ -14,6 +14,11 @@ export interface AppHeaderProps extends HTMLAttributes<HTMLElement> {
   menuButton?: ReactNode;
   /** A11y label for the default hamburger button. */
   ariaMenuLabel?: string;
+  /**
+   * When true, an inline mono eyebrow `· ADMIN ·` is rendered next to the
+   * wordmark / back arrow. Used on every `/admin/*` route.
+   */
+  admin?: boolean;
 }
 
 function HamburgerIcon() {
@@ -62,6 +67,7 @@ export function AppHeader({
   ariaBackLabel = "Go back",
   menuButton,
   ariaMenuLabel = "Open menu",
+  admin = false,
   className,
   ...rest
 }: AppHeaderProps) {
@@ -95,7 +101,17 @@ export function AppHeader({
   return (
     <header className={cn(className)} {...rest}>
       <div className="relative flex items-center justify-between px-[22px] pb-2 pt-[10px]">
-        {left}
+        <div className="flex items-center gap-3">
+          {left}
+          {admin ? (
+            <span
+              data-testid="app-header-admin"
+              className="font-mono text-[9px] uppercase tracking-[0.32em] text-text-2"
+            >
+              · ADMIN ·
+            </span>
+          ) : null}
+        </div>
         {title ? (
           <span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[9px] uppercase tracking-[0.32em] text-text-2">
             {title}
@@ -103,6 +119,12 @@ export function AppHeader({
         ) : null}
         {menu}
       </div>
+      {admin ? (
+        <div
+          aria-hidden
+          className="mx-[22px] mt-1 h-px bg-line-strong"
+        />
+      ) : null}
     </header>
   );
 }

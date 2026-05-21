@@ -49,7 +49,7 @@ export function HomeHero() {
         style={styledHero}
       >
         <Eyebrow>—— {t("hero_cover_story")}</Eyebrow>
-        <h1 className="mt-4 font-display text-[clamp(56px,16vw,76px)] font-light italic leading-[0.94] tracking-[-0.025em]">
+        <h1 className="mt-4 font-display text-h1 font-light italic leading-[0.94] tracking-[-0.025em]">
           {t("hero_title_line_1")}
           <br />
           <span className="font-normal not-italic text-text-2">

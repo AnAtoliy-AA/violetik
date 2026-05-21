@@ -46,7 +46,7 @@ export default async function AdminGoogleRoute({
 
   return (
     <div className="pb-16">
-      <AppHeader back="/admin" title={t("meta_title")} />
+      <AppHeader back="/admin" title={t("meta_title")} admin />
 
       <section className="px-[22px] py-6">
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>

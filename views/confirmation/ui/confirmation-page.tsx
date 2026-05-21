@@ -145,7 +145,7 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
                 ? t("cancelled_eyebrow", { code })
                 : t("reserved_eyebrow", { code })}
           </Eyebrow>
-          <h1 className="my-3 mb-1.5 font-display text-[44px] font-normal italic leading-tight tracking-[-0.02em]">
+          <h1 className="my-3 mb-1.5 font-display text-h1 font-normal italic leading-tight tracking-[-0.02em]">
             <HeadlineTypeOn text={titleRaw} reduceMotion={reduceMotion ?? false} />
           </h1>
           <LetterpressRule className="mx-auto mt-3 max-w-[160px]" />

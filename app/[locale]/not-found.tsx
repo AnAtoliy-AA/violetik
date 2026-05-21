@@ -14,7 +14,7 @@ export default function NotFound() {
     <main className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-[22px] text-center">
       <Aurora intensity="subtle" />
       <Eyebrow gold>{t("plate_404")}</Eyebrow>
-      <h1 className="my-5 max-w-[420px] font-display text-[44px] font-light italic leading-[1.04] tracking-[-0.02em]">
+      <h1 className="my-5 max-w-[420px] font-display text-h1 font-light italic leading-[1.04] tracking-[-0.02em]">
         {t.rich("title", { br: () => <br /> })}
       </h1>
       <p className="max-w-md text-[14px] leading-relaxed text-text-2">

@@ -15,9 +15,14 @@ export function ConnectionStatus({
   connectedLabel,
 }: ConnectionStatusProps) {
   return (
-    <div className="flex flex-col gap-3 rounded-[18px] border-[0.5px] border-line bg-surface p-5">
+    <div className="gilded flex flex-col gap-3 rounded-[18px] p-5">
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
+        <div className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
+          <span
+            aria-hidden="true"
+            className="inline-block size-1.5 rounded-full bg-[#7ec699] motion-safe:animate-soft-pulse"
+            data-testid="google-connected-dot"
+          />
           {connectedLabel}
         </div>
         <div className="mt-1 text-sm text-text">{email}</div>

@@ -46,7 +46,7 @@ export default async function AdminSiteSettingsRoute({
 
   return (
     <div className="pb-16">
-      <AppHeader back="/admin" title={t("site_settings_plate_title")} />
+      <AppHeader back="/admin" title={t("site_settings_plate_title")} admin />
       <SiteSettingsForm
         initial={settings}
         services={STUDIO_DATA.services.map((s) => ({
