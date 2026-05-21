@@ -97,6 +97,17 @@ export default async function AdminRoute({
               </div>
             </Link>
           </li>
+          <li className="col-span-2">
+            <Link
+              href="/admin/site-settings"
+              className="block rounded-[18px] border-[0.5px] border-line bg-surface p-5 transition-colors duration-fast ease-out hover:bg-surface/80"
+            >
+              <div className="font-display text-[16px] italic">{t("inbox_site_settings")}</div>
+              <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+                {t("inbox_site_settings_caption")}
+              </div>
+            </Link>
+          </li>
         </ul>
       </section>
 
