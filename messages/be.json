@@ -295,6 +295,10 @@
     "site_settings_saved": "Захавана",
     "site_settings_error": "Не атрымалася захаваць: {error}"
   },
+  "AtelierHours": {
+    "open_until": "Адкрыта · да {time}",
+    "opens_on": "Зачынена · адкрыецца ў {day} а {time}"
+  },
   "NotFound": {
     "meta_title": "Згубіліся ў атэлье",
     "eyebrow": "Па-за меню",

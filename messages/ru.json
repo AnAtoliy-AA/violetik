@@ -295,6 +295,10 @@
     "site_settings_saved": "Сохранено",
     "site_settings_error": "Не удалось сохранить: {error}"
   },
+  "AtelierHours": {
+    "open_until": "Открыто · до {time}",
+    "opens_on": "Закрыто · откроется в {day} в {time}"
+  },
   "NotFound": {
     "meta_title": "Затерялись в ателье",
     "eyebrow": "Вне меню",

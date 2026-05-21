@@ -49,9 +49,13 @@ export function TabBar() {
     >
       <ul
         className={cn(
-          "relative flex items-center justify-around",
-          "h-14 rounded-full border-[0.5px] border-line-strong bg-bg-2/85 shadow-[0_12px_28px_-16px_rgba(0,0,0,0.55)] backdrop-blur-md",
+          "glass-top relative flex items-center justify-around",
+          "h-14 rounded-full border-[0.5px] border-line-strong bg-bg-2/70 shadow-card",
         )}
+        style={{
+          backdropFilter: "var(--backdrop-blur-lg)",
+          WebkitBackdropFilter: "var(--backdrop-blur-lg)",
+        }}
       >
         {TABS.map(({ key, href, Icon }) => {
           const isActive = key === active;
@@ -62,24 +66,39 @@ export function TabBar() {
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "relative flex items-center justify-center rounded-full px-5 py-2",
-                  "transition-colors duration-fast ease-out",
+                  "transition-[color,opacity] duration-fast ease-out",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-                  isActive ? "text-text" : "text-text-3 hover:text-text-2",
+                  isActive
+                    ? "text-text opacity-100"
+                    : "text-text-3 opacity-50 hover:text-text-2 hover:opacity-100",
                 )}
               >
                 {isActive ? (
-                  <motion.span
-                    layoutId="tab-thumb"
-                    aria-hidden
-                    className="absolute inset-0 -z-10 rounded-full bg-surface-2"
-                    transition={
-                      reduceMotion
-                        ? { duration: 0 }
-                        : { type: "spring", stiffness: 380, damping: 32 }
-                    }
-                  />
+                  <>
+                    <motion.span
+                      layoutId="tab-thumb"
+                      aria-hidden
+                      className="absolute inset-0 -z-10 rounded-full bg-surface-2"
+                      transition={
+                        reduceMotion
+                          ? { duration: 0 }
+                          : { type: "spring", stiffness: 380, damping: 32 }
+                      }
+                    />
+                    <motion.span
+                      aria-hidden
+                      className="gilded pointer-events-none absolute inset-0 rounded-full"
+                      initial={reduceMotion ? false : { opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{
+                        duration: reduceMotion ? 0 : 0.32,
+                        ease: [0.22, 1, 0.36, 1],
+                        delay: reduceMotion ? 0 : 0.1,
+                      }}
+                    />
+                  </>
                 ) : null}
-                <span className="flex flex-col items-center gap-0.5">
+                <span className="relative flex flex-col items-center gap-0.5">
                   <Icon
                     aria-hidden
                     width={18}

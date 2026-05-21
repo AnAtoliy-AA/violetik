@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion, type MotionValue } from "motion/react";
 import type { NailTilePalette, NailTileVariant } from "@/shared/ui/nail-tile";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
@@ -12,15 +12,20 @@ export interface OnboardingSlideProps {
   palette: NailTilePalette;
   variant: NailTileVariant;
   active: boolean;
+  /** Drag-driven vertical parallax on the hero image. */
+  parallaxY?: MotionValue<number>;
   eyebrow: string;
   title: string;
   body: string;
 }
 
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 export function OnboardingSlide({
   palette,
   variant,
   active,
+  parallaxY,
   eyebrow,
   title,
   body,
@@ -31,7 +36,24 @@ export function OnboardingSlide({
   return (
     <div className="flex h-full w-full shrink-0 flex-col">
       <div className="relative h-[60%] overflow-hidden">
-        <NailTile palette={palette} variant={variant} className="size-full" />
+        <motion.div
+          className="absolute inset-0"
+          style={parallaxY ? { y: parallaxY } : undefined}
+          // Passing-the-lens: incoming hero settles 1.08 → 1, outgoing one
+          // expands 1 → 1.08 as it slides away.
+          animate={
+            reduceMotion
+              ? { scale: 1 }
+              : { scale: active ? 1 : 1.08 }
+          }
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : { duration: 0.7, ease: EASE_OUT }
+          }
+        >
+          <NailTile palette={palette} variant={variant} className="size-full" />
+        </motion.div>
         <PaperGrain className="opacity-[0.06]" />
         <motion.div
           aria-hidden
@@ -42,7 +64,7 @@ export function OnboardingSlide({
             rotate: -8,
             opacity: 0.92,
           }}
-          transition={{ duration: reduceMotion ? 0 : 0.9, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: reduceMotion ? 0 : 0.9, ease: EASE_OUT }}
         >
           <NailFan palette={fanPalette} count={4} className="size-full" />
         </motion.div>
