@@ -1,7 +1,7 @@
 export interface Palette {
   /** Stable id used as the `data-palette` attribute value. */
   id: string;
-  /** Display name (English; switcher translates via PaletteSwitcher.palettes.<id>). */
+  /** Display name (English). */
   name: string;
   /** Three colors for a swatch preview: [bg, surface, accent]. */
   preview: readonly [string, string, string];

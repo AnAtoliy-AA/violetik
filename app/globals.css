@@ -414,20 +414,6 @@
   }
 }
 
-@keyframes paletteSweep {
-  0% {
-    transform: scale(0);
-    opacity: 0.85;
-  }
-  60% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(2.5);
-    opacity: 0;
-  }
-}
-
 body {
   background: var(--color-bg);
   color: var(--color-text);
@@ -616,20 +602,4 @@ body {
   ::view-transition-image-pair(*) {
     animation: none !important;
   }
-}
-
-/* Palette-sweep one-shot wash (consumed by palette-switcher). */
-.palette-sweep {
-  position: fixed;
-  border-radius: 9999px;
-  width: 36px;
-  height: 36px;
-  pointer-events: none;
-  z-index: 999;
-  background: radial-gradient(
-    circle at center,
-    var(--palette-sweep-color, var(--color-accent)),
-    transparent 65%
-  );
-  animation: paletteSweep 450ms var(--ease-out) both;
 }

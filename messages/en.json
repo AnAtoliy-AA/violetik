@@ -252,30 +252,12 @@
       "label": "You"
     }
   },
-  "PaletteSwitcher": {
-    "label": "Palette",
-    "palettes": {
-      "aubergine": "Aubergine",
-      "rose": "Rose",
-      "lilac": "Lilac",
-      "mono": "Mono",
-      "ink": "Ink",
-      "moss": "Moss",
-      "bronze": "Bronze",
-      "pearl": "Pearl",
-      "emerald": "Emerald",
-      "sapphire": "Sapphire",
-      "ruby": "Ruby",
-      "obsidian": "Obsidian"
-    }
-  },
   "Admin": {
     "meta_title": "Atelier admin",
     "plate_title": "Atelier admin",
     "eyebrow": "Private · Studio admin",
     "hero_title": "Studio admin.",
     "hero_paragraph": "Manage bookings, VIP requests, photography, and site-wide defaults from one place.",
-    "persistence_note": "Stored locally in the vio-palette cookie · 1 year",
     "inbox_title": "Inbox",
     "inbox_bookings": "Bookings",
     "inbox_vip_requests": "VIP requests",

@@ -252,30 +252,12 @@
       "label": "Вы"
     }
   },
-  "PaletteSwitcher": {
-    "label": "Палитра",
-    "palettes": {
-      "aubergine": "Aubergine",
-      "rose": "Rose",
-      "lilac": "Lilac",
-      "mono": "Mono",
-      "ink": "Ink",
-      "moss": "Moss",
-      "bronze": "Bronze",
-      "pearl": "Pearl",
-      "emerald": "Emerald",
-      "sapphire": "Sapphire",
-      "ruby": "Ruby",
-      "obsidian": "Obsidian"
-    }
-  },
   "Admin": {
     "meta_title": "Админка ателье",
     "plate_title": "Админка ателье",
     "eyebrow": "Приватно · Админ-панель",
     "hero_title": "Админ ателье.",
     "hero_paragraph": "Записи, VIP-заявки, галерея и настройки сайта — в одном месте.",
-    "persistence_note": "Хранится в cookie vio-palette · 1 год",
     "inbox_title": "Входящие",
     "inbox_bookings": "Записи",
     "inbox_vip_requests": "Заявки на VIP",
