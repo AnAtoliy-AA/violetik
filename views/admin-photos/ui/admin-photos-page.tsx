@@ -19,7 +19,7 @@ const KINDS: readonly PhotoSlotKind[] = [
 
 export async function AdminPhotosPage() {
   const t = await getTranslations("Admin.photos");
-  const slots = listAllPhotoSlots();
+  const slots = await listAllPhotoSlots();
   const storageConfigured = isPhotoStorageConfigured();
 
   // Pull every kind once, then index by slotId for cheap lookup in the

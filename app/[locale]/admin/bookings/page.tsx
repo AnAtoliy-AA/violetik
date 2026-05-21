@@ -5,8 +5,8 @@ import { requireAdmin } from "@/shared/lib/auth-server";
 import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { listBookingsForAdmin } from "@/db/bookings";
+import { listAllServices } from "@/db/services";
 import { bookingTimeZone } from "@/shared/lib/google-calendar";
-import { STUDIO_DATA } from "@/entities/studio";
 import { BookingActions } from "@/features/bookings-admin";
 
 export const dynamic = "force-dynamic";
@@ -63,7 +63,11 @@ export default async function AdminBookingsRoute({
   const t = await getTranslations("AdminBookings");
   const tStatus = await getTranslations("AdminBookings.status");
   const tz = bookingTimeZone();
-  const bookings = await listBookingsForAdmin();
+  const [bookings, allServices] = await Promise.all([
+    listBookingsForAdmin(),
+    listAllServices(),
+  ]);
+  const serviceById = new Map(allServices.map((s) => [s.id, s]));
 
   return (
     <div className="pb-16">
@@ -86,9 +90,7 @@ export default async function AdminBookingsRoute({
       ) : (
         <ul className="flex flex-col gap-3 px-[22px]">
           {bookings.map((b) => {
-            const service = STUDIO_DATA.services.find(
-              (s) => s.id === b.serviceId,
-            );
+            const service = serviceById.get(b.serviceId);
             const isPending = b.status === "pending";
             return (
               <li
@@ -97,7 +99,7 @@ export default async function AdminBookingsRoute({
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="font-display text-[22px] italic">
-                    {service?.name ?? b.serviceId}
+                    {service?.nameEn ?? b.serviceId}
                   </div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
                     {tStatus(b.status)}
