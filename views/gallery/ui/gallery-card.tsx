@@ -46,6 +46,8 @@ export function GalleryCard({ item, index, onOpen }: GalleryCardProps) {
         <NailTile
           palette={item.palette}
           variant={((index + 1) % 6) as NailTileVariant}
+          image={item.image}
+          imageSizes="(max-width: 420px) 50vw, 240px"
           className="size-full"
         />
       </motion.div>

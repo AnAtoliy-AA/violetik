@@ -49,4 +49,34 @@ describe("NailTile", () => {
     expect(root.style.width).toBe("100px");
     expect(root.style.height).toBe("100px");
   });
+
+  describe("with an image asset", () => {
+    it("renders a next/image instead of the gradient when image is set", () => {
+      const { container } = render(
+        <NailTile
+          image={{ src: "/studio/services/signature.jpg", alt: "Signature" }}
+        />,
+      );
+      const img = container.querySelector("img");
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute("alt", "Signature");
+    });
+
+    it("falls back to the gradient background when no image is set", () => {
+      const { container } = render(<NailTile palette={["#aaa", "#bbb"]} />);
+      const img = container.querySelector("img");
+      expect(img).toBeNull();
+      expect((container.firstChild as HTMLElement).style.background).not.toBe(
+        "",
+      );
+    });
+
+    it("forwards an empty alt string when image.alt is omitted", () => {
+      const { container } = render(
+        <NailTile image={{ src: "/studio/x.jpg" }} />,
+      );
+      const img = container.querySelector("img");
+      expect(img).toHaveAttribute("alt", "");
+    });
+  });
 });

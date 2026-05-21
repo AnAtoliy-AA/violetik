@@ -48,7 +48,14 @@ export function DetailHero({
         style={heroStyle}
         aria-hidden
       >
-        <NailTile palette={palette} variant={variant} className="size-full" />
+        <NailTile
+          palette={palette}
+          variant={variant}
+          image={service.image}
+          imageSizes="(max-width: 420px) 100vw, 420px"
+          imagePriority
+          className="size-full"
+        />
       </motion.div>
 
       <PaperGrain className="opacity-[0.05]" />

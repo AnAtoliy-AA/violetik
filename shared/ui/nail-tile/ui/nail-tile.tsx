@@ -1,4 +1,6 @@
 import type { CSSProperties, HTMLAttributes } from "react";
+import Image from "next/image";
+import type { ImageAsset } from "@/entities/studio";
 import { cn } from "@/shared/lib/cn";
 
 export type NailTileVariant = 0 | 1 | 2 | 3 | 4 | 5;
@@ -7,9 +9,20 @@ export type NailTilePalette = readonly [string, string];
 export interface NailTileProps extends HTMLAttributes<HTMLDivElement> {
   palette?: NailTilePalette;
   variant?: NailTileVariant;
+  /**
+   * Real photograph that replaces the gradient placeholder. When absent
+   * (the default) the tile renders the existing variant gradient. Use
+   * the `sizes` prop to hint next/image's responsive sizing for this slot.
+   */
+  image?: ImageAsset;
+  /** next/image `sizes` hint. Required for `fill` images to load efficiently. */
+  imageSizes?: string;
+  /** next/image `priority` — set true for above-the-fold tiles. */
+  imagePriority?: boolean;
 }
 
 const DEFAULT_PALETTE: NailTilePalette = ["#c9a96e", "#7d3a6f"];
+const DEFAULT_IMAGE_SIZES = "(max-width: 420px) 50vw, 220px";
 
 const FILM_GRAIN_URL =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")";
@@ -56,10 +69,50 @@ function compose(a: string, b: string): string[] {
 export function NailTile({
   palette = DEFAULT_PALETTE,
   variant = 0,
+  image,
+  imageSizes = DEFAULT_IMAGE_SIZES,
+  imagePriority = false,
   className,
   style,
   ...rest
 }: NailTileProps) {
+  if (image) {
+    // Asset-aware path. The wrapper keeps positioning context for any
+    // overlays the consumer stacks above us (eyebrows, captions, plate
+    // marks etc.). The film-grain stays for materiality continuity.
+    return (
+      <div
+        className={cn("relative overflow-hidden bg-bg-2", className)}
+        style={style}
+        {...rest}
+      >
+        <Image
+          src={image.src}
+          alt={image.alt ?? ""}
+          fill
+          sizes={imageSizes}
+          priority={imagePriority}
+          placeholder={image.blurDataURL ? "blur" : undefined}
+          blurDataURL={image.blurDataURL}
+          className="object-cover"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 90% 90% at 50% 50%, transparent 55%, rgba(0,0,0,0.35) 100%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
+          style={{ backgroundImage: FILM_GRAIN_URL }}
+        />
+      </div>
+    );
+  }
+
   const [a, b] = palette;
   const compositions = compose(a, b);
   const layer = compositions[variant % compositions.length];

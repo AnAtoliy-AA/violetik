@@ -45,6 +45,8 @@ export function ServiceMenuItem({
           <NailTile
             palette={palette}
             variant={variant}
+            image={service.image}
+            imageSizes="78px"
             className="size-full"
           />
         </div>

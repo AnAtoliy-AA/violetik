@@ -1,5 +1,6 @@
 import type {
   Artist,
+  AtelierClip,
   CustomerProfile,
   GalleryItem,
   MembershipTier,
@@ -227,6 +228,19 @@ const visits: Visit[] = [
   },
 ];
 
+/**
+ * Three home clips. Drop matching files at:
+ *   public/studio/atelier/{key}.mp4
+ *   public/studio/atelier/{key}-poster.jpg
+ * then set `video: { src: "/studio/atelier/{key}.mp4", posterSrc: ... }`
+ * on each entry to swap from gradient placeholder to real footage.
+ */
+const atelierClips: AtelierClip[] = [
+  { key: "buff", palette: ["#7d3a6f", "#c9a96e"] },
+  { key: "polish", palette: ["#9d7bc7", "#e8cf99"] },
+  { key: "design", palette: ["#d9a3b6", "#7d3a6f"] },
+];
+
 export const STUDIO_DATA = {
   studio,
   artist,
@@ -236,4 +250,5 @@ export const STUDIO_DATA = {
   membership,
   profile,
   visits,
+  atelierClips,
 } as const;

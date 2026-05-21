@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA } from "@/entities/studio";
@@ -46,14 +47,27 @@ export function MasterPage() {
       <div className="relative px-[22px]">
         <Aurora intensity="subtle" />
         <div className="gilded-lift glass-top relative aspect-[1/1.2] overflow-hidden rounded-[28px]">
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse 65% 60% at 50% 35%, #f3ead8 0%, #c9a96e 30%, #7d3a6f 70%, #14091a 100%)",
-            }}
-          />
+          {artist.image ? (
+            <Image
+              src={artist.image.src}
+              alt={artist.image.alt ?? artist.name}
+              fill
+              priority
+              sizes="(max-width: 420px) 100vw, 420px"
+              placeholder={artist.image.blurDataURL ? "blur" : undefined}
+              blurDataURL={artist.image.blurDataURL}
+              className="object-cover"
+            />
+          ) : (
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse 65% 60% at 50% 35%, #f3ead8 0%, #c9a96e 30%, #7d3a6f 70%, #14091a 100%)",
+              }}
+            />
+          )}
           <PaperGrain className="opacity-[0.06]" />
           <div
             aria-hidden
@@ -130,14 +144,28 @@ export function MasterPage() {
               </p>
               <LetterpressRule className="mb-3 max-w-[140px]" />
               <div className="flex items-center gap-2.5">
-                <span
-                  aria-hidden
-                  className="size-[22px] rounded-full"
-                  style={{
-                    background:
-                      "color-mix(in oklab, var(--color-rose) 60%, var(--color-accent))",
-                  }}
-                />
+                {tm.avatar ? (
+                  <span className="relative size-[22px] overflow-hidden rounded-full">
+                    <Image
+                      src={tm.avatar.src}
+                      alt={tm.avatar.alt ?? tm.name}
+                      fill
+                      sizes="22px"
+                      placeholder={tm.avatar.blurDataURL ? "blur" : undefined}
+                      blurDataURL={tm.avatar.blurDataURL}
+                      className="object-cover"
+                    />
+                  </span>
+                ) : (
+                  <span
+                    aria-hidden
+                    className="size-[22px] rounded-full"
+                    style={{
+                      background:
+                        "color-mix(in oklab, var(--color-rose) 60%, var(--color-accent))",
+                    }}
+                  />
+                )}
                 <div className="text-[12px]">
                   <span className="font-medium">{tm.name}</span>
                   <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.16em] text-text-3">
