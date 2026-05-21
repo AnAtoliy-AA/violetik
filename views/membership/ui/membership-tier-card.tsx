@@ -3,6 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/cn";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
+import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import type { MembershipTier } from "@/entities/studio";
 
 export interface MembershipTierCardProps {
@@ -39,11 +41,7 @@ export function MembershipTierCard({
   return (
     <article
       className={cn(
-        "relative overflow-hidden rounded-[28px] p-[22px]",
-        "border-[0.5px]",
-        featured
-          ? "border-accent bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-plum)_40%,var(--color-surface))_0%,var(--color-surface)_80%)]"
-          : "border-line bg-surface",
+        "gilded glass-top relative overflow-hidden rounded-[28px] p-[22px]",
       )}
     >
       {featured ? (
@@ -56,7 +54,8 @@ export function MembershipTierCard({
                 "radial-gradient(circle, color-mix(in oklab, var(--color-accent) 30%, transparent), transparent 70%)",
             }}
           />
-          <span className="absolute right-[18px] top-[18px] rounded-full border-[0.5px] border-accent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+          <span className="absolute right-[18px] top-[18px] inline-flex items-center gap-1.5 rounded-full border-[0.5px] border-accent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+            <MonogramSeal letter="V" className="size-3.5 text-[8px]" />
             {mostChosenLabel}
           </span>
         </>
@@ -71,6 +70,7 @@ export function MembershipTierCard({
           </span>
         ) : null}
       </h3>
+      <LetterpressRule className="my-3.5" />
 
       <div className="my-[18px]">
         {tier.perks.map((p) => (
