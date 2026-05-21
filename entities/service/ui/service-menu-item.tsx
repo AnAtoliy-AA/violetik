@@ -31,15 +31,14 @@ export function ServiceMenuItem({
   return (
     <article
       className={cn(
-        "group/menu border-b-[0.5px] border-line-strong py-[22px] transition-transform duration-fast ease-out",
+        "group/menu border-b-[0.5px] border-line-strong py-[22px]",
         topRule && "border-t-[0.5px]",
-        "hover:translate-x-1 motion-reduce:hover:translate-x-0",
         className,
       )}
       {...rest}
     >
       <div className="flex items-start gap-4">
-        <div className="gilded glass-top h-[98px] w-[78px] shrink-0 overflow-hidden rounded-lg">
+        <div className="gilded glass-top h-[98px] w-[78px] shrink-0 overflow-hidden rounded-lg transition-transform duration-fast ease-out group-hover/menu:scale-[1.03] motion-reduce:group-hover/menu:scale-100">
           <NailTile
             palette={palette}
             variant={variant}
@@ -54,11 +53,11 @@ export function ServiceMenuItem({
             <LetterpressRule className="mb-1 flex-1" />
           </div>
           <div className="mt-1.5 flex items-baseline justify-between gap-3">
-            <h3 className="font-display text-[28px] font-normal italic leading-[1.05] tracking-[-0.01em]">
+            <h3 className="font-display text-[28px] font-normal italic leading-[1.05] tracking-[-0.01em] transition-transform duration-fast ease-out group-hover/menu:translate-x-1 motion-reduce:group-hover/menu:translate-x-0">
               {service.name}
             </h3>
             <span className="gilded inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5">
-              <span className="font-mono text-[14px] text-gold">
+              <span className="font-mono text-[14px] text-gold group-hover/menu:text-gold-shimmer">
                 {resolvedPrice ? (
                   <Price resolved={resolvedPrice} />
                 ) : (

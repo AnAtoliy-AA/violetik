@@ -295,6 +295,10 @@
     "site_settings_saved": "Saved",
     "site_settings_error": "Save failed: {error}"
   },
+  "AtelierHours": {
+    "open_until": "Open · until {time}",
+    "opens_on": "Closed · opens {day} at {time}"
+  },
   "NotFound": {
     "meta_title": "Lost in the atelier",
     "eyebrow": "Off menu",
