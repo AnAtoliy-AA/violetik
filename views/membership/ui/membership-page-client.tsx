@@ -2,26 +2,52 @@
 
 import { useState } from "react";
 import type { ReactNode } from "react";
+import {
+  DEFAULT_SITE_SETTINGS,
+  resolvePrice,
+  type ResolvedPrice,
+  type SiteSettings,
+} from "@/entities/site-settings";
 import type { MembershipTier } from "@/entities/studio";
+import { Price } from "@/shared/ui/price";
 import { BillingToggle, type Billing } from "./billing-toggle";
 import { MembershipTierCard } from "./membership-tier-card";
+
+interface TierPricing {
+  resolved: ResolvedPrice | null; // null for the free tier
+  cadenceLabel: string;
+}
 
 function pricing(
   tier: MembershipTier,
   billing: Billing,
-  freeLabel: string,
+  settings: SiteSettings,
   perMonth: string,
   perYear: string,
-): { priceLabel: string; cadenceLabel: string } {
-  if (tier.price === 0) return { priceLabel: freeLabel, cadenceLabel: "" };
+): TierPricing {
+  if (tier.price === 0) return { resolved: null, cadenceLabel: "" };
+
+  // Member is excluded from overrides; only VIP can be overridden.
+  // resolvePrice returns the base (catalog or override) and an
+  // effective price after the global discount.
+  const monthly = resolvePrice("membership:VIP", tier.price, settings);
+
   if (billing === "annual") {
-    return { priceLabel: `€${tier.price * 10}`, cadenceLabel: perYear };
+    return {
+      resolved: {
+        base: monthly.base * 10,
+        effective: monthly.effective * 10,
+        hasDiscount: monthly.hasDiscount,
+      },
+      cadenceLabel: perYear,
+    };
   }
-  return { priceLabel: `€${tier.price}`, cadenceLabel: perMonth };
+  return { resolved: monthly, cadenceLabel: perMonth };
 }
 
 export interface MembershipPageClientProps {
   tiers: MembershipTier[];
+  settings?: SiteSettings;
   labels: {
     billingAria: string;
     billingMonthly: string;
@@ -38,6 +64,7 @@ export interface MembershipPageClientProps {
 
 export function MembershipPageClient({
   tiers,
+  settings = DEFAULT_SITE_SETTINGS,
   labels,
   vipCardCta,
 }: MembershipPageClientProps) {
@@ -57,10 +84,10 @@ export function MembershipPageClient({
 
       <section className="flex flex-col gap-3.5 px-[22px] pb-6 pt-5">
         {tiers.map((tier) => {
-          const { priceLabel, cadenceLabel } = pricing(
+          const { resolved, cadenceLabel } = pricing(
             tier,
             billing,
-            labels.priceFree,
+            settings,
             labels.cadenceMonth,
             labels.cadenceYear,
           );
@@ -69,7 +96,8 @@ export function MembershipPageClient({
             <MembershipTierCard
               key={tier.tier}
               tier={tier}
-              priceLabel={priceLabel}
+              priceLabel={resolved ? `€${resolved.effective}` : labels.priceFree}
+              priceSlot={resolved ? <Price resolved={resolved} /> : undefined}
               cadenceLabel={cadenceLabel}
               ctaLabel={
                 tier.price === 0
