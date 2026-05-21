@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { AnchorHTMLAttributes } from "react";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -17,59 +17,157 @@ vi.mock("@/i18n/navigation", () => ({
   ),
 }));
 
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(),
+  getLocale: vi.fn(),
+}));
+
+vi.mock("@/db/vip-requests", () => ({
+  getCurrentTier: vi.fn(),
+}));
+
+vi.mock("@/shared/lib/auth-server", () => ({
+  getCurrentSessionUser: vi.fn(),
+}));
+
+vi.mock("@/features/vip-request-submit/api/actions", () => ({
+  submitVipRequest: vi.fn(),
+  cancelVipRequest: vi.fn(),
+}));
+
+vi.mock("@/auth", () => ({ auth: vi.fn() }));
+
+import { getTranslations, getLocale } from "next-intl/server";
+import { getCurrentTier } from "@/db/vip-requests";
+import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 import { MembershipPage } from "./membership-page";
 
-function renderPage() {
+function makeT(messages: Record<string, unknown>) {
+  function t(key: string, params?: Record<string, string>): string {
+    const val = (messages as Record<string, string>)[key] ?? key;
+    if (!params) return val;
+    return Object.entries(params).reduce(
+      (s, [k, v]) => s.replace(`{${k}}`, v),
+      val,
+    );
+  }
+  t.rich = (key: string, tags: Record<string, (c: unknown) => unknown>) => {
+    const val = (messages as Record<string, string>)[key] ?? key;
+    return val.replace(/<(\w+)>(.*?)<\/\1>/g, (_: string, tag: string, content: string) => {
+      const fn = tags[tag];
+      return fn ? String(fn(content)) : content;
+    });
+  };
+  return t;
+}
+
+async function renderPage() {
+  const t = makeT(en.Membership);
+  vi.mocked(getTranslations).mockResolvedValue(t as never);
+  vi.mocked(getLocale).mockResolvedValue("en");
+  const page = await MembershipPage();
   return render(
     <NextIntlClientProvider locale="en" messages={en}>
-      <MembershipPage />
+      {page}
     </NextIntlClientProvider>,
   );
 }
 
+beforeEach(() => {
+  vi.mocked(getCurrentSessionUser).mockReset();
+  vi.mocked(getCurrentTier).mockReset();
+});
+
 describe("MembershipPage", () => {
-  it("renders three tier cards in canonical order", () => {
-    renderPage();
+  it("renders two tier cards in canonical order", async () => {
+    vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+    await renderPage();
     const articles = screen.getAllByRole("article");
-    expect(articles).toHaveLength(3);
-    expect(within(articles[0]).getByText("Petale")).toBeInTheDocument();
-    expect(within(articles[1]).getByText("Violette")).toBeInTheDocument();
-    expect(within(articles[2]).getByText("Atelier")).toBeInTheDocument();
+    expect(articles).toHaveLength(2);
+    expect(within(articles[0]).getByText("Member")).toBeInTheDocument();
+    expect(within(articles[1]).getByText("VIP")).toBeInTheDocument();
   });
 
-  it("marks the Violette tier as featured with the Most chosen tag", () => {
-    renderPage();
+  it("marks the VIP tier as featured with the Most chosen tag", async () => {
+    vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+    await renderPage();
     expect(screen.getByText(/Most chosen/i)).toBeInTheDocument();
   });
 
   it("shows monthly prices by default and switches to annual ×10", async () => {
     const user = userEvent.setup();
-    renderPage();
-    const violetteArticle = screen.getAllByRole("article")[1];
-    expect(within(violetteArticle).getByText("€180")).toBeInTheDocument();
-    expect(within(violetteArticle).getByText("/ month")).toBeInTheDocument();
+    vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+    await renderPage();
+    const vipArticle = screen.getAllByRole("article")[1];
+    expect(within(vipArticle).getByText("€180")).toBeInTheDocument();
+    expect(within(vipArticle).getByText("/ month")).toBeInTheDocument();
 
     await user.click(screen.getByRole("tab", { name: /Annual/i }));
-    expect(within(violetteArticle).getByText("€1800")).toBeInTheDocument();
-    expect(within(violetteArticle).getByText("/ year")).toBeInTheDocument();
+    expect(within(vipArticle).getByText("€1800")).toBeInTheDocument();
+    expect(within(vipArticle).getByText("/ year")).toBeInTheDocument();
   });
 
-  it("free tier renders Free instead of a price and a Stay free CTA", () => {
-    renderPage();
-    const petale = screen.getAllByRole("article")[0];
-    expect(within(petale).getByText(/^Free$/)).toBeInTheDocument();
+  it("free tier renders Free instead of a price and a Stay free CTA", async () => {
+    vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+    await renderPage();
+    const memberCard = screen.getAllByRole("article")[0];
+    expect(within(memberCard).getByText(/^Free$/)).toBeInTheDocument();
     expect(
-      within(petale).getByRole("link", { name: /Stay free/i }),
+      within(memberCard).getByRole("link", { name: /Stay free/i }),
     ).toBeInTheDocument();
   });
 
-  it("paid tier CTAs interpolate the tier name", () => {
-    renderPage();
-    expect(
-      screen.getByRole("link", { name: /Join Violette/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /Join Atelier/i }),
-    ).toBeInTheDocument();
+  describe("VIP CTA states", () => {
+    it("visitor — VIP card shows sign-in link", async () => {
+      vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+      await renderPage();
+      const vipCard = screen.getAllByRole("article")[1];
+      expect(
+        within(vipCard).getByRole("link", { name: /Sign in to apply/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("member — VIP card shows Join VIP button", async () => {
+      vi.mocked(getCurrentSessionUser).mockResolvedValue({
+        id: "u1",
+      } as never);
+      vi.mocked(getCurrentTier).mockResolvedValue({ state: "member" });
+      await renderPage();
+      const vipCard = screen.getAllByRole("article")[1];
+      expect(
+        within(vipCard).getByRole("button", { name: /Join VIP/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("pending — VIP card shows Cancel request button", async () => {
+      vi.mocked(getCurrentSessionUser).mockResolvedValue({
+        id: "u1",
+      } as never);
+      vi.mocked(getCurrentTier).mockResolvedValue({
+        state: "member-pending",
+        pendingRequestId: "vipreq_x",
+      });
+      await renderPage();
+      const vipCard = screen.getAllByRole("article")[1];
+      expect(
+        within(vipCard).getByRole("button", { name: /Cancel request/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("vip — VIP card shows You're a VIP label", async () => {
+      vi.mocked(getCurrentSessionUser).mockResolvedValue({
+        id: "u1",
+      } as never);
+      vi.mocked(getCurrentTier).mockResolvedValue({
+        state: "vip",
+        activeRequestId: "vipreq_a",
+        expiresAt: new Date("2027-01-01T00:00:00Z"),
+      });
+      await renderPage();
+      const vipCard = screen.getAllByRole("article")[1];
+      expect(
+        within(vipCard).getByText(/You're a VIP/i),
+      ).toBeInTheDocument();
+    });
   });
 });

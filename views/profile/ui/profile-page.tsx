@@ -1,12 +1,12 @@
-"use client";
-
-import { useLocale, useTranslations } from "next-intl";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA, type Visit } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
+import { getCurrentTier } from "@/db/vip-requests";
+import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 
 const QUICK_LINKS: ReadonlyArray<{ key: string; href: string }> = [
   { key: "bookings", href: "/booking/service" },
@@ -31,11 +31,14 @@ function initialsOf(name: string): string {
     .join("");
 }
 
-export function ProfilePage() {
-  const t = useTranslations("Profile");
-  const tCountdown = useTranslations("Profile.countdown");
-  const tLinks = useTranslations("Profile.quick_links");
-  const locale = useLocale();
+export async function ProfilePage() {
+  const t = await getTranslations("Profile");
+  const tCountdown = await getTranslations("Profile.countdown");
+  const tLinks = await getTranslations("Profile.quick_links");
+  const locale = await getLocale();
+
+  const user = await getCurrentSessionUser();
+  const tier = user ? await getCurrentTier(user.id) : { state: "member" as const };
 
   const { profile, visits, services } = STUDIO_DATA;
   const upcoming: Visit | undefined = visits.find(
@@ -68,11 +71,16 @@ export function ProfilePage() {
             {initialsOf(profile.name)}
           </div>
           <div>
-            {profile.membership ? (
-              <Eyebrow gold>
-                {t("member_tag", { tier: profile.membership })}
-              </Eyebrow>
-            ) : null}
+            {tier.state === "vip" && (
+              <span className="rounded-full border-[0.5px] border-accent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+                {t("badge_vip")}
+              </span>
+            )}
+            {tier.state === "member-pending" && (
+              <span className="rounded-full border-[0.5px] border-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-text-2">
+                {t("badge_pending_vip")}
+              </span>
+            )}
             <h1 className="mt-1.5 font-display text-[40px] font-light italic leading-none tracking-[-0.025em]">
               {profile.name}
             </h1>

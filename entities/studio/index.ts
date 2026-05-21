@@ -6,7 +6,6 @@ export type {
   GalleryItem,
   GalleryTag,
   MembershipTier,
-  MembershipTierName,
   Service,
   StudioInfo,
   Testimonial,

@@ -1,11 +1,9 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/cn";
-import { StatusBar } from "@/shared/ui/status-bar";
 import { Wordmark } from "@/shared/ui/wordmark";
 
 export interface AppHeaderProps extends HTMLAttributes<HTMLElement> {
-  showStatusBar?: boolean;
   /** If set, replaces the default Wordmark with a centred mono caps title. */
   title?: string;
   /** If set, replaces the wordmark slot with a round back-arrow Link to this locale-aware href. */
@@ -59,7 +57,6 @@ const circleButtonClass = cn(
 );
 
 export function AppHeader({
-  showStatusBar = true,
   title,
   back,
   ariaBackLabel = "Go back",
@@ -77,7 +74,12 @@ export function AppHeader({
       <BackIcon />
     </Link>
   ) : (
-    <Wordmark size="xs" />
+    <Link
+      href="/home"
+      className="-m-2 rounded-sm p-2 transition-opacity duration-fast ease-out hover:opacity-80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+    >
+      <Wordmark size="xs" />
+    </Link>
   );
 
   const menu = menuButton ?? (
@@ -92,7 +94,6 @@ export function AppHeader({
 
   return (
     <header className={cn(className)} {...rest}>
-      {showStatusBar ? <StatusBar /> : null}
       <div className="relative flex items-center justify-between px-[22px] pb-2 pt-[10px]">
         {left}
         {title ? (

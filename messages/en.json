@@ -1,9 +1,6 @@
 {
   "Home": {
     "meta_title": "The hands are a portrait",
-    "magazine_volume": "VOL XXIV · No 24",
-    "magazine_season": "SS · MMXXVI",
-    "magazine_location": "VERBENA · 14",
     "hero_cover_story": "Cover story",
     "hero_title_line_1": "The hands",
     "hero_title_lead": "are a",
@@ -24,8 +21,8 @@
     "gallery_title_a": "Recent",
     "gallery_title_b": "work",
     "gallery_view_all": "View all",
-    "membership_title_lead": "Become a",
-    "membership_title_word": "Violette",
+    "membership_title_lead": "Become a member or",
+    "membership_title_word": "VIP",
     "membership_blurb": "Two visits a month, priority calendar, the welcome ritual, and ten percent on extensions & art.",
     "membership_link": "See the tiers",
     "footer_copyright": "© MMXXVI · All rights reserved"
@@ -34,7 +31,7 @@
     "meta_title": "Membership",
     "plate_title": "Membership",
     "eyebrow": "By invitation · Limited circle",
-    "hero_title": "Become a <em>member</em>.",
+    "hero_title": "Become a member or <em>VIP</em>.",
     "hero_paragraph": "A small ring of regulars. Three tiers, one chair, complete attention.",
     "billing_aria": "Billing cadence",
     "billing_monthly": "Monthly",
@@ -45,6 +42,11 @@
     "most_chosen": "Most chosen",
     "cta_stay_free": "Stay free",
     "cta_join": "Join {tier}",
+    "cta_sign_in": "Sign in to apply",
+    "cta_join_vip": "Join VIP",
+    "cta_cancel_request": "Cancel request",
+    "cta_youre_member": "You're a Member",
+    "cta_youre_vip": "You're a VIP · expires {date}",
     "footnote": "Memberships pause anytime. Cancel by message — no calls, no forms."
   },
   "Master": {
@@ -172,15 +174,12 @@
     "ritual_body": "Every set begins with a mood conversation. Every finish ends with photography of your hands.",
     "membership_eyebrow": "03 / MEMBERSHIP",
     "membership_title": "Yours, by appointment",
-    "membership_body": "Become a Violette member for two visits a month, priority access, and the after-hours calendar."
+    "membership_body": "Become a member or VIP for two visits a month, priority access, and the after-hours calendar."
   },
   "Welcome": {
-    "established": "EST · MMXIV",
-    "volume": "VOL · 24",
-    "issue": "Nº 001",
     "tagline": "A private nail atelier — one chair, one hour, one quiet ritual at a time.",
-    "cta_enter": "Enter the atelier",
-    "cta_returning": "I already have an account"
+    "cta_enter": "I'm new here",
+    "cta_returning": "Start booking"
   },
   "LocaleSwitcher": {
     "label": "Language",
@@ -214,7 +213,8 @@
   "Profile": {
     "meta_title": "Account",
     "plate_title": "Account",
-    "member_tag": "Member · {tier}",
+    "badge_vip": "VIP",
+    "badge_pending_vip": "Pending VIP",
     "joined": "Joined in {year}",
     "next_visit_eyebrow": "Next visit",
     "countdown": {
@@ -269,7 +269,11 @@
     "eyebrow": "Private · Studio admin",
     "hero_title": "Palette.",
     "hero_paragraph": "Pick the studio colourway. The selection persists in a cookie and applies for everyone visiting from this device.",
-    "persistence_note": "Stored locally in the vio-palette cookie · 1 year"
+    "persistence_note": "Stored locally in the vio-palette cookie · 1 year",
+    "inbox_title": "Inbox",
+    "inbox_bookings": "Bookings",
+    "inbox_vip_requests": "VIP requests",
+    "inbox_pending_suffix": "pending"
   },
   "NotFound": {
     "meta_title": "Lost in the atelier",
@@ -322,6 +326,25 @@
       "cancelled": "Cancelled",
       "completed": "Completed"
     }
+  },
+  "AdminVipRequests": {
+    "meta_title": "VIP requests",
+    "expired_page_title": "Expired VIP",
+    "eyebrow": "Admin",
+    "hero_title": "VIP membership requests",
+    "hero_paragraph": "Pending requests, active VIPs sorted by upcoming expiry, and recent expirations.",
+    "section_pending": "Pending ({n})",
+    "section_active": "Active VIPs ({n})",
+    "section_expired": "Expired ({shown} of {total})",
+    "empty_pending": "No requests right now.",
+    "empty_active": "No active VIPs right now.",
+    "empty_expired": "No expirations yet.",
+    "cta_approve": "Approve",
+    "cta_decline": "Decline",
+    "cta_downgrade": "Downgrade",
+    "cta_show_all_expired": "Show all {total}",
+    "expires_in_days": "expires in {n}d",
+    "expired_ago_days": "expired {n}d ago"
   },
   "AdminGoogle": {
     "meta_title": "Google Calendar",

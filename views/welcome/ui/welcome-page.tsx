@@ -4,10 +4,8 @@ import { motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { buttonClassName } from "@/shared/ui/button";
-import { Eyebrow } from "@/shared/ui/eyebrow";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { Ornament } from "@/shared/ui/ornament";
-import { StatusBar } from "@/shared/ui/status-bar";
 import { LetterReveal } from "./letter-reveal";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -47,18 +45,7 @@ export function WelcomePage() {
         transition={{ duration: reduceMotion ? 0 : 1.8, ease: EASE_OUT, delay: 0.55 }}
       />
 
-      <StatusBar />
-
-      <div className="flex min-h-[calc(100dvh-44px)] flex-col justify-between">
-        <motion.div className="pt-12" {...fade(0.35)}>
-          <div className="flex items-center justify-between">
-            <Eyebrow>{t("established")}</Eyebrow>
-            <Eyebrow gold>{t("volume")}</Eyebrow>
-            <Eyebrow>{t("issue")}</Eyebrow>
-          </div>
-          <Ornament className="mt-[22px]" />
-        </motion.div>
-
+      <div className="mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
           <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)]">
             <LetterReveal text="Violetta" />
@@ -111,7 +98,7 @@ export function WelcomePage() {
             {t("cta_enter")}
           </Link>
           <Link
-            href="/home"
+            href="/booking/service"
             className={buttonClassName({ variant: "ghost", size: "lg", block: true })}
           >
             {t("cta_returning")}

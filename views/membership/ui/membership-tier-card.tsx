@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/cn";
 import { buttonClassName } from "@/shared/ui/button";
@@ -10,6 +11,7 @@ export interface MembershipTierCardProps {
   cadenceLabel: string;
   ctaLabel: string;
   mostChosenLabel: string;
+  ctaSlot?: ReactNode;
 }
 
 function Bullet({ featured }: { featured: boolean }) {
@@ -31,6 +33,7 @@ export function MembershipTierCard({
   cadenceLabel,
   ctaLabel,
   mostChosenLabel,
+  ctaSlot,
 }: MembershipTierCardProps) {
   const featured = tier.featured;
   return (
@@ -83,16 +86,18 @@ export function MembershipTierCard({
         ))}
       </div>
 
-      <Link
-        href="/booking/service"
-        className={buttonClassName({
-          variant: featured ? "gold" : "outline",
-          size: "md",
-          block: true,
-        })}
-      >
-        {ctaLabel}
-      </Link>
+      {ctaSlot ?? (
+        <Link
+          href="/booking/service"
+          className={buttonClassName({
+            variant: featured ? "gold" : "outline",
+            size: "md",
+            block: true,
+          })}
+        >
+          {ctaLabel}
+        </Link>
+      )}
     </article>
   );
 }

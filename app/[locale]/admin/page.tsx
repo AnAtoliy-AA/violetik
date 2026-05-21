@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
-import { redirect } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { PaletteSwitcher } from "@/features/palette-switcher";
 import { SignOutButton } from "@/features/telegram-login";
+import { listBookingsForAdmin } from "@/db/bookings";
+import { listPendingVipRequests } from "@/db/vip-requests";
 
 type Params = { locale: string };
 
@@ -48,6 +50,12 @@ export default async function AdminRoute({
   const t = await getTranslations("Admin");
   const tSignIn = await getTranslations("SignIn");
 
+  const [bookings, pendingVip] = await Promise.all([
+    listBookingsForAdmin(),
+    listPendingVipRequests(),
+  ]);
+  const pendingBookings = bookings.filter((b) => b.status === "pending").length;
+
   return (
     <div className="pb-16">
       <AppHeader back="/home" title={t("plate_title")} />
@@ -60,6 +68,36 @@ export default async function AdminRoute({
         <p className="max-w-[420px] text-[14px] text-text-2">
           {t("hero_paragraph")}
         </p>
+      </section>
+
+      <section className="px-[22px] pb-6">
+        <h2 className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("inbox_title")}
+        </h2>
+        <ul className="grid grid-cols-2 gap-3">
+          <li>
+            <Link
+              href="/admin/bookings"
+              className="block rounded-[18px] border-[0.5px] border-line bg-surface p-5 transition-colors duration-fast ease-out hover:bg-surface/80"
+            >
+              <div className="font-display text-[16px] italic">{t("inbox_bookings")}</div>
+              <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+                {pendingBookings} {t("inbox_pending_suffix")}
+              </div>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/admin/vip-requests"
+              className="block rounded-[18px] border-[0.5px] border-line bg-surface p-5 transition-colors duration-fast ease-out hover:bg-surface/80"
+            >
+              <div className="font-display text-[16px] italic">{t("inbox_vip_requests")}</div>
+              <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+                {pendingVip.length} {t("inbox_pending_suffix")}
+              </div>
+            </Link>
+          </li>
+        </ul>
       </section>
 
       <section className="px-[22px] pt-2 pb-10">

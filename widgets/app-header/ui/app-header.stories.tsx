@@ -9,19 +9,15 @@ const meta: Meta<typeof AppHeader> = {
     docs: {
       description: {
         component:
-          "Top chrome for tab-bar screens: a thin status-bar conceit (delete in production), the small wordmark, and a hamburger menu button. The menu button is a non-functional placeholder until the navigation drawer is wired in a later PR — `menuButton` lets a slot override that default.",
+          "Top chrome for tab-bar screens: the small wordmark on the left and a hamburger menu button on the right. The menu button is a non-functional placeholder until the navigation drawer is wired in a later PR — `menuButton` lets a slot override that default.",
       },
     },
   },
-  args: { showStatusBar: true },
-  argTypes: { showStatusBar: { control: "boolean" } },
 };
 export default meta;
 type Story = StoryObj<typeof AppHeader>;
 
 export const Default: Story = {};
-
-export const WithoutStatusBar: Story = { args: { showStatusBar: false } };
 
 export const DetailScreen: Story = {
   args: { back: "/services", title: "PLATE · 02" },

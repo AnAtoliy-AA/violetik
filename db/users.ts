@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, schema } from "./index";
 
 export interface TelegramUserPayload {
@@ -50,5 +50,17 @@ export async function upsertTelegramUser(
     })
     .returning();
 
+  return rows[0] ?? null;
+}
+
+export async function getUserById(
+  id: string,
+): Promise<schema.User | null> {
+  if (!db) return null;
+  const rows = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, id))
+    .limit(1);
   return rows[0] ?? null;
 }

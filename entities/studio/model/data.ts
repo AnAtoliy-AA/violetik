@@ -157,14 +157,14 @@ const testimonials: Testimonial[] = [
 
 const membership: MembershipTier[] = [
   {
-    tier: "Petale",
+    tier: "Member",
     price: 0,
     cadence: "Open",
     perks: ["Online booking", "Two reminders", "Gallery access"],
     featured: false,
   },
   {
-    tier: "Violette",
+    tier: "VIP",
     price: 180,
     cadence: "/ month",
     perks: [
@@ -175,23 +175,10 @@ const membership: MembershipTier[] = [
     ],
     featured: true,
   },
-  {
-    tier: "Atelier",
-    price: 420,
-    cadence: "/ month",
-    perks: [
-      "Unlimited visits",
-      "After-hours access",
-      "Travel kit & home care",
-      "First look at collections",
-    ],
-    featured: false,
-  },
 ];
 
 const profile: CustomerProfile = {
   name: "Lara K.",
-  membership: "Violette",
   joined: 2024,
   palette: ["#d9a3b6", "#7d3a6f"],
 };

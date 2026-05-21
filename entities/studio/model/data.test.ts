@@ -12,11 +12,10 @@ describe("STUDIO_DATA", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("has 3 membership tiers in the canonical order", () => {
+  it("has 2 membership tiers in the canonical order", () => {
     expect(STUDIO_DATA.membership.map((m) => m.tier)).toEqual([
-      "Petale",
-      "Violette",
-      "Atelier",
+      "Member",
+      "VIP",
     ]);
   });
 

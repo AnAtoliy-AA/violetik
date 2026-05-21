@@ -6,6 +6,8 @@ import {
   googleOauthTokens,
   userRole,
   users,
+  vipRequests,
+  vipRequestStatus,
 } from "./schema";
 import type {
   AvailabilityRule,
@@ -14,6 +16,7 @@ import type {
   NewBooking,
   NewGoogleOauthToken,
   NewUser,
+  NewVipRequest,
   User,
 } from "./schema";
 
@@ -74,6 +77,21 @@ describe("db/schema", () => {
     expect(_selUser.role).toBe("customer");
     expect(_selBooking.status).toBe("pending");
     expect(_selRule.dayOfWeek).toBe(2);
+  });
+
+  it("declares vip_requests table and status enum", () => {
+    expect(vipRequests).toBeDefined();
+    expect(vipRequestStatus.enumValues).toEqual([
+      "pending",
+      "approved",
+      "declined",
+      "cancelled",
+    ]);
+  });
+
+  it("infers VipRequest insert type with required fields", () => {
+    const _r: NewVipRequest = { id: "vipreq_x", userId: "tg:1" };
+    expect(_r).toBeDefined();
   });
 
   it("declares the google_oauth_tokens table with the expected shape", () => {

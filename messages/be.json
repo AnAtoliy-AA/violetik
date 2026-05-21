@@ -1,9 +1,6 @@
 {
   "Home": {
     "meta_title": "Рукі — гэта партрэт",
-    "magazine_volume": "ТОМ XXIV · № 24",
-    "magazine_season": "SS · MMXXVI",
-    "magazine_location": "ВЕРБЕНА · 14",
     "hero_cover_story": "Кавер-стары",
     "hero_title_line_1": "Рукі —",
     "hero_title_lead": "гэта",
@@ -24,8 +21,8 @@
     "gallery_title_a": "Свежыя",
     "gallery_title_b": "працы",
     "gallery_view_all": "Усе",
-    "membership_title_lead": "Станьце",
-    "membership_title_word": "Віалетай",
+    "membership_title_lead": "Станьце сябрам або",
+    "membership_title_word": "VIP",
     "membership_blurb": "Два візіты на месяц, прыярытэтны каляндар, рытуал прывітання і дзесяць працэнтаў на нарошчванне і арт.",
     "membership_link": "Паглядзець тарыфы",
     "footer_copyright": "© MMXXVI · Усе правы абароненыя"
@@ -34,7 +31,7 @@
     "meta_title": "Сяброўства",
     "plate_title": "Сяброўства",
     "eyebrow": "Па запрашэнні · Вузкі круг",
-    "hero_title": "Станьце <em>сябрам</em>.",
+    "hero_title": "Станьце сябрам або <em>VIP</em>.",
     "hero_paragraph": "Невялікі круг сталых гасцей. Тры узроўні, адно крэсла, поўная ўвага.",
     "billing_aria": "Перыядычнасць аплаты",
     "billing_monthly": "Штомесяц",
@@ -45,6 +42,11 @@
     "most_chosen": "Часцей за ўсё",
     "cta_stay_free": "Застацца бясплатным",
     "cta_join": "Далучыцца да {tier}",
+    "cta_sign_in": "Увайсці, каб падаць заяўку",
+    "cta_join_vip": "Стаць VIP",
+    "cta_cancel_request": "Адмяніць заяўку",
+    "cta_youre_member": "Вы Member",
+    "cta_youre_vip": "Вы VIP · да {date}",
     "footnote": "Сяброўства можна паставіць на паўзу ў любы момант. Адмена ў адзін клік — без званкоў і формаў."
   },
   "Master": {
@@ -172,15 +174,12 @@
     "ritual_body": "Кожны сэт пачынаецца з гутаркі пра настрой. Кожны фінал — фотаздымкам вашых рук.",
     "membership_eyebrow": "03 / СЯБРОЎСТВА",
     "membership_title": "Ваша, па запісе",
-    "membership_body": "Станьце сябрам Violette — два візіты на месяц, прыярытэтны доступ і каляндар пасля зачынення."
+    "membership_body": "Станьце сябрам або VIP — два візіты на месяц, прыярытэтны доступ і каляндар пасля зачынення."
   },
   "Welcome": {
-    "established": "ЗАСН · MMXIV",
-    "volume": "ВЫП · 24",
-    "issue": "№ 001",
     "tagline": "Прыватнае атэлье манікюру — адно крэсла, адна гадзіна, адзін ціхі рытуал за раз.",
-    "cta_enter": "Увайсці ў атэлье",
-    "cta_returning": "У мяне ўжо ёсць акаўнт"
+    "cta_enter": "Я тут упершыню",
+    "cta_returning": "Запісацца"
   },
   "LocaleSwitcher": {
     "label": "Мова",
@@ -214,7 +213,8 @@
   "Profile": {
     "meta_title": "Аккаўнт",
     "plate_title": "Аккаўнт",
-    "member_tag": "Сябар · {tier}",
+    "badge_vip": "VIP",
+    "badge_pending_vip": "VIP у апрацоўцы",
     "joined": "Далучылася ў {year}",
     "next_visit_eyebrow": "Наступны візіт",
     "countdown": {
@@ -269,7 +269,11 @@
     "eyebrow": "Прыватна · Адмін-панэль",
     "hero_title": "Палітра.",
     "hero_paragraph": "Абярыце колеравую схему студыі. Выбар захоўваецца ў cookie і прымяняецца для ўсіх наведвальнікаў з гэтай прылады.",
-    "persistence_note": "Захоўваецца ў cookie vio-palette · 1 год"
+    "persistence_note": "Захоўваецца ў cookie vio-palette · 1 год",
+    "inbox_title": "Уваходныя",
+    "inbox_bookings": "Запісы",
+    "inbox_vip_requests": "Заяўкі на VIP",
+    "inbox_pending_suffix": "чакаюць"
   },
   "NotFound": {
     "meta_title": "Згубіліся ў атэлье",
@@ -322,6 +326,25 @@
       "cancelled": "Адменена",
       "completed": "Завершана"
     }
+  },
+  "AdminVipRequests": {
+    "meta_title": "Заяўкі на VIP",
+    "expired_page_title": "Заканчаныя VIP",
+    "eyebrow": "Адмін",
+    "hero_title": "Заяўкі на VIP-сяброўства",
+    "hero_paragraph": "Заяўкі на разглядзе, актыўныя VIP па набліжэнні тэрміну, а таксама нядаўнія заканчэнні.",
+    "section_pending": "Чакаюць ({n})",
+    "section_active": "Актыўныя VIP ({n})",
+    "section_expired": "Заканчаныя ({shown} з {total})",
+    "empty_pending": "Зараз заяўак няма.",
+    "empty_active": "Зараз актыўных VIP няма.",
+    "empty_expired": "Заканчаных яшчэ няма.",
+    "cta_approve": "Зацвердзіць",
+    "cta_decline": "Адхіліць",
+    "cta_downgrade": "Зніжыць",
+    "cta_show_all_expired": "Паказаць усе {total}",
+    "expires_in_days": "заканчваецца праз {n}д",
+    "expired_ago_days": "закончылася {n}д таму"
   },
   "AdminGoogle": {
     "meta_title": "Google Каляндар",

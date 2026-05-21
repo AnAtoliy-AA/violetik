@@ -7,7 +7,6 @@ import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA } from "@/entities/studio";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
-import { StatusBar } from "@/shared/ui/status-bar";
 import { formatLongDate } from "@/views/booking/lib/booking-steps";
 import { useBookingStore } from "@/views/booking/model/booking-store";
 import { ConfettiBurst } from "./confetti-burst";
@@ -69,7 +68,6 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
   return (
     <div className="relative px-[22px] pb-9">
       <ConfettiBurst />
-      <StatusBar />
       <div className="pt-10 text-center">
         <GoldenSeal />
 
