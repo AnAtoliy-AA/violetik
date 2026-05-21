@@ -1,35 +1,43 @@
-"use client";
-
-import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { STUDIO_DATA, type MembershipTier } from "@/entities/studio";
+import { getTranslations, getLocale } from "next-intl/server";
+import { STUDIO_DATA } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { AppHeader } from "@/widgets/app-header";
-import { BillingToggle, type Billing } from "./billing-toggle";
-import { MembershipTierCard } from "./membership-tier-card";
+import { getCurrentTier } from "@/db/vip-requests";
+import { getCurrentSessionUser } from "@/shared/lib/auth-server";
+import { VipCardCta, type VipCardCtaState } from "@/features/vip-request-submit";
+import { formatLongDate } from "@/views/booking/lib/booking-steps";
+import { MembershipPageClient } from "./membership-page-client";
 
-function pricing(
-  tier: MembershipTier,
-  billing: Billing,
-  freeLabel: string,
-  perMonth: string,
-  perYear: string,
-): { priceLabel: string; cadenceLabel: string } {
-  if (tier.price === 0) return { priceLabel: freeLabel, cadenceLabel: "" };
-  if (billing === "annual") {
-    return { priceLabel: `€${tier.price * 10}`, cadenceLabel: perYear };
-  }
-  return { priceLabel: `€${tier.price}`, cadenceLabel: perMonth };
-}
+export async function MembershipPage() {
+  const t = await getTranslations("Membership");
+  const locale = await getLocale();
 
-function ctaFor(tier: MembershipTier, t: (k: string, p?: Record<string, string>) => string) {
-  if (tier.price === 0) return t("cta_stay_free");
-  return t("cta_join", { tier: tier.tier });
-}
+  const user = await getCurrentSessionUser();
+  const tier = user ? await getCurrentTier(user.id) : null;
 
-export function MembershipPage() {
-  const t = useTranslations("Membership");
-  const [billing, setBilling] = useState<Billing>("monthly");
+  const vipState: VipCardCtaState =
+    !user
+      ? { kind: "visitor", locale }
+      : tier?.state === "vip"
+        ? { kind: "vip", expiresAt: tier.expiresAt }
+        : tier?.state === "member-pending"
+          ? { kind: "pending" }
+          : { kind: "member" };
+
+  const cardLabels = {
+    signIn: t("cta_sign_in"),
+    join: t("cta_join_vip"),
+    cancel: t("cta_cancel_request"),
+    youreVip:
+      tier?.state === "vip"
+        ? t("cta_youre_vip", {
+            date: formatLongDate(
+              tier.expiresAt.toISOString().slice(0, 10),
+              locale,
+            ),
+          })
+        : t("cta_youre_vip", { date: "" }),
+  };
 
   return (
     <div className="pb-10">
@@ -45,37 +53,21 @@ export function MembershipPage() {
         </p>
       </section>
 
-      <section className="px-[22px] pb-1 pt-2.5">
-        <BillingToggle
-          value={billing}
-          onChange={setBilling}
-          monthlyLabel={t("billing_monthly")}
-          annualLabel={t("billing_annual")}
-          ariaLabel={t("billing_aria")}
-        />
-      </section>
-
-      <section className="flex flex-col gap-3.5 px-[22px] pb-6 pt-5">
-        {STUDIO_DATA.membership.map((tier) => {
-          const { priceLabel, cadenceLabel } = pricing(
-            tier,
-            billing,
-            t("price_free"),
-            t("cadence_month"),
-            t("cadence_year"),
-          );
-          return (
-            <MembershipTierCard
-              key={tier.tier}
-              tier={tier}
-              priceLabel={priceLabel}
-              cadenceLabel={cadenceLabel}
-              ctaLabel={ctaFor(tier, t)}
-              mostChosenLabel={t("most_chosen")}
-            />
-          );
-        })}
-      </section>
+      <MembershipPageClient
+        tiers={STUDIO_DATA.membership}
+        labels={{
+          billingAria: t("billing_aria"),
+          billingMonthly: t("billing_monthly"),
+          billingAnnual: t("billing_annual"),
+          priceFree: t("price_free"),
+          cadenceMonth: t("cadence_month"),
+          cadenceYear: t("cadence_year"),
+          ctaStayFree: t("cta_stay_free"),
+          ctaJoin: (tierName) => t("cta_join", { tier: tierName }),
+          mostChosen: t("most_chosen"),
+        }}
+        vipCardCta={<VipCardCta state={vipState} labels={cardLabels} />}
+      />
 
       <section className="px-[22px] pb-10 pt-2.5 text-center">
         <p className="mx-auto m-0 max-w-[280px] text-[12px] text-text-3">
