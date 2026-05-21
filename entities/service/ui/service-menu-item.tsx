@@ -38,7 +38,10 @@ export function ServiceMenuItem({
       {...rest}
     >
       <div className="flex items-start gap-4">
-        <div className="gilded glass-top h-[98px] w-[78px] shrink-0 overflow-hidden rounded-lg transition-transform duration-fast ease-out group-hover/menu:scale-[1.03] motion-reduce:group-hover/menu:scale-100">
+        <div
+          className="gilded glass-top h-[98px] w-[78px] shrink-0 overflow-hidden rounded-lg transition-transform duration-fast ease-out group-hover/menu:scale-[1.03] motion-reduce:group-hover/menu:scale-100"
+          style={{ viewTransitionName: `service-hero-${service.id}` }}
+        >
           <NailTile
             palette={palette}
             variant={variant}

@@ -41,3 +41,26 @@ test("unknown service id returns 404", async ({ page }) => {
   const response = await page.goto("/en/services/does-not-exist");
   expect(response?.status()).toBe(404);
 });
+
+test("source thumbnail carries a view-transition-name", async ({ page }) => {
+  await page.goto("/en/services");
+  // The first menu row's thumbnail is the source for the shared-element morph.
+  const row = page.locator("article.group\\/menu").first();
+  const thumb = row.locator("div[style*='view-transition-name']").first();
+  await expect(thumb).toHaveAttribute(
+    "style",
+    /view-transition-name:\s*service-hero-/,
+  );
+});
+
+test("destination detail hero carries the matching view-transition-name", async ({
+  page,
+}) => {
+  await page.goto("/en/services/signature");
+  const heroes = page.locator("[style*='view-transition-name']");
+  // The hero is one of (potentially) several flagged elements; at least one
+  // must name the active service.
+  await expect(heroes.first()).toBeVisible();
+  const html = await page.content();
+  expect(html).toMatch(/view-transition-name:\s*service-hero-signature/);
+});

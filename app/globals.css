@@ -587,6 +587,37 @@ body {
   transform: translateY(-2px);
 }
 
+/* View Transitions API — service-hero morph between catalog and detail.
+ *
+ * Without this, the browser uses default 250ms ease. We slow it down so the
+ * morph reads as a deliberate camera move (not a UI flicker), and pass it
+ * through a brief blur to hide pixel-level interpolation artifacts when
+ * the source thumbnail and destination hero render different NailTile
+ * variants. Honors prefers-reduced-motion below.
+ */
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 480ms;
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-image-pair(*) {
+  animation: vt-blur 480ms var(--ease-out);
+}
+@keyframes vt-blur {
+  30%,
+  60% {
+    filter: blur(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-image-pair(*) {
+    animation: none !important;
+  }
+}
+
 /* Palette-sweep one-shot wash (consumed by palette-switcher). */
 .palette-sweep {
   position: fixed;
