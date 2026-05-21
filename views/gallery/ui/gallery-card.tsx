@@ -26,7 +26,7 @@ export function GalleryCard({ item, index, onOpen }: GalleryCardProps) {
       }}
       whileHover={reduceMotion ? undefined : { y: -2 }}
       className={cn(
-        "relative w-full overflow-hidden rounded-[18px] border-[0.5px] border-line p-0",
+        "gilded relative w-full overflow-hidden rounded-[18px] p-0",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
       )}
       style={{ height: item.h }}
@@ -43,6 +43,9 @@ export function GalleryCard({ item, index, onOpen }: GalleryCardProps) {
           className="size-full"
         />
       </motion.div>
+      <span className="absolute left-2.5 top-2.5 rounded-full bg-[rgba(20,9,26,0.45)] px-2 py-[3px] font-display text-[12px] italic text-text backdrop-blur-md">
+        Nº {String(index + 1).padStart(2, "0")}
+      </span>
       <span className="absolute bottom-2.5 left-2.5 rounded-full bg-[rgba(20,9,26,0.55)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-text backdrop-blur-md">
         {item.tag}
       </span>
