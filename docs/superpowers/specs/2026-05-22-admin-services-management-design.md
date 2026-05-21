@@ -36,6 +36,13 @@ menu must look identical the moment Phase 1 ships.
   retired `site_settings.price_overrides` column stays in the database
   (unused) so this design is non-destructive to existing data. Same for the
   now-unused `Services.category.*` keys in `messages/*.json` — left in place.
+- **Honoring `site_settings.price_overrides` at render time.** Phase 1's
+  `loadServicesForLocale` reads only `services.price_cents` and the global
+  `discountActive` / `discountPercent` flags. The `price_overrides` JSON is
+  ignored from Phase 1 forward (its values were already lifted into
+  `services.price_cents` by the seed). The "Service prices" override card
+  in `/admin/site-settings` is removed in Phase 2 because it can no longer
+  do anything meaningful; the column itself stays per the rule above.
 
 ## 3. Schema
 
@@ -132,6 +139,12 @@ export const services = pgTable(
 design — see [db/schema.ts](../../db/schema.ts) booking-table comment).
 Archiving a service therefore never breaks historical bookings.
 
+**Delete posture:** services and categories are **never hard-deleted** by
+the admin UI — "Remove" archives instead. The `ON DELETE RESTRICT` on
+`services.category_id` exists as a safety net against future code that
+might attempt a hard delete; the day-to-day enforcement that an attached
+category cannot be archived is done at the server-action layer (§9).
+
 ### 3.4 `site_settings.currency`
 
 ```ts
@@ -169,6 +182,16 @@ RU/BE translations for each bullet must be authored as part of the seed —
 this is called out as a discrete task in the implementation plan and must
 land before Phase 1 merges (per the "all locales required" rule).
 
+**Translation source of truth for the seed.** The RU/BE strings for service
+names, blurbs, categories and bullet `includes` are authored **inline in
+the seed migration file** by the implementer (claude-code), drawing on the
+existing translation style in [messages/ru.json](../../messages/ru.json) and
+[messages/be.json](../../messages/be.json). They are not deferred to a
+human translator — if the implementer is uncertain about a phrase, the
+translation is flagged in the migration with a `-- TODO(human): verify`
+comment and surfaced as a question on the Phase 1 PR. This keeps the
+phase 1 PR self-contained: no external blocker.
+
 ## 5. Architecture (FSD)
 
 ### 5.1 Phase 1 — reads
@@ -195,17 +218,24 @@ entities/studio/model/data.ts        — `services` and category exports removed
                                         atelierClips, studio) stays
 ```
 
-Consumers switched to the loader:
+Consumers switched to the loader (full list — verified against the
+codebase, no others should appear in a final grep):
 
 - [views/services-catalog/](../../views/services-catalog/) — page + category chips
 - [views/service-detail/](../../views/service-detail/)
 - [views/home/](../../views/home/) — Signatures strip
-- [views/booking/](../../views/booking/) — service-pick step
-- [widgets/booking-stepper/](../../widgets/booking-stepper/) wherever the service list is referenced
-- Any other `STUDIO_DATA.services` references (verify via grep in plan-out)
+- [views/booking/](../../views/booking/)
+- [widgets/booking-stepper/](../../widgets/booking-stepper/)
+- [app/sitemap.ts](../../app/sitemap.ts)
+- [app/[locale]/services/[id]/page.tsx](../../app/[locale]/services/[id]/page.tsx) — including its `generateStaticParams`
+- [app/[locale]/booking/[step]/page.tsx](../../app/[locale]/booking/[step]/page.tsx)
+- [app/[locale]/admin/bookings/page.tsx](../../app/[locale]/admin/bookings/page.tsx)
+- [app/[locale]/admin/site-settings/page.tsx](../../app/[locale]/admin/site-settings/page.tsx) — the "Service prices" card; removed entirely in Phase 2 (see §2)
+- [app/api/booking/slots/route.ts](../../app/api/booking/slots/route.ts)
+- [features/photo-upload-admin/model/slot.ts](../../features/photo-upload-admin/model/slot.ts) — the "Service rituals" slot list (becomes DB-driven in Phase 2)
 
-All consumers are server components today and stay server components. Where a
-client child needs the data it receives it as props.
+All consumers are server components / server-side modules today and stay
+that way. Where a client child needs the data it receives it as props.
 
 ### 5.2 Phase 2 — writes
 
@@ -249,7 +279,11 @@ also embedded inline in `/admin/services/<id>` for convenience.
    (100 - discountPercent) / 100) : priceCents`.
 5. Format display price with
    `Intl.NumberFormat(locale, { style: "currency", currency: settings.currency,
-   maximumFractionDigits: 0 })` (the menu shows `€95`, not `€95.00`).
+   maximumFractionDigits: 0 })` (the menu shows `€95`, not `€95.00`). Note
+   that the symbol position and spacing vary by `locale × currency` — e.g.
+   `en + EUR → €95`, `ru + RUB → 95 ₽`, `be + BYN → 95 Br`. This is by
+   design; the loader does not normalize the symbol position. Snapshot tests
+   must use stable currency/locale pairs.
 6. Format display duration with a tiny per-locale helper (`{n} min` /
    `{n} мин` / `{n} хв`).
 
