@@ -4,7 +4,6 @@ import type {
   CustomerProfile,
   GalleryItem,
   MembershipTier,
-  Service,
   StudioInfo,
   Testimonial,
   Visit,
@@ -28,99 +27,6 @@ const artist: Artist = {
   quote:
     "A manicure is the smallest piece of jewellery a woman wears every day.",
 };
-
-const services: Service[] = [
-  {
-    id: "signature",
-    name: "Signature Manicure",
-    category: "Care",
-    duration: "75 min",
-    price: 95,
-    blurb:
-      "Russian dry technique, cuticle work, hydration ritual & gloss finish.",
-    includes: [
-      "Hand soak in rose & milk",
-      "Russian e-file manicure",
-      "Cuticle reconstruction",
-      "Bespoke gloss",
-    ],
-    hero: "manicure",
-  },
-  {
-    id: "gel",
-    name: "Couture Gel",
-    category: "Gel",
-    duration: "120 min",
-    price: 145,
-    blurb:
-      "Long-wear Japanese gel in a single tone or a curated nude palette.",
-    includes: [
-      "Signature prep",
-      "Japanese gel application",
-      "Edge sculpt & shape",
-      "Two-week guarantee",
-    ],
-    hero: "gel",
-  },
-  {
-    id: "editorial",
-    name: "Editorial Art",
-    category: "Design",
-    duration: "150 min",
-    price: 195,
-    blurb:
-      "Bespoke nail design — chrome, lace, hand-painted miniatures.",
-    includes: [
-      "Mood consultation",
-      "Hand-painted artwork",
-      "3D detailing on request",
-      "Photography of the set",
-    ],
-    hero: "editorial",
-  },
-  {
-    id: "extensions",
-    name: "Glass Extensions",
-    category: "Form",
-    duration: "180 min",
-    price: 240,
-    blurb:
-      "Sculpted soft-gel extensions in glass, almond or ballerina silhouettes.",
-    includes: [
-      "Form sculpting",
-      "Architectural shape",
-      "Strength layer",
-      "Mirror buff & seal",
-    ],
-    hero: "extensions",
-  },
-  {
-    id: "pedi",
-    name: "Spa Pedicure",
-    category: "Care",
-    duration: "90 min",
-    price: 110,
-    blurb:
-      "Foot bath in violet salts, gentle exfoliation and lacquered finish.",
-    includes: [
-      "Violet salt bath",
-      "Heel restoration",
-      "Massage with cassis oil",
-      "Lacquer or gel finish",
-    ],
-    hero: "pedi",
-  },
-  {
-    id: "removal",
-    name: "Gentle Removal",
-    category: "Care",
-    duration: "45 min",
-    price: 40,
-    blurb: "Soak-off, nail rehab and a single coat of strengthener.",
-    includes: ["Soak-off", "Nail rehab", "Strengthener", "Cuticle oil"],
-    hero: "removal",
-  },
-];
 
 const gallery: GalleryItem[] = [
   { id: "g1", tag: "Chrome", palette: ["#c9a96e", "#7d3a6f"], h: 220 },
@@ -244,7 +150,6 @@ const atelierClips: AtelierClip[] = [
 export const STUDIO_DATA = {
   studio,
   artist,
-  services,
   gallery,
   testimonials,
   membership,

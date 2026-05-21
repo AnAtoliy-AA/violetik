@@ -3,6 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA, type Visit } from "@/entities/studio";
 import { loadProfileWithPhoto } from "@/entities/studio/api/load-with-photos";
+import { listAllServices } from "@/db/services";
 import { Aurora } from "@/shared/ui/aurora";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
@@ -47,14 +48,18 @@ export async function ProfilePage() {
   const tier = user ? await getCurrentTier(user.id) : { state: "member" as const };
 
   const profile = await loadProfileWithPhoto();
-  const { visits, services } = STUDIO_DATA;
+  const services = await listAllServices();
+  const { visits } = STUDIO_DATA;
   const upcoming: Visit | undefined = visits.find(
     (v) => v.status === "upcoming",
   );
   const history = visits.filter((v) => v.status === "past");
 
-  const serviceName = (id: string): string =>
-    services.find((s) => s.id === id)?.name ?? id;
+  const serviceName = (id: string): string => {
+    const s = services.find((row) => row.id === id);
+    if (!s) return id;
+    return locale === "ru" ? s.nameRu : locale === "be" ? s.nameBe : s.nameEn;
+  };
 
   const countdownLabel = (days: number): string => {
     if (days <= 0) return tCountdown("today");

@@ -9,7 +9,6 @@ import type {
   CustomerProfile,
   GalleryItem,
   ImageAsset,
-  Service,
   Testimonial,
 } from "../model/types";
 import { getStudioPhotos, getStudioPhoto } from "@/db/studio-photos";
@@ -22,25 +21,6 @@ async function imagesByKind(
   const map = new Map<string, ImageAsset>();
   for (const r of rows) map.set(r.slotId, r.image);
   return map;
-}
-
-/** Returns the service list with `image` populated from `studio_photos`. */
-export async function loadServicesWithPhotos(): Promise<Service[]> {
-  const photos = await imagesByKind("service");
-  return STUDIO_DATA.services.map((s) => ({
-    ...s,
-    image: photos.get(s.id) ?? s.image,
-  }));
-}
-
-/** Returns a single service with `image` populated, or null when unknown. */
-export async function loadServiceWithPhoto(
-  id: string,
-): Promise<Service | null> {
-  const found = STUDIO_DATA.services.find((s) => s.id === id);
-  if (!found) return null;
-  const photo = await getStudioPhoto("service", id);
-  return { ...found, image: photo?.image ?? found.image };
 }
 
 /** Returns the gallery list with `image` populated. */
