@@ -180,6 +180,29 @@ export const googleOauthTokens = pgTable("google_oauth_tokens", {
 });
 
 /**
+ * Lifecycle states for services and service categories. `draft` and
+ * `archived` are admin-only; only `published` rows are visible on the
+ * public menu. See docs/superpowers/specs/2026-05-22-admin-services-management-design.md §3.
+ */
+export const serviceStatus = pgEnum("service_status", [
+  "draft",
+  "published",
+  "archived",
+]);
+
+/**
+ * The site-wide display currency lives as a single value on the
+ * `site_settings` singleton (column added in this same migration).
+ * Currency is a display label — no FX conversion. See spec §2 / §3.4.
+ */
+export const currencyCode = pgEnum("currency_code", [
+  "EUR",
+  "USD",
+  "BYN",
+  "RUB",
+]);
+
+/**
  * Singleton row carrying admin-controlled, site-wide defaults:
  * default palette (applied to visitors with no cookie), default
  * locale (used by the proxy for bare `/` redirects), per-service
@@ -200,6 +223,7 @@ export const siteSettings = pgTable(
       .default({}),
     discountPercent: integer("discount_percent").notNull().default(0),
     discountActive: boolean("discount_active").notNull().default(false),
+    currency: currencyCode("currency").notNull().default("EUR"),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .default(sql`now()`),
@@ -213,6 +237,77 @@ export const siteSettings = pgTable(
     discountRange: check(
       "site_settings_discount_range",
       sql`${table.discountPercent} BETWEEN 0 AND 90`,
+    ),
+  }),
+);
+
+export const serviceCategories = pgTable(
+  "service_categories",
+  {
+    id: text("id").primaryKey(),
+    nameEn: text("name_en").notNull(),
+    nameRu: text("name_ru").notNull(),
+    nameBe: text("name_be").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    status: serviceStatus("status").notNull().default("published"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedBy: text("updated_by").references(() => users.id),
+  },
+  (table) => ({
+    sortIdx: index("service_categories_sort_idx").on(table.sortOrder),
+    statusIdx: index("service_categories_status_idx").on(table.status),
+  }),
+);
+
+export const services = pgTable(
+  "services",
+  {
+    id: text("id").primaryKey(),
+    categoryId: text("category_id")
+      .notNull()
+      .references(() => serviceCategories.id, { onDelete: "restrict" }),
+    nameEn: text("name_en").notNull(),
+    nameRu: text("name_ru").notNull(),
+    nameBe: text("name_be").notNull(),
+    blurbEn: text("blurb_en").notNull(),
+    blurbRu: text("blurb_ru").notNull(),
+    blurbBe: text("blurb_be").notNull(),
+    includes: jsonb("includes")
+      .$type<Array<{ en: string; ru: string; be: string }>>()
+      .notNull()
+      .default([]),
+    priceCents: integer("price_cents").notNull(),
+    durationMinutes: integer("duration_minutes").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    status: serviceStatus("status").notNull().default("draft"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedBy: text("updated_by").references(() => users.id),
+  },
+  (table) => ({
+    categoryIdx: index("services_category_idx").on(table.categoryId),
+    sortIdx: index("services_sort_idx").on(table.sortOrder),
+    statusIdx: index("services_status_idx").on(table.status),
+    includesMax8: check(
+      "services_includes_max_8",
+      sql`jsonb_array_length(${table.includes}) <= 8`,
+    ),
+    pricePositive: check(
+      "services_price_non_negative",
+      sql`${table.priceCents} >= 0`,
+    ),
+    durationPositive: check(
+      "services_duration_positive",
+      sql`${table.durationMinutes} > 0`,
     ),
   }),
 );
@@ -273,3 +368,9 @@ export type NewSiteSettingsRow = typeof siteSettings.$inferInsert;
 export type StudioPhotoRow = typeof studioPhotos.$inferSelect;
 export type NewStudioPhotoRow = typeof studioPhotos.$inferInsert;
 export type PhotoSlotKind = (typeof photoSlotKind.enumValues)[number];
+export type ServiceCategoryRow = typeof serviceCategories.$inferSelect;
+export type NewServiceCategory = typeof serviceCategories.$inferInsert;
+export type Service = typeof services.$inferSelect;
+export type NewService = typeof services.$inferInsert;
+export type ServiceStatus = (typeof serviceStatus.enumValues)[number];
+export type CurrencyCode = (typeof currencyCode.enumValues)[number];
