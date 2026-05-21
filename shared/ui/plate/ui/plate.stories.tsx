@@ -13,6 +13,9 @@ type Story = StoryObj<typeof Plate>;
 
 export const Default: Story = {};
 export const NumberOnly: Story = { args: { label: undefined } };
+export const Folio: Story = {
+  args: { folio: true, number: 2, label: "THE MENU" },
+};
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-3 items-start">

@@ -20,4 +20,16 @@ describe("Plate", () => {
     render(<Plate number={3} />);
     expect(screen.queryByText(/·/)).not.toBeInTheDocument();
   });
+
+  it("renders a large folio numeral when folio is true", () => {
+    const { container } = render(<Plate number={2} label="THE MENU" folio />);
+    const display = container.querySelector(".font-display");
+    expect(display?.textContent).toContain("02");
+    expect(screen.getByText(/THE MENU/)).toBeInTheDocument();
+  });
+
+  it("does not render a folio numeral by default", () => {
+    const { container } = render(<Plate number={2} label="THE MENU" />);
+    expect(container.querySelector(".font-display")).toBeNull();
+  });
 });
