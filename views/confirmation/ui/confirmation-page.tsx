@@ -7,6 +7,8 @@ import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA } from "@/entities/studio";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
+import { PaperGrain } from "@/shared/ui/paper-grain";
 import { formatLongDate } from "@/views/booking/lib/booking-steps";
 import { useBookingStore } from "@/views/booking/model/booking-store";
 import { ConfettiBurst } from "./confetti-burst";
@@ -66,9 +68,10 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
   ];
 
   return (
-    <div className="relative px-[22px] pb-9">
+    <div className="relative overflow-hidden px-[22px] pb-9">
+      <PaperGrain />
       <ConfettiBurst />
-      <div className="pt-10 text-center">
+      <div className="relative z-10 pt-10 text-center">
         <GoldenSeal />
 
         <motion.div
@@ -87,7 +90,8 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
           <h1 className="my-3 mb-1.5 font-display text-[44px] font-normal italic leading-tight tracking-[-0.02em]">
             {t.rich("title", { br: () => <br /> })}
           </h1>
-          <p className="mx-auto mt-2.5 max-w-[320px] text-[14px] text-text-2">
+          <LetterpressRule className="mx-auto mt-3 max-w-[160px]" />
+          <p className="mx-auto mt-3.5 max-w-[320px] text-[14px] text-text-2">
             {t("subtitle")}
           </p>
         </motion.div>
@@ -96,11 +100,7 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.8, ease: EASE_OUT, delay: 1.5 }}
-          className="relative mt-8 overflow-hidden rounded-[28px] border-[0.5px] border-accent p-[22px] text-left"
-          style={{
-            background:
-              "linear-gradient(135deg, color-mix(in oklab, var(--color-plum) 30%, var(--color-surface)) 0%, var(--color-surface) 80%)",
-          }}
+          className="gilded glass-top relative mt-8 overflow-hidden rounded-[28px] p-[22px] text-left"
         >
           <span
             aria-hidden
