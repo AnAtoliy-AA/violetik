@@ -16,9 +16,9 @@ export function IncludesList({ items }: IncludesListProps) {
         {items.map((line, i) => (
           <li
             key={`${line}-${i}`}
-            className="flex items-center gap-4 border-b-[0.5px] border-line py-4"
+            className="flex items-baseline gap-4 border-b-[0.5px] border-line py-4"
           >
-            <span className="w-8 shrink-0 font-display text-[18px] italic leading-none tracking-[-0.02em] text-gold">
+            <span className="w-[68px] shrink-0 font-display text-[56px] italic font-light leading-none tracking-[-0.04em] text-gold">
               {String(i + 1).padStart(2, "0")}
             </span>
             <span className="text-[14.5px]">{line}</span>

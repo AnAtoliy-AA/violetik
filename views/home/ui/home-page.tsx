@@ -1,6 +1,7 @@
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
 import { AnnouncementCapsule } from "./sections/announcement-capsule";
+import { AtelierMotion } from "./sections/atelier-motion";
 import { GalleryStrip } from "./sections/gallery-strip";
 import { HomeFooter } from "./sections/home-footer";
 import { HomeHero } from "./sections/home-hero";
@@ -20,6 +21,7 @@ export function HomePage() {
       <SignaturesList />
       <MasterStrip />
       <GalleryStrip />
+      <AtelierMotion />
       <TestimonialCard />
       <MembershipCard />
       <HomeFooter />
