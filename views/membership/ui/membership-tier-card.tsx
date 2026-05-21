@@ -14,6 +14,12 @@ export interface MembershipTierCardProps {
   ctaLabel: string;
   mostChosenLabel: string;
   ctaSlot?: ReactNode;
+  /**
+   * When present, replaces the `priceLabel` text. Used by paid tiers
+   * to render a `<Price>` element (which can include a struck base
+   * price when a global discount is active).
+   */
+  priceSlot?: ReactNode;
 }
 
 function Bullet({ featured }: { featured: boolean }) {
@@ -36,6 +42,7 @@ export function MembershipTierCard({
   ctaLabel,
   mostChosenLabel,
   ctaSlot,
+  priceSlot,
 }: MembershipTierCardProps) {
   const featured = tier.featured;
   return (
@@ -63,7 +70,7 @@ export function MembershipTierCard({
 
       <Eyebrow gold={featured}>{tier.tier}</Eyebrow>
       <h3 className="my-2 mt-2 font-display text-[36px] font-normal italic">
-        {priceLabel}
+        {priceSlot ?? priceLabel}
         {cadenceLabel ? (
           <span className="ml-2 font-mono text-[12px] not-italic uppercase tracking-[0.12em] text-text-3">
             {cadenceLabel}

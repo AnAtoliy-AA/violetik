@@ -37,9 +37,15 @@ vi.mock("@/features/vip-request-submit/api/actions", () => ({
 
 vi.mock("@/auth", () => ({ auth: vi.fn() }));
 
+vi.mock("@/shared/lib/site-settings-server", () => ({
+  getSiteSettingsServer: vi.fn(),
+}));
+
 import { getTranslations, getLocale } from "next-intl/server";
 import { getCurrentTier } from "@/db/vip-requests";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import { DEFAULT_SITE_SETTINGS } from "@/entities/site-settings";
 import { MembershipPage } from "./membership-page";
 
 function makeT(messages: Record<string, unknown>) {
@@ -76,6 +82,7 @@ async function renderPage() {
 beforeEach(() => {
   vi.mocked(getCurrentSessionUser).mockReset();
   vi.mocked(getCurrentTier).mockReset();
+  vi.mocked(getSiteSettingsServer).mockResolvedValue(DEFAULT_SITE_SETTINGS);
 });
 
 describe("MembershipPage", () => {
@@ -168,6 +175,47 @@ describe("MembershipPage", () => {
       expect(
         within(vipCard).getByText(/You're a VIP/i),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("site settings overrides + discount", () => {
+    it("respects a VIP price override (monthly view)", async () => {
+      vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+      vi.mocked(getSiteSettingsServer).mockResolvedValue({
+        ...DEFAULT_SITE_SETTINGS,
+        priceOverrides: { "membership:VIP": 200 },
+      });
+      await renderPage();
+      const vipCard = screen.getAllByRole("article")[1];
+      expect(within(vipCard).getByText("€200")).toBeInTheDocument();
+    });
+
+    it("annual view multiplies the override by 10", async () => {
+      const user = userEvent.setup();
+      vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+      vi.mocked(getSiteSettingsServer).mockResolvedValue({
+        ...DEFAULT_SITE_SETTINGS,
+        priceOverrides: { "membership:VIP": 200 },
+      });
+      await renderPage();
+      await user.click(screen.getByRole("tab", { name: /Annual/i }));
+      const vipCard = screen.getAllByRole("article")[1];
+      expect(within(vipCard).getByText("€2000")).toBeInTheDocument();
+    });
+
+    it("renders struck base alongside discounted effective when discount is active", async () => {
+      vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+      vi.mocked(getSiteSettingsServer).mockResolvedValue({
+        ...DEFAULT_SITE_SETTINGS,
+        priceOverrides: { "membership:VIP": 200 },
+        discountPercent: 10,
+        discountActive: true,
+      });
+      await renderPage();
+      const vipCard = screen.getAllByRole("article")[1];
+      // 200 * 0.9 = 180
+      expect(within(vipCard).getByText("€180")).toBeInTheDocument();
+      expect(within(vipCard).getByText("€200").tagName).toBe("S");
     });
   });
 });

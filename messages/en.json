@@ -273,7 +273,21 @@
     "inbox_title": "Inbox",
     "inbox_bookings": "Bookings",
     "inbox_vip_requests": "VIP requests",
-    "inbox_pending_suffix": "pending"
+    "inbox_pending_suffix": "pending",
+    "inbox_site_settings": "Site settings",
+    "inbox_site_settings_caption": "Defaults & pricing",
+    "site_settings_plate_title": "Site settings",
+    "site_settings_section_palette": "Default palette",
+    "site_settings_section_locale": "Default language",
+    "site_settings_section_services": "Service prices",
+    "site_settings_section_vip": "VIP membership",
+    "site_settings_section_discount": "Global discount",
+    "site_settings_discount_active": "Discount active",
+    "site_settings_base_label": "Base €{price}",
+    "site_settings_vip_base_label": "Base €{price} / mo",
+    "site_settings_save": "Save",
+    "site_settings_saved": "Saved",
+    "site_settings_error": "Save failed: {error}"
   },
   "NotFound": {
     "meta_title": "Lost in the atelier",

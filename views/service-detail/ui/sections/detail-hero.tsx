@@ -1,11 +1,13 @@
 "use client";
 
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import type { ResolvedPrice } from "@/entities/site-settings";
 import type { Service } from "@/entities/studio";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { Plate } from "@/shared/ui/plate";
+import { Price } from "@/shared/ui/price";
 
 export interface DetailHeroProps {
   service: Service;
@@ -13,6 +15,7 @@ export interface DetailHeroProps {
   variant: NailTileVariant;
   palette: readonly [string, string];
   durationLabel: string;
+  resolvedPrice?: ResolvedPrice;
 }
 
 export function DetailHero({
@@ -21,6 +24,7 @@ export function DetailHero({
   variant,
   palette,
   durationLabel,
+  resolvedPrice,
 }: DetailHeroProps) {
   const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
@@ -63,7 +67,11 @@ export function DetailHero({
           </span>
           <span className="gilded inline-flex items-center rounded-full px-3 py-1">
             <span className="font-display text-[20px] italic leading-none text-gold-shimmer">
-              €{service.price}
+              {resolvedPrice ? (
+                <Price resolved={resolvedPrice} />
+              ) : (
+                <>€{service.price}</>
+              )}
             </span>
           </span>
         </div>

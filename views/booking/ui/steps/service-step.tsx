@@ -1,12 +1,18 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
+import { Price } from "@/shared/ui/price";
 import { useBookingStore } from "@/views/booking/model/booking-store";
+
+export interface ServiceStepProps {
+  pricedServices?: Readonly<Record<string, ResolvedPrice>>;
+}
 
 function CheckIcon() {
   return (
@@ -23,7 +29,7 @@ function CheckIcon() {
   );
 }
 
-export function ServiceStep() {
+export function ServiceStep({ pricedServices }: ServiceStepProps = {}) {
   const t = useTranslations("Booking.service");
   const serviceId = useBookingStore((s) => s.serviceId);
   const setService = useBookingStore((s) => s.setService);
@@ -65,8 +71,14 @@ export function ServiceStep() {
                 <div className="font-display text-[20px] font-normal italic leading-[1.05]">
                   {s.name}
                 </div>
-                <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.08em] text-text-3">
-                  {s.duration} · €{s.price}
+                <div className="mt-1 flex items-baseline gap-1 font-mono text-[11px] uppercase tracking-[0.08em] text-text-3">
+                  <span>{s.duration}</span>
+                  <span>·</span>
+                  {pricedServices?.[s.id] ? (
+                    <Price resolved={pricedServices[s.id]} />
+                  ) : (
+                    <span>€{s.price}</span>
+                  )}
                 </div>
               </div>
               <span

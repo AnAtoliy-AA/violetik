@@ -6,6 +6,7 @@ import { PaperGrain } from "@/shared/ui/paper-grain";
 import { AppHeader } from "@/widgets/app-header";
 import { getCurrentTier } from "@/db/vip-requests";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { VipCardCta, type VipCardCtaState } from "@/features/vip-request-submit";
 import { formatLongDate } from "@/views/booking/lib/booking-steps";
 import { MembershipPageClient } from "./membership-page-client";
@@ -61,6 +62,7 @@ export async function MembershipPage() {
 
       <MembershipPageClient
         tiers={STUDIO_DATA.membership}
+        settings={await getSiteSettingsServer()}
         labels={{
           billingAria: t("billing_aria"),
           billingMonthly: t("billing_monthly"),

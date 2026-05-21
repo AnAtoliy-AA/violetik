@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import { resolvePrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
 import { routing } from "@/i18n/routing";
 import { ServiceDetailPage } from "@/views/service-detail";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 
 type Params = { locale: string; id: string };
 
@@ -34,5 +36,11 @@ export default async function ServiceDetailRoute({
   setRequestLocale(locale);
   const service = STUDIO_DATA.services.find((s) => s.id === id);
   if (!service) notFound();
-  return <ServiceDetailPage service={service} />;
+  const settings = await getSiteSettingsServer();
+  const resolvedPrice = resolvePrice(
+    `service:${service.id}`,
+    service.price,
+    settings,
+  );
+  return <ServiceDetailPage service={service} resolvedPrice={resolvedPrice} />;
 }

@@ -1,8 +1,11 @@
 import { sql } from "drizzle-orm";
 import {
   bigint,
+  boolean,
+  check,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -176,6 +179,44 @@ export const googleOauthTokens = pgTable("google_oauth_tokens", {
   lastRefreshAt: timestamp("last_refresh_at", { withTimezone: true }),
 });
 
+/**
+ * Singleton row carrying admin-controlled, site-wide defaults:
+ * default palette (applied to visitors with no cookie), default
+ * locale (used by the proxy for bare `/` redirects), per-service
+ * and VIP-tier price overrides, and a global discount percentage.
+ *
+ * The CHECK constraint guarantees at most one row. See
+ * docs/superpowers/specs/2026-05-21-admin-site-settings-design.md §3.
+ */
+export const siteSettings = pgTable(
+  "site_settings",
+  {
+    id: text("id").primaryKey().default("singleton"),
+    defaultPalette: text("default_palette").notNull().default("aubergine"),
+    defaultLocale: text("default_locale").notNull().default("en"),
+    priceOverrides: jsonb("price_overrides")
+      .$type<Record<string, number>>()
+      .notNull()
+      .default({}),
+    discountPercent: integer("discount_percent").notNull().default(0),
+    discountActive: boolean("discount_active").notNull().default(false),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedBy: text("updated_by").references(() => users.id),
+  },
+  (table) => ({
+    singleton: check(
+      "site_settings_singleton",
+      sql`${table.id} = 'singleton'`,
+    ),
+    discountRange: check(
+      "site_settings_discount_range",
+      sql`${table.discountPercent} BETWEEN 0 AND 90`,
+    ),
+  }),
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Booking = typeof bookings.$inferSelect;
@@ -184,3 +225,5 @@ export type AvailabilityRule = typeof availabilityRules.$inferSelect;
 export type NewAvailabilityRule = typeof availabilityRules.$inferInsert;
 export type GoogleOauthToken = typeof googleOauthTokens.$inferSelect;
 export type NewGoogleOauthToken = typeof googleOauthTokens.$inferInsert;
+export type SiteSettingsRow = typeof siteSettings.$inferSelect;
+export type NewSiteSettingsRow = typeof siteSettings.$inferInsert;

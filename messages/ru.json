@@ -273,7 +273,21 @@
     "inbox_title": "Входящие",
     "inbox_bookings": "Записи",
     "inbox_vip_requests": "Заявки на VIP",
-    "inbox_pending_suffix": "ожидают"
+    "inbox_pending_suffix": "ожидают",
+    "inbox_site_settings": "Настройки сайта",
+    "inbox_site_settings_caption": "Умолчания и цены",
+    "site_settings_plate_title": "Настройки сайта",
+    "site_settings_section_palette": "Палитра по умолчанию",
+    "site_settings_section_locale": "Язык по умолчанию",
+    "site_settings_section_services": "Цены на услуги",
+    "site_settings_section_vip": "Членство VIP",
+    "site_settings_section_discount": "Общая скидка",
+    "site_settings_discount_active": "Скидка активна",
+    "site_settings_base_label": "База €{price}",
+    "site_settings_vip_base_label": "База €{price} / мес.",
+    "site_settings_save": "Сохранить",
+    "site_settings_saved": "Сохранено",
+    "site_settings_error": "Не удалось сохранить: {error}"
   },
   "NotFound": {
     "meta_title": "Затерялись в ателье",

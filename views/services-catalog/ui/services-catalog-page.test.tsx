@@ -4,6 +4,12 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import en from "@/messages/en.json";
+import { ServiceCard } from "@/entities/service";
+import {
+  DEFAULT_SITE_SETTINGS,
+  resolvePrice,
+} from "@/entities/site-settings";
+import { STUDIO_DATA } from "@/entities/studio";
 
 vi.mock("@/i18n/navigation", () => ({
   Link: ({
@@ -72,5 +78,21 @@ describe("ServicesCatalogPage", () => {
     expect(within(articles[0]).getByText("01")).toBeInTheDocument();
     expect(within(articles[1]).getByText("02")).toBeInTheDocument();
     expect(within(articles[2]).getByText("03")).toBeInTheDocument();
+  });
+});
+
+describe("ServiceCard <-> resolvePrice wiring", () => {
+  it("renders <s>€base</s> alongside the discounted price when discount is active", () => {
+    const settings = {
+      ...DEFAULT_SITE_SETTINGS,
+      discountPercent: 20,
+      discountActive: true,
+    };
+    const gel = STUDIO_DATA.services.find((s) => s.id === "gel")!;
+    const resolved = resolvePrice("service:gel", gel.price, settings);
+    render(<ServiceCard service={gel} resolvedPrice={resolved} />);
+    // 145 * 0.8 = 116
+    expect(screen.getByText("€116")).toBeInTheDocument();
+    expect(screen.getByText("€145").tagName).toBe("S");
   });
 });

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { auth } from "@/auth";
 import { Link, redirect } from "@/i18n/navigation";
+import { requireAdmin } from "@/shared/lib/auth-server";
 import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { PaletteSwitcher } from "@/features/palette-switcher";
@@ -40,8 +40,8 @@ export default async function AdminRoute({
   const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
 
   if (AUTH_REQUIRED) {
-    const session = await auth();
-    if (!session) {
+    const gate = await requireAdmin();
+    if (!gate.ok) {
       redirect({ href: "/sign-in", locale });
     }
   }
@@ -94,6 +94,17 @@ export default async function AdminRoute({
               <div className="font-display text-[16px] italic">{t("inbox_vip_requests")}</div>
               <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
                 {pendingVip.length} {t("inbox_pending_suffix")}
+              </div>
+            </Link>
+          </li>
+          <li className="col-span-2">
+            <Link
+              href="/admin/site-settings"
+              className="block rounded-[18px] border-[0.5px] border-line bg-surface p-5 transition-colors duration-fast ease-out hover:bg-surface/80"
+            >
+              <div className="font-display text-[16px] italic">{t("inbox_site_settings")}</div>
+              <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+                {t("inbox_site_settings_caption")}
               </div>
             </Link>
           </li>

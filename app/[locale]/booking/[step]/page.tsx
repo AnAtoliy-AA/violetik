@@ -2,12 +2,15 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import { resolvePrice, type ResolvedPrice } from "@/entities/site-settings";
+import { STUDIO_DATA } from "@/entities/studio";
 import { routing } from "@/i18n/routing";
 import {
   BookingPage,
   BOOKING_STEPS,
   isBookingStep,
 } from "@/views/booking";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 
 type Params = { locale: string; step: string };
 
@@ -36,9 +39,14 @@ export default async function BookingRoute({
   const { locale, step } = await params;
   setRequestLocale(locale);
   if (!isBookingStep(step)) notFound();
+  const settings = await getSiteSettingsServer();
+  const pricedServices: Record<string, ResolvedPrice> = {};
+  for (const s of STUDIO_DATA.services) {
+    pricedServices[s.id] = resolvePrice(`service:${s.id}`, s.price, settings);
+  }
   return (
     <Suspense fallback={null}>
-      <BookingPage step={step} />
+      <BookingPage step={step} pricedServices={pricedServices} />
     </Suspense>
   );
 }

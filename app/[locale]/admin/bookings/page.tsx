@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { auth } from "@/auth";
 import { redirect } from "@/i18n/navigation";
+import { requireAdmin } from "@/shared/lib/auth-server";
 import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { listBookingsForAdmin } from "@/db/bookings";
@@ -55,8 +55,8 @@ export default async function AdminBookingsRoute({
 
   const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
   if (AUTH_REQUIRED) {
-    const session = await auth();
-    if (!session) redirect({ href: "/sign-in", locale });
+    const gate = await requireAdmin();
+    if (!gate.ok) redirect({ href: "/sign-in", locale });
   }
 
   setRequestLocale(locale);

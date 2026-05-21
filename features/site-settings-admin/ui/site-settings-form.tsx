@@ -1,0 +1,261 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import type { FormEvent } from "react";
+import { useTranslations } from "next-intl";
+import { PALETTES } from "@/shared/config/palettes";
+import { routing } from "@/i18n/routing";
+import type {
+  SiteSettings,
+  SiteSettingsPatch,
+} from "@/entities/site-settings";
+import { buttonClassName } from "@/shared/ui/button";
+
+export type SubmitFn = (
+  patch: SiteSettingsPatch,
+) => Promise<{ ok: true } | { ok: false; error: string }>;
+
+export interface SiteSettingsFormProps {
+  initial: SiteSettings;
+  services: ReadonlyArray<{ id: string; name: string; basePrice: number }>;
+  vipBasePrice: number;
+  /**
+   * Action invoked on submit. The route file passes the server action;
+   * stories/tests pass a mock. Keeps this client component out of the
+   * "use server" import chain.
+   */
+  onSubmit: SubmitFn;
+}
+
+type OverrideInput = string; // "" means "no override"
+
+type Status =
+  | { kind: "idle" }
+  | { kind: "saved" }
+  | { kind: "error"; message: string };
+
+export function SiteSettingsForm({
+  initial,
+  services,
+  vipBasePrice,
+  onSubmit: submit,
+}: SiteSettingsFormProps) {
+  const t = useTranslations("Admin");
+  const [isPending, startTransition] = useTransition();
+  const [status, setStatus] = useState<Status>({ kind: "idle" });
+
+  const [defaultPalette, setDefaultPalette] = useState(initial.defaultPalette);
+  const [defaultLocale, setDefaultLocale] = useState(initial.defaultLocale);
+  const [discountPercent, setDiscountPercent] = useState(
+    initial.discountPercent,
+  );
+  const [discountActive, setDiscountActive] = useState(initial.discountActive);
+
+  const [overrideInputs, setOverrideInputs] = useState<
+    Record<string, OverrideInput>
+  >(() => {
+    const obj: Record<string, OverrideInput> = {};
+    for (const s of services) {
+      const key = `service:${s.id}`;
+      obj[key] =
+        key in initial.priceOverrides
+          ? String(initial.priceOverrides[key])
+          : "";
+    }
+    obj["membership:VIP"] =
+      "membership:VIP" in initial.priceOverrides
+        ? String(initial.priceOverrides["membership:VIP"])
+        : "";
+    return obj;
+  });
+
+  function buildPatch(): SiteSettingsPatch {
+    const priceOverrides: Record<string, number> = {};
+    for (const [key, raw] of Object.entries(overrideInputs)) {
+      if (raw === "") continue;
+      const n = Number(raw);
+      if (Number.isFinite(n) && n >= 0) priceOverrides[key] = Math.round(n);
+    }
+    return {
+      defaultPalette,
+      defaultLocale,
+      priceOverrides,
+      discountPercent: Math.max(0, Math.min(90, Math.round(discountPercent))),
+      discountActive,
+    };
+  }
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setStatus({ kind: "idle" });
+    const patch = buildPatch();
+    startTransition(async () => {
+      const result = await submit(patch);
+      if (result.ok) setStatus({ kind: "saved" });
+      else setStatus({ kind: "error", message: result.error });
+    });
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-[22px] py-6">
+      <fieldset aria-label={t("site_settings_section_palette")}>
+        <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("site_settings_section_palette")}
+        </legend>
+        <div className="grid grid-cols-3 gap-2">
+          {PALETTES.map((p) => (
+            <label key={p.id} className="flex items-center gap-2 text-[13px]">
+              <input
+                type="radio"
+                name="palette"
+                value={p.id}
+                checked={defaultPalette === p.id}
+                onChange={() => setDefaultPalette(p.id)}
+              />
+              <span>{p.name}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset aria-label={t("site_settings_section_locale")}>
+        <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("site_settings_section_locale")}
+        </legend>
+        <div className="flex gap-3">
+          {routing.locales.map((l) => (
+            <label key={l} className="flex items-center gap-2 text-[13px]">
+              <input
+                type="radio"
+                name="locale"
+                value={l}
+                checked={defaultLocale === l}
+                onChange={() => setDefaultLocale(l)}
+              />
+              <span className="uppercase">{l}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset aria-label={t("site_settings_section_services")}>
+        <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("site_settings_section_services")}
+        </legend>
+        <ul className="flex flex-col gap-2">
+          {services.map((s) => {
+            const key = `service:${s.id}`;
+            return (
+              <li
+                key={key}
+                className="flex items-center justify-between gap-3"
+              >
+                <div>
+                  <div className="text-[14px]">{s.name}</div>
+                  <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+                    {t("site_settings_base_label", { price: s.basePrice })}
+                  </div>
+                </div>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={10_000}
+                  placeholder="—"
+                  aria-label={`${s.name} override`}
+                  className="w-24 rounded border border-line bg-surface px-2 py-1 text-right"
+                  value={overrideInputs[key]}
+                  onChange={(e) =>
+                    setOverrideInputs((prev) => ({
+                      ...prev,
+                      [key]: e.target.value,
+                    }))
+                  }
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </fieldset>
+
+      <fieldset aria-label={t("site_settings_section_vip")}>
+        <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("site_settings_section_vip")}
+        </legend>
+        <div className="flex items-center justify-between gap-3">
+          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+            {t("site_settings_vip_base_label", { price: vipBasePrice })}
+          </div>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={10_000}
+            placeholder="—"
+            aria-label="VIP price override"
+            className="w-24 rounded border border-line bg-surface px-2 py-1 text-right"
+            value={overrideInputs["membership:VIP"]}
+            onChange={(e) =>
+              setOverrideInputs((prev) => ({
+                ...prev,
+                "membership:VIP": e.target.value,
+              }))
+            }
+          />
+        </div>
+      </fieldset>
+
+      <fieldset aria-label={t("site_settings_section_discount")}>
+        <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("site_settings_section_discount")}
+        </legend>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 text-[13px]">
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={90}
+              aria-label="discount percent"
+              className="w-20 rounded border border-line bg-surface px-2 py-1 text-right"
+              value={discountPercent}
+              onChange={(e) =>
+                setDiscountPercent(
+                  Math.max(0, Math.min(90, Number(e.target.value) || 0)),
+                )
+              }
+            />
+            <span>%</span>
+          </label>
+          <label className="flex items-center gap-2 text-[13px]">
+            <input
+              type="checkbox"
+              checked={discountActive}
+              onChange={(e) => setDiscountActive(e.target.checked)}
+            />
+            {t("site_settings_discount_active")}
+          </label>
+        </div>
+      </fieldset>
+
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={isPending}
+          className={buttonClassName({ variant: "gold", size: "md" })}
+        >
+          {t("site_settings_save")}
+        </button>
+        {status.kind === "saved" ? (
+          <span role="status" className="text-[12px] text-text-2">
+            {t("site_settings_saved")}
+          </span>
+        ) : status.kind === "error" ? (
+          <span role="alert" className="text-[12px] text-accent">
+            {t("site_settings_error", { error: status.message })}
+          </span>
+        ) : null}
+      </div>
+    </form>
+  );
+}
