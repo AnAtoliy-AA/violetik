@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import type { FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { PALETTES } from "@/shared/config/palettes";
+import { cn } from "@/shared/lib/cn";
 import { routing } from "@/i18n/routing";
 import type {
   SiteSettings,
@@ -98,43 +99,76 @@ export function SiteSettingsForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-[22px] py-6">
-      <fieldset aria-label={t("site_settings_section_palette")}>
+      <fieldset>
         <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
           {t("site_settings_section_palette")}
         </legend>
-        <div className="grid grid-cols-3 gap-2">
-          {PALETTES.map((p) => (
-            <label key={p.id} className="flex items-center gap-2 text-[13px]">
-              <input
-                type="radio"
-                name="palette"
-                value={p.id}
-                checked={defaultPalette === p.id}
-                onChange={() => setDefaultPalette(p.id)}
-              />
-              <span>{p.name}</span>
-            </label>
-          ))}
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+          {PALETTES.map((p) => {
+            const selected = defaultPalette === p.id;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => setDefaultPalette(p.id)}
+                className={cn(
+                  "group flex items-center gap-3 rounded-full border-[0.5px] px-3 py-2",
+                  "transition-colors duration-fast ease-out",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+                  selected
+                    ? "border-accent bg-surface-2 text-text"
+                    : "border-line text-text-2 hover:border-line-strong hover:text-text",
+                )}
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex shrink-0 overflow-hidden rounded-full border-[0.5px] border-line-strong"
+                >
+                  {p.preview.map((color) => (
+                    <span key={color} className="block size-4" style={{ background: color }} />
+                  ))}
+                </span>
+                <span className="font-mono text-[11px] uppercase tracking-[0.16em]">
+                  {p.name}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </fieldset>
 
-      <fieldset aria-label={t("site_settings_section_locale")}>
+      <fieldset>
         <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
           {t("site_settings_section_locale")}
         </legend>
-        <div className="flex gap-3">
-          {routing.locales.map((l) => (
-            <label key={l} className="flex items-center gap-2 text-[13px]">
-              <input
-                type="radio"
-                name="locale"
-                value={l}
-                checked={defaultLocale === l}
-                onChange={() => setDefaultLocale(l)}
-              />
-              <span className="uppercase">{l}</span>
-            </label>
-          ))}
+        <div className="grid grid-cols-3 gap-2">
+          {routing.locales.map((l) => {
+            const selected = defaultLocale === l;
+            return (
+              <button
+                key={l}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                aria-label={l.toUpperCase()}
+                onClick={() => setDefaultLocale(l)}
+                className={cn(
+                  "flex items-center justify-center rounded-full border-[0.5px] px-3 py-2",
+                  "transition-colors duration-fast ease-out",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+                  selected
+                    ? "border-accent bg-surface-2 text-text"
+                    : "border-line text-text-2 hover:border-line-strong hover:text-text",
+                )}
+              >
+                <span className="font-mono text-[11px] uppercase tracking-[0.16em]">
+                  {l}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </fieldset>
 

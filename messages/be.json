@@ -252,30 +252,12 @@
       "label": "Вы"
     }
   },
-  "PaletteSwitcher": {
-    "label": "Палітра",
-    "palettes": {
-      "aubergine": "Aubergine",
-      "rose": "Rose",
-      "lilac": "Lilac",
-      "mono": "Mono",
-      "ink": "Ink",
-      "moss": "Moss",
-      "bronze": "Bronze",
-      "pearl": "Pearl",
-      "emerald": "Emerald",
-      "sapphire": "Sapphire",
-      "ruby": "Ruby",
-      "obsidian": "Obsidian"
-    }
-  },
   "Admin": {
     "meta_title": "Адмінка атэлье",
     "plate_title": "Адмінка атэлье",
     "eyebrow": "Прыватна · Адмін-панэль",
-    "hero_title": "Палітра.",
-    "hero_paragraph": "Абярыце колеравую схему студыі. Выбар захоўваецца ў cookie і прымяняецца для ўсіх наведвальнікаў з гэтай прылады.",
-    "persistence_note": "Захоўваецца ў cookie vio-palette · 1 год",
+    "hero_title": "Адмін атэлье.",
+    "hero_paragraph": "Запісы, VIP-заяўкі, галерэя і налады сайта — у адным месцы.",
     "inbox_title": "Уваходныя",
     "inbox_bookings": "Запісы",
     "inbox_vip_requests": "Заяўкі на VIP",

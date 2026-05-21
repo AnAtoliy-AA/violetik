@@ -4,7 +4,6 @@ import { Link, redirect } from "@/i18n/navigation";
 import { requireAdmin } from "@/shared/lib/auth-server";
 import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
-import { PaletteSwitcher } from "@/features/palette-switcher";
 import { SignOutButton } from "@/features/telegram-login";
 import { listBookingsForAdmin } from "@/db/bookings";
 import { listPendingVipRequests } from "@/db/vip-requests";
@@ -34,9 +33,9 @@ export default async function AdminRoute({
   const { locale } = await params;
 
   // Auth gate is only active when TELEGRAM_BOT_TOKEN is set. Local dev /
-  // CI (no token) keep the admin page open so the existing palette
-  // tests work without secrets. The gate activates as soon as the env
-  // var is populated in any environment.
+  // CI (no token) keep the admin page open so route-level tests can run
+  // without secrets. The gate activates as soon as the env var is
+  // populated in any environment.
   const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
 
   if (AUTH_REQUIRED) {
@@ -120,13 +119,6 @@ export default async function AdminRoute({
             </Link>
           </li>
         </ul>
-      </section>
-
-      <section className="px-[22px] pt-2 pb-10">
-        <PaletteSwitcher />
-        <p className="mt-6 max-w-[420px] font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
-          {t("persistence_note")}
-        </p>
       </section>
 
       {AUTH_REQUIRED ? (

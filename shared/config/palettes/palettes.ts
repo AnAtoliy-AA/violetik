@@ -1,7 +1,7 @@
 export interface Palette {
-  /** Stable id used as the `data-palette` attribute value and cookie value. */
+  /** Stable id used as the `data-palette` attribute value. */
   id: string;
-  /** Display name (English; switcher translates via PaletteSwitcher.palettes.<id>). */
+  /** Display name (English). */
   name: string;
   /** Three colors for a swatch preview: [bg, surface, accent]. */
   preview: readonly [string, string, string];
@@ -31,8 +31,6 @@ export const PALETTES = [
 export type PaletteId = (typeof PALETTES)[number]["id"];
 
 export const DEFAULT_PALETTE_ID: PaletteId = "aubergine";
-
-export const PALETTE_COOKIE = "vio-palette";
 
 export function isPaletteId(value: unknown): value is PaletteId {
   return (

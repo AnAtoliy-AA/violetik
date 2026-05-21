@@ -27,12 +27,37 @@ function renderForm() {
 }
 
 describe("SiteSettingsForm", () => {
-  it("renders a radio per palette and per locale", () => {
+  it("renders a pill per palette with a 3-swatch preview", () => {
     renderForm();
-    expect(screen.getAllByRole("radio", { name: /Aubergine/i })).toHaveLength(1);
-    expect(screen.getAllByRole("radio", { name: /^EN$/i })).toHaveLength(1);
-    expect(screen.getAllByRole("radio", { name: /^RU$/i })).toHaveLength(1);
-    expect(screen.getAllByRole("radio", { name: /^BE$/i })).toHaveLength(1);
+    const pills = screen.getAllByRole("radio", { name: /Aubergine|Rose|Lilac|Mono|Ink|Moss|Bronze|Pearl|Emerald|Sapphire|Ruby|Obsidian/ });
+    expect(pills).toHaveLength(12);
+    // The initial defaultPalette is `aubergine` per DEFAULT_SITE_SETTINGS.
+    const aubergine = screen.getByRole("radio", { name: /Aubergine/i });
+    expect(aubergine).toHaveAttribute("aria-checked", "true");
+    // Each pill contains a 3-color swatch row (one <span> per color, aria-hidden).
+    const swatch = aubergine.querySelector('[aria-hidden="true"]');
+    expect(swatch).not.toBeNull();
+    expect(swatch!.children).toHaveLength(3);
+  });
+
+  it("changes the checked palette when a different pill is clicked", async () => {
+    const user = userEvent.setup();
+    renderForm();
+    await user.click(screen.getByRole("radio", { name: /Ink/i }));
+    expect(screen.getByRole("radio", { name: /Ink/i })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: /Aubergine/i })).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("submits the chosen palette and locale in the patch", async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    await user.click(screen.getByRole("radio", { name: /Moss/i }));
+    await user.click(screen.getByRole("radio", { name: /^RU$/i }));
+    await user.click(screen.getByRole("button", { name: /Save/i }));
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    const patch = onSubmit.mock.calls[0][0];
+    expect(patch.defaultPalette).toBe("moss");
+    expect(patch.defaultLocale).toBe("ru");
   });
 
   it("renders an override input per service plus a VIP override", () => {

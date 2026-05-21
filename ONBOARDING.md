@@ -40,7 +40,7 @@ Imports may only point **downward**:
 | app | `app/` | Next.js App Router routes + global init (root layout, providers, generateMetadata, opengraph-image) |
 | views | `views/` | Page-level compositions (FSD `pages` renamed to avoid Next's legacy Pages Router clash) |
 | widgets | `widgets/` | Large self-contained UI blocks (e.g. `app-header`, `tab-bar`, `booking-stepper`) |
-| features | `features/` | User actions / interactive units (`locale-switcher`, `palette-switcher`) |
+| features | `features/` | User actions / interactive units (`locale-switcher`, `site-settings-admin`) |
 | entities | `entities/` | Business entities (`studio`, `service`) |
 | shared | `shared/` | UI primitives, utility libs, config — no business logic |
 
@@ -61,8 +61,8 @@ Twelve dark palettes — Aubergine (default), Rose, Lilac, Mono, Ink, Moss, Bron
 
 - Registry: [shared/config/palettes/palettes.ts](shared/config/palettes/palettes.ts)
 - Each palette is a `:root[data-palette="…"]` block in [app/globals.css](app/globals.css) overriding the @theme color tokens
-- Active palette: `vio-palette` cookie. Server emits `data-palette="aubergine"`, an inline script in the locale layout flips the attribute before paint based on the cookie. **Static rendering stays intact** — we never read cookies on the server.
-- Pick palettes at `/[locale]/admin` (no auth gate yet — gated when real auth lands)
+- Active palette: a site-wide admin setting. The locale layout reads `settings.defaultPalette` from the database via `getSiteSettingsServer()` and SSRs `<html data-palette="…">`. No cookie, no inline script — every page load reflects the current site-wide value.
+- Admin picks the palette at `/[locale]/admin/site-settings` (alongside default locale and pricing). The polished pill picker is inline inside `features/site-settings-admin/`.
 
 ## Branch + PR workflow
 
