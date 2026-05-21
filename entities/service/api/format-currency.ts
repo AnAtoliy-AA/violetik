@@ -28,5 +28,9 @@ export function formatMajorAmount({
     currency,
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
+    // Suppress thousands separators — keeps en output "byte-identical"
+    // to the legacy "€95" / "€2000" rendering and avoids "€2,000" surprises
+    // in tests that pinned the old output.
+    useGrouping: false,
   }).format(major);
 }
