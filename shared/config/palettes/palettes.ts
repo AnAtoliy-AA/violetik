@@ -32,8 +32,6 @@ export type PaletteId = (typeof PALETTES)[number]["id"];
 
 export const DEFAULT_PALETTE_ID: PaletteId = "aubergine";
 
-export const PALETTE_COOKIE = "vio-palette";
-
 export function isPaletteId(value: unknown): value is PaletteId {
   return (
     typeof value === "string" && PALETTES.some((p) => p.id === value)
