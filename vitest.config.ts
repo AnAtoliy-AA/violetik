@@ -12,8 +12,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./"),
-      "server-only": resolve(__dirname, "./shared/lib/__mocks__/server-only.ts")
+      "@": resolve(__dirname, "./")
     }
   },
   test: {

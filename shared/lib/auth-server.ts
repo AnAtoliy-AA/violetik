@@ -1,4 +1,3 @@
-import "server-only";
 import { auth } from "@/auth";
 import { getUserById } from "@/db/users";
 import type { User } from "@/db/schema";
