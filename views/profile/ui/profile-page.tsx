@@ -1,10 +1,12 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA, type Visit } from "@/entities/studio";
+import { Aurora } from "@/shared/ui/aurora";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { PaperGrain } from "@/shared/ui/paper-grain";
+import { SpotlightCard } from "@/shared/ui/spotlight-card";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
 import { getCurrentTier } from "@/db/vip-requests";
@@ -62,6 +64,7 @@ export async function ProfilePage() {
       <AppHeader title={t("plate_title")} />
 
       <section className="relative overflow-hidden px-[22px] pt-4 pb-7">
+        <Aurora intensity="subtle" />
         <PaperGrain />
         <div className="relative z-10 flex items-center gap-4">
           <div
@@ -96,9 +99,10 @@ export async function ProfilePage() {
 
       {upcoming ? (
         <section className="px-[22px] pb-7">
-          <article
+          <SpotlightCard
+            as="article"
             aria-label={t("next_visit_eyebrow")}
-            className="gilded glass-top relative overflow-hidden rounded-[28px] px-5 py-5"
+            className="gilded-lift glass-top relative overflow-hidden rounded-[28px] px-5 py-5"
           >
             <div
               aria-hidden
@@ -118,7 +122,7 @@ export async function ProfilePage() {
                 {countdownLabel(upcoming.daysAway)}
               </span>
             ) : null}
-          </article>
+          </SpotlightCard>
         </section>
       ) : null}
 

@@ -4,7 +4,9 @@ import { cn } from "@/shared/lib/cn";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
+import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { MonogramSeal } from "@/shared/ui/monogram-seal";
+import { SpotlightCard } from "@/shared/ui/spotlight-card";
 import type { MembershipTier } from "@/entities/studio";
 
 export interface MembershipTierCardProps {
@@ -46,16 +48,18 @@ export function MembershipTierCard({
 }: MembershipTierCardProps) {
   const featured = tier.featured;
   return (
-    <article
+    <SpotlightCard
+      as="article"
       className={cn(
-        "gilded glass-top relative overflow-hidden rounded-[28px] p-[22px]",
+        "glass-top relative overflow-hidden rounded-[28px] p-[22px]",
+        featured ? "gilded-lift" : "gilded",
       )}
     >
       {featured ? (
         <>
           <span
             aria-hidden
-            className="pointer-events-none absolute -right-[50px] -top-[50px] size-[180px] rounded-full"
+            className="pointer-events-none absolute -right-[50px] -top-[50px] size-[180px] rounded-full motion-safe:[animation:sealRotate_60s_linear_infinite]"
             style={{
               background:
                 "radial-gradient(circle, color-mix(in oklab, var(--color-accent) 30%, transparent), transparent 70%)",
@@ -93,18 +97,32 @@ export function MembershipTierCard({
         ))}
       </div>
 
-      {ctaSlot ?? (
-        <Link
-          href="/booking/service"
-          className={buttonClassName({
-            variant: featured ? "gold" : "outline",
-            size: "md",
-            block: true,
-          })}
-        >
-          {ctaLabel}
-        </Link>
-      )}
-    </article>
+      {ctaSlot ??
+        (featured ? (
+          <MagneticButton className="block w-full">
+            <Link
+              href="/booking/service"
+              className={buttonClassName({
+                variant: "gold",
+                size: "md",
+                block: true,
+              })}
+            >
+              {ctaLabel}
+            </Link>
+          </MagneticButton>
+        ) : (
+          <Link
+            href="/booking/service"
+            className={buttonClassName({
+              variant: "outline",
+              size: "md",
+              block: true,
+            })}
+          >
+            {ctaLabel}
+          </Link>
+        ))}
+    </SpotlightCard>
   );
 }

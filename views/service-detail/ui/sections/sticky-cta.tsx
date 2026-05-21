@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { buttonClassName } from "@/shared/ui/button";
+import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { Price } from "@/shared/ui/price";
 
 export interface StickyCtaProps {
@@ -30,9 +31,11 @@ export function StickyCta({ serviceId, resolvedPrice }: StickyCtaProps) {
   const t = useTranslations("ServiceDetail");
   return (
     <div
-      className="sticky bottom-0 px-[22px] pb-6 pt-3.5"
+      className="glass-top sticky bottom-0 px-[22px] pb-6 pt-3.5"
       style={{
         background: "linear-gradient(to top, var(--color-bg) 70%, transparent)",
+        backdropFilter: "var(--backdrop-blur-lg)",
+        WebkitBackdropFilter: "var(--backdrop-blur-lg)",
       }}
     >
       <div className="flex items-center gap-3.5">
@@ -44,17 +47,19 @@ export function StickyCta({ serviceId, resolvedPrice }: StickyCtaProps) {
             <Price resolved={resolvedPrice} />
           </div>
         </div>
-        <Link
-          href={`/booking/service?selected=${encodeURIComponent(serviceId)}`}
-          className={buttonClassName({
-            variant: "gold",
-            size: "lg",
-            block: true,
-            className: "gap-2",
-          })}
-        >
-          {t("cta_reserve")} <ArrowRight />
-        </Link>
+        <MagneticButton className="block w-full">
+          <Link
+            href={`/booking/service?selected=${encodeURIComponent(serviceId)}`}
+            className={buttonClassName({
+              variant: "gold",
+              size: "lg",
+              block: true,
+              className: "gap-2",
+            })}
+          >
+            {t("cta_reserve")} <ArrowRight />
+          </Link>
+        </MagneticButton>
       </div>
     </div>
   );

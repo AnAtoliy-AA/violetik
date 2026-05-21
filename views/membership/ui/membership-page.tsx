@@ -1,5 +1,6 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { STUDIO_DATA } from "@/entities/studio";
+import { Aurora } from "@/shared/ui/aurora";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { PaperGrain } from "@/shared/ui/paper-grain";
@@ -47,6 +48,7 @@ export async function MembershipPage() {
       <AppHeader back="/home" title={t("plate_title")} />
 
       <section className="relative overflow-hidden px-[22px] pb-4 pt-3">
+        <Aurora intensity="subtle" />
         <PaperGrain />
         <div className="relative z-10">
           <Eyebrow gold>{t("eyebrow")}</Eyebrow>

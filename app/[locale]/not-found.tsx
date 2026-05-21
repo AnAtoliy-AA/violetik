@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 
@@ -10,7 +11,8 @@ export default function NotFound() {
   const t = useTranslations("NotFound");
 
   return (
-    <main className="flex min-h-[100dvh] flex-col items-center justify-center px-[22px] text-center">
+    <main className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-[22px] text-center">
+      <Aurora intensity="subtle" />
       <Eyebrow gold>{t("plate_404")}</Eyebrow>
       <h1 className="my-5 max-w-[420px] font-display text-[44px] font-light italic leading-[1.04] tracking-[-0.02em]">
         {t.rich("title", { br: () => <br /> })}

@@ -1,10 +1,13 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA } from "@/entities/studio";
+import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
+import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { PaperGrain } from "@/shared/ui/paper-grain";
+import { SpotlightCard } from "@/shared/ui/spotlight-card";
 import { AppHeader } from "@/widgets/app-header";
 
 function ArrowRight() {
@@ -40,8 +43,9 @@ export function MasterPage() {
     <div className="pb-10">
       <AppHeader back="/home" title={t("plate_title")} />
 
-      <div className="px-[22px]">
-        <div className="gilded glass-top relative aspect-[1/1.2] overflow-hidden rounded-[28px]">
+      <div className="relative px-[22px]">
+        <Aurora intensity="subtle" />
+        <div className="gilded-lift glass-top relative aspect-[1/1.2] overflow-hidden rounded-[28px]">
           <div
             aria-hidden
             className="absolute inset-0"
@@ -120,7 +124,7 @@ export function MasterPage() {
         <Eyebrow>{t("voices_eyebrow")}</Eyebrow>
         <div className="mt-4 flex flex-col gap-3.5">
           {testimonials.map((tm) => (
-            <div key={tm.id} className="gilded glass-top rounded-[18px] p-[18px]">
+            <SpotlightCard key={tm.id} className="gilded glass-top rounded-[18px] p-[18px]">
               <p className="m-0 mb-3 font-display text-[18px] font-normal italic leading-[1.35]">
                 &ldquo;{tm.text}&rdquo;
               </p>
@@ -141,23 +145,25 @@ export function MasterPage() {
                   </span>
                 </div>
               </div>
-            </div>
+            </SpotlightCard>
           ))}
         </div>
       </section>
 
       <section className="px-[22px] pb-10">
-        <Link
-          href="/services"
-          className={buttonClassName({
-            variant: "gold",
-            size: "lg",
-            block: true,
-            className: "gap-2",
-          })}
-        >
-          {t("cta_reserve")} <ArrowRight />
-        </Link>
+        <MagneticButton className="block w-full">
+          <Link
+            href="/services"
+            className={buttonClassName({
+              variant: "gold",
+              size: "lg",
+              block: true,
+              className: "gap-2",
+            })}
+          >
+            {t("cta_reserve")} <ArrowRight />
+          </Link>
+        </MagneticButton>
       </section>
     </div>
   );

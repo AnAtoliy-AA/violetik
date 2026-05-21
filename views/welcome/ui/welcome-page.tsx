@@ -3,7 +3,9 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
+import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { Ornament } from "@/shared/ui/ornament";
@@ -30,23 +32,8 @@ export function WelcomePage() {
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
+      <Aurora intensity="vivid" />
       <PaperGrain />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -right-[120px] -top-[100px] size-[360px] rounded-full blur-[60px]"
-        style={{ background: "radial-gradient(circle, var(--color-plum), transparent 70%)" }}
-        initial={reduceMotion ? false : { opacity: 0 }}
-        animate={{ opacity: 0.55 }}
-        transition={{ duration: reduceMotion ? 0 : 1.4, ease: EASE_OUT, delay: 0.35 }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-[180px] -left-[140px] size-[420px] rounded-full blur-[60px]"
-        style={{ background: "radial-gradient(circle, var(--color-violet), transparent 70%)" }}
-        initial={reduceMotion ? false : { opacity: 0 }}
-        animate={{ opacity: 0.35 }}
-        transition={{ duration: reduceMotion ? 0 : 1.8, ease: EASE_OUT, delay: 0.55 }}
-      />
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
@@ -100,12 +87,14 @@ export function WelcomePage() {
           className="flex flex-col gap-3 pb-9"
           {...rise(2.4)}
         >
-          <Link
-            href="/onboarding"
-            className={buttonClassName({ variant: "gold", size: "lg", block: true })}
-          >
-            {t("cta_enter")}
-          </Link>
+          <MagneticButton className="block w-full">
+            <Link
+              href="/onboarding"
+              className={buttonClassName({ variant: "gold", size: "lg", block: true })}
+            >
+              {t("cta_enter")}
+            </Link>
+          </MagneticButton>
           <Link
             href="/booking/service"
             className={buttonClassName({ variant: "ghost", size: "lg", block: true })}

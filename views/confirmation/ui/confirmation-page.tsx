@@ -5,9 +5,11 @@ import { motion, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA } from "@/entities/studio";
+import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
+import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { formatLongDate } from "@/views/booking/lib/booking-steps";
 import { useBookingStore } from "@/views/booking/model/booking-store";
@@ -69,6 +71,7 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
 
   return (
     <div className="relative overflow-hidden px-[22px] pb-9">
+      <Aurora intensity="subtle" />
       <PaperGrain />
       <ConfettiBurst />
       <div className="relative z-10 pt-10 text-center">
@@ -135,12 +138,14 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
           transition={{ duration: reduceMotion ? 0 : 0.8, ease: EASE_OUT, delay: 1.7 }}
           className="mt-7 flex flex-col gap-2.5 pb-7"
         >
-          <Link
-            href="/profile"
-            className={buttonClassName({ variant: "solid", size: "lg", block: true })}
-          >
-            {t("cta_calendar")}
-          </Link>
+          <MagneticButton className="block w-full">
+            <Link
+              href="/profile"
+              className={buttonClassName({ variant: "solid", size: "lg", block: true })}
+            >
+              {t("cta_calendar")}
+            </Link>
+          </MagneticButton>
           <Link
             href="/home"
             className={buttonClassName({ variant: "ghost", size: "lg", block: true })}

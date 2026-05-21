@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { Link, useRouter } from "@/i18n/navigation";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { buttonClassName } from "@/shared/ui/button";
+import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { AppHeader } from "@/widgets/app-header";
 import { BookingStepper } from "@/widgets/booking-stepper";
 import {
@@ -152,20 +153,22 @@ export function BookingPage({ step, pricedServices }: BookingPageProps) {
                 {tErr(submitError)}
               </p>
             ) : null}
-            <button
-              type="button"
-              onClick={handleAdvance}
-              disabled={pending}
-              className={buttonClassName({
-                variant: "gold",
-                size: "lg",
-                block: true,
-                className: "gap-2",
-              })}
-            >
-              {step === "confirm" ? t("cta_confirm") : t("cta_continue")}
-              <ArrowRight />
-            </button>
+            <MagneticButton className="block w-full">
+              <button
+                type="button"
+                onClick={handleAdvance}
+                disabled={pending}
+                className={buttonClassName({
+                  variant: "gold",
+                  size: "lg",
+                  block: true,
+                  className: "gap-2",
+                })}
+              >
+                {step === "confirm" ? t("cta_confirm") : t("cta_continue")}
+                <ArrowRight />
+              </button>
+            </MagneticButton>
           </>
         ) : (
           <Link

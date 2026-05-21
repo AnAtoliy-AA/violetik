@@ -1,11 +1,20 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { useRef } from "react";
+import {
+  motion,
+  useInView,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
+import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 
@@ -26,8 +35,14 @@ export function HomeHero() {
     ? { opacity: 0.65 }
     : { y: fanY, opacity: fanOpacity };
 
+  const wordRef = useRef<HTMLSpanElement>(null);
+  // `once: true` latches the boolean after the first intersection, so it acts
+  // as a one-way reveal flag without a separate piece of state.
+  const wordRevealed = useInView(wordRef, { amount: 0.6, once: true });
+
   return (
     <div className="relative">
+      <Aurora intensity="subtle" />
       <PaperGrain />
       <motion.div
         className="relative z-10 mt-9 max-w-[calc(100%-120px)]"
@@ -40,7 +55,11 @@ export function HomeHero() {
           <span className="font-normal not-italic text-text-2">
             {t("hero_title_lead")}{" "}
           </span>
-          <span className="text-gold-shimmer font-normal">
+          <span
+            ref={wordRef}
+            data-revealed={wordRevealed ? "true" : undefined}
+            className="stroke-draw text-gold-shimmer font-normal"
+          >
             {t("hero_title_word")}
           </span>
         </h1>
@@ -49,12 +68,14 @@ export function HomeHero() {
           {t("hero_paragraph")}
         </p>
         <div className="mt-7 flex gap-2.5">
-          <Link
-            href="/services"
-            className={buttonClassName({ variant: "gold", size: "md" })}
-          >
-            {t("cta_book")}
-          </Link>
+          <MagneticButton>
+            <Link
+              href="/services"
+              className={buttonClassName({ variant: "gold", size: "md" })}
+            >
+              {t("cta_book")}
+            </Link>
+          </MagneticButton>
           <Link
             href="/gallery"
             className={buttonClassName({ variant: "outline", size: "md" })}
