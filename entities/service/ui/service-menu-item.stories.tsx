@@ -39,6 +39,13 @@ type Story = StoryObj<typeof ServiceMenuItem>;
 
 export const Default: Story = { args: { topRule: true } };
 
+export const WithDiscount: Story = {
+  args: {
+    topRule: true,
+    resolvedPrice: { base: 145, effective: 116, hasDiscount: true },
+  },
+};
+
 export const Stack: Story = {
   render: () => (
     <div className="flex w-[380px] flex-col">

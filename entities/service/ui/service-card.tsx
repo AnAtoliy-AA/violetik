@@ -4,6 +4,8 @@ import {
   NailTile,
   type NailTileVariant,
 } from "@/shared/ui/nail-tile";
+import { Price } from "@/shared/ui/price";
+import type { ResolvedPrice } from "@/entities/site-settings";
 import type { Service } from "@/entities/studio";
 
 export interface ServiceCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -11,6 +13,7 @@ export interface ServiceCardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: NailTileVariant;
   topRule?: boolean;
   palette?: readonly [string, string];
+  resolvedPrice?: ResolvedPrice;
 }
 
 const DEFAULT_PALETTE: readonly [string, string] = ["#c9a96e", "#7d3a6f"];
@@ -20,6 +23,7 @@ export function ServiceCard({
   variant = 0,
   topRule = false,
   palette = DEFAULT_PALETTE,
+  resolvedPrice,
   className,
   ...rest
 }: ServiceCardProps) {
@@ -51,7 +55,11 @@ export function ServiceCard({
             className="mb-1 h-0 flex-1 border-b-[0.5px] border-dotted border-line-strong"
           />
           <span className="shrink-0 font-mono text-[13px] text-gold">
-            €{service.price}
+            {resolvedPrice ? (
+              <Price resolved={resolvedPrice} />
+            ) : (
+              <>€{service.price}</>
+            )}
           </span>
         </div>
         <div className="mt-1.5 flex items-baseline justify-between gap-3">

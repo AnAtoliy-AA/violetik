@@ -1,6 +1,8 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "@/shared/lib/cn";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
+import { Price } from "@/shared/ui/price";
+import type { ResolvedPrice } from "@/entities/site-settings";
 import type { Service } from "@/entities/studio";
 
 export interface ServiceMenuItemProps extends HTMLAttributes<HTMLElement> {
@@ -9,6 +11,7 @@ export interface ServiceMenuItemProps extends HTMLAttributes<HTMLElement> {
   variant?: NailTileVariant;
   palette?: readonly [string, string];
   topRule?: boolean;
+  resolvedPrice?: ResolvedPrice;
 }
 
 const DEFAULT_PALETTE: readonly [string, string] = ["#c9a96e", "#7d3a6f"];
@@ -19,6 +22,7 @@ export function ServiceMenuItem({
   variant = 0,
   palette = DEFAULT_PALETTE,
   topRule = false,
+  resolvedPrice,
   className,
   ...rest
 }: ServiceMenuItemProps) {
@@ -56,7 +60,11 @@ export function ServiceMenuItem({
               {service.name}
             </h3>
             <span className="shrink-0 font-mono text-[15px] text-gold">
-              €{service.price}
+              {resolvedPrice ? (
+                <Price resolved={resolvedPrice} />
+              ) : (
+                <>€{service.price}</>
+              )}
             </span>
           </div>
           <div className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
