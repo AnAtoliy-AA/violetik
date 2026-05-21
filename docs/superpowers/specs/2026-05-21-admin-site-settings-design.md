@@ -40,7 +40,11 @@ CREATE TABLE site_settings (
 );
 ```
 
-`price_overrides` is a flat map keyed `"service:<id>"` or `"membership:<tier>"` → integer euros. Unknown keys are tolerated and ignored on read (forward-compatible with catalog renames).
+`price_overrides` is a flat map keyed `"service:<id>"` or `"membership:VIP"` → integer euros. Unknown keys are tolerated and ignored on read (forward-compatible with catalog renames).
+
+**Member tier is not overridable.** The catalog `Member` tier has `price: 0` and the membership pricing helper short-circuits on `price === 0` to render "Free". Allowing a Member override would silently no-op (or, worse, demote the tier out of "Free" without the UI noticing). The Zod schema rejects `membership:Member` keys.
+
+**Annual multiplier is unchanged.** Today annual = monthly × 10 in `views/membership/ui/membership-page-client.tsx:18`. Overrides set the *monthly* price; annual continues to derive `× 10`. The admin form labels the field explicitly: "VIP price (per month)".
 
 The singleton `CHECK` constraint guarantees at most one row. Reads use a `getSiteSettings()` helper that lazily inserts the default row on first call and returns the in-memory defaults if `db` is null (graceful degradation, same pattern as the rest of `db/`).
 
@@ -93,7 +97,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings;
 
 export type PriceOverrideKey =
   | `service:${string}`
-  | `membership:${'Member' | 'VIP'}`;
+  | `membership:VIP`;       // Member is intentionally excluded — see §3
 
 export interface ResolvedPrice {
   base: number;       // catalog price (or override) before discount
@@ -161,31 +165,62 @@ The inline `PALETTE_INIT_SCRIPT` already swaps in the user's cookie value if pre
 ```ts
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
-import { getSiteSettingsServer } from '@/shared/lib/site-settings-server';
+import { getCachedDefaultLocale } from '@/shared/lib/site-settings-cache';
 
 export default async function proxy(req: NextRequest) {
-  const settings = await getSiteSettingsServer();
+  const defaultLocale = await getCachedDefaultLocale();
   const handler = createMiddleware({
     ...routing,
-    defaultLocale: settings.defaultLocale,
+    defaultLocale,
   });
   return handler(req);
 }
 ```
 
-The middleware is rebuilt per request; that's the recommended pattern from next-intl for runtime-derived defaults. (Cost is one DB read per request, mitigated by React `cache()` and the singleton row being trivially small. If profiling later shows it matters, we can add an in-memory TTL.)
+**Runtime**: Next.js 16's proxy defaults to the Node.js runtime (see `node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md:219`); `postgres-js` works directly inside proxy with no `runtime` directive needed. The `runtime` config option is, in fact, forbidden in proxy files in Next 16.
+
+**Caching**: the proxy doc also says fetch caching (`next.tags`, `next.revalidate`) has no effect in proxy. So we add a tiny module-level TTL cache in `shared/lib/site-settings-cache.ts`:
+
+```ts
+let cache: { value: Locale; expiresAt: number } | null = null;
+const TTL_MS = 60_000;
+
+export async function getCachedDefaultLocale(): Promise<Locale> {
+  const now = Date.now();
+  if (cache && cache.expiresAt > now) return cache.value;
+  const settings = await getSiteSettings();
+  cache = { value: settings.defaultLocale, expiresAt: now + TTL_MS };
+  return cache.value;
+}
+
+export function invalidateDefaultLocaleCache(): void {
+  cache = null;
+}
+```
+
+The admin server action calls `invalidateDefaultLocaleCache()` after a successful save, so the change is visible immediately on the saving server instance; other instances (if any) catch up within 60s. For a single-VM private-atelier deployment this is sufficient.
 
 ### 6.3 Price overrides + discount
 
-Every existing price render site reads through `resolvePrice`:
+Every existing price render site reads through `resolvePrice`. Audited list (every `€` and `price` reference under views/ + entities/):
 
 | File | Today | After |
 |---|---|---|
-| `entities/service/ui/service-card.tsx` | `€{service.price}` | `<Price resolved={resolvePrice('service:'+service.id, service.price, settings)} />` |
-| `entities/service/ui/service-menu-item.tsx` | `€{service.price}` | same |
-| `views/membership/ui/membership-page-client.tsx` `pricing()` helper | `tier.price * 10` etc. | reads resolved price |
-| `views/service-detail/ui/sections/sticky-cta.tsx` | `price` prop (number) | accepts `ResolvedPrice` |
-| `views/booking/ui/steps/confirm-step.tsx` & `confirmation-page.tsx` | `service.price` | resolved version |
+| `entities/service/ui/service-card.tsx:54` | `€{service.price}` | `<Price resolved={resolvePrice('service:'+service.id, service.price, settings)} />` |
+| `entities/service/ui/service-menu-item.tsx:59` | `€{service.price}` | same |
+| `views/services-catalog/ui/services-catalog-page.tsx` | passes service to card | thread `settings` |
+| `views/service-detail/ui/sections/detail-hero.tsx:62` | `€{service.price}` | `<Price resolved={…}/>` |
+| `views/service-detail/ui/sections/sticky-cta.tsx` | `price: number` prop | accepts `ResolvedPrice` |
+| `views/membership/ui/membership-page-client.tsx:16-20` (`pricing()` helper) | `tier.price * 10` etc. | overlay override on monthly, then `* 10` for annual, then discount |
+| `views/booking/ui/steps/service-step.tsx:69` | `€{s.price}` | resolved |
+| `views/booking/ui/steps/confirm-step.tsx` | `service.price` | resolved |
+
+**Excluded from this change** (intentional, documented):
+
+- `views/profile/ui/profile-page.tsx:157` renders `€{visit.price}` from `STUDIO_DATA.visits`. These are *historical snapshots* — what the customer paid at the time. They must NOT shift retroactively when the admin changes prices today. Left as raw numbers.
+- `views/confirmation/ui/confirmation-page.tsx` does not render any price (it's a "request received" stub). Listed here so the audit is complete.
+
+**`bookings` DB rows don't have a price column** — admin changes affect the booking *flow* (what the user sees while booking) but not records of past bookings rendered elsewhere. The Visits view is fed by mock data today; a future change that persists real bookings will need to snapshot the resolved price into `bookings.price_at_booking`. Out of scope for this PR but noted.
 
 `settings` is fetched once per server render at the page root and threaded down. Client components that need it receive it as a serialized prop (`SiteSettings` is JSON-safe).
 
@@ -214,9 +249,15 @@ A new `Admin.site_settings_*` translation namespace covers labels in all three l
 
 ## 8. Auth
 
-The existing admin gate in `/admin` (TELEGRAM_BOT_TOKEN env var → session check → role check) extends to `/admin/site-settings`. The role check is the gate that's actually load-bearing here — only `users.role = 'admin'` can save. A new helper `requireAdmin()` in `shared/lib/auth-server.ts` centralizes the check so the page and the server action share it.
+**Existing state is weaker than first assumed.** `app/[locale]/admin/page.tsx:42-47` only checks `session` truthiness; it does **not** check `users.role = 'admin'`. So today, any signed-in Telegram user can hit `/admin`, `/admin/bookings`, and `/admin/vip-requests`. The `userRole` enum exists in `db/schema.ts:23` but isn't enforced anywhere.
 
-The server action also re-checks the session inside its body (defense in depth — server actions are externally callable endpoints).
+This spec ships a **net new** authorization tightening:
+
+1. New helper `shared/lib/auth-server.ts → requireAdmin()`: reads the session, fetches `users.role` from the DB, redirects to `/sign-in` if missing, returns the user record if `role === 'admin'`. When `TELEGRAM_BOT_TOKEN` is unset (local dev / CI), the helper still passes (matching the existing dev-friendly behavior so palette tests work without secrets).
+2. Apply `requireAdmin()` to all four admin routes: `/admin`, `/admin/bookings`, `/admin/vip-requests`, `/admin/site-settings`. The change replaces the existing `if (!session) redirect…` blocks.
+3. The new server action `updateSiteSettings` calls `requireAdmin()` inside its body (defense in depth — server actions are externally callable endpoints).
+
+This is the security-correct change regardless of the new feature; surfacing the new feature is what forced us to look. The PR description will call this out explicitly.
 
 ## 9. Error handling
 
@@ -240,9 +281,11 @@ The server action also re-checks the session inside its body (defense in depth �
 
 ## 12. Risks & open notes
 
-- **Per-request middleware cost**: one DB select per request. Acceptable for a private-atelier site (low traffic); revisit with an LRU/TTL if traffic profile changes.
-- **Price snapshotting at booking time**: out of scope. Today's `bookings` rows don't store the price paid — admin price changes therefore retroactively affect what the "Visits" view shows. Documented here so it's a known intentional limitation, not a bug.
+- **Per-request proxy cost**: one DB select per request from `proxy.ts` would be too much; mitigated by the 60s module-level TTL cache (§6.2). Admin changes propagate within at most 60s.
+- **Price snapshotting at booking time**: out of scope. Today's `bookings` rows don't store the price paid. The Profile view's "Visits" feeds from mock `STUDIO_DATA.visits` — admin price changes do not affect those rows because they bypass `resolvePrice` (see §6.3). When real bookings persist, we will need a `bookings.price_at_booking` snapshot.
 - **Cookie palettes vs admin default**: anyone who has *ever* visited has a cookie, so the admin's choice mostly affects new visitors and incognito sessions. Acceptable; this is what "default" means.
+- **Membership Member tier is not overridable**: see §3. If the studio later introduces a paid Member tier we'd lift the restriction and audit the `price === 0 → "Free"` short-circuit.
+- **Existing admin routes were unprotected**: this PR tightens auth on `/admin`, `/admin/bookings`, `/admin/vip-requests` in addition to the new `/admin/site-settings`. Any signed-in Telegram user could view those pages today. See §8.
 
 ## 13. Acceptance checklist
 
