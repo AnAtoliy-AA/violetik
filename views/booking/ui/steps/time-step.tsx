@@ -44,7 +44,7 @@ export function TimeStep() {
   return (
     <div>
       <Eyebrow gold>{t("eyebrow")}</Eyebrow>
-      <h2 className="my-2.5 mb-1.5 font-display text-[36px] font-normal italic leading-tight tracking-[-0.02em]">
+      <h2 className="my-2.5 mb-1.5 font-display text-h2 font-normal italic leading-tight tracking-[-0.02em]">
         {t.rich("title", { em: (c) => <em>{c}</em> })}
       </h2>
       <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />

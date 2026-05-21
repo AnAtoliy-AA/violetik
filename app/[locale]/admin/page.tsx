@@ -58,7 +58,7 @@ export default async function AdminRoute({
 
   return (
     <div className="pb-16">
-      <AppHeader back="/home" title={t("plate_title")} />
+      <AppHeader back="/home" title={t("plate_title")} admin />
 
       <section className="px-[22px] py-6">
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>
@@ -78,7 +78,7 @@ export default async function AdminRoute({
           <li>
             <Link
               href="/admin/bookings"
-              className="block rounded-[18px] border-[0.5px] border-line bg-surface p-5 transition-colors duration-fast ease-out hover:bg-surface/80"
+              className="gilded block rounded-[18px] p-5 transition-colors duration-fast ease-out hover:bg-surface-2"
             >
               <div className="font-display text-[16px] italic">{t("inbox_bookings")}</div>
               <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
@@ -89,7 +89,7 @@ export default async function AdminRoute({
           <li>
             <Link
               href="/admin/vip-requests"
-              className="block rounded-[18px] border-[0.5px] border-line bg-surface p-5 transition-colors duration-fast ease-out hover:bg-surface/80"
+              className="gilded block rounded-[18px] p-5 transition-colors duration-fast ease-out hover:bg-surface-2"
             >
               <div className="font-display text-[16px] italic">{t("inbox_vip_requests")}</div>
               <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
@@ -100,7 +100,7 @@ export default async function AdminRoute({
           <li className="col-span-2">
             <Link
               href="/admin/site-settings"
-              className="block rounded-[18px] border-[0.5px] border-line bg-surface p-5 transition-colors duration-fast ease-out hover:bg-surface/80"
+              className="gilded block rounded-[18px] p-5 transition-colors duration-fast ease-out hover:bg-surface-2"
             >
               <div className="font-display text-[16px] italic">{t("inbox_site_settings")}</div>
               <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">

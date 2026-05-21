@@ -67,7 +67,7 @@ export function MasterPage() {
             <Eyebrow gold>{t("frame_mark")}</Eyebrow>
           </div>
           <div className="absolute inset-x-[18px] bottom-[18px]">
-            <h1 className="m-0 font-display text-[46px] font-light italic leading-[0.96] tracking-[-0.02em]">
+            <h1 className="m-0 font-display text-h1 font-light italic leading-[0.96] tracking-[-0.02em]">
               {firstName}
               <br />
               <span className="not-italic">{lastName}.</span>

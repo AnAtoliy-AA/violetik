@@ -72,7 +72,7 @@ export default async function AdminVipRequestsRoute({
 
   return (
     <div className="pb-16">
-      <AppHeader back="/admin" title={t("meta_title")} />
+      <AppHeader back="/admin" title={t("meta_title")} admin />
 
       <section className="px-[22px] py-6">
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>
@@ -91,7 +91,7 @@ export default async function AdminVipRequestsRoute({
         ) : (
           <ul className="flex flex-col gap-3">
             {pending.map((r) => (
-              <li key={r.id} className="rounded-[18px] border-[0.5px] border-line bg-surface p-5">
+              <li key={r.id} className="gilded rounded-[18px] p-5">
                 <div className="font-display text-[20px] italic">{customerLabel(r)}</div>
                 {r.note ? (
                   <p className="mt-1 italic text-[13px] text-text-2">&ldquo;{r.note}&rdquo;</p>
@@ -119,7 +119,7 @@ export default async function AdminVipRequestsRoute({
         ) : (
           <ul className="flex flex-col gap-3">
             {active.map((r) => (
-              <li key={r.id} className="rounded-[18px] border-[0.5px] border-line bg-surface p-5">
+              <li key={r.id} className="gilded rounded-[18px] p-5">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="font-display text-[20px] italic">{customerLabel(r)}</div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
@@ -147,7 +147,7 @@ export default async function AdminVipRequestsRoute({
         ) : (
           <ul className="flex flex-col gap-2">
             {expired.map((r) => (
-              <li key={r.id} className="rounded-[12px] border-[0.5px] border-line bg-surface px-4 py-3">
+              <li key={r.id} className="gilded rounded-[12px] px-4 py-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="font-display text-[16px] italic">{customerLabel(r)}</div>
                   <ExpiredRowMeta

@@ -50,7 +50,7 @@ export default async function ExpiredVipRequestsRoute({
 
   return (
     <div className="pb-16">
-      <AppHeader back="/admin/vip-requests" title={t("expired_page_title")} />
+      <AppHeader back="/admin/vip-requests" title={t("expired_page_title")} admin />
 
       <section className="px-[22px] py-6">
         <h1 className="mb-2 font-display text-[40px] font-light italic leading-[1.05] tracking-[-0.02em]">
@@ -67,7 +67,7 @@ export default async function ExpiredVipRequestsRoute({
         ) : (
           <ul className="flex flex-col gap-2">
             {rows.map((r) => (
-              <li key={r.id} className="rounded-[12px] border-[0.5px] border-line bg-surface px-4 py-3">
+              <li key={r.id} className="gilded rounded-[12px] px-4 py-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="font-display text-[16px] italic">{customerLabel(r)}</div>
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-3">

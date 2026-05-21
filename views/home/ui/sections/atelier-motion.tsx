@@ -27,7 +27,7 @@ export function AtelierMotion() {
       <div className="flex items-end justify-between">
         <Plate folio number={6} label={t("plate_atelier").toUpperCase()} />
       </div>
-      <h2 className="mt-2 font-display text-[34px] font-normal italic leading-[1.05] tracking-[-0.02em]">
+      <h2 className="mt-2 font-display text-h2 font-normal italic leading-[1.05] tracking-[-0.02em]">
         {t("atelier_motion_title_a")}{" "}
         <em>{t("atelier_motion_title_b")}</em>.
       </h2>

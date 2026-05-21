@@ -24,6 +24,11 @@
   --font-body: var(--next-font-dm-sans), system-ui, sans-serif;
   --font-mono: var(--next-font-jetbrains), ui-monospace, monospace;
 
+  /* Type scale — clamped headings auto-generate text-h1/h2/h3 utilities */
+  --text-h1: clamp(56px, 16vw, 84px);
+  --text-h2: clamp(34px, 8vw, 48px);
+  --text-h3: clamp(24px, 5.5vw, 32px);
+
   /* Radii */
   --radius-sm: 12px;
   --radius-DEFAULT: 18px;
@@ -428,6 +433,11 @@ body {
   color: var(--color-text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Enable Cormorant ligatures + alternates on every display-set heading. */
+.font-display {
+  font-feature-settings: "liga", "dlig", "ss01";
 }
 
 /* Hide scrollbars on horizontal scroll regions */

@@ -67,7 +67,7 @@ export default async function AdminBookingsRoute({
 
   return (
     <div className="pb-16">
-      <AppHeader back="/admin" title={t("meta_title")} />
+      <AppHeader back="/admin" title={t("meta_title")} admin />
 
       <section className="px-[22px] py-6">
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>
@@ -93,7 +93,7 @@ export default async function AdminBookingsRoute({
             return (
               <li
                 key={b.id}
-                className="rounded-[18px] border-[0.5px] border-line bg-surface p-5"
+                className="gilded rounded-[18px] p-5"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="font-display text-[22px] italic">
