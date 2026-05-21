@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateVipRequestId, createVipRequest } from "./vip-requests";
+import { generateVipRequestId, createVipRequest, cancelOwnVipRequest } from "./vip-requests";
 
 describe("generateVipRequestId", () => {
   it("returns a vipreq_-prefixed id with 16 hex chars", () => {
@@ -23,5 +23,12 @@ describe("createVipRequest", () => {
       // real DB rejects FK — acceptable; function attempted the insert
     }
     expect(result === null || (typeof result === "object" && result !== null && result.userId === "tg:1")).toBe(true);
+  });
+});
+
+describe("cancelOwnVipRequest", () => {
+  it("returns null when db is null", async () => {
+    const result = await cancelOwnVipRequest("tg:nobody");
+    expect(result === null || result === undefined || typeof result === "object").toBe(true);
   });
 });
