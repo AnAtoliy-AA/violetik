@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import { Aurora } from "@/shared/ui/aurora";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { Wordmark } from "@/shared/ui/wordmark";
 import { TelegramLogin } from "@/features/telegram-login";
@@ -33,10 +34,11 @@ export default async function SignInPage({
   const eitherConfigured = Boolean(botUsername) || googleEnabled;
 
   return (
-    <div className="pb-10">
+    <div className="relative overflow-hidden pb-10">
+      <Aurora intensity="vivid" />
       <AppHeader back="/welcome" title={t("plate_title")} />
 
-      <main className="flex min-h-[60vh] flex-col items-center justify-center px-[22px] text-center">
+      <main className="relative z-10 flex min-h-[60vh] flex-col items-center justify-center px-[22px] text-center">
         <Wordmark size="sm" className="mb-10" />
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>
         <h1 className="my-4 max-w-[420px] font-display text-[40px] font-light italic leading-tight tracking-[-0.02em]">

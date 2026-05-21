@@ -26,11 +26,11 @@ export function MembershipCard() {
     <section className="px-[22px] pb-7 pt-2.5">
       <Link
         href="/membership"
-        className="gilded glass-top relative block w-full overflow-hidden rounded-[28px] px-[26px] py-8 text-left text-text"
+        className="gilded-lift glass-top relative block w-full overflow-hidden rounded-[28px] px-[26px] py-8 text-left text-text"
       >
         <span
           aria-hidden
-          className="pointer-events-none absolute -right-[50px] -top-[50px] size-[220px] rounded-full"
+          className="pointer-events-none absolute -right-[50px] -top-[50px] size-[220px] rounded-full motion-safe:[animation:sealRotate_60s_linear_infinite]"
           style={{
             background:
               "radial-gradient(circle, color-mix(in oklab, var(--color-accent) 28%, transparent), transparent 70%)",

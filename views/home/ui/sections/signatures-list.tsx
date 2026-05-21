@@ -4,6 +4,7 @@ import { ServiceCard } from "@/entities/service";
 import { STUDIO_DATA } from "@/entities/studio";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Plate } from "@/shared/ui/plate";
+import { SpotlightCard } from "@/shared/ui/spotlight-card";
 import type { NailTileVariant } from "@/shared/ui/nail-tile";
 
 function ArrowRight() {
@@ -44,17 +45,18 @@ export function SignaturesList() {
 
       <div className="flex flex-col">
         {services.map((service, i) => (
-          <Link
-            key={service.id}
-            href={`/services/${service.id}`}
-            className="block transition-transform duration-fast ease-out hover:scale-[1.005] motion-reduce:hover:scale-100"
-          >
-            <ServiceCard
-              service={service}
-              variant={(i % 6) as NailTileVariant}
-              topRule={i === 0}
-            />
-          </Link>
+          <SpotlightCard key={service.id} className="rounded-none">
+            <Link
+              href={`/services/${service.id}`}
+              className="block transition-transform duration-fast ease-out hover:scale-[1.005] motion-reduce:hover:scale-100"
+            >
+              <ServiceCard
+                service={service}
+                variant={(i % 6) as NailTileVariant}
+                topRule={i === 0}
+              />
+            </Link>
+          </SpotlightCard>
         ))}
       </div>
     </section>

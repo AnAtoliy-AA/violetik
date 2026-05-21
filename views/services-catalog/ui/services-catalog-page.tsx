@@ -8,11 +8,13 @@ import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA, type Category } from "@/entities/studio";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
+import { Aurora } from "@/shared/ui/aurora";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import type { NailTileVariant } from "@/shared/ui/nail-tile";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { Plate } from "@/shared/ui/plate";
+import { SpotlightCard } from "@/shared/ui/spotlight-card";
 import { CategoryChips, type ChipValue } from "./category-chips";
 
 const CATEGORIES: readonly Category[] = ["Care", "Gel", "Design", "Form"];
@@ -56,6 +58,7 @@ export function ServicesCatalogPage({ pricedServices }: ServicesCatalogPageProps
       <AppHeader />
 
       <section className="relative overflow-hidden px-[22px] pb-[18px] pt-3">
+        <Aurora intensity="subtle" />
         <PaperGrain />
         <div className="relative z-10">
           <div className="flex items-end justify-between">
@@ -92,19 +95,20 @@ export function ServicesCatalogPage({ pricedServices }: ServicesCatalogPageProps
           </div>
         ) : (
           filtered.map((service, i) => (
-            <Link
-              key={service.id}
-              href={`/services/${service.id}`}
-              className="block transition-transform duration-fast ease-out"
-            >
-              <ServiceMenuItem
-                service={service}
-                plateNumber={i + 1}
-                variant={(i % 6) as NailTileVariant}
-                topRule={i === 0}
-                resolvedPrice={pricedServices?.[service.id]}
-              />
-            </Link>
+            <SpotlightCard key={service.id} className="rounded-none">
+              <Link
+                href={`/services/${service.id}`}
+                className="block transition-transform duration-fast ease-out"
+              >
+                <ServiceMenuItem
+                  service={service}
+                  plateNumber={i + 1}
+                  variant={(i % 6) as NailTileVariant}
+                  topRule={i === 0}
+                  resolvedPrice={pricedServices?.[service.id]}
+                />
+              </Link>
+            </SpotlightCard>
           ))
         )}
       </div>

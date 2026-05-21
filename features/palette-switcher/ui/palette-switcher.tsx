@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useTranslations } from "next-intl";
 import {
   PALETTES,
+  type Palette,
   type PaletteId,
   writePaletteCookie,
 } from "@/shared/config/palettes";
@@ -11,6 +12,33 @@ import { cn } from "@/shared/lib/cn";
 
 export interface PaletteSwitcherProps {
   className?: string;
+}
+
+function spawnPaletteSweep(x: number, y: number, accent: string) {
+  if (typeof document === "undefined") return;
+  if (
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  ) {
+    return;
+  }
+  const sweep = document.createElement("div");
+  sweep.className = "palette-sweep";
+  sweep.style.left = `${x - 18}px`;
+  sweep.style.top = `${y - 18}px`;
+  sweep.style.setProperty("--palette-sweep-color", accent);
+  document.body.appendChild(sweep);
+  sweep.addEventListener(
+    "animationend",
+    () => {
+      sweep.remove();
+    },
+    { once: true },
+  );
+  // Defensive cleanup in case the animationend event doesn't fire.
+  window.setTimeout(() => {
+    sweep.remove();
+  }, 700);
 }
 
 export function PaletteSwitcher({ className }: PaletteSwitcherProps) {
@@ -27,9 +55,18 @@ export function PaletteSwitcher({ className }: PaletteSwitcherProps) {
     setActive(attr);
   }, []);
 
-  const handleSelect = (id: PaletteId) => {
-    setActive(id);
-    writePaletteCookie(id);
+  const handleSelect = (
+    event: MouseEvent<HTMLButtonElement>,
+    palette: Palette,
+  ) => {
+    setActive(palette.id as PaletteId);
+    writePaletteCookie(palette.id as PaletteId);
+    const rect = event.currentTarget.getBoundingClientRect();
+    spawnPaletteSweep(
+      rect.left + rect.width / 2,
+      rect.top + rect.height / 2,
+      palette.preview[2],
+    );
   };
 
   return (
@@ -49,7 +86,7 @@ export function PaletteSwitcher({ className }: PaletteSwitcherProps) {
               type="button"
               role="radio"
               aria-checked={selected}
-              onClick={() => handleSelect(palette.id)}
+              onClick={(event) => handleSelect(event, palette)}
               className={cn(
                 "group flex items-center gap-3 rounded-full border-[0.5px] px-3 py-2",
                 "transition-colors duration-fast ease-out",
