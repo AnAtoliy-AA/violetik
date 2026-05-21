@@ -2,8 +2,6 @@ export type Category = "Care" | "Gel" | "Design" | "Form";
 
 export type GalleryTag = "Editorial" | "Gel" | "Chrome" | "Lace" | "Bridal";
 
-export type MembershipTierName = "Member" | "VIP";
-
 export interface Service {
   id: string;
   name: string;
@@ -23,7 +21,7 @@ export interface GalleryItem {
 }
 
 export interface MembershipTier {
-  tier: MembershipTierName;
+  tier: "Member" | "VIP";
   price: number;
   cadence: string;
   perks: string[];
@@ -55,7 +53,6 @@ export interface StudioInfo {
 
 export interface CustomerProfile {
   name: string;
-  membership: MembershipTierName | null;
   joined: number;
   palette: readonly [string, string];
 }

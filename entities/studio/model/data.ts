@@ -179,7 +179,6 @@ const membership: MembershipTier[] = [
 
 const profile: CustomerProfile = {
   name: "Lara K.",
-  membership: "VIP",
   joined: 2024,
   palette: ["#d9a3b6", "#7d3a6f"],
 };
