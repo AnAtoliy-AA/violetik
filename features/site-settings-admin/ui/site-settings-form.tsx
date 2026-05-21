@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import type { FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { PALETTES, type PaletteId } from "@/shared/config/palettes";
+import { PALETTES } from "@/shared/config/palettes";
 import { cn } from "@/shared/lib/cn";
 import { routing } from "@/i18n/routing";
 import type {
@@ -99,11 +99,11 @@ export function SiteSettingsForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-[22px] py-6">
-      <fieldset aria-label={t("site_settings_section_palette")}>
+      <fieldset>
         <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
           {t("site_settings_section_palette")}
         </legend>
-        <div role="radiogroup" className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
           {PALETTES.map((p) => {
             const selected = defaultPalette === p.id;
             return (
@@ -112,7 +112,7 @@ export function SiteSettingsForm({
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                onClick={() => setDefaultPalette(p.id as PaletteId)}
+                onClick={() => setDefaultPalette(p.id)}
                 className={cn(
                   "group flex items-center gap-3 rounded-full border-[0.5px] px-3 py-2",
                   "transition-colors duration-fast ease-out",
@@ -126,8 +126,8 @@ export function SiteSettingsForm({
                   aria-hidden="true"
                   className="flex shrink-0 overflow-hidden rounded-full border-[0.5px] border-line-strong"
                 >
-                  {p.preview.map((color, i) => (
-                    <span key={i} className="block size-4" style={{ background: color }} />
+                  {p.preview.map((color) => (
+                    <span key={color} className="block size-4" style={{ background: color }} />
                   ))}
                 </span>
                 <span className="font-mono text-[11px] uppercase tracking-[0.16em]">
@@ -139,11 +139,11 @@ export function SiteSettingsForm({
         </div>
       </fieldset>
 
-      <fieldset aria-label={t("site_settings_section_locale")}>
+      <fieldset>
         <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
           {t("site_settings_section_locale")}
         </legend>
-        <div role="radiogroup" className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {routing.locales.map((l) => {
             const selected = defaultLocale === l;
             return (
