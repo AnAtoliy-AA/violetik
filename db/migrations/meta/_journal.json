@@ -43,6 +43,13 @@
       "when": 1779355482128,
       "tag": "0005_glossy_gambit",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779383409781,
+      "tag": "0006_studio_photos",
+      "breakpoints": true
     }
   ]
 }

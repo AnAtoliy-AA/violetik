@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA, type Visit } from "@/entities/studio";
+import { loadProfileWithPhoto } from "@/entities/studio/api/load-with-photos";
 import { Aurora } from "@/shared/ui/aurora";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
@@ -45,7 +46,8 @@ export async function ProfilePage() {
   const user = await getCurrentSessionUser();
   const tier = user ? await getCurrentTier(user.id) : { state: "member" as const };
 
-  const { profile, visits, services } = STUDIO_DATA;
+  const profile = await loadProfileWithPhoto();
+  const { visits, services } = STUDIO_DATA;
   const upcoming: Visit | undefined = visits.find(
     (v) => v.status === "upcoming",
   );

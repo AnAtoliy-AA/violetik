@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { resolvePrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
+import { loadServiceWithPhoto } from "@/entities/studio/api/load-with-photos";
 import { routing } from "@/i18n/routing";
 import { ServiceDetailPage } from "@/views/service-detail";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
@@ -34,7 +35,7 @@ export default async function ServiceDetailRoute({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const service = STUDIO_DATA.services.find((s) => s.id === id);
+  const service = await loadServiceWithPhoto(id);
   if (!service) notFound();
   const settings = await getSiteSettingsServer();
   const resolvedPrice = resolvePrice(

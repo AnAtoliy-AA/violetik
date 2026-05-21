@@ -3,7 +3,11 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
-import { STUDIO_DATA, type GalleryTag } from "@/entities/studio";
+import {
+  STUDIO_DATA,
+  type GalleryItem,
+  type GalleryTag,
+} from "@/entities/studio";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
@@ -22,7 +26,15 @@ const TAGS: readonly GalleryTag[] = [
   "Bridal",
 ];
 
-export function GalleryPage() {
+export interface GalleryPageProps {
+  /**
+   * Optional gallery items with `image` populated from `studio_photos`.
+   * When omitted, falls back to the in-memory STUDIO_DATA.gallery.
+   */
+  items?: readonly GalleryItem[];
+}
+
+export function GalleryPage({ items }: GalleryPageProps = {}) {
   const t = useTranslations("Gallery");
   const tCat = useTranslations("Gallery.category");
   const [active, setActive] = useState<TagFilterValue>("All");
@@ -42,12 +54,13 @@ export function GalleryPage() {
     [t, tCat],
   );
 
+  const source = items ?? STUDIO_DATA.gallery;
   const filtered = useMemo(
     () =>
       active === "All"
-        ? STUDIO_DATA.gallery
-        : STUDIO_DATA.gallery.filter((g) => g.tag === active),
-    [active],
+        ? source
+        : source.filter((g) => g.tag === active),
+    [active, source],
   );
 
   const openItem = openId

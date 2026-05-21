@@ -1,7 +1,7 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ServiceCard } from "@/entities/service";
-import { STUDIO_DATA } from "@/entities/studio";
+import { loadServicesWithPhotos } from "@/entities/studio/api/load-with-photos";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Plate } from "@/shared/ui/plate";
 import { SpotlightCard } from "@/shared/ui/spotlight-card";
@@ -24,9 +24,10 @@ function ArrowRight() {
   );
 }
 
-export function SignaturesList() {
-  const t = useTranslations("Home");
-  const services = STUDIO_DATA.services.slice(0, 4);
+export async function SignaturesList() {
+  const t = await getTranslations("Home");
+  const all = await loadServicesWithPhotos();
+  const services = all.slice(0, 4);
   return (
     <section className="px-[22px] pb-6 pt-12">
       <div className="mb-3 flex items-end justify-between">

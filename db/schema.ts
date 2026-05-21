@@ -217,6 +217,49 @@ export const siteSettings = pgTable(
   }),
 );
 
+/**
+ * Each row stores one customer-facing photograph the admin has uploaded
+ * through `/admin/photos`. The pair (slotKind, slotId) is unique — the
+ * second upload for a given slot replaces the first row (and the prior
+ * Vercel Blob is deleted server-side).
+ *
+ * The `src` is the public Vercel Blob URL; `width` / `height` come from
+ * the upload form (read from the file's natural dimensions before submit).
+ * `blurDataURL` is reserved for a future plaiceholder pass; nullable today.
+ */
+export const photoSlotKind = pgEnum("photo_slot_kind", [
+  "service",
+  "gallery",
+  "atelier",
+  "master",
+  "testimonial",
+  "profile",
+]);
+
+export const studioPhotos = pgTable(
+  "studio_photos",
+  {
+    id: text("id").primaryKey(),
+    slotKind: photoSlotKind("slot_kind").notNull(),
+    slotId: text("slot_id").notNull(),
+    src: text("src").notNull(),
+    alt: text("alt"),
+    width: integer("width"),
+    height: integer("height"),
+    blurDataUrl: text("blur_data_url"),
+    uploadedAt: timestamp("uploaded_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    uploadedBy: text("uploaded_by").references(() => users.id),
+  },
+  (table) => ({
+    uniqueSlot: uniqueIndex("studio_photos_slot_uq").on(
+      table.slotKind,
+      table.slotId,
+    ),
+  }),
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Booking = typeof bookings.$inferSelect;
@@ -227,3 +270,6 @@ export type GoogleOauthToken = typeof googleOauthTokens.$inferSelect;
 export type NewGoogleOauthToken = typeof googleOauthTokens.$inferInsert;
 export type SiteSettingsRow = typeof siteSettings.$inferSelect;
 export type NewSiteSettingsRow = typeof siteSettings.$inferInsert;
+export type StudioPhotoRow = typeof studioPhotos.$inferSelect;
+export type NewStudioPhotoRow = typeof studioPhotos.$inferInsert;
+export type PhotoSlotKind = (typeof photoSlotKind.enumValues)[number];
