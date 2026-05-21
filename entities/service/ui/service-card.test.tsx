@@ -1,23 +1,34 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ServiceCard } from "./service-card";
-import { STUDIO_DATA } from "@/entities/studio";
+import type { Service } from "../model/types";
 
-const sample = STUDIO_DATA.services[0];
+const sample: Service = {
+  id: "signature",
+  category: { id: "care", name: "Care" },
+  name: "Signature Manicure",
+  blurb:
+    "Russian dry technique, cuticle work, hydration ritual & gloss finish.",
+  includes: [],
+  price: 95,
+  priceCents: 9500,
+  displayPrice: "€95",
+  duration: "75 min",
+  durationMinutes: 75,
+  sortOrder: 1,
+};
 
 describe("ServiceCard", () => {
-  it("renders the service name, blurb, duration, and price", () => {
+  it("renders the service name, blurb, duration, and displayPrice", () => {
     render(<ServiceCard service={sample} />);
-    expect(screen.getByText(sample.name)).toBeInTheDocument();
+    expect(screen.getByText("Signature Manicure")).toBeInTheDocument();
     expect(screen.getByText(sample.blurb)).toBeInTheDocument();
-    expect(screen.getByText(sample.duration)).toBeInTheDocument();
-    expect(screen.getByText(`€${sample.price}`)).toBeInTheDocument();
+    expect(screen.getByText("75 min")).toBeInTheDocument();
+    expect(screen.getByText("€95")).toBeInTheDocument();
   });
 
   it("adds the top rule border when topRule is true", () => {
-    const { container } = render(
-      <ServiceCard service={sample} topRule />,
-    );
+    const { container } = render(<ServiceCard service={sample} topRule />);
     expect(container.firstChild).toHaveClass("border-t-line-strong");
   });
 

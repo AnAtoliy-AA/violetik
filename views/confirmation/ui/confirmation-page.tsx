@@ -4,6 +4,7 @@ import { Fragment, useMemo } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import type { Service } from "@/entities/service";
 import { STUDIO_DATA } from "@/entities/studio";
 import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
@@ -73,6 +74,12 @@ export interface ConfirmationPageProps {
   date?: string;
   time?: string;
   status?: "pending" | "confirmed" | "cancelled" | "completed";
+  /**
+   * Optional pre-loaded service (from the DB, locale-resolved). When
+   * absent — e.g. on the immediate post-booking confirmation render —
+   * the page falls back to "—" labels.
+   */
+  service?: Service | null;
 }
 
 export function ConfirmationPage(props: ConfirmationPageProps = {}) {
@@ -88,9 +95,7 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
   const date = props.date ?? storeDate;
   const time = props.time ?? storeTime;
 
-  const service =
-    STUDIO_DATA.services.find((s) => s.id === serviceId) ??
-    STUDIO_DATA.services[0];
+  const service = props.service ?? null;
   const dateLabel = date ? formatLongDate(date, locale) : t("missing_date");
   const timeLabel = time ?? t("missing_time");
   const code = useMemo(() => {
@@ -106,7 +111,7 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
     [t("row_date"), dateLabel],
     [t("row_time"), timeLabel],
     [t("row_where"), STUDIO_DATA.studio.address],
-    [t("row_duration"), service.duration],
+    [t("row_duration"), service?.duration ?? t("missing_date")],
   ];
 
   const titleRaw = t.raw("title") as string;
@@ -170,7 +175,7 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
           />
           <Eyebrow gold>{t("card_eyebrow")}</Eyebrow>
           <h3 className="my-2 mb-3.5 font-display text-[26px] font-normal italic">
-            {service.name}
+            {service?.name ?? t("missing_date")}
           </h3>
           {rows.map(([k, v], i) => (
             <div

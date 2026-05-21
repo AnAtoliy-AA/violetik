@@ -1,10 +1,12 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "@/shared/lib/cn";
+import type { CurrencyCode } from "@/db/schema";
+import type { Locale } from "@/i18n/routing";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
 import { Price } from "@/shared/ui/price";
 import type { ResolvedPrice } from "@/entities/site-settings";
-import type { Service } from "@/entities/studio";
+import type { Service } from "../model/types";
 
 export interface ServiceMenuItemProps extends HTMLAttributes<HTMLElement> {
   service: Service;
@@ -13,6 +15,10 @@ export interface ServiceMenuItemProps extends HTMLAttributes<HTMLElement> {
   palette?: readonly [string, string];
   topRule?: boolean;
   resolvedPrice?: ResolvedPrice;
+  /** Display currency. Defaults to EUR for legacy stories/tests. */
+  currency?: CurrencyCode;
+  /** Active locale. Defaults to en for legacy stories/tests. */
+  locale?: Locale;
 }
 
 const DEFAULT_PALETTE: readonly [string, string] = ["#c9a96e", "#7d3a6f"];
@@ -24,6 +30,8 @@ export function ServiceMenuItem({
   palette = DEFAULT_PALETTE,
   topRule = false,
   resolvedPrice,
+  currency = "EUR",
+  locale = "en",
   className,
   ...rest
 }: ServiceMenuItemProps) {
@@ -64,15 +72,19 @@ export function ServiceMenuItem({
             <span className="gilded inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5">
               <span className="font-mono text-[14px] text-gold group-hover/menu:text-gold-shimmer">
                 {resolvedPrice ? (
-                  <Price resolved={resolvedPrice} />
+                  <Price
+                    resolved={resolvedPrice}
+                    currency={currency}
+                    locale={locale}
+                  />
                 ) : (
-                  <>€{service.price}</>
+                  service.displayPrice
                 )}
               </span>
             </span>
           </div>
           <div className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
-            {service.duration} · {service.category}
+            {service.duration} · {service.category.name}
           </div>
           <p className="mt-2.5 text-[13px] leading-[1.5] text-text-2">
             {service.blurb}

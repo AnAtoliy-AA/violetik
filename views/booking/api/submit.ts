@@ -16,14 +16,15 @@ import {
   setBookingGcalEventId,
 } from "@/db/bookings";
 import { ensureUserRow } from "@/db/ensure-user";
-import { STUDIO_DATA } from "@/entities/studio";
+import { getServiceById } from "@/db/services";
 
-const DEFAULT_DURATION_MIN = 60;
-
-function parseDurationMin(label?: string): number {
-  if (!label) return DEFAULT_DURATION_MIN;
-  const m = /^(\d+)\s*min/i.exec(label);
-  return m ? Number.parseInt(m[1]!, 10) : DEFAULT_DURATION_MIN;
+function localizedServiceName(
+  service: { nameEn: string; nameRu: string; nameBe: string },
+  locale: string,
+): string {
+  if (locale === "ru") return service.nameRu;
+  if (locale === "be") return service.nameBe;
+  return service.nameEn;
 }
 
 /**
@@ -83,14 +84,19 @@ export async function submitBooking(
     );
   }
 
-  const service = STUDIO_DATA.services.find((s) => s.id === input.serviceId);
-  if (!service || !/^\d{4}-\d{2}-\d{2}$/.test(input.date) || !/^\d{2}:\d{2}$/.test(input.time)) {
+  const service = await getServiceById(input.serviceId);
+  if (
+    !service ||
+    service.status !== "published" ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(input.date) ||
+    !/^\d{2}:\d{2}$/.test(input.time)
+  ) {
     return { ok: false, error: "invalid_input" };
   }
 
   const tz = bookingTimeZone();
   const scheduledFor = localToUtc(input.date, input.time, tz);
-  const durationMin = parseDurationMin(service.duration);
+  const durationMin = service.durationMinutes;
 
   // Safety net: the Auth.js signIn callback is supposed to upsert
   // the user row, but it swallows errors. Re-assert here so the
@@ -151,7 +157,7 @@ export async function submitBooking(
       const eventId = await createCalendarEvent({
         calendarId: token.calendarId,
         accessToken,
-        summary: `${service.name} · ${customerLabel}`,
+        summary: `${localizedServiceName(service, input.locale)} · ${customerLabel}`,
         description: `Violetta booking ${booking.id}\nStatus: pending`,
         start: scheduledFor,
         end,

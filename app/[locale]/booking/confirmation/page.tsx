@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { ConfirmationPage } from "@/views/confirmation";
 import { getBookingById } from "@/db/bookings";
+import { loadServiceByIdForLocale } from "@/entities/service/api/load";
 import { bookingTimeZone } from "@/shared/lib/google-calendar";
+import { routing, type Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
 type Search = { id?: string };
@@ -63,6 +65,10 @@ export default async function ConfirmationRoute({
   }
 
   const tz = bookingTimeZone();
+  const safeLocale = (routing.locales as readonly string[]).includes(locale)
+    ? (locale as Locale)
+    : routing.defaultLocale;
+  const service = await loadServiceByIdForLocale(booking.serviceId, safeLocale);
   return (
     <ConfirmationPage
       bookingId={booking.id}
@@ -70,6 +76,7 @@ export default async function ConfirmationRoute({
       date={formatLocalDate(booking.scheduledFor, tz)}
       time={formatLocalTime(booking.scheduledFor, tz)}
       status={booking.status}
+      service={service}
     />
   );
 }

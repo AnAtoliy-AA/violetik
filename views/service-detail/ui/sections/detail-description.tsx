@@ -1,4 +1,4 @@
-import type { Service } from "@/entities/studio";
+import type { Service } from "@/entities/service";
 
 export interface DetailDescriptionProps {
   service: Service;

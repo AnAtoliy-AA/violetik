@@ -5,11 +5,11 @@ import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import en from "@/messages/en.json";
 import { ServiceCard } from "@/entities/service";
+import type { Service, ServiceCategoryRef } from "@/entities/service";
 import {
   DEFAULT_SITE_SETTINGS,
   resolvePrice,
 } from "@/entities/site-settings";
-import { STUDIO_DATA } from "@/entities/studio";
 
 vi.mock("@/i18n/navigation", () => ({
   Link: ({
@@ -26,10 +26,49 @@ vi.mock("@/i18n/navigation", () => ({
 
 import { ServicesCatalogPage } from "./services-catalog-page";
 
+const categories: ServiceCategoryRef[] = [
+  { id: "care", name: "Care" },
+  { id: "gel", name: "Gel" },
+  { id: "design", name: "Design" },
+  { id: "form", name: "Form" },
+];
+
+function makeService(
+  id: string,
+  categoryId: string,
+  name: string,
+  priceMajor: number,
+  sortOrder: number,
+): Service {
+  const category = categories.find((c) => c.id === categoryId)!;
+  return {
+    id,
+    category,
+    name,
+    blurb: `${name} blurb.`,
+    includes: [],
+    price: priceMajor,
+    priceCents: priceMajor * 100,
+    displayPrice: `€${priceMajor}`,
+    duration: "75 min",
+    durationMinutes: 75,
+    sortOrder,
+  };
+}
+
+const services: Service[] = [
+  makeService("signature", "care", "Signature Manicure", 95, 1),
+  makeService("gel", "gel", "Couture Gel", 145, 2),
+  makeService("editorial", "design", "Editorial Art", 195, 3),
+  makeService("extensions", "form", "Glass Extensions", 240, 4),
+  makeService("pedi", "care", "Spa Pedicure", 110, 5),
+  makeService("removal", "care", "Gentle Removal", 40, 6),
+];
+
 function renderPage() {
   return render(
     <NextIntlClientProvider locale="en" messages={en}>
-      <ServicesCatalogPage />
+      <ServicesCatalogPage services={services} categories={categories} />
     </NextIntlClientProvider>,
   );
 }
@@ -73,7 +112,7 @@ describe("ServicesCatalogPage", () => {
     const user = userEvent.setup();
     renderPage();
     await user.click(screen.getByRole("tab", { name: /^Care$/ }));
-    // Three Care services: Signature, Spa Pedicure, Gentle Removal — plates 01/02/03
+    // Three Care services in fixture: Signature, Spa Pedicure, Gentle Removal — plates 01/02/03
     const articles = screen.getAllByRole("article");
     expect(within(articles[0]).getByText("01")).toBeInTheDocument();
     expect(within(articles[1]).getByText("02")).toBeInTheDocument();
@@ -88,7 +127,7 @@ describe("ServiceCard <-> resolvePrice wiring", () => {
       discountPercent: 20,
       discountActive: true,
     };
-    const gel = STUDIO_DATA.services.find((s) => s.id === "gel")!;
+    const gel = services.find((s) => s.id === "gel")!;
     const resolved = resolvePrice("service:gel", gel.price, settings);
     render(<ServiceCard service={gel} resolvedPrice={resolved} />);
     // 145 * 0.8 = 116
