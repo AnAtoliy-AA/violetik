@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, or } from "drizzle-orm";
 import { db, schema } from "./index";
 
 export function generateVipRequestId(): string {
@@ -105,4 +105,46 @@ export async function downgradeVipRequest(
     )
     .returning();
   return rows[0] ?? null;
+}
+
+export type CurrentTier =
+  | { state: "member" }
+  | { state: "member-pending"; pendingRequestId: string }
+  | { state: "vip"; activeRequestId: string; expiresAt: Date };
+
+export async function getCurrentTier(userId: string): Promise<CurrentTier> {
+  if (!db) return { state: "member" };
+  const rows = await db
+    .select()
+    .from(schema.vipRequests)
+    .where(
+      and(
+        eq(schema.vipRequests.userId, userId),
+        or(
+          eq(schema.vipRequests.status, "pending"),
+          eq(schema.vipRequests.status, "approved"),
+        ),
+      ),
+    )
+    .orderBy(desc(schema.vipRequests.createdAt));
+
+  const now = new Date();
+  const activeVip = rows.find(
+    (r) =>
+      r.status === "approved" &&
+      r.expiresAt !== null &&
+      r.expiresAt > now,
+  );
+  if (activeVip) {
+    return {
+      state: "vip",
+      activeRequestId: activeVip.id,
+      expiresAt: activeVip.expiresAt!,
+    };
+  }
+  const pending = rows.find((r) => r.status === "pending");
+  if (pending) {
+    return { state: "member-pending", pendingRequestId: pending.id };
+  }
+  return { state: "member" };
 }

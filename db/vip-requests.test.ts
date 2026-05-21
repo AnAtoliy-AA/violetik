@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateVipRequestId, createVipRequest, cancelOwnVipRequest, decideVipRequest, downgradeVipRequest } from "./vip-requests";
+import { generateVipRequestId, createVipRequest, cancelOwnVipRequest, decideVipRequest, downgradeVipRequest, getCurrentTier } from "./vip-requests";
 
 describe("generateVipRequestId", () => {
   it("returns a vipreq_-prefixed id with 16 hex chars", () => {
@@ -59,5 +59,16 @@ describe("downgradeVipRequest", () => {
   it("returns null when db is null", async () => {
     const result = await downgradeVipRequest("vipreq_x");
     expect(result === null || typeof result === "object").toBe(true);
+  });
+});
+
+describe("getCurrentTier", () => {
+  it('defaults to {state: "member"} when db is null', async () => {
+    const result = await getCurrentTier("tg:nobody");
+    if (result.state === "member" && !("pendingRequestId" in result)) {
+      expect(result).toEqual({ state: "member" });
+    } else {
+      expect(result.state).toBe("member");
+    }
   });
 });
