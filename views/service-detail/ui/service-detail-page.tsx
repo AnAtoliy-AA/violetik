@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA, type Service } from "@/entities/studio";
 import type { NailTileVariant } from "@/shared/ui/nail-tile";
 import { AppHeader } from "@/widgets/app-header";
@@ -10,11 +11,15 @@ import { StickyCta } from "./sections/sticky-cta";
 
 export interface ServiceDetailPageProps {
   service: Service;
+  resolvedPrice: ResolvedPrice;
 }
 
 const HERO_PALETTE: readonly [string, string] = ["#c9a96e", "#7d3a6f"];
 
-export function ServiceDetailPage({ service }: ServiceDetailPageProps) {
+export function ServiceDetailPage({
+  service,
+  resolvedPrice,
+}: ServiceDetailPageProps) {
   const t = useTranslations("ServiceDetail");
   const index = STUDIO_DATA.services.findIndex((s) => s.id === service.id);
   const plateNumber = index + 1;
@@ -32,6 +37,7 @@ export function ServiceDetailPage({ service }: ServiceDetailPageProps) {
           variant={variant}
           palette={HERO_PALETTE}
           durationLabel={service.duration}
+          resolvedPrice={resolvedPrice}
         />
         <div className="pointer-events-none absolute inset-x-0 top-0">
           <div className="pointer-events-auto">
@@ -42,7 +48,7 @@ export function ServiceDetailPage({ service }: ServiceDetailPageProps) {
       <DetailDescription service={service} />
       <IncludesList items={service.includes} />
       <RecentMiniGallery items={recent} />
-      <StickyCta serviceId={service.id} price={service.price} />
+      <StickyCta serviceId={service.id} resolvedPrice={resolvedPrice} />
     </div>
   );
 }

@@ -1,10 +1,12 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import type { ResolvedPrice } from "@/entities/site-settings";
 import { buttonClassName } from "@/shared/ui/button";
+import { Price } from "@/shared/ui/price";
 
 export interface StickyCtaProps {
   serviceId: string;
-  price: number;
+  resolvedPrice: ResolvedPrice;
 }
 
 function ArrowRight() {
@@ -24,7 +26,7 @@ function ArrowRight() {
   );
 }
 
-export function StickyCta({ serviceId, price }: StickyCtaProps) {
+export function StickyCta({ serviceId, resolvedPrice }: StickyCtaProps) {
   const t = useTranslations("ServiceDetail");
   return (
     <div
@@ -39,7 +41,7 @@ export function StickyCta({ serviceId, price }: StickyCtaProps) {
             {t("from")}
           </div>
           <div className="font-display text-[28px] font-normal italic leading-none text-gold">
-            €{price}
+            <Price resolved={resolvedPrice} />
           </div>
         </div>
         <Link

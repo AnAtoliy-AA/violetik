@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ServiceMenuItem } from "@/entities/service";
+import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA, type Category } from "@/entities/studio";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
@@ -12,7 +13,16 @@ import { CategoryChips, type ChipValue } from "./category-chips";
 
 const CATEGORIES: readonly Category[] = ["Care", "Gel", "Design", "Form"];
 
-export function ServicesCatalogPage() {
+export interface ServicesCatalogPageProps {
+  /**
+   * Optional price map indexed by service id. Server route resolves
+   * prices via site settings and passes them in. Missing entries fall
+   * back to the catalog price — keeps tests/stories simple.
+   */
+  pricedServices?: Readonly<Record<string, ResolvedPrice>>;
+}
+
+export function ServicesCatalogPage({ pricedServices }: ServicesCatalogPageProps = {}) {
   const t = useTranslations("Services");
   const tCat = useTranslations("Services.category");
   const [active, setActive] = useState<ChipValue>("All");
@@ -79,6 +89,7 @@ export function ServicesCatalogPage() {
                 plateNumber={i + 1}
                 variant={(i % 6) as NailTileVariant}
                 topRule={i === 0}
+                resolvedPrice={pricedServices?.[service.id]}
               />
             </Link>
           ))

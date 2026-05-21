@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import { resolvePrice, type ResolvedPrice } from "@/entities/site-settings";
+import { STUDIO_DATA } from "@/entities/studio";
 import { ServicesCatalogPage } from "@/views/services-catalog";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 
 type Params = { locale: string };
 
@@ -21,5 +24,10 @@ export default async function ServicesRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ServicesCatalogPage />;
+  const settings = await getSiteSettingsServer();
+  const pricedServices: Record<string, ResolvedPrice> = {};
+  for (const s of STUDIO_DATA.services) {
+    pricedServices[s.id] = resolvePrice(`service:${s.id}`, s.price, settings);
+  }
+  return <ServicesCatalogPage pricedServices={pricedServices} />;
 }

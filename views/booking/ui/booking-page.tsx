@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Link, useRouter } from "@/i18n/navigation";
+import type { ResolvedPrice } from "@/entities/site-settings";
 import { buttonClassName } from "@/shared/ui/button";
 import { AppHeader } from "@/widgets/app-header";
 import { BookingStepper } from "@/widgets/booking-stepper";
@@ -43,9 +44,10 @@ const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export interface BookingPageProps {
   step: BookingStep;
+  pricedServices?: Readonly<Record<string, ResolvedPrice>>;
 }
 
-export function BookingPage({ step }: BookingPageProps) {
+export function BookingPage({ step, pricedServices }: BookingPageProps) {
   const t = useTranslations("Booking");
   const tSteps = useTranslations("Booking.steps");
   const tErr = useTranslations("Booking.errors");
@@ -125,10 +127,10 @@ export function BookingPage({ step }: BookingPageProps) {
             exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
             transition={{ duration: reduceMotion ? 0 : 0.26, ease: EASE_OUT }}
           >
-            {step === "service" ? <ServiceStep /> : null}
+            {step === "service" ? <ServiceStep pricedServices={pricedServices} /> : null}
             {step === "date" ? <DateStep /> : null}
             {step === "time" ? <TimeStep /> : null}
-            {step === "confirm" ? <ConfirmStep /> : null}
+            {step === "confirm" ? <ConfirmStep pricedServices={pricedServices} /> : null}
           </motion.div>
         </AnimatePresence>
       </div>

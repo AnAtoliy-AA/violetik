@@ -1,15 +1,21 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { NailTile } from "@/shared/ui/nail-tile";
+import { Price } from "@/shared/ui/price";
 import { formatLongDate } from "@/views/booking/lib/booking-steps";
 import { useBookingStore } from "@/views/booking/model/booking-store";
 
 const HERO_PALETTE: readonly [string, string] = ["#c9a96e", "#7d3a6f"];
 
-export function ConfirmStep() {
+export interface ConfirmStepProps {
+  pricedServices?: Readonly<Record<string, ResolvedPrice>>;
+}
+
+export function ConfirmStep({ pricedServices }: ConfirmStepProps = {}) {
   const t = useTranslations("Booking.confirm");
   const locale = useLocale();
 
@@ -52,8 +58,14 @@ export function ConfirmStep() {
             <div className="my-1 font-display text-[22px] font-normal italic">
               {service.name}
             </div>
-            <div className="font-mono text-[12px] uppercase tracking-[0.06em] text-text-3">
-              {service.duration} · €{service.price}
+            <div className="flex items-baseline gap-1 font-mono text-[12px] uppercase tracking-[0.06em] text-text-3">
+              <span>{service.duration}</span>
+              <span>·</span>
+              {pricedServices?.[service.id] ? (
+                <Price resolved={pricedServices[service.id]} />
+              ) : (
+                <span>€{service.price}</span>
+              )}
             </div>
           </div>
         </div>
@@ -80,7 +92,11 @@ export function ConfirmStep() {
               {t("total")}
             </div>
             <div className="font-display text-[30px] font-normal italic text-gold">
-              €{service.price}
+              {pricedServices?.[service.id] ? (
+                <Price resolved={pricedServices[service.id]} />
+              ) : (
+                <>€{service.price}</>
+              )}
             </div>
           </div>
           <div className="text-right">
