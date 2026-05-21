@@ -72,7 +72,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
  */
 export async function updateSiteSettings(
   patch: SiteSettingsPatch,
-  updatedBy: string,
+  updatedBy: string | null,
 ): Promise<SiteSettings> {
   const parsed = siteSettingsPatchSchema.parse(patch);
   if (!db) return DEFAULT_SITE_SETTINGS;

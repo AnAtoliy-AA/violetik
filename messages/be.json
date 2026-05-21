@@ -273,7 +273,21 @@
     "inbox_title": "Уваходныя",
     "inbox_bookings": "Запісы",
     "inbox_vip_requests": "Заяўкі на VIP",
-    "inbox_pending_suffix": "чакаюць"
+    "inbox_pending_suffix": "чакаюць",
+    "inbox_site_settings": "Налады сайта",
+    "inbox_site_settings_caption": "Змаўчанні і цэны",
+    "site_settings_plate_title": "Налады сайта",
+    "site_settings_section_palette": "Палітра па змаўчанні",
+    "site_settings_section_locale": "Мова па змаўчанні",
+    "site_settings_section_services": "Цэны на паслугі",
+    "site_settings_section_vip": "Сяброўства VIP",
+    "site_settings_section_discount": "Агульная скідка",
+    "site_settings_discount_active": "Скідка актыўная",
+    "site_settings_base_label": "База €{price}",
+    "site_settings_vip_base_label": "База €{price} / мес.",
+    "site_settings_save": "Захаваць",
+    "site_settings_saved": "Захавана",
+    "site_settings_error": "Не атрымалася захаваць: {error}"
   },
   "NotFound": {
     "meta_title": "Згубіліся ў атэлье",
