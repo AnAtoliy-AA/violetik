@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { Plate } from "@/shared/ui/plate";
 
 function ArrowRight() {
@@ -25,12 +26,7 @@ export function MembershipCard() {
     <section className="px-[22px] pb-7 pt-2.5">
       <Link
         href="/membership"
-        className="relative block w-full overflow-hidden rounded-[28px] border-[0.5px] px-[26px] py-8 text-left text-text"
-        style={{
-          background:
-            "linear-gradient(140deg, #2a1632 0%, #1a0f1f 60%, #1a0f1f 100%)",
-          borderColor: "color-mix(in oklab, var(--color-accent) 40%, transparent)",
-        }}
+        className="gilded glass-top relative block w-full overflow-hidden rounded-[28px] px-[26px] py-8 text-left text-text"
       >
         <span
           aria-hidden
@@ -40,12 +36,15 @@ export function MembershipCard() {
               "radial-gradient(circle, color-mix(in oklab, var(--color-accent) 28%, transparent), transparent 70%)",
           }}
         />
+        <div className="absolute right-5 top-5">
+          <MonogramSeal letter="V" />
+        </div>
         <Plate number={5} label={t("plate_invitation").toUpperCase()} />
         <h3 className="my-3 font-display text-[32px] font-normal italic leading-tight tracking-[-0.01em]">
           {t("membership_title_lead")}{" "}
           <span className="text-gold-shimmer">{t("membership_title_word")}</span>.
         </h3>
-        <p className="m-0 max-w-[300px] text-[13.5px] leading-[1.55] text-text-2">
+        <p className="dropcap m-0 max-w-[300px] text-[13.5px] leading-[1.55] text-text-2">
           {t("membership_blurb")}
         </p>
         <div className="mt-5 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-accent">
