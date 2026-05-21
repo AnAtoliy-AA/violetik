@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateVipRequestId, createVipRequest, cancelOwnVipRequest, decideVipRequest, downgradeVipRequest, getCurrentTier } from "./vip-requests";
+import { generateVipRequestId, createVipRequest, cancelOwnVipRequest, decideVipRequest, downgradeVipRequest, getCurrentTier, listPendingVipRequests, listActiveVips, listExpiredVipRequests } from "./vip-requests";
 
 describe("generateVipRequestId", () => {
   it("returns a vipreq_-prefixed id with 16 hex chars", () => {
@@ -70,5 +70,17 @@ describe("getCurrentTier", () => {
     } else {
       expect(result.state).toBe("member");
     }
+  });
+});
+
+describe("admin list queries", () => {
+  it("listPendingVipRequests returns [] when db is null", async () => {
+    expect(await listPendingVipRequests()).toEqual([]);
+  });
+  it("listActiveVips returns [] when db is null", async () => {
+    expect(await listActiveVips()).toEqual([]);
+  });
+  it("listExpiredVipRequests returns [] when db is null", async () => {
+    expect(await listExpiredVipRequests({ limit: 10, offset: 0 })).toEqual([]);
   });
 });

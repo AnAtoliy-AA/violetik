@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { and, desc, eq, or } from "drizzle-orm";
+import { and, desc, eq, gt, lte, or, sql } from "drizzle-orm";
 import { db, schema } from "./index";
 
 export function generateVipRequestId(): string {
@@ -147,4 +147,101 @@ export async function getCurrentTier(userId: string): Promise<CurrentTier> {
     return { state: "member-pending", pendingRequestId: pending.id };
   }
   return { state: "member" };
+}
+
+export interface VipRequestWithUser extends schema.VipRequest {
+  userEmail: string | null;
+  userFirstName: string | null;
+  userLastName: string | null;
+  username: string | null;
+}
+
+const userJoinColumns = {
+  userEmail: schema.users.email,
+  userFirstName: schema.users.firstName,
+  userLastName: schema.users.lastName,
+  username: schema.users.username,
+};
+
+function withUserShape(
+  row: {
+    request: schema.VipRequest;
+    userEmail: string | null;
+    userFirstName: string | null;
+    userLastName: string | null;
+    username: string | null;
+  },
+): VipRequestWithUser {
+  return {
+    ...row.request,
+    userEmail: row.userEmail,
+    userFirstName: row.userFirstName,
+    userLastName: row.userLastName,
+    username: row.username,
+  };
+}
+
+export async function listPendingVipRequests(): Promise<VipRequestWithUser[]> {
+  if (!db) return [];
+  const rows = await db
+    .select({ request: schema.vipRequests, ...userJoinColumns })
+    .from(schema.vipRequests)
+    .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
+    .where(eq(schema.vipRequests.status, "pending"))
+    .orderBy(desc(schema.vipRequests.createdAt));
+  return rows.map(withUserShape);
+}
+
+export async function listActiveVips(): Promise<VipRequestWithUser[]> {
+  if (!db) return [];
+  const now = new Date();
+  const rows = await db
+    .select({ request: schema.vipRequests, ...userJoinColumns })
+    .from(schema.vipRequests)
+    .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
+    .where(
+      and(
+        eq(schema.vipRequests.status, "approved"),
+        gt(schema.vipRequests.expiresAt, now),
+      ),
+    )
+    .orderBy(schema.vipRequests.expiresAt);
+  return rows.map(withUserShape);
+}
+
+export async function listExpiredVipRequests(opts: {
+  limit: number;
+  offset: number;
+}): Promise<VipRequestWithUser[]> {
+  if (!db) return [];
+  const now = new Date();
+  const rows = await db
+    .select({ request: schema.vipRequests, ...userJoinColumns })
+    .from(schema.vipRequests)
+    .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
+    .where(
+      and(
+        eq(schema.vipRequests.status, "approved"),
+        lte(schema.vipRequests.expiresAt, now),
+      ),
+    )
+    .orderBy(desc(schema.vipRequests.expiresAt))
+    .limit(opts.limit)
+    .offset(opts.offset);
+  return rows.map(withUserShape);
+}
+
+export async function countExpiredVipRequests(): Promise<number> {
+  if (!db) return 0;
+  const now = new Date();
+  const rows = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(schema.vipRequests)
+    .where(
+      and(
+        eq(schema.vipRequests.status, "approved"),
+        lte(schema.vipRequests.expiresAt, now),
+      ),
+    );
+  return rows[0]?.n ?? 0;
 }
