@@ -272,7 +272,11 @@
     "eyebrow": "Private · Studio admin",
     "hero_title": "Palette.",
     "hero_paragraph": "Pick the studio colourway. The selection persists in a cookie and applies for everyone visiting from this device.",
-    "persistence_note": "Stored locally in the vio-palette cookie · 1 year"
+    "persistence_note": "Stored locally in the vio-palette cookie · 1 year",
+    "inbox_title": "Inbox",
+    "inbox_bookings": "Bookings",
+    "inbox_vip_requests": "VIP requests",
+    "inbox_pending_suffix": "pending"
   },
   "NotFound": {
     "meta_title": "Lost in the atelier",

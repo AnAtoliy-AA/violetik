@@ -272,7 +272,11 @@
     "eyebrow": "Прыватна · Адмін-панэль",
     "hero_title": "Палітра.",
     "hero_paragraph": "Абярыце колеравую схему студыі. Выбар захоўваецца ў cookie і прымяняецца для ўсіх наведвальнікаў з гэтай прылады.",
-    "persistence_note": "Захоўваецца ў cookie vio-palette · 1 год"
+    "persistence_note": "Захоўваецца ў cookie vio-palette · 1 год",
+    "inbox_title": "Уваходныя",
+    "inbox_bookings": "Запісы",
+    "inbox_vip_requests": "Заяўкі на VIP",
+    "inbox_pending_suffix": "чакаюць"
   },
   "NotFound": {
     "meta_title": "Згубіліся ў атэлье",

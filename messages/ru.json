@@ -272,7 +272,11 @@
     "eyebrow": "Приватно · Админ-панель",
     "hero_title": "Палитра.",
     "hero_paragraph": "Выберите цветовую схему студии. Выбор сохраняется в cookie и применяется для всех посетителей с этого устройства.",
-    "persistence_note": "Хранится в cookie vio-palette · 1 год"
+    "persistence_note": "Хранится в cookie vio-palette · 1 год",
+    "inbox_title": "Входящие",
+    "inbox_bookings": "Записи",
+    "inbox_vip_requests": "Заявки на VIP",
+    "inbox_pending_suffix": "ожидают"
   },
   "NotFound": {
     "meta_title": "Затерялись в ателье",
