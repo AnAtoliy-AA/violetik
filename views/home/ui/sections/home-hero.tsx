@@ -5,7 +5,9 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailFan } from "@/shared/ui/nail-fan";
+import { PaperGrain } from "@/shared/ui/paper-grain";
 
 export function HomeHero() {
   const t = useTranslations("Home");
@@ -20,11 +22,17 @@ export function HomeHero() {
   const styledHero = reduceMotion
     ? undefined
     : { y: heroY, opacity: heroOpacity };
-  const styledFan = reduceMotion ? { opacity: 0.65 } : { y: fanY, opacity: fanOpacity };
+  const styledFan = reduceMotion
+    ? { opacity: 0.65 }
+    : { y: fanY, opacity: fanOpacity };
 
   return (
     <div className="relative">
-      <motion.div className="mt-9 max-w-[calc(100%-120px)]" style={styledHero}>
+      <PaperGrain />
+      <motion.div
+        className="relative z-10 mt-9 max-w-[calc(100%-120px)]"
+        style={styledHero}
+      >
         <Eyebrow>—— {t("hero_cover_story")}</Eyebrow>
         <h1 className="mt-4 font-display text-[clamp(56px,16vw,76px)] font-light italic leading-[0.94] tracking-[-0.025em]">
           {t("hero_title_line_1")}
@@ -32,9 +40,12 @@ export function HomeHero() {
           <span className="font-normal not-italic text-text-2">
             {t("hero_title_lead")}{" "}
           </span>
-          <span className="text-gold-shimmer font-normal">{t("hero_title_word")}</span>
+          <span className="text-gold-shimmer font-normal">
+            {t("hero_title_word")}
+          </span>
         </h1>
-        <p className="mt-6 max-w-[320px] text-[14.5px] leading-[1.55] text-text-2">
+        <LetterpressRule className="mt-5 max-w-[260px]" />
+        <p className="dropcap mt-6 max-w-[320px] text-[14.5px] leading-[1.55] text-text-2">
           {t("hero_paragraph")}
         </p>
         <div className="mt-7 flex gap-2.5">
@@ -55,7 +66,7 @@ export function HomeHero() {
 
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -right-10 top-[60px] h-[250px] w-[190px] rotate-[10deg]"
+        className="pointer-events-none absolute -right-10 top-[60px] z-0 h-[250px] w-[190px] rotate-[10deg]"
         style={styledFan}
       >
         <NailFan palette={["#c9a96e", "#7d3a6f"]} className="size-full" />

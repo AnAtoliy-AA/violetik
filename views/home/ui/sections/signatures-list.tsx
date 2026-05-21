@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ServiceCard } from "@/entities/service";
 import { STUDIO_DATA } from "@/entities/studio";
+import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Plate } from "@/shared/ui/plate";
 import type { NailTileVariant } from "@/shared/ui/nail-tile";
 
@@ -27,25 +28,26 @@ export function SignaturesList() {
   const services = STUDIO_DATA.services.slice(0, 4);
   return (
     <section className="px-[22px] pb-6 pt-12">
-      <div className="mb-2 flex items-baseline justify-between">
-        <Plate number={1} label={t("plate_menu").toUpperCase()} />
+      <div className="mb-3 flex items-end justify-between">
+        <Plate folio number={1} label={t("plate_menu").toUpperCase()} />
         <Link
           href="/services"
-          className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-accent"
+          className="inline-flex items-center gap-1.5 pb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-accent"
         >
           {t("signatures_all_link")} <ArrowRight />
         </Link>
       </div>
-      <h2 className="mb-[22px] mt-1 font-display text-[40px] font-normal italic leading-[1.05] tracking-[-0.02em]">
+      <h2 className="mt-1 font-display text-[40px] font-normal italic leading-[1.05] tracking-[-0.02em]">
         {t("signatures_title")}
       </h2>
+      <LetterpressRule className="mb-[22px] mt-3" />
 
       <div className="flex flex-col">
         {services.map((service, i) => (
           <Link
             key={service.id}
             href={`/services/${service.id}`}
-            className="block transition-transform duration-fast ease-out"
+            className="block transition-transform duration-fast ease-out hover:scale-[1.005] motion-reduce:hover:scale-100"
           >
             <ServiceCard
               service={service}

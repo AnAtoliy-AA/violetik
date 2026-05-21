@@ -20,12 +20,16 @@ function ArrowRight() {
 export function AnnouncementCapsule() {
   const t = useTranslations("Home");
   return (
-    <div className="relative mx-[22px] flex items-center gap-4 overflow-hidden rounded-[18px] border-[0.5px] border-line-strong bg-surface px-[22px] py-[18px]">
+    <div className="gilded glass-top relative mx-[22px] flex items-center gap-4 overflow-hidden rounded-[18px] px-[22px] py-[18px]">
       <span
         aria-hidden
         className="absolute bottom-0 left-0 top-0 w-[3px] bg-gold"
       />
-      <div className="min-w-0 flex-1">
+      <span
+        aria-hidden
+        className="absolute left-[10px] top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-accent animate-soft-pulse"
+      />
+      <div className="ml-3 min-w-0 flex-1">
         <span className="font-mono text-[9px] uppercase tracking-[0.32em] text-accent">
           {t("capsule_eyebrow")}
         </span>
