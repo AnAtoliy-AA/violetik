@@ -30,26 +30,39 @@ function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
 export async function getSiteSettings(): Promise<SiteSettings> {
   if (!db) return DEFAULT_SITE_SETTINGS;
 
-  const existing = await db
-    .select()
-    .from(schema.siteSettings)
-    .where(eq(schema.siteSettings.id, SINGLETON_ID))
-    .limit(1);
-  if (existing.length > 0) return rowToSettings(existing[0]);
+  try {
+    const existing = await db
+      .select()
+      .from(schema.siteSettings)
+      .where(eq(schema.siteSettings.id, SINGLETON_ID))
+      .limit(1);
+    if (existing.length > 0) return rowToSettings(existing[0]);
 
-  const inserted = await db
-    .insert(schema.siteSettings)
-    .values({ id: SINGLETON_ID })
-    .onConflictDoNothing({ target: schema.siteSettings.id })
-    .returning();
-  if (inserted.length > 0) return rowToSettings(inserted[0]);
+    const inserted = await db
+      .insert(schema.siteSettings)
+      .values({ id: SINGLETON_ID })
+      .onConflictDoNothing({ target: schema.siteSettings.id })
+      .returning();
+    if (inserted.length > 0) return rowToSettings(inserted[0]);
 
-  const refetch = await db
-    .select()
-    .from(schema.siteSettings)
-    .where(eq(schema.siteSettings.id, SINGLETON_ID))
-    .limit(1);
-  return refetch.length > 0 ? rowToSettings(refetch[0]) : DEFAULT_SITE_SETTINGS;
+    const refetch = await db
+      .select()
+      .from(schema.siteSettings)
+      .where(eq(schema.siteSettings.id, SINGLETON_ID))
+      .limit(1);
+    return refetch.length > 0
+      ? rowToSettings(refetch[0])
+      : DEFAULT_SITE_SETTINGS;
+  } catch (error) {
+    // The migration may not have been applied (build-time SSG hitting
+    // a pre-migration DB, etc.). Same graceful-degradation philosophy
+    // as `db === null`: fall back to defaults so the app keeps working.
+    console.warn(
+      "[db/site-settings] read failed, returning defaults:",
+      error instanceof Error ? error.message : error,
+    );
+    return DEFAULT_SITE_SETTINGS;
+  }
 }
 
 /**
