@@ -83,7 +83,8 @@
 | `app/[locale]/admin/site-settings/page.tsx` | Stop loading `listAllServices()`. Stop passing the `services` prop. |
 | `app/[locale]/admin/page.tsx` | Add an inbox tile linking to `/admin/services`. |
 | `entities/service/api/load.ts` | No code change — but **delete** the inline `currencyOf()` helper's `?? "EUR"` defensive fallback once `SiteSettings.currency` is required (defensive guard becomes dead code). Optional cleanup; can ship without. |
-| `messages/en.json` / `messages/ru.json` / `messages/be.json` | Add `AdminServices.*` namespace (~30 keys per locale). Add `currency` to `Admin.site_settings_section_*` keys (one new key per locale). Add inbox tile labels. |
+| `views/admin-photos/ui/admin-photos-page.tsx` | Service-kind rows gain a small "Edit service" link to `/admin/services/<id>`. Per spec §5.2: "links each row to `/admin/services/<id>` for full editing." (`slot.ts` itself is **already** DB-driven from Phase 1 Task 12 — confirm no further changes there.) |
+| `messages/en.json` / `messages/ru.json` / `messages/be.json` | Add `AdminServices.*` namespace (~30 keys per locale). Add `currency` to `Admin.site_settings_section_*` keys (one new key per locale). Add inbox tile labels. Add `Admin.photos_edit_service` link label. |
 
 ---
 
@@ -1065,6 +1066,8 @@ export async function archiveCategoryAction(
 
 The remaining eight follow the same shape (auth → validate with the matching schema or just the id → call the mutation → revalidate). Each file under ~30 lines.
 
+**`archive-service.ts` photo posture:** the action does NOT delete the matching `studio_photos` row. Archiving is reversible (`restoreServiceAction` flips status back to `published`) so keeping the photo lets a restored service immediately show its imagery. The DB row + Vercel Blob stay until the admin replaces or removes the photo via `/admin/photos` (or the inline slot inside the service editor).
+
 `features/services-admin/api/create-service.ts` adds slug auto-generation:
 ```ts
 import { slugSchema, serviceFormSchema } from "@/entities/service/model/schema";
@@ -1439,7 +1442,7 @@ The service editor is the largest piece of UI in Phase 2. Split out:
 `service-editor.test.tsx`:
 - Required EN / RU / BE inputs on name + blurb.
 - Slug auto-fills from EN name on `create` and is editable; frozen on `edit`.
-- Pricing input converts major → cents (e.g. enters "95", patch carries 9500).
+- Pricing input converts major → cents (`Math.round(parseFloat(input) * 100)`, so `"95"` → 9500 and `"95.5"` → 9550; out-of-range or non-numeric is treated as zero and surfaces the validation error). One test covers `"95.5"` → patch carries `priceCents: 9550` to lock the rounding rule.
 - Includes max 8 enforced before submit.
 - Saves through `onSubmit`.
 
@@ -1703,15 +1706,68 @@ git commit -m "feat(i18n, admin): AdminServices namespace + admin inbox tile"
 
 ---
 
+## Task 13b: Link `/admin/photos` service rows to `/admin/services/<id>`
+
+**Files:**
+- Modify: `views/admin-photos/ui/admin-photos-page.tsx`
+- Modify: `messages/{en,ru,be}.json` (one new key: `Admin.photos.edit_service`)
+
+Spec §5.2 says the `/admin/photos` Service rituals section "links each row to `/admin/services/<id>` for full editing." Phase 1 already made the slot list DB-driven (Task 12 of Phase 1); the only thing left is the link.
+
+- [ ] **Step 1: Add the i18n key**
+
+Append to the `Admin.photos` block in every locale:
+```json
+  "edit_service": "Edit service"
+```
+(ru: `"Редактировать"`, be: `"Рэдагаваць"`.)
+
+- [ ] **Step 2: Add the link in `admin-photos-page.tsx`**
+
+Inside the loop that renders each slot, when `slot.kind === "service"`, render a small text link below the upload row:
+```tsx
+import { Link } from "@/i18n/navigation";
+// …
+{slot.kind === "service" && (
+  <Link
+    href={`/admin/services/${slot.id}`}
+    className="mt-2 inline-flex font-mono text-[10px] uppercase tracking-[0.16em] text-accent hover:underline"
+  >
+    {t("edit_service")} →
+  </Link>
+)}
+```
+
+- [ ] **Step 3: Verify**
+
+Run: `npx vitest run views/admin-photos/`
+Expected: PASS.
+
+- [ ] **Step 4: Commit.**
+
+```bash
+git add views/admin-photos/ messages/
+git commit -m "feat(admin-photos): link each service row to /admin/services/<id>"
+```
+
+---
+
 ## Task 14: e2e — Phase 2 admin smoke
 
 **Files:**
 - Create: `e2e/admin-services.spec.ts`
 
-Three specs, all skipped on CI when `TELEGRAM_BOT_TOKEN` is set (auth fixture not yet wired — same posture as `e2e/vip-request.spec.ts`).
+Three specs. When `TELEGRAM_BOT_TOKEN` is unset (default CI and local dev), the `/admin/*` routes are open and the specs run normally. When the token IS set, `requireAdmin()` activates and the route redirects to `/sign-in` — no admin fixture is wired yet, so the specs would fail on the redirect.
+
+Skip conditionally at module scope (the pattern already used by `e2e/vip-request.spec.ts`):
 
 ```ts
 import { test, expect } from "@playwright/test";
+
+test.skip(
+  Boolean(process.env.TELEGRAM_BOT_TOKEN),
+  "admin auth fixture not yet wired — runs only when TELEGRAM_BOT_TOKEN is unset (default CI + local dev)",
+);
 
 test("admin services list renders both groups", async ({ page }) => {
   await page.goto("/en/admin/services");
