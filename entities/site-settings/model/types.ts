@@ -1,3 +1,4 @@
+import type { CurrencyCode } from "@/db/schema";
 import type { PaletteId } from "@/shared/config/palettes";
 import type { Locale } from "@/i18n/routing";
 
@@ -9,6 +10,7 @@ export interface SiteSettings {
   priceOverrides: Readonly<Record<string, number>>;
   discountPercent: number;
   discountActive: boolean;
+  currency: CurrencyCode;
   updatedAt: string;
 }
 
@@ -24,5 +26,6 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = Object.freeze({
   priceOverrides: Object.freeze({}),
   discountPercent: 0,
   discountActive: false,
+  currency: "EUR" as CurrencyCode,
   updatedAt: new Date(0).toISOString(),
 });

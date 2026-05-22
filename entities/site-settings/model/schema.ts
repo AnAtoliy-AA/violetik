@@ -19,6 +19,7 @@ export const siteSettingsPatchSchema = z
     priceOverrides: z.record(overrideKey, z.number().int().min(0).max(10_000)),
     discountPercent: z.number().int().min(0).max(90),
     discountActive: z.boolean(),
+    currency: z.enum(["EUR", "USD", "BYN", "RUB"]),
   })
   .partial();
 

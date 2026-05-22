@@ -16,6 +16,7 @@ describe("getSiteSettings", () => {
     const s = result ?? DEFAULT_SITE_SETTINGS;
     expect(s).toHaveProperty("defaultPalette");
     expect(s).toHaveProperty("defaultLocale");
+    expect(s).toHaveProperty("currency");
     expect(s.priceOverrides).toBeTypeOf("object");
     expect(typeof s.discountPercent).toBe("number");
     expect(typeof s.discountActive).toBe("boolean");
@@ -26,5 +27,11 @@ describe("getSiteSettings", () => {
     expect(DEFAULT_SITE_SETTINGS.defaultLocale).toBe("en");
     expect(DEFAULT_SITE_SETTINGS.discountPercent).toBe(0);
     expect(DEFAULT_SITE_SETTINGS.discountActive).toBe(false);
+  });
+
+  it("exposes currency on the settings shape", () => {
+    expect(["EUR", "USD", "BYN", "RUB"]).toContain(
+      DEFAULT_SITE_SETTINGS.currency,
+    );
   });
 });
