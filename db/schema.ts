@@ -94,6 +94,9 @@ export const bookings = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     serviceId: text("service_id").notNull(),
+    masterId: text("master_id").references(() => masters.id, {
+      onDelete: "restrict",
+    }),
     scheduledFor: timestamp("scheduled_for", { withTimezone: true }).notNull(),
     durationMinutes: integer("duration_minutes").notNull(),
     status: bookingStatus("status").notNull().default("pending"),
@@ -110,6 +113,7 @@ export const bookings = pgTable(
     userIdx: index("bookings_user_idx").on(table.userId),
     scheduledIdx: index("bookings_scheduled_idx").on(table.scheduledFor),
     statusIdx: index("bookings_status_idx").on(table.status),
+    masterIdx: index("bookings_master_idx").on(table.masterId),
     // One active booking per slot. Partial unique so 'cancelled'
     // bookings can pile up at the same scheduled_for without blocking
     // the slot.
