@@ -99,7 +99,22 @@ export default async function ServiceEditorRoute({
   async function onSubmit(patch: ServiceFormInput) {
     "use server";
     if (mode === "create") return createServiceAction(patch);
-    const { id: _id, ...rest } = patch;
+    // id is frozen on edit — strip it from the patch so update-service's
+    // server-side schema (which omits id) accepts the payload cleanly.
+    const rest: Omit<ServiceFormInput, "id"> = {
+      categoryId: patch.categoryId,
+      nameEn: patch.nameEn,
+      nameRu: patch.nameRu,
+      nameBe: patch.nameBe,
+      blurbEn: patch.blurbEn,
+      blurbRu: patch.blurbRu,
+      blurbBe: patch.blurbBe,
+      includes: patch.includes,
+      priceCents: patch.priceCents,
+      durationMinutes: patch.durationMinutes,
+      sortOrder: patch.sortOrder,
+      status: patch.status,
+    };
     return updateServiceAction(id, rest);
   }
 

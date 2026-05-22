@@ -80,7 +80,15 @@ export default async function CategoryEditorRoute({
   async function onSubmit(patch: CategoryFormInput) {
     "use server";
     if (mode === "create") return createCategoryAction(patch);
-    const { id: _id, ...rest } = patch;
+    // id is frozen on edit — strip it from the patch so update-category's
+    // server-side schema (which omits id) accepts the payload cleanly.
+    const rest: Omit<CategoryFormInput, "id"> = {
+      nameEn: patch.nameEn,
+      nameRu: patch.nameRu,
+      nameBe: patch.nameBe,
+      sortOrder: patch.sortOrder,
+      status: patch.status,
+    };
     return updateCategoryAction(id, rest);
   }
 
