@@ -270,6 +270,7 @@
     "site_settings_section_services": "Цэны на паслугі",
     "site_settings_section_vip": "Сяброўства VIP",
     "site_settings_section_discount": "Агульная скідка",
+    "site_settings_section_currency": "Валюта",
     "site_settings_discount_active": "Скідка актыўная",
     "site_settings_base_label": "База €{price}",
     "site_settings_vip_base_label": "База €{price} / мес.",

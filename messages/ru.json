@@ -270,6 +270,7 @@
     "site_settings_section_services": "Цены на услуги",
     "site_settings_section_vip": "Членство VIP",
     "site_settings_section_discount": "Общая скидка",
+    "site_settings_section_currency": "Валюта",
     "site_settings_discount_active": "Скидка активна",
     "site_settings_base_label": "База €{price}",
     "site_settings_vip_base_label": "База €{price} / мес.",

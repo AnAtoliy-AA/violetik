@@ -270,6 +270,7 @@
     "site_settings_section_services": "Service prices",
     "site_settings_section_vip": "VIP membership",
     "site_settings_section_discount": "Global discount",
+    "site_settings_section_currency": "Currency",
     "site_settings_discount_active": "Discount active",
     "site_settings_base_label": "Base €{price}",
     "site_settings_vip_base_label": "Base €{price} / mo",
