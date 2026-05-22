@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -97,7 +97,6 @@ function SortableRow({
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
-  const reactId = useId();
   return (
     <li
       ref={setNodeRef}
@@ -107,16 +106,13 @@ function SortableRow({
       <button
         type="button"
         aria-label={dragLabel}
-        aria-describedby={reactId}
         className="cursor-grab text-text-3 active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
         ⠿
       </button>
-      <div className="flex-1" id={reactId}>
-        {children}
-      </div>
+      <div className="flex-1">{children}</div>
     </li>
   );
 }
