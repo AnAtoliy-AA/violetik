@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Link, useRouter } from "@/i18n/navigation";
 import type { CurrencyCode } from "@/db/schema";
+import type { Master } from "@/entities/master";
 import type { Service } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { buttonClassName } from "@/shared/ui/button";
@@ -23,6 +24,7 @@ import { useBookingStore } from "@/views/booking/model/booking-store";
 import { submitBooking } from "@/views/booking/api/submit";
 import { ConfirmStep } from "./steps/confirm-step";
 import { DateStep } from "./steps/date-step";
+import { MasterStep } from "./steps/master-step";
 import { ServiceStep } from "./steps/service-step";
 import { TimeStep } from "./steps/time-step";
 
@@ -50,7 +52,7 @@ export interface BookingPageProps {
   services: readonly Service[];
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
   currency?: CurrencyCode;
-  masterName?: string;
+  masters: readonly Master[];
 }
 
 export function BookingPage({
@@ -58,7 +60,7 @@ export function BookingPage({
   services,
   pricedServices,
   currency = "EUR",
-  masterName,
+  masters,
 }: BookingPageProps) {
   const t = useTranslations("Booking");
   const tSteps = useTranslations("Booking.steps");
@@ -69,6 +71,7 @@ export function BookingPage({
   const searchParams = useSearchParams();
   const setService = useBookingStore((s) => s.setService);
   const serviceId = useBookingStore((s) => s.serviceId);
+  const masterId = useBookingStore((s) => s.masterId);
   const date = useBookingStore((s) => s.date);
   const time = useBookingStore((s) => s.time);
 
@@ -88,6 +91,7 @@ export function BookingPage({
 
   const canAdvance =
     (step === "service" && !!serviceId) ||
+    (step === "master" && !!masterId) ||
     (step === "date" && !!date) ||
     (step === "time" && !!time) ||
     (step === "confirm" && !!serviceId && !!date && !!time);
@@ -99,6 +103,7 @@ export function BookingPage({
       startTransition(async () => {
         const result = await submitBooking({
           serviceId,
+          masterId,
           date,
           time,
           locale,
@@ -146,6 +151,7 @@ export function BookingPage({
                 currency={currency}
               />
             ) : null}
+            {step === "master" ? <MasterStep masters={masters} /> : null}
             {step === "date" ? <DateStep /> : null}
             {step === "time" ? <TimeStep /> : null}
             {step === "confirm" ? (
@@ -153,7 +159,7 @@ export function BookingPage({
                 services={services}
                 pricedServices={pricedServices}
                 currency={currency}
-                masterName={masterName}
+                masters={masters}
               />
             ) : null}
           </motion.div>

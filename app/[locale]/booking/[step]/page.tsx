@@ -57,7 +57,6 @@ export default async function BookingRoute({
   }
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
-  const masterName = masters[0]?.name;
   return (
     <Suspense fallback={null}>
       <BookingPage
@@ -65,7 +64,7 @@ export default async function BookingRoute({
         services={services}
         pricedServices={pricedServices}
         currency={currency}
-        masterName={masterName}
+        masters={masters}
       />
     </Suspense>
   );
