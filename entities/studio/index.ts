@@ -1,6 +1,5 @@
 export { STUDIO_DATA } from "./model/data";
 export type {
-  Artist,
   AtelierClip,
   AtelierClipKey,
   CustomerProfile,

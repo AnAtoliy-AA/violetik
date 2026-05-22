@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { loadServicesForLocale } from "@/entities/service/api/load";
+import { loadMastersForLocale } from "@/entities/master/api/load";
 import { resolvePrice, type ResolvedPrice } from "@/entities/site-settings";
 import type { CurrencyCode } from "@/db/schema";
 import { routing, type Locale } from "@/i18n/routing";
@@ -45,9 +46,10 @@ export default async function BookingRoute({
   if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
   if (!isBookingStep(step)) notFound();
-  const [settings, services] = await Promise.all([
+  const [settings, services, masters] = await Promise.all([
     getSiteSettingsServer(),
     loadServicesForLocale(locale),
+    loadMastersForLocale(locale, { publishedOnly: true }),
   ]);
   const pricedServices: Record<string, ResolvedPrice> = {};
   for (const s of services) {
@@ -55,6 +57,7 @@ export default async function BookingRoute({
   }
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
+  const masterName = masters[0]?.name;
   return (
     <Suspense fallback={null}>
       <BookingPage
@@ -62,6 +65,7 @@ export default async function BookingRoute({
         services={services}
         pricedServices={pricedServices}
         currency={currency}
+        masterName={masterName}
       />
     </Suspense>
   );

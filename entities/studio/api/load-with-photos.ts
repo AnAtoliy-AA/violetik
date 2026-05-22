@@ -4,14 +4,13 @@
 // only; these loader functions are reached via a deeper path import.
 import { STUDIO_DATA } from "../model/data";
 import type {
-  Artist,
   AtelierClip,
   CustomerProfile,
   GalleryItem,
   ImageAsset,
   Testimonial,
 } from "../model/types";
-import { getStudioPhotos, getStudioPhoto } from "@/db/studio-photos";
+import { getStudioPhoto, getStudioPhotos } from "@/db/studio-photos";
 import type { PhotoSlotKind } from "@/db/schema";
 
 async function imagesByKind(
@@ -30,12 +29,6 @@ export async function loadGalleryWithPhotos(): Promise<GalleryItem[]> {
     ...g,
     image: photos.get(g.id) ?? g.image,
   }));
-}
-
-/** Returns the artist record with `image` populated. */
-export async function loadArtistWithPhoto(): Promise<Artist> {
-  const photo = await getStudioPhoto("master", "violetta");
-  return { ...STUDIO_DATA.artist, image: photo?.image ?? STUDIO_DATA.artist.image };
 }
 
 /** Returns the testimonials list with `avatar` populated. */

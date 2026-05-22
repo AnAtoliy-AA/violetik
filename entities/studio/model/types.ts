@@ -51,16 +51,6 @@ export interface MembershipTier {
   featured: boolean;
 }
 
-export interface Artist {
-  name: string;
-  role: string;
-  years: number;
-  bio: string;
-  quote: string;
-  /** Optional portrait used by the master hero card. */
-  image?: ImageAsset;
-}
-
 export interface Testimonial {
   id: string;
   name: string;

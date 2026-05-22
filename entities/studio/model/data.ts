@@ -1,5 +1,4 @@
 import type {
-  Artist,
   AtelierClip,
   CustomerProfile,
   GalleryItem,
@@ -15,17 +14,6 @@ const studio: StudioInfo = {
   address: "By appointment · Verbena Lane 14, Studio B",
   hours: "Tue – Sat · 10:00 – 19:00",
   instagram: "@violetta.atelier",
-};
-
-const artist: Artist = {
-  name: "Violetta Marchenko",
-  role: "Master nail artist & founder",
-  years: 11,
-  bio:
-    "Trained in Milan and Kyiv, Violetta runs a one-chair atelier — one guest at a time, by appointment only. " +
-    "Specialising in editorial nail design, glass shapes and Japanese gel.",
-  quote:
-    "A manicure is the smallest piece of jewellery a woman wears every day.",
 };
 
 const gallery: GalleryItem[] = [
@@ -149,7 +137,6 @@ const atelierClips: AtelierClip[] = [
 
 export const STUDIO_DATA = {
   studio,
-  artist,
   gallery,
   testimonials,
   membership,
