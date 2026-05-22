@@ -516,7 +516,7 @@ Expected: "Cannot find module './masters-mutations'".
 Use this exact template (mirrors `db/services-mutations.ts`):
 
 ```ts
-import { and, eq, gt, inArray, ne, sql } from "drizzle-orm";
+import { and, eq, notInArray, sql } from "drizzle-orm";
 import { db, schema } from "./index";
 
 function isMissingTable(error: unknown): boolean {
@@ -647,7 +647,7 @@ export async function setMasterServices(
           .where(
             and(
               eq(schema.masterServices.masterId, masterId),
-              sql`${schema.masterServices.serviceId} NOT IN ${serviceIds}`,
+              notInArray(schema.masterServices.serviceId, serviceIds as string[]),
             ),
           );
       }
@@ -1001,6 +1001,46 @@ export async function listPublishedServices(): Promise<schema.Service[]> {
 ```
 
 Add at the top of the file: `import { getServiceIdsHavingAnyPublishedMaster } from "./masters";`
+
+- [ ] **Step 1b: Test the zero-masters fall-through**
+
+Add to `db/services.test.ts` (or create it if absent):
+
+```ts
+import { describe, expect, it, vi } from "vitest";
+
+// Mock getServiceIdsHavingAnyPublishedMaster to return an empty set.
+vi.mock("./masters", () => ({
+  getServiceIdsHavingAnyPublishedMaster: vi.fn().mockResolvedValue(new Set()),
+}));
+vi.mock("./index", () => ({
+  db: {
+    select: () => ({
+      from: () => ({
+        where: () => ({
+          orderBy: () => Promise.resolve([
+            { id: "signature", status: "published", sortOrder: 0 },
+          ]),
+        }),
+      }),
+    }),
+  },
+  schema: { services: {} },
+}));
+
+import { listPublishedServices } from "./services";
+
+describe("listPublishedServices — zero-masters fall-through", () => {
+  it("returns the unfiltered published list when no master is published", async () => {
+    const rows = await listPublishedServices();
+    expect(rows).toHaveLength(1);
+    expect(rows[0].id).toBe("signature");
+  });
+});
+```
+
+Run: `npx vitest run db/services.test.ts --pool=threads`
+Expected: green.
 
 - [ ] **Step 2: Verify no consumers break**
 
@@ -1618,7 +1658,7 @@ Mirror `app/[locale]/admin/services/page.tsx` line-for-line:
 
 Mirror `app/[locale]/admin/services/[id]/page.tsx`:
 1. `id === "new"` → mode `"create"`; otherwise load `loadMasterBySlugForLocale(id, locale)` and `getStudioPhoto("master", id)`
-2. Build the `services` list (id, name, categoryId, categoryName) by joining `listPublishedServices()` with categories
+2. Build the `services` list (id, name, categoryId, categoryName) by joining `listAllServices()` with categories, then filter to `status !== 'archived'`. **Use `listAllServices` (not `listPublishedServices`) so admins can pre-assign a draft service to a master before publishing it.** Orphan-hiding still applies on the public side — drafts won't leak to customers.
 3. `onSubmit`: `"use server"` calls `createMasterAction` (create) or `updateMasterAction(id, rest)` (edit), stripping `id` from the patch via an explicit `Omit<MasterFormInput, "id">` pick (the same pattern shipped in [commit 6847821](../../app/[locale]/admin/services/[id]/page.tsx))
 4. `photoSlot = mode === "edit" ? <PhotoUploadRow slot={{ kind: "master", id, label: t("label_photo"), hint: t("label_photo_hint") }} current={photo?.image ?? null} storageConfigured={...} /> : undefined`
 5. Wrap in `<div className="pb-16">` + `<AppHeader back="/admin/masters" title={t("plate_title")} admin />` + `<MasterEditor mode initial services onSubmit photoSlot />`
@@ -1841,6 +1881,8 @@ git commit -m "feat(master): DB-backed /master + /master/[slug] route + list vie
 ## Task 15: Drop `STUDIO_DATA.artist` + clean up old `Artist` re-exports
 
 **Files:**
+- Modify: `views/booking/ui/steps/confirm-step.tsx:41` (the row that reads `STUDIO_DATA.artist.name`)
+- Modify: `app/[locale]/booking/[step]/page.tsx` (pass `masterName` through to ConfirmStep)
 - Modify: `entities/studio/model/data.ts` (delete the `artist` const)
 - Modify: `entities/studio/api/load-with-photos.ts` (delete `loadArtistWithPhoto`)
 - Modify: `entities/studio/index.ts` (drop the `Artist` re-export)
@@ -1850,7 +1892,55 @@ git commit -m "feat(master): DB-backed /master + /master/[slug] route + list vie
 - [ ] **Step 1: Run the grep first**
 
 Run: `grep -rn "STUDIO_DATA.artist\|loadArtistWithPhoto\|\bArtist\b" --include="*.ts" --include="*.tsx" .`
-Expected: only matches in `entities/studio/*` and `views/master/ui/master-page.tsx`. If anything else references `Artist`, lift it onto `Master` first.
+
+Expected matches: `entities/studio/*`, `views/master/ui/master-page.tsx`, **`views/booking/ui/steps/confirm-step.tsx:41`** (current confirm row hardcodes the master name from `STUDIO_DATA.artist.name`). Address the confirm-step site in Step 1b before deleting `STUDIO_DATA.artist`.
+
+- [ ] **Step 1b: Lift the booking confirm step off `STUDIO_DATA.artist`**
+
+In Phase 1 the booking funnel still doesn't track `masterId` (that's Phase 2). The confirm step's existing "Master" row should keep working — point it at the first published master via a new prop instead of importing `STUDIO_DATA`.
+
+Edit `views/booking/ui/steps/confirm-step.tsx`:
+
+```ts
+// Replace the import
+- import { STUDIO_DATA } from "@/entities/studio";
++ import { STUDIO_DATA } from "@/entities/studio"; // (kept for STUDIO_DATA.studio.address)
+
+// Extend props
+export interface ConfirmStepProps {
+  services: readonly Service[];
+  pricedServices?: Readonly<Record<string, ResolvedPrice>>;
+  currency?: CurrencyCode;
++ masterName?: string;
+}
+
+// In the component body
+- export function ConfirmStep({ services, pricedServices, currency = "EUR" }: ConfirmStepProps) {
++ export function ConfirmStep({ services, pricedServices, currency = "EUR", masterName }: ConfirmStepProps) {
+
+// In the rows array
+- [t("row_master"), STUDIO_DATA.artist.name],
++ [t("row_master"), masterName ?? "—"],
+```
+
+`ConfirmStep` is rendered by the `BookingPage` client component (`views/booking/ui/booking-page.tsx`), not directly by `app/[locale]/booking/[step]/page.tsx`. Thread `masterName` through both:
+
+1. In `app/[locale]/booking/[step]/page.tsx`, load the first published master server-side and pass it into `<BookingPage masterName={...} />`:
+
+   ```ts
+   import { loadMastersForLocale } from "@/entities/master";
+
+   const masters = await loadMastersForLocale(locale as "en" | "ru" | "be", {
+     publishedOnly: true,
+   });
+   const masterName = masters[0]?.name;
+   return <BookingPage services={services} ... masterName={masterName} />;
+   ```
+
+2. In `views/booking/ui/booking-page.tsx`, extend `BookingPageProps` with `masterName?: string` and forward it to `<ConfirmStep masterName={masterName} ... />` at the confirm-branch render site.
+
+Run: `npm run build`
+Expected: build green; the confirm page still shows "Violetta Marchenko" (or the locale-resolved equivalent) on the Master row.
 
 - [ ] **Step 2: Delete the artist exports**
 
