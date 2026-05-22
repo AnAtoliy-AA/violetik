@@ -438,3 +438,7 @@ export type Service = typeof services.$inferSelect;
 export type NewService = typeof services.$inferInsert;
 export type ServiceStatus = (typeof serviceStatus.enumValues)[number];
 export type CurrencyCode = (typeof currencyCode.enumValues)[number];
+export type Master = typeof masters.$inferSelect;
+export type NewMaster = typeof masters.$inferInsert;
+export type MasterServiceRow = typeof masterServices.$inferSelect;
+export type MasterStatus = (typeof masterStatus.enumValues)[number];
