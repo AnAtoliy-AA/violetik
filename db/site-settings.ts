@@ -18,6 +18,7 @@ function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
     priceOverrides: row.priceOverrides ?? {},
     discountPercent: row.discountPercent,
     discountActive: row.discountActive,
+    currency: row.currency,
     updatedAt: row.updatedAt.toISOString(),
   };
 }

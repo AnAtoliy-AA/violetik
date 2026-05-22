@@ -10,6 +10,7 @@ import type {
   SiteSettings,
   SiteSettingsPatch,
 } from "@/entities/site-settings";
+import type { CurrencyCode } from "@/db/schema";
 import { buttonClassName } from "@/shared/ui/button";
 
 export type SubmitFn = (
@@ -18,7 +19,6 @@ export type SubmitFn = (
 
 export interface SiteSettingsFormProps {
   initial: SiteSettings;
-  services: ReadonlyArray<{ id: string; name: string; basePrice: number }>;
   vipBasePrice: number;
   /**
    * Action invoked on submit. The route file passes the server action;
@@ -35,9 +35,10 @@ type Status =
   | { kind: "saved" }
   | { kind: "error"; message: string };
 
+const CURRENCIES: readonly CurrencyCode[] = ["EUR", "USD", "BYN", "RUB"];
+
 export function SiteSettingsForm({
   initial,
-  services,
   vipBasePrice,
   onSubmit: submit,
 }: SiteSettingsFormProps) {
@@ -47,39 +48,30 @@ export function SiteSettingsForm({
 
   const [defaultPalette, setDefaultPalette] = useState(initial.defaultPalette);
   const [defaultLocale, setDefaultLocale] = useState(initial.defaultLocale);
+  const [currency, setCurrency] = useState<CurrencyCode>(initial.currency);
   const [discountPercent, setDiscountPercent] = useState(
     initial.discountPercent,
   );
   const [discountActive, setDiscountActive] = useState(initial.discountActive);
 
-  const [overrideInputs, setOverrideInputs] = useState<
-    Record<string, OverrideInput>
-  >(() => {
-    const obj: Record<string, OverrideInput> = {};
-    for (const s of services) {
-      const key = `service:${s.id}`;
-      obj[key] =
-        key in initial.priceOverrides
-          ? String(initial.priceOverrides[key])
-          : "";
-    }
-    obj["membership:VIP"] =
-      "membership:VIP" in initial.priceOverrides
-        ? String(initial.priceOverrides["membership:VIP"])
-        : "";
-    return obj;
-  });
+  const [vipOverride, setVipOverride] = useState<OverrideInput>(() =>
+    "membership:VIP" in initial.priceOverrides
+      ? String(initial.priceOverrides["membership:VIP"])
+      : "",
+  );
 
   function buildPatch(): SiteSettingsPatch {
     const priceOverrides: Record<string, number> = {};
-    for (const [key, raw] of Object.entries(overrideInputs)) {
-      if (raw === "") continue;
-      const n = Number(raw);
-      if (Number.isFinite(n) && n >= 0) priceOverrides[key] = Math.round(n);
+    if (vipOverride !== "") {
+      const n = Number(vipOverride);
+      if (Number.isFinite(n) && n >= 0) {
+        priceOverrides["membership:VIP"] = Math.round(n);
+      }
     }
     return {
       defaultPalette,
       defaultLocale,
+      currency,
       priceOverrides,
       discountPercent: Math.max(0, Math.min(90, Math.round(discountPercent))),
       discountActive,
@@ -172,44 +164,37 @@ export function SiteSettingsForm({
         </div>
       </fieldset>
 
-      <fieldset aria-label={t("site_settings_section_services")}>
+      <fieldset>
         <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
-          {t("site_settings_section_services")}
+          {t("site_settings_section_currency")}
         </legend>
-        <ul className="flex flex-col gap-2">
-          {services.map((s) => {
-            const key = `service:${s.id}`;
+        <div className="grid grid-cols-4 gap-2">
+          {CURRENCIES.map((c) => {
+            const selected = currency === c;
             return (
-              <li
-                key={key}
-                className="flex items-center justify-between gap-3"
+              <button
+                key={c}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                aria-label={c}
+                onClick={() => setCurrency(c)}
+                className={cn(
+                  "flex items-center justify-center rounded-full border-[0.5px] px-3 py-2",
+                  "transition-colors duration-fast ease-out",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+                  selected
+                    ? "border-accent bg-surface-2 text-text"
+                    : "border-line text-text-2 hover:border-line-strong hover:text-text",
+                )}
               >
-                <div>
-                  <div className="text-[14px]">{s.name}</div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
-                    {t("site_settings_base_label", { price: s.basePrice })}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={0}
-                  max={10_000}
-                  placeholder="—"
-                  aria-label={`${s.name} override`}
-                  className="w-24 rounded border border-line bg-surface px-2 py-1 text-right"
-                  value={overrideInputs[key]}
-                  onChange={(e) =>
-                    setOverrideInputs((prev) => ({
-                      ...prev,
-                      [key]: e.target.value,
-                    }))
-                  }
-                />
-              </li>
+                <span className="font-mono text-[11px] uppercase tracking-[0.16em]">
+                  {c}
+                </span>
+              </button>
             );
           })}
-        </ul>
+        </div>
       </fieldset>
 
       <fieldset aria-label={t("site_settings_section_vip")}>
@@ -228,13 +213,8 @@ export function SiteSettingsForm({
             placeholder="—"
             aria-label="VIP price override"
             className="w-24 rounded border border-line bg-surface px-2 py-1 text-right"
-            value={overrideInputs["membership:VIP"]}
-            onChange={(e) =>
-              setOverrideInputs((prev) => ({
-                ...prev,
-                "membership:VIP": e.target.value,
-              }))
-            }
+            value={vipOverride}
+            onChange={(e) => setVipOverride(e.target.value)}
           />
         </div>
       </fieldset>

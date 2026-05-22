@@ -118,6 +118,19 @@ export default async function AdminRoute({
               </div>
             </Link>
           </li>
+          <li>
+            <Link
+              href="/admin/services"
+              className="gilded block rounded-[18px] p-5 transition-colors duration-fast ease-out hover:bg-surface-2"
+            >
+              <div className="font-display text-[16px] italic">
+                {t("inbox_services")}
+              </div>
+              <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+                {t("inbox_services_caption")}
+              </div>
+            </Link>
+          </li>
         </ul>
       </section>
 

@@ -9,6 +9,7 @@ const baseSettings: SiteSettings = {
   priceOverrides: {},
   discountPercent: 0,
   discountActive: false,
+  currency: "EUR",
   updatedAt: new Date(0).toISOString(),
 };
 

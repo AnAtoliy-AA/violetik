@@ -7,12 +7,6 @@ import {
 } from "@/entities/site-settings";
 import { SiteSettingsForm } from "./site-settings-form";
 
-const services = [
-  { id: "signature", name: "Signature Manicure", basePrice: 95 },
-  { id: "gel", name: "Couture Gel", basePrice: 145 },
-  { id: "editorial", name: "Editorial Art", basePrice: 195 },
-];
-
 const meta: Meta<typeof SiteSettingsForm> = {
   title: "features/site-settings-admin/SiteSettingsForm",
   component: SiteSettingsForm,
@@ -34,7 +28,6 @@ const noopSubmit = async () => ({ ok: true as const });
 export const Empty: Story = {
   args: {
     initial: DEFAULT_SITE_SETTINGS,
-    services,
     vipBasePrice: 180,
     onSubmit: noopSubmit,
   },
@@ -44,7 +37,8 @@ const populated: SiteSettings = {
   ...DEFAULT_SITE_SETTINGS,
   defaultPalette: "ruby",
   defaultLocale: "ru",
-  priceOverrides: { "service:gel": 160, "membership:VIP": 200 },
+  currency: "RUB",
+  priceOverrides: { "membership:VIP": 200 },
   discountPercent: 15,
   discountActive: true,
 };
@@ -52,7 +46,6 @@ const populated: SiteSettings = {
 export const Populated: Story = {
   args: {
     initial: populated,
-    services,
     vipBasePrice: 180,
     onSubmit: noopSubmit,
   },
