@@ -19,9 +19,15 @@ describe("booking-steps", () => {
   });
 
   it("nextStep / prevStep walk the sequence and bound at ends", () => {
-    expect(nextStep("service")).toBe("date");
+    expect(nextStep("service")).toBe("master");
+    expect(nextStep("master")).toBe("date");
+    expect(nextStep("date")).toBe("time");
+    expect(nextStep("time")).toBe("confirm");
     expect(nextStep("confirm")).toBeNull();
     expect(prevStep("service")).toBeNull();
+    expect(prevStep("master")).toBe("service");
+    expect(prevStep("date")).toBe("master");
+    expect(prevStep("time")).toBe("date");
     expect(prevStep("confirm")).toBe("time");
   });
 
