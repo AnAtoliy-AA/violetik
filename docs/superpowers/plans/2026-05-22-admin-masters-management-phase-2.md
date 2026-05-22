@@ -297,7 +297,13 @@ export const BOOKING_STEPS = [
 
 - [ ] **Step 2: Update existing booking-steps tests**
 
-Open `views/booking/lib/booking-steps.test.ts`. Find any assertions that check `nextStep("service") === "date"` or `prevStep("date") === "service"`. They must become `"master"` and the new step must have its own coverage:
+First find the affected assertions:
+
+```bash
+grep -n "nextStep\|prevStep\|service.*date\|date.*service" views/booking/lib/booking-steps.test.ts
+```
+
+Then update / extend them so the new step is covered:
 
 ```ts
 expect(nextStep("service")).toBe("master");
@@ -411,6 +417,12 @@ git commit -m "feat(i18n): Booking.master step keys + steps.master label"
 
 ## Task 6: `MasterStep` component
 
+**Final signatures** (see Task 7's note for context):
+- Props: `{ masters: readonly Master[] }` — single prop, no `eligibleMasterIds`.
+- The component reads `serviceId` from the booking store and filters
+  `masters` by `serviceIds.includes(serviceId)` internally.
+- An `useEffect` performs the 1-eligible auto-skip via `useRouter().replace("/booking/date")`.
+
 **Files:**
 - Create: `views/booking/ui/steps/master-step.tsx`
 - Create: `views/booking/ui/steps/master-step.test.tsx`
@@ -426,10 +438,12 @@ import en from "@/messages/en.json";
 import { MasterStep } from "./master-step";
 import { useBookingStore } from "@/views/booking/model/booking-store";
 
+const routerReplace = vi.fn();
 vi.mock("@/i18n/navigation", () => ({
   Link: ({ href, children }: { href: string; children: React.ReactNode }) => (
     <a href={href}>{children}</a>
   ),
+  useRouter: () => ({ replace: routerReplace }),
 }));
 
 const masters = [
@@ -457,26 +471,32 @@ const masters = [
   },
 ];
 
-function setup() {
-  useBookingStore.setState({ masterId: null });
+function setup(serviceId: string | null = "signature") {
+  useBookingStore.setState({ serviceId, masterId: null });
+  routerReplace.mockClear();
   render(
     <NextIntlClientProvider locale="en" messages={en}>
-      <MasterStep masters={masters} eligibleMasterIds={["violetta", "iris"]} />
+      <MasterStep masters={masters} />
     </NextIntlClientProvider>,
   );
 }
 
 describe("MasterStep", () => {
-  it("renders every eligible master", () => {
+  it("renders every master eligible for the chosen service", () => {
     setup();
     expect(screen.getByText("Violetta")).toBeVisible();
     expect(screen.getByText("Iris")).toBeVisible();
   });
-  it("filters out masters not in the eligible set", () => {
-    useBookingStore.setState({ masterId: null });
+  it("filters out masters who don't perform the chosen service", () => {
+    // Make only violetta eligible for "signature".
+    const onlyVioletta = masters.map((m) =>
+      m.id === "iris" ? { ...m, serviceIds: ["editorial"] } : m,
+    );
+    useBookingStore.setState({ serviceId: "signature", masterId: null });
+    routerReplace.mockClear();
     render(
       <NextIntlClientProvider locale="en" messages={en}>
-        <MasterStep masters={masters} eligibleMasterIds={["violetta"]} />
+        <MasterStep masters={onlyVioletta} />
       </NextIntlClientProvider>,
     );
     expect(screen.getByText("Violetta")).toBeVisible();
@@ -488,14 +508,24 @@ describe("MasterStep", () => {
     await user.click(screen.getByRole("button", { name: /Violetta/ }));
     expect(useBookingStore.getState().masterId).toBe("violetta");
   });
-  it("renders the empty-set fallback when no masters are eligible", () => {
-    useBookingStore.setState({ masterId: null });
+  it("renders the empty-set fallback when no master performs the service", () => {
+    setup("only-orphan-service");
+    expect(screen.getByText(/No master is currently set up/i)).toBeVisible();
+  });
+  it("auto-skips to /booking/date when exactly one master is eligible", () => {
+    const onlyVioletta = masters.map((m) =>
+      m.id === "iris" ? { ...m, serviceIds: ["editorial"] } : m,
+    );
+    useBookingStore.setState({ serviceId: "signature", masterId: null });
+    routerReplace.mockClear();
     render(
       <NextIntlClientProvider locale="en" messages={en}>
-        <MasterStep masters={masters} eligibleMasterIds={[]} />
+        <MasterStep masters={onlyVioletta} />
       </NextIntlClientProvider>,
     );
-    expect(screen.getByText(/No master is currently set up/i)).toBeVisible();
+    // useEffect runs after first paint; assert side effects.
+    expect(useBookingStore.getState().masterId).toBe("violetta");
+    expect(routerReplace).toHaveBeenCalledWith("/booking/date");
   });
 });
 ```
@@ -505,7 +535,9 @@ describe("MasterStep", () => {
 ```tsx
 "use client";
 
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import type { Master } from "@/entities/master";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
@@ -513,15 +545,26 @@ import { useBookingStore } from "@/views/booking/model/booking-store";
 
 export interface MasterStepProps {
   masters: readonly Master[];
-  eligibleMasterIds: readonly string[];
 }
 
-export function MasterStep({ masters, eligibleMasterIds }: MasterStepProps) {
+export function MasterStep({ masters }: MasterStepProps) {
   const t = useTranslations("Booking.master");
+  const serviceId = useBookingStore((s) => s.serviceId);
   const selectedMasterId = useBookingStore((s) => s.masterId);
   const setMaster = useBookingStore((s) => s.setMaster);
+  const router = useRouter();
 
-  const eligible = masters.filter((m) => eligibleMasterIds.includes(m.id));
+  const eligible = serviceId
+    ? masters.filter((m) => m.serviceIds.includes(serviceId))
+    : masters;
+
+  // Auto-skip when only one master is eligible for the chosen service.
+  useEffect(() => {
+    if (eligible.length === 1 && selectedMasterId !== eligible[0].id) {
+      setMaster(eligible[0].id);
+      router.replace("/booking/date");
+    }
+  }, [eligible, selectedMasterId, setMaster, router]);
 
   if (eligible.length === 0) {
     return (
@@ -583,11 +626,13 @@ git commit -m "feat(booking): MasterStep — eligible-master cards + empty fallb
 
 ## Task 7: Booking server route — auto-skip + thread masters
 
+> **Read this whole task before starting** — Step 3 reveals a constraint that simplifies the prop shape. The final signatures (used by Task 6 too) are: `MasterStep` takes only `masters: readonly Master[]` and filters internally via the store's `serviceId`. `BookingPage` takes `masters: readonly Master[]` only. The Phase 1 `masterName?: string` prop is **dropped entirely** — Phase 2 reads master from store + masters list. Apply that signature consistently across Task 6 and Task 7 from the start.
+
 **Files:**
 - Modify: `app/[locale]/booking/[step]/page.tsx`
 - Modify: `views/booking/ui/booking-page.tsx`
 
-- [ ] **Step 1: Booking page — accept master props**
+- [ ] **Step 1: Booking page — accept masters list, drop masterName**
 
 Extend `BookingPageProps`:
 
@@ -598,12 +643,10 @@ export interface BookingPageProps {
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
   currency?: CurrencyCode;
   masters: readonly Master[];
-  eligibleMasterIds: readonly string[];
-  masterName?: string;
 }
 ```
 
-(`masterName` stays as a fallback for the confirm step's display; Phase 2 will derive it from `masters` + store, but we keep the prop for SSR continuity.)
+Drop the Phase-1 `masterName?: string` field from `BookingPageProps`; the confirm step now reads master from the store + the `masters` list directly. Also drop `masterName` from the route's `<BookingPage ... />` callsite in `app/[locale]/booking/[step]/page.tsx` (currently passes `masterName={masters[0]?.name}`).
 
 Inside the page, render the master step:
 
@@ -644,140 +687,48 @@ export function ConfirmStep({ services, pricedServices, currency = "EUR", master
 
 Remove the now-unused `masterName?: string` prop. Update `BookingPageProps` accordingly and drop the `masterName` field that Phase 1 introduced (it's superseded). Pass `masters` to `<ConfirmStep masters={masters} ... />`.
 
-- [ ] **Step 3: Booking route — load masters + redirect when 1 eligible**
+- [ ] **Step 3: Booking route — load masters + pass through**
 
-In `app/[locale]/booking/[step]/page.tsx`, replace the Phase 1 loader block with:
+> **Why the auto-skip lives in `MasterStep`, not here.** The booking-store is client-only (Zustand + sessionStorage, hydrated post-mount). The server route doesn't know which service the customer picked, so it can't auto-skip the master step purely server-side. Instead, the master step itself runs the auto-skip in a `useEffect` once the store hydrates — already implemented in Task 6.
 
-```ts
-import { loadMastersForLocale, loadEligibleMastersForService } from "@/entities/master/api/load";
-import { redirect } from "@/i18n/navigation";
-
-// ... inside BookingRoute, after loading services + settings:
-
-const masters = await loadMastersForLocale(locale, { publishedOnly: true });
-
-// Build eligibility: per-service the master step renders the eligible
-// set; when the customer hasn't picked a service yet we render the full
-// list (the picker step's auto-skip logic won't fire until they do).
-const searchParams = new URL(/* … */); // see note below
-// Eligible-set is computed CLIENT-side from the store on the master
-// step (master-step.tsx filters by eligibleMasterIds); we pass the full
-// id-set for the chosen service when known via a server-component
-// helper. For Phase 2 we expose every master and the server-side
-// auto-skip uses the eligible-set on demand.
-
-// Auto-skip the master step when exactly one master is eligible for
-// the chosen service. We don't have access to the booking-store from
-// the server, so we *cannot* perform an honest auto-skip purely
-// server-side — the cookie/session storage is client-only. The
-// approximation: when the route hits ?service=<id> we honour it; the
-// client-side store hydrates and, on mount, dispatches `setMaster`
-// when eligible.length === 1 (see ServiceStep below).
-```
-
-> **Stop and think.** The auto-skip semantics in the spec assume server-side knowledge of `serviceId`. The current booking-store is client-only (sessionStorage, hydrated post-mount). Two viable strategies:
->
-> (a) **Server-side via search-param**: the ServiceStep adds `?serviceId=<id>` when it sets the service in the store, then the route reads it and performs the auto-skip server-side via `redirect`.
-> (b) **Client-side fallback**: keep the master step client-only; in `MasterStep` itself, when `eligibleMasterIds.length === 1`, dispatch `setMaster` + use `useRouter().replace("/booking/date")` on first render.
->
-> Pick (b). It avoids URL coupling and keeps the booking flow's state model intact (the store stays the source of truth). It's a one-line `useEffect` and Suspense already gates this branch. Update Task 6 to include the redirect — see Task 6 follow-up below.
-
-- [ ] **Step 4: Update Task 6's `MasterStep` to handle the 1-eligible auto-skip**
-
-Edit `views/booking/ui/steps/master-step.tsx` and add:
-
-```tsx
-import { useEffect } from "react";
-import { useRouter } from "@/i18n/navigation";
-
-// inside the component, after `const eligible = ...`:
-const router = useRouter();
-useEffect(() => {
-  if (eligible.length === 1 && selectedMasterId !== eligible[0].id) {
-    setMaster(eligible[0].id);
-    router.replace("/booking/date");
-  }
-}, [eligible, selectedMasterId, setMaster, router]);
-```
-
-Test for the auto-skip:
+Replace the Phase 1 loader block in `app/[locale]/booking/[step]/page.tsx`:
 
 ```ts
-it("auto-skips to /booking/date when exactly one master is eligible", () => {
-  useBookingStore.setState({ masterId: null });
-  const replace = vi.fn();
-  vi.mocked(/* useRouter mock here */); // simpler: spy on router via jsdom location
-  render(
-    <NextIntlClientProvider locale="en" messages={en}>
-      <MasterStep masters={masters} eligibleMasterIds={["violetta"]} />
-    </NextIntlClientProvider>,
-  );
-  // useEffect runs synchronously after render in jsdom; assert the
-  // store updated.
-  expect(useBookingStore.getState().masterId).toBe("violetta");
-});
-```
+import { loadMastersForLocale } from "@/entities/master/api/load";
 
-(Mock `useRouter` from `@/i18n/navigation` at the top of the test file with a `vi.mock(...)` factory.)
-
-- [ ] **Step 5: Booking route — load + pass through**
-
-The route is straightforward without the server-side redirect:
-
-```ts
+// inside BookingRoute, after the locale + step validation:
 const [settings, services, masters] = await Promise.all([
   getSiteSettingsServer(),
   loadServicesForLocale(locale),
   loadMastersForLocale(locale, { publishedOnly: true }),
 ]);
-// ... existing pricedServices + currency wiring ...
+const pricedServices: Record<string, ResolvedPrice> = {};
+for (const s of services) {
+  pricedServices[s.id] = resolvePrice(`service:${s.id}`, s.price, settings);
+}
+const currency = (settings as { currency?: CurrencyCode }).currency ?? "EUR";
 
-// eligibleMasterIds = masters whose serviceIds includes the chosen service.
-// Without access to the booking-store, we cannot know the chosen service
-// here — instead pass the full master list down, and let MasterStep filter
-// client-side using `masters[i].serviceIds`. So we don't need an
-// eligibleMasterIds prop after all; MasterStep does its own filtering.
+return (
+  <Suspense fallback={null}>
+    <BookingPage
+      step={step}
+      services={services}
+      pricedServices={pricedServices}
+      currency={currency}
+      masters={masters}
+    />
+  </Suspense>
+);
 ```
 
-> **Simpler**: pass `masters` only. MasterStep reads the store's `serviceId`, then filters `masters` by `serviceIds.includes(serviceId)`. The `eligibleMasterIds` prop drops out entirely.
+(Drop the Phase-1 `masterName={masters[0]?.name}` — superseded by reading the store in ConfirmStep.)
 
-Updated MasterStep signature:
-
-```ts
-export interface MasterStepProps {
-  masters: readonly Master[];
-}
-
-export function MasterStep({ masters }: MasterStepProps) {
-  const t = useTranslations("Booking.master");
-  const serviceId = useBookingStore((s) => s.serviceId);
-  const selectedMasterId = useBookingStore((s) => s.masterId);
-  const setMaster = useBookingStore((s) => s.setMaster);
-  const router = useRouter();
-
-  const eligible = serviceId
-    ? masters.filter((m) => m.serviceIds.includes(serviceId))
-    : masters;
-
-  useEffect(() => {
-    if (eligible.length === 1 && selectedMasterId !== eligible[0].id) {
-      setMaster(eligible[0].id);
-      router.replace("/booking/date");
-    }
-  }, [eligible, selectedMasterId, setMaster, router]);
-
-  // ... rest as before
-}
-```
-
-Update the tests in Task 6 to remove `eligibleMasterIds` from the props.
-
-- [ ] **Step 6: Build + tests**
+- [ ] **Step 4: Build + tests**
 
 Run: `npm run build && npx vitest run --pool=threads`
 Expected: green.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add app/[locale]/booking/[step]/page.tsx views/booking/ui/booking-page.tsx views/booking/ui/steps/master-step.tsx views/booking/ui/steps/master-step.test.tsx views/booking/ui/steps/confirm-step.tsx
@@ -861,20 +812,23 @@ booking = await createBooking({
 
 - [ ] **Step 4: GCal title includes master**
 
-In the GCal block, after deriving the master:
+> **Import path matters.** `getMasterById` exists in both `@/db/masters` (returns the raw row with `nameEn` / `nameRu` / `nameBe`) and `@/entities/master/api/load.ts` (returns the locale-resolved `Master` with `name`). For the GCal EN summary we want the raw row — import from `@/db/masters`:
 
 ```ts
+import { getMasterById, getMasterIdsForService } from "@/db/masters";
+
+// inside submitBooking, after deriving masterId (Step 2):
 const master = await getMasterById(masterId);
 const masterLabel = master ? ` · ${master.nameEn}` : "";
 // ...
 summary: `${localizedServiceName(service, input.locale)}${masterLabel} · ${customerLabel}`,
 ```
 
-(`nameEn` because the GCal event is read by the admin in English; if you'd rather use the booking locale, swap to a localised name pick. Pick EN to match the existing customerLabel and service-name conventions.)
+(`nameEn` matches the existing customerLabel + service-name conventions in this file.)
 
 - [ ] **Step 5: Caller wiring**
 
-Find every `submitBooking(...)` call site. The booking funnel's confirm step is the only caller. Update it to read `masterId` from the store:
+There is exactly one `submitBooking(...)` call site — `views/booking/ui/booking-page.tsx` (around line 100). Update it to read `masterId` from the store:
 
 ```ts
 const masterId = useBookingStore((s) => s.masterId);
@@ -960,10 +914,10 @@ test("master step auto-skips when only one master is eligible", async ({
   await page.goto("/en/booking/service");
   // Pick any seeded service; signature is reliable.
   await page.getByRole("button", { name: /Signature/i }).click();
-  // Click "Next" or wait for the auto-progress — depends on how the
-  // service step is wired. If the service step does its own router
-  // push to /booking/master, the page will land there briefly then
-  // bounce. Assert the final URL.
+  // The user may briefly visit /booking/master before MasterStep's
+  // useEffect calls router.replace("/booking/date"). toHaveURL auto-
+  // retries until the URL settles, so the assertion absorbs the bounce.
+  // Do NOT assert that /booking/master is never visited.
   await expect(page).toHaveURL(/\/booking\/date(\?.*)?$/);
 });
 ```
