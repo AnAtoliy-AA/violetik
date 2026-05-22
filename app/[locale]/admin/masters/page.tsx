@@ -52,10 +52,7 @@ export default async function AdminMastersRoute({
       <AppHeader back="/admin" title={t("plate_title")} admin />
       <AdminMastersList
         masters={rows}
-        reorderMastersAction={async (ids: string[]) => {
-          const r = await reorderMastersAction(ids);
-          return r.ok ? { ok: true } : { ok: false, error: r.error };
-        }}
+        reorderMastersAction={reorderMastersAction}
       />
     </div>
   );
