@@ -148,16 +148,23 @@ export function ServiceEditor({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-6 px-[22px] py-6"
-    >
+    <div className="flex flex-col gap-6 px-[22px] py-6">
       <h1 className="font-display text-[32px] font-light italic leading-tight">
         {mode === "create" ? t("title_new_service") : t("title_edit_service")}
       </h1>
 
-      <Field
-        id="svc-slug"
+      {photoSlot ? (
+        <div>
+          <div className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+            {t("label_photo")}
+          </div>
+          {photoSlot}
+        </div>
+      ) : null}
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <Field
+          id="svc-slug"
         label={t("label_slug")}
         hint={t("label_slug_hint")}
         error={errFor("id")}
@@ -319,15 +326,6 @@ export function ServiceEditor({
         </Field>
       </div>
 
-      {photoSlot ? (
-        <div>
-          <div className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
-            {t("label_photo")}
-          </div>
-          {photoSlot}
-        </div>
-      ) : null}
-
       <div className="flex items-center gap-3">
         <button
           type="submit"
@@ -346,7 +344,8 @@ export function ServiceEditor({
           </span>
         ) : null}
       </div>
-    </form>
+      </form>
+    </div>
   );
 }
 

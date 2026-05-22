@@ -78,4 +78,28 @@ describe("ServiceEditor", () => {
     expect(onSubmit).not.toHaveBeenCalled();
     expect(screen.getAllByText(/Required/).length).toBeGreaterThan(0);
   });
+
+  // Regression: PhotoUploadRow has its own <form action={uploadAction}>.
+  // If photoSlot is rendered inside the editor's <form>, React surfaces a
+  // hydration error ("<form> cannot be a descendant of <form>").
+  it("renders photoSlot outside the editor's <form>", () => {
+    const onSubmit = vi.fn(async () => ({ ok: true as const }));
+    const { container } = render(
+      <NextIntlClientProvider locale="en" messages={en}>
+        <ServiceEditor
+          mode="edit"
+          initial={makeInitial()}
+          categories={categories}
+          onSubmit={onSubmit}
+          photoSlot={<form data-testid="photo-form" />}
+        />
+      </NextIntlClientProvider>,
+    );
+    const editorForm = container.querySelector(
+      "form:not([data-testid='photo-form'])",
+    );
+    const photoForm = screen.getByTestId("photo-form");
+    expect(editorForm).not.toBeNull();
+    expect(editorForm!.contains(photoForm)).toBe(false);
+  });
 });
