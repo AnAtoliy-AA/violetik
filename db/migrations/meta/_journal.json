@@ -57,6 +57,13 @@
       "when": 1779399762150,
       "tag": "0007_admin_services",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1779439773465,
+      "tag": "0008_admin_masters",
+      "breakpoints": true
     }
   ]
 }

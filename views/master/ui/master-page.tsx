@@ -1,11 +1,17 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import {
-  STUDIO_DATA,
-  type Artist,
-  type Testimonial,
-} from "@/entities/studio";
+import { STUDIO_DATA, type Testimonial } from "@/entities/studio";
+import type { Master } from "@/entities/master";
+
+interface DisplayMaster {
+  name: string;
+  role: string;
+  years: number;
+  bio: string;
+  quote: string;
+  image?: { src: string; alt?: string; blurDataURL?: string };
+}
 import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
@@ -33,18 +39,31 @@ function ArrowRight() {
 }
 
 export interface MasterPageProps {
-  /** Override the master record (with DB-loaded photo) at the route level. */
-  artist?: Artist;
+  /** DB-backed master record. */
+  master?: Master;
   /** Override the testimonials list (with DB-loaded avatars). */
   testimonials?: readonly Testimonial[];
 }
 
+const FALLBACK_MASTER: DisplayMaster = {
+  name: "Violetta Marchenko",
+  role: "Master nail artist & founder",
+  years: 11,
+  bio:
+    "Trained in Milan and Kyiv, Violetta runs a one-chair atelier — one guest at a time, by appointment only. " +
+    "Specialising in editorial nail design, glass shapes and Japanese gel.",
+  quote:
+    "A manicure is the smallest piece of jewellery a woman wears every day.",
+};
+
 export function MasterPage({
-  artist: artistProp,
+  master,
   testimonials: testimonialsProp,
 }: MasterPageProps = {}) {
   const t = useTranslations("Master");
-  const artist = artistProp ?? STUDIO_DATA.artist;
+  // When the masters table is empty (first-run install, db-null), fall
+  // back to a static record so the customer-facing page still renders.
+  const artist: DisplayMaster = master ?? FALLBACK_MASTER;
   const testimonials = testimonialsProp ?? STUDIO_DATA.testimonials;
   const [firstName, ...rest] = artist.name.split(" ");
   const lastName = rest.join(" ");

@@ -1,6 +1,7 @@
 import { AppHeader } from "@/widgets/app-header";
 import { AtelierHours } from "@/widgets/atelier-hours";
 import { TabBar } from "@/widgets/tab-bar";
+import type { Master } from "@/entities/master";
 import { AnnouncementCapsule } from "./sections/announcement-capsule";
 import { AtelierMotion } from "./sections/atelier-motion";
 import { GalleryStrip } from "./sections/gallery-strip";
@@ -11,7 +12,11 @@ import { MembershipCard } from "./sections/membership-card";
 import { SignaturesList } from "./sections/signatures-list";
 import { TestimonialCard } from "./sections/testimonial-card";
 
-export function HomePage() {
+export interface HomePageProps {
+  master?: Master;
+}
+
+export function HomePage({ master }: HomePageProps = {}) {
   return (
     <div className="pb-28">
       <AppHeader />
@@ -21,7 +26,7 @@ export function HomePage() {
       </section>
       <AnnouncementCapsule />
       <SignaturesList />
-      <MasterStrip />
+      <MasterStrip master={master} />
       <GalleryStrip />
       <AtelierMotion />
       <TestimonialCard />

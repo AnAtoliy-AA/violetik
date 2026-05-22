@@ -8,6 +8,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -313,6 +314,69 @@ export const services = pgTable(
 );
 
 /**
+ * Lifecycle states for masters. Mirrors `serviceStatus`. `draft` and
+ * `archived` are admin-only; only `published` rows are visible on
+ * /master, on the booking step, and counted by auto-skip logic.
+ * See docs/superpowers/specs/2026-05-22-admin-masters-management-design.md §2.1.
+ */
+export const masterStatus = pgEnum("master_status", [
+  "draft",
+  "published",
+  "archived",
+]);
+
+export const masters = pgTable("masters", {
+  id: text("id").primaryKey(),
+  nameEn: text("name_en").notNull(),
+  nameRu: text("name_ru").notNull(),
+  nameBe: text("name_be").notNull(),
+  roleEn: text("role_en").notNull(),
+  roleRu: text("role_ru").notNull(),
+  roleBe: text("role_be").notNull(),
+  bioEn: text("bio_en").notNull(),
+  bioRu: text("bio_ru").notNull(),
+  bioBe: text("bio_be").notNull(),
+  quoteEn: text("quote_en").notNull(),
+  quoteRu: text("quote_ru").notNull(),
+  quoteBe: text("quote_be").notNull(),
+  years: integer("years").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
+  status: masterStatus("status").notNull().default("draft"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+});
+
+/**
+ * Many-to-many specialty join: `(master_id, service_id)` pairs mark
+ * which services a master performs. Used by the booking step to filter
+ * eligible masters and by listPublishedServices() to hide orphan
+ * services from the public menu.
+ */
+export const masterServices = pgTable(
+  "master_services",
+  {
+    masterId: text("master_id")
+      .notNull()
+      .references(() => masters.id, { onDelete: "cascade" }),
+    serviceId: text("service_id")
+      .notNull()
+      .references(() => services.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.masterId, t.serviceId] }),
+    masterIdx: index("master_services_master_idx").on(t.masterId),
+    serviceIdx: index("master_services_service_idx").on(t.serviceId),
+  }),
+);
+
+/**
  * Each row stores one customer-facing photograph the admin has uploaded
  * through `/admin/photos`. The pair (slotKind, slotId) is unique — the
  * second upload for a given slot replaces the first row (and the prior
@@ -374,3 +438,7 @@ export type Service = typeof services.$inferSelect;
 export type NewService = typeof services.$inferInsert;
 export type ServiceStatus = (typeof serviceStatus.enumValues)[number];
 export type CurrencyCode = (typeof currencyCode.enumValues)[number];
+export type Master = typeof masters.$inferSelect;
+export type NewMaster = typeof masters.$inferInsert;
+export type MasterServiceRow = typeof masterServices.$inferSelect;
+export type MasterStatus = (typeof masterStatus.enumValues)[number];

@@ -19,12 +19,16 @@ export interface ConfirmStepProps {
   services: readonly Service[];
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
   currency?: CurrencyCode;
+  /** Phase 1: first-published-master name; Phase 2 will read from the
+   * booking store after the master step lands. */
+  masterName?: string;
 }
 
 export function ConfirmStep({
   services,
   pricedServices,
   currency = "EUR",
+  masterName,
 }: ConfirmStepProps) {
   const t = useTranslations("Booking.confirm");
   const locale = useLocale() as Locale;
@@ -38,7 +42,7 @@ export function ConfirmStep({
   const timeLabel = time ?? t("missing_time");
 
   const rows: readonly [string, string][] = [
-    [t("row_master"), STUDIO_DATA.artist.name],
+    [t("row_master"), masterName ?? "—"],
     [t("row_date"), dateLabel],
     [t("row_time"), timeLabel],
     [t("row_location"), STUDIO_DATA.studio.address],

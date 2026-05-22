@@ -1,4 +1,5 @@
 import { listAllServices } from "@/db/services";
+import { listAllMasters } from "@/db/masters";
 import { STUDIO_DATA } from "@/entities/studio";
 import type { PhotoSlotKind } from "@/db/schema";
 
@@ -55,12 +56,15 @@ export async function listAllPhotoSlots(): Promise<PhotoSlot[]> {
       hint: "3:4 poster frame for the clip",
     });
   }
-  slots.push({
-    kind: "master",
-    id: "violetta",
-    label: STUDIO_DATA.artist.name,
-    hint: "1:1.2 portrait — master page hero",
-  });
+  const masters = await listAllMasters();
+  for (const m of masters) {
+    slots.push({
+      kind: "master",
+      id: m.id,
+      label: m.nameEn,
+      hint: "1:1.2 portrait — master page hero",
+    });
+  }
   slots.push({
     kind: "profile",
     id: STUDIO_DATA.profile.name.toLowerCase().replace(/\s+/g, "-"),

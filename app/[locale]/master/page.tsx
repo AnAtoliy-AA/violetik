@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import {
-  loadArtistWithPhoto,
-  loadTestimonialsWithPhotos,
-} from "@/entities/studio/api/load-with-photos";
+import { loadMastersForLocale } from "@/entities/master/api/load";
+import { loadTestimonialsWithPhotos } from "@/entities/studio/api/load-with-photos";
 import { MasterPage } from "@/views/master";
+import { MastersListPage } from "@/views/masters-list";
+import type { Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
 
@@ -25,9 +25,12 @@ export default async function MasterRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [artist, testimonials] = await Promise.all([
-    loadArtistWithPhoto(),
-    loadTestimonialsWithPhotos(),
-  ]);
-  return <MasterPage artist={artist} testimonials={testimonials} />;
+  const masters = await loadMastersForLocale(locale as Locale, {
+    publishedOnly: true,
+  });
+  if (masters.length === 1) {
+    const testimonials = await loadTestimonialsWithPhotos();
+    return <MasterPage master={masters[0]} testimonials={testimonials} />;
+  }
+  return <MastersListPage masters={masters} />;
 }
