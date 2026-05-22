@@ -2,17 +2,25 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { resolvePrice } from "@/entities/site-settings";
-import { STUDIO_DATA } from "@/entities/studio";
-import { loadServiceWithPhoto } from "@/entities/studio/api/load-with-photos";
-import { routing } from "@/i18n/routing";
+import {
+  loadPublishedServiceIds,
+  loadServiceByIdForLocale,
+} from "@/entities/service/api/load";
+import type { CurrencyCode } from "@/db/schema";
+import { routing, type Locale } from "@/i18n/routing";
 import { ServiceDetailPage } from "@/views/service-detail";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 
 type Params = { locale: string; id: string };
 
-export function generateStaticParams() {
+function isLocale(value: string): value is Locale {
+  return (routing.locales as readonly string[]).includes(value);
+}
+
+export async function generateStaticParams() {
+  const ids = await loadPublishedServiceIds();
   return routing.locales.flatMap((locale) =>
-    STUDIO_DATA.services.map((s) => ({ locale, id: s.id })),
+    ids.map((id) => ({ locale, id })),
   );
 }
 
@@ -22,7 +30,8 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale, id } = await params;
-  const service = STUDIO_DATA.services.find((s) => s.id === id);
+  if (!isLocale(locale)) return { title: "Violetta" };
+  const service = await loadServiceByIdForLocale(id, locale);
   if (!service) return { title: "Violetta" };
   const t = await getTranslations({ locale, namespace: "ServiceDetail" });
   return { title: `Violetta — ${service.name} · ${t("meta_subtitle")}` };
@@ -34,8 +43,9 @@ export default async function ServiceDetailRoute({
   params: Promise<Params>;
 }) {
   const { locale, id } = await params;
+  if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
-  const service = await loadServiceWithPhoto(id);
+  const service = await loadServiceByIdForLocale(id, locale);
   if (!service) notFound();
   const settings = await getSiteSettingsServer();
   const resolvedPrice = resolvePrice(
@@ -43,5 +53,14 @@ export default async function ServiceDetailRoute({
     service.price,
     settings,
   );
-  return <ServiceDetailPage service={service} resolvedPrice={resolvedPrice} />;
+  const currency =
+    ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
+  return (
+    <ServiceDetailPage
+      service={service}
+      resolvedPrice={resolvedPrice}
+      currency={currency}
+      locale={locale}
+    />
+  );
 }

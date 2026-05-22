@@ -1,8 +1,10 @@
 "use client";
 
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import type { CurrencyCode } from "@/db/schema";
+import type { Locale } from "@/i18n/routing";
 import type { ResolvedPrice } from "@/entities/site-settings";
-import type { Service } from "@/entities/studio";
+import type { Service } from "@/entities/service";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
 import { PaperGrain } from "@/shared/ui/paper-grain";
@@ -16,6 +18,8 @@ export interface DetailHeroProps {
   palette: readonly [string, string];
   durationLabel: string;
   resolvedPrice?: ResolvedPrice;
+  currency?: CurrencyCode;
+  locale?: Locale;
 }
 
 export function DetailHero({
@@ -25,6 +29,8 @@ export function DetailHero({
   palette,
   durationLabel,
   resolvedPrice,
+  currency = "EUR",
+  locale = "en",
 }: DetailHeroProps) {
   const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
@@ -70,7 +76,11 @@ export function DetailHero({
       />
 
       <div className="absolute inset-x-[22px] bottom-[22px]">
-        <Plate folio number={plateNumber} label={service.category.toUpperCase()} />
+        <Plate
+          folio
+          number={plateNumber}
+          label={service.category.name.toUpperCase()}
+        />
         <h1 className="mt-3 font-display text-h1 font-light italic leading-[0.95] tracking-[-0.025em]">
           {service.name}.
         </h1>
@@ -82,9 +92,13 @@ export function DetailHero({
           <span className="gilded inline-flex items-center rounded-full px-3 py-1">
             <span className="font-display text-[20px] italic leading-none text-gold-shimmer">
               {resolvedPrice ? (
-                <Price resolved={resolvedPrice} />
+                <Price
+                  resolved={resolvedPrice}
+                  currency={currency}
+                  locale={locale}
+                />
               ) : (
-                <>€{service.price}</>
+                service.displayPrice
               )}
             </span>
           </span>

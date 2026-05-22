@@ -71,6 +71,31 @@ jobs:
     runs-on: ubuntu-latest
     needs: verify
     timeout-minutes: 20
+    # The booking + catalog + service-detail + sitemap + profile specs all
+    # assert on canonical service names that used to come from STUDIO_DATA
+    # but now live in the DB. Spin up a Postgres service container, point
+    # both DATABASE_URL (postgres-js / next dev) and DIRECT_URL
+    # (drizzle-kit migrate) at it, and apply migrations before the dev
+    # server boots. The migration seeds the six legacy services + four
+    # categories idempotently via ON CONFLICT DO NOTHING, so retries
+    # don't double-insert.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: violetik_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/violetik_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/violetik_test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -83,6 +108,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Apply DB migrations
+        run: npm run db:migrate
 
       - name: Cache Playwright browsers
         id: pw-cache

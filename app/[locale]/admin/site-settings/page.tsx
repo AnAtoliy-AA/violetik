@@ -3,6 +3,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { requireAdmin } from "@/shared/lib/auth-server";
 import { getSiteSettings } from "@/db/site-settings";
+import { listAllServices } from "@/db/services";
 import { STUDIO_DATA } from "@/entities/studio";
 import { AppHeader } from "@/widgets/app-header";
 import {
@@ -40,7 +41,10 @@ export default async function AdminSiteSettingsRoute({
   setRequestLocale(locale);
 
   const t = await getTranslations("Admin");
-  const settings = await getSiteSettings();
+  const [settings, allServices] = await Promise.all([
+    getSiteSettings(),
+    listAllServices(),
+  ]);
   const vipTier = STUDIO_DATA.membership.find((m) => m.tier === "VIP");
   const vipBasePrice = vipTier?.price ?? 0;
 
@@ -49,10 +53,10 @@ export default async function AdminSiteSettingsRoute({
       <AppHeader back="/admin" title={t("site_settings_plate_title")} admin />
       <SiteSettingsForm
         initial={settings}
-        services={STUDIO_DATA.services.map((s) => ({
+        services={allServices.map((s) => ({
           id: s.id,
-          name: s.name,
-          basePrice: s.price,
+          name: s.nameEn,
+          basePrice: Math.round(s.priceCents / 100),
         }))}
         vipBasePrice={vipBasePrice}
         onSubmit={updateSiteSettingsAction}

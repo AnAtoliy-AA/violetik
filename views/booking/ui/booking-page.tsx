@@ -5,6 +5,8 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Link, useRouter } from "@/i18n/navigation";
+import type { CurrencyCode } from "@/db/schema";
+import type { Service } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { buttonClassName } from "@/shared/ui/button";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
@@ -45,10 +47,17 @@ const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export interface BookingPageProps {
   step: BookingStep;
+  services: readonly Service[];
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
+  currency?: CurrencyCode;
 }
 
-export function BookingPage({ step, pricedServices }: BookingPageProps) {
+export function BookingPage({
+  step,
+  services,
+  pricedServices,
+  currency = "EUR",
+}: BookingPageProps) {
   const t = useTranslations("Booking");
   const tSteps = useTranslations("Booking.steps");
   const tErr = useTranslations("Booking.errors");
@@ -128,10 +137,22 @@ export function BookingPage({ step, pricedServices }: BookingPageProps) {
             exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
             transition={{ duration: reduceMotion ? 0 : 0.26, ease: EASE_OUT }}
           >
-            {step === "service" ? <ServiceStep pricedServices={pricedServices} /> : null}
+            {step === "service" ? (
+              <ServiceStep
+                services={services}
+                pricedServices={pricedServices}
+                currency={currency}
+              />
+            ) : null}
             {step === "date" ? <DateStep /> : null}
             {step === "time" ? <TimeStep /> : null}
-            {step === "confirm" ? <ConfirmStep pricedServices={pricedServices} /> : null}
+            {step === "confirm" ? (
+              <ConfirmStep
+                services={services}
+                pricedServices={pricedServices}
+                currency={currency}
+              />
+            ) : null}
           </motion.div>
         </AnimatePresence>
       </div>

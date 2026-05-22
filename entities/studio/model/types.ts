@@ -1,5 +1,3 @@
-export type Category = "Care" | "Gel" | "Design" | "Form";
-
 export type GalleryTag = "Editorial" | "Gel" | "Chrome" | "Lace" | "Bridal";
 
 /**
@@ -24,19 +22,6 @@ export interface VideoAsset {
   posterSrc?: string;
   /** Accessible label for screen readers, also surfaced as <video aria-label>. */
   alt?: string;
-}
-
-export interface Service {
-  id: string;
-  name: string;
-  category: Category;
-  duration: string;
-  price: number;
-  blurb: string;
-  includes: string[];
-  hero: string;
-  /** Optional real photograph; when absent, consumers fall back to NailTile. */
-  image?: ImageAsset;
 }
 
 export interface GalleryItem {

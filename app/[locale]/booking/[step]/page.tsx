@@ -2,9 +2,10 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import { loadServicesForLocale } from "@/entities/service/api/load";
 import { resolvePrice, type ResolvedPrice } from "@/entities/site-settings";
-import { STUDIO_DATA } from "@/entities/studio";
-import { routing } from "@/i18n/routing";
+import type { CurrencyCode } from "@/db/schema";
+import { routing, type Locale } from "@/i18n/routing";
 import {
   BookingPage,
   BOOKING_STEPS,
@@ -13,6 +14,10 @@ import {
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 
 type Params = { locale: string; step: string };
+
+function isLocale(value: string): value is Locale {
+  return (routing.locales as readonly string[]).includes(value);
+}
 
 export function generateStaticParams() {
   return routing.locales.flatMap((locale) =>
@@ -37,16 +42,27 @@ export default async function BookingRoute({
   params: Promise<Params>;
 }) {
   const { locale, step } = await params;
+  if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
   if (!isBookingStep(step)) notFound();
-  const settings = await getSiteSettingsServer();
+  const [settings, services] = await Promise.all([
+    getSiteSettingsServer(),
+    loadServicesForLocale(locale),
+  ]);
   const pricedServices: Record<string, ResolvedPrice> = {};
-  for (const s of STUDIO_DATA.services) {
+  for (const s of services) {
     pricedServices[s.id] = resolvePrice(`service:${s.id}`, s.price, settings);
   }
+  const currency =
+    ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
   return (
     <Suspense fallback={null}>
-      <BookingPage step={step} pricedServices={pricedServices} />
+      <BookingPage
+        step={step}
+        services={services}
+        pricedServices={pricedServices}
+        currency={currency}
+      />
     </Suspense>
   );
 }

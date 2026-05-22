@@ -1,7 +1,67 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ServiceMenuItem } from "./service-menu-item";
-import { STUDIO_DATA } from "@/entities/studio";
+import type { Service } from "../model/types";
 import type { NailTileVariant } from "@/shared/ui/nail-tile";
+
+const sample: Service = {
+  id: "signature",
+  category: { id: "care", name: "Care" },
+  name: "Signature Manicure",
+  blurb:
+    "Russian dry technique, cuticle work, hydration ritual & gloss finish.",
+  includes: [],
+  price: 95,
+  priceCents: 9500,
+  displayPrice: "€95",
+  duration: "75 min",
+  durationMinutes: 75,
+  sortOrder: 1,
+};
+
+const stackSamples: Service[] = [
+  sample,
+  {
+    id: "gel",
+    category: { id: "gel", name: "Gel" },
+    name: "Couture Gel",
+    blurb:
+      "Long-wear Japanese gel in a single tone or a curated nude palette.",
+    includes: [],
+    price: 145,
+    priceCents: 14500,
+    displayPrice: "€145",
+    duration: "120 min",
+    durationMinutes: 120,
+    sortOrder: 2,
+  },
+  {
+    id: "editorial",
+    category: { id: "design", name: "Design" },
+    name: "Editorial Art",
+    blurb: "Bespoke nail design — chrome, lace, hand-painted miniatures.",
+    includes: [],
+    price: 195,
+    priceCents: 19500,
+    displayPrice: "€195",
+    duration: "150 min",
+    durationMinutes: 150,
+    sortOrder: 3,
+  },
+  {
+    id: "extensions",
+    category: { id: "form", name: "Form" },
+    name: "Glass Extensions",
+    blurb:
+      "Sculpted soft-gel extensions in glass, almond or ballerina silhouettes.",
+    includes: [],
+    price: 240,
+    priceCents: 24000,
+    displayPrice: "€240",
+    duration: "180 min",
+    durationMinutes: 180,
+    sortOrder: 4,
+  },
+];
 
 const meta: Meta<typeof ServiceMenuItem> = {
   title: "entities/service/ServiceMenuItem",
@@ -16,7 +76,7 @@ const meta: Meta<typeof ServiceMenuItem> = {
     },
   },
   args: {
-    service: STUDIO_DATA.services[0],
+    service: sample,
     plateNumber: 1,
     variant: 0,
     topRule: false,
@@ -49,7 +109,7 @@ export const WithDiscount: Story = {
 export const Stack: Story = {
   render: () => (
     <div className="flex w-[380px] flex-col">
-      {STUDIO_DATA.services.map((s, i) => (
+      {stackSamples.map((s, i) => (
         <ServiceMenuItem
           key={s.id}
           service={s}

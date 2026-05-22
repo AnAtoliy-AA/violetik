@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { STUDIO_DATA } from "@/entities/studio";
+import { listPublishedServices } from "@/db/services";
 import { routing } from "@/i18n/routing";
 
 /**
@@ -9,7 +9,7 @@ import { routing } from "@/i18n/routing";
  * not crawl-worthy), and the implicit `/[locale]` redirect (it forwards
  * to `/welcome`, so we list `/welcome` directly).
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://violetta.example.com";
 
   const PUBLIC_PATHS = [
@@ -23,7 +23,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/profile",
   ] as const;
 
-  const servicePaths = STUDIO_DATA.services.map((s) => `/services/${s.id}`);
+  const services = await listPublishedServices();
+  const servicePaths = services.map((s) => `/services/${s.id}`);
   const allPaths = [...PUBLIC_PATHS, ...servicePaths];
 
   return routing.locales.flatMap((locale) =>

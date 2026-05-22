@@ -1,8 +1,11 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import type { CurrencyCode } from "@/db/schema";
+import type { Service } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
+import type { Locale } from "@/i18n/routing";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile } from "@/shared/ui/nail-tile";
@@ -13,20 +16,24 @@ import { useBookingStore } from "@/views/booking/model/booking-store";
 const HERO_PALETTE: readonly [string, string] = ["#c9a96e", "#7d3a6f"];
 
 export interface ConfirmStepProps {
+  services: readonly Service[];
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
+  currency?: CurrencyCode;
 }
 
-export function ConfirmStep({ pricedServices }: ConfirmStepProps = {}) {
+export function ConfirmStep({
+  services,
+  pricedServices,
+  currency = "EUR",
+}: ConfirmStepProps) {
   const t = useTranslations("Booking.confirm");
-  const locale = useLocale();
+  const locale = useLocale() as Locale;
 
   const serviceId = useBookingStore((s) => s.serviceId);
   const date = useBookingStore((s) => s.date);
   const time = useBookingStore((s) => s.time);
 
-  const service =
-    STUDIO_DATA.services.find((s) => s.id === serviceId) ??
-    STUDIO_DATA.services[0];
+  const service = services.find((s) => s.id === serviceId) ?? services[0];
   const dateLabel = date ? formatLongDate(date, locale) : t("missing_date");
   const timeLabel = time ?? t("missing_time");
 
@@ -36,6 +43,24 @@ export function ConfirmStep({ pricedServices }: ConfirmStepProps = {}) {
     [t("row_time"), timeLabel],
     [t("row_location"), STUDIO_DATA.studio.address],
   ];
+
+  // When the catalog is empty (DB unset), `service` is undefined — fall
+  // back to a minimal placeholder so the JSX still renders rather than
+  // crashing on `service.name`. This keeps the booking page rendering
+  // in pre-migration / db-null environments.
+  const safeService: Service = service ?? {
+    id: "",
+    category: { id: "", name: "" },
+    name: t("missing_date"),
+    blurb: "",
+    includes: [],
+    price: 0,
+    priceCents: 0,
+    displayPrice: "",
+    duration: "",
+    durationMinutes: 0,
+    sortOrder: 0,
+  };
 
   return (
     <div>
@@ -58,15 +83,19 @@ export function ConfirmStep({ pricedServices }: ConfirmStepProps = {}) {
           <div className="min-w-0 flex-1">
             <Eyebrow>{t("row_ritual")}</Eyebrow>
             <div className="my-1 font-display text-[22px] font-normal italic">
-              {service.name}
+              {safeService.name}
             </div>
             <div className="flex items-baseline gap-1 font-mono text-[12px] uppercase tracking-[0.06em] text-text-3">
-              <span>{service.duration}</span>
+              <span>{safeService.duration}</span>
               <span>·</span>
-              {pricedServices?.[service.id] ? (
-                <Price resolved={pricedServices[service.id]} />
+              {pricedServices?.[safeService.id] ? (
+                <Price
+                  resolved={pricedServices[safeService.id]}
+                  currency={currency}
+                  locale={locale}
+                />
               ) : (
-                <span>€{service.price}</span>
+                <span>{safeService.displayPrice}</span>
               )}
             </div>
           </div>
@@ -94,10 +123,14 @@ export function ConfirmStep({ pricedServices }: ConfirmStepProps = {}) {
               {t("total")}
             </div>
             <div className="font-display text-[30px] font-normal italic text-gold-shimmer">
-              {pricedServices?.[service.id] ? (
-                <Price resolved={pricedServices[service.id]} />
+              {pricedServices?.[safeService.id] ? (
+                <Price
+                  resolved={pricedServices[safeService.id]}
+                  currency={currency}
+                  locale={locale}
+                />
               ) : (
-                <>€{service.price}</>
+                safeService.displayPrice
               )}
             </div>
           </div>

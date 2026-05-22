@@ -1,12 +1,14 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "@/shared/lib/cn";
+import type { CurrencyCode } from "@/db/schema";
+import type { Locale } from "@/i18n/routing";
 import {
   NailTile,
   type NailTileVariant,
 } from "@/shared/ui/nail-tile";
 import { Price } from "@/shared/ui/price";
 import type { ResolvedPrice } from "@/entities/site-settings";
-import type { Service } from "@/entities/studio";
+import type { Service } from "../model/types";
 
 export interface ServiceCardProps extends HTMLAttributes<HTMLDivElement> {
   service: Service;
@@ -14,6 +16,10 @@ export interface ServiceCardProps extends HTMLAttributes<HTMLDivElement> {
   topRule?: boolean;
   palette?: readonly [string, string];
   resolvedPrice?: ResolvedPrice;
+  /** Display currency. Defaults to EUR for legacy stories/tests. */
+  currency?: CurrencyCode;
+  /** Active locale. Defaults to en for legacy stories/tests. */
+  locale?: Locale;
 }
 
 const DEFAULT_PALETTE: readonly [string, string] = ["#c9a96e", "#7d3a6f"];
@@ -24,6 +30,8 @@ export function ServiceCard({
   topRule = false,
   palette = DEFAULT_PALETTE,
   resolvedPrice,
+  currency = "EUR",
+  locale = "en",
   className,
   ...rest
 }: ServiceCardProps) {
@@ -61,9 +69,13 @@ export function ServiceCard({
           />
           <span className="shrink-0 font-mono text-[13px] text-gold">
             {resolvedPrice ? (
-              <Price resolved={resolvedPrice} />
+              <Price
+                resolved={resolvedPrice}
+                currency={currency}
+                locale={locale}
+              />
             ) : (
-              <>€{service.price}</>
+              service.displayPrice
             )}
           </span>
         </div>

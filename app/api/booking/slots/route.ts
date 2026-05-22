@@ -10,17 +10,11 @@ import {
   updateLastRefresh,
 } from "@/db/google-tokens";
 import { listActiveBookingsFrom } from "@/db/bookings";
-import { STUDIO_DATA } from "@/entities/studio";
+import { getServiceById } from "@/db/services";
 import { slotCache } from "./cache";
 
 const DEFAULT_DURATION_MIN = 60;
 const REFRESH_THRESHOLD_MS = 50 * 60_000;
-
-function parseDurationMin(durationLabel: string | undefined): number {
-  if (!durationLabel) return DEFAULT_DURATION_MIN;
-  const m = /^(\d+)\s*min/i.exec(durationLabel);
-  return m ? Number.parseInt(m[1]!, 10) : DEFAULT_DURATION_MIN;
-}
 
 export async function GET(req: Request): Promise<Response> {
   const url = new URL(req.url);
@@ -30,8 +24,8 @@ export async function GET(req: Request): Promise<Response> {
     return Response.json({ error: "missing_params" }, { status: 400 });
   }
 
-  const service = STUDIO_DATA.services.find((s) => s.id === serviceId);
-  const durationMin = parseDurationMin(service?.duration);
+  const service = await getServiceById(serviceId);
+  const durationMin = service?.durationMinutes ?? DEFAULT_DURATION_MIN;
   const tz = bookingTimeZone();
   const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
   const cacheKey = `${calendarId}:${dayISO}:${durationMin}`;

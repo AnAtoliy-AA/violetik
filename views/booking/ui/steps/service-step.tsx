@@ -1,8 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import type { CurrencyCode } from "@/db/schema";
+import type { Service } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
-import { STUDIO_DATA } from "@/entities/studio";
+import type { Locale } from "@/i18n/routing";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
@@ -11,7 +13,9 @@ import { Price } from "@/shared/ui/price";
 import { useBookingStore } from "@/views/booking/model/booking-store";
 
 export interface ServiceStepProps {
+  services: readonly Service[];
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
+  currency?: CurrencyCode;
 }
 
 function CheckIcon() {
@@ -29,8 +33,13 @@ function CheckIcon() {
   );
 }
 
-export function ServiceStep({ pricedServices }: ServiceStepProps = {}) {
+export function ServiceStep({
+  services,
+  pricedServices,
+  currency = "EUR",
+}: ServiceStepProps) {
   const t = useTranslations("Booking.service");
+  const locale = useLocale() as Locale;
   const serviceId = useBookingStore((s) => s.serviceId);
   const setService = useBookingStore((s) => s.setService);
 
@@ -44,7 +53,7 @@ export function ServiceStep({ pricedServices }: ServiceStepProps = {}) {
       <p className="m-0 mb-5 text-sm text-text-2">{t("paragraph")}</p>
 
       <div className="flex flex-col gap-2.5">
-        {STUDIO_DATA.services.map((s, i) => {
+        {services.map((s, i) => {
           const active = serviceId === s.id;
           return (
             <button
@@ -75,9 +84,13 @@ export function ServiceStep({ pricedServices }: ServiceStepProps = {}) {
                   <span>{s.duration}</span>
                   <span>·</span>
                   {pricedServices?.[s.id] ? (
-                    <Price resolved={pricedServices[s.id]} />
+                    <Price
+                      resolved={pricedServices[s.id]}
+                      currency={currency}
+                      locale={locale}
+                    />
                   ) : (
-                    <span>€{s.price}</span>
+                    <span>{s.displayPrice}</span>
                   )}
                 </div>
               </div>

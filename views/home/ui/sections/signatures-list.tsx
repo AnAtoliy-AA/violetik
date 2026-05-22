@@ -1,7 +1,10 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ServiceCard } from "@/entities/service";
-import { loadServicesWithPhotos } from "@/entities/studio/api/load-with-photos";
+import { loadServicesForLocale } from "@/entities/service/api/load";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import type { CurrencyCode } from "@/db/schema";
+import type { Locale } from "@/i18n/routing";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Plate } from "@/shared/ui/plate";
 import { SpotlightCard } from "@/shared/ui/spotlight-card";
@@ -25,9 +28,16 @@ function ArrowRight() {
 }
 
 export async function SignaturesList() {
-  const t = await getTranslations("Home");
-  const all = await loadServicesWithPhotos();
+  const [t, localeStr, settings] = await Promise.all([
+    getTranslations("Home"),
+    getLocale(),
+    getSiteSettingsServer(),
+  ]);
+  const locale = localeStr as Locale;
+  const all = await loadServicesForLocale(locale);
   const services = all.slice(0, 4);
+  const currency =
+    ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
   return (
     <section className="px-[22px] pb-6 pt-12">
       <div className="mb-3 flex items-end justify-between">
@@ -55,6 +65,8 @@ export async function SignaturesList() {
                 service={service}
                 variant={(i % 6) as NailTileVariant}
                 topRule={i === 0}
+                currency={currency}
+                locale={locale}
               />
             </Link>
           </SpotlightCard>

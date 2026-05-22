@@ -50,6 +50,13 @@
       "when": 1779383409781,
       "tag": "0006_studio_photos",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1779399762150,
+      "tag": "0007_admin_services",
+      "breakpoints": true
     }
   ]
 }

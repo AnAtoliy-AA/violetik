@@ -4,12 +4,10 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ServiceMenuItem } from "@/entities/service";
+import type { Service, ServiceCategoryRef } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
-import {
-  STUDIO_DATA,
-  type Category,
-  type Service,
-} from "@/entities/studio";
+import type { CurrencyCode } from "@/db/schema";
+import type { Locale } from "@/i18n/routing";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
 import { Aurora } from "@/shared/ui/aurora";
@@ -21,50 +19,42 @@ import { Plate } from "@/shared/ui/plate";
 import { SpotlightCard } from "@/shared/ui/spotlight-card";
 import { CategoryChips, type ChipValue } from "./category-chips";
 
-const CATEGORIES: readonly Category[] = ["Care", "Gel", "Design", "Form"];
+const ALL: ChipValue = "All";
 
 export interface ServicesCatalogPageProps {
-  /**
-   * Optional price map indexed by service id. Server route resolves
-   * prices via site settings and passes them in. Missing entries fall
-   * back to the catalog price — keeps tests/stories simple.
-   */
+  services: readonly Service[];
+  categories: readonly ServiceCategoryRef[];
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
-  /**
-   * Optional service list with `image` populated from `studio_photos`.
-   * When omitted, falls back to the in-memory STUDIO_DATA so existing
-   * tests / stories don't need to thread a DB.
-   */
-  services?: readonly Service[];
+  currency?: CurrencyCode;
+  locale?: Locale;
 }
 
 export function ServicesCatalogPage({
-  pricedServices,
   services,
-}: ServicesCatalogPageProps = {}) {
+  categories,
+  pricedServices,
+  currency = "EUR",
+  locale = "en",
+}: ServicesCatalogPageProps) {
   const t = useTranslations("Services");
-  const tCat = useTranslations("Services.category");
-  const [active, setActive] = useState<ChipValue>("All");
+  const [active, setActive] = useState<ChipValue>(ALL);
 
-  const chips: readonly ChipValue[] = useMemo(() => ["All", ...CATEGORIES], []);
-  const labels = useMemo<Record<string, string>>(
-    () => ({
-      All: t("category_all"),
-      Care: tCat("Care"),
-      Gel: tCat("Gel"),
-      Design: tCat("Design"),
-      Form: tCat("Form"),
-    }),
-    [t, tCat],
+  const chips: readonly ChipValue[] = useMemo(
+    () => [ALL, ...categories.map((c) => c.id)],
+    [categories],
   );
+  const labels = useMemo<Record<string, string>>(() => {
+    const out: Record<string, string> = { [ALL]: t("category_all") };
+    for (const c of categories) out[c.id] = c.name;
+    return out;
+  }, [categories, t]);
 
-  const source = services ?? STUDIO_DATA.services;
   const filtered = useMemo(
     () =>
-      active === "All"
-        ? source
-        : source.filter((s) => s.category === active),
-    [active, source],
+      active === ALL
+        ? services
+        : services.filter((s) => s.category.id === active),
+    [active, services],
   );
 
   return (
@@ -120,6 +110,8 @@ export function ServicesCatalogPage({
                   variant={(i % 6) as NailTileVariant}
                   topRule={i === 0}
                   resolvedPrice={pricedServices?.[service.id]}
+                  currency={currency}
+                  locale={locale}
                 />
               </Link>
             </SpotlightCard>

@@ -3,7 +3,11 @@ import {
   availabilityRules,
   bookings,
   bookingStatus,
+  currencyCode,
   googleOauthTokens,
+  serviceCategories,
+  serviceStatus,
+  services,
   userRole,
   users,
   vipRequests,
@@ -15,8 +19,12 @@ import type {
   GoogleOauthToken,
   NewBooking,
   NewGoogleOauthToken,
+  NewService,
+  NewServiceCategory,
   NewUser,
   NewVipRequest,
+  Service,
+  ServiceCategoryRow,
   User,
 } from "./schema";
 
@@ -112,5 +120,51 @@ describe("db/schema", () => {
     };
     expect(_insert.userId).toBe("tg:1");
     expect(_select.calendarId).toBe("primary");
+  });
+});
+
+describe("db/schema — services", () => {
+  it("declares the two services tables and two new enums", () => {
+    expect(serviceCategories).toBeDefined();
+    expect(services).toBeDefined();
+    expect(serviceStatus.enumValues).toEqual(["draft", "published", "archived"]);
+    expect(currencyCode.enumValues).toEqual(["EUR", "USD", "BYN", "RUB"]);
+  });
+
+  it("infers Service / ServiceCategoryRow Insert types with required i18n columns", () => {
+    const _cat: NewServiceCategory = {
+      id: "care",
+      nameEn: "Care",
+      nameRu: "Уход",
+      nameBe: "Догляд",
+    };
+    const _svc: NewService = {
+      id: "signature",
+      categoryId: "care",
+      nameEn: "Signature Manicure",
+      nameRu: "Сигнатурный маникюр",
+      nameBe: "Сігнатурны манікюр",
+      blurbEn: "Russian dry technique, cuticle work, hydration ritual & gloss finish.",
+      blurbRu: "Русская сухая техника, работа с кутикулой, ритуал увлажнения и финишный блеск.",
+      blurbBe: "Расейская сухая тэхніка, праца з кутыкулай, рытуал увільгатнення і фініш-бляск.",
+      includes: [],
+      priceCents: 9500,
+      durationMinutes: 75,
+    };
+    const _sel: Pick<Service, "id" | "status" | "sortOrder" | "createdAt"> = {
+      id: "signature",
+      status: "published",
+      sortOrder: 1,
+      createdAt: new Date(),
+    };
+    const _selCat: Pick<ServiceCategoryRow, "id" | "status" | "sortOrder"> = {
+      id: "care",
+      status: "published",
+      sortOrder: 1,
+    };
+    expect(_cat.id).toBe("care");
+    expect(_svc.priceCents).toBe(9500);
+    expect(_sel.status).toBe("published");
+    expect(_selCat.status).toBe("published");
   });
 });
