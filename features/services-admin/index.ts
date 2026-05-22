@@ -10,4 +10,24 @@ export { reorderCategoriesAction } from "./api/reorder-categories";
 export { reorderServicesAction } from "./api/reorder-services";
 export type { ActionResult } from "./api/_common";
 export type { ArchiveCategoryResult } from "./api/archive-category";
-// UI exports land in subsequent tasks (SortableList, editors, AdminServicesList).
+
+export { SortableList } from "./ui/sortable-list";
+export type { SortableListProps, SortableItem } from "./ui/sortable-list";
+export { CategoryEditor } from "./ui/category-editor";
+export type {
+  CategoryEditorProps,
+  CategoryEditorInitial,
+} from "./ui/category-editor";
+export { ServiceEditor } from "./ui/service-editor";
+export type {
+  ServiceEditorProps,
+  ServiceEditorInitial,
+  CategoryOption,
+} from "./ui/service-editor";
+export { IncludesFieldset } from "./ui/includes-fieldset";
+export type { IncludeEntry } from "./ui/includes-fieldset";
+export { AdminServicesList } from "./ui/admin-services-list";
+export type {
+  AdminServicesListProps,
+  ReorderAction,
+} from "./ui/admin-services-list";
