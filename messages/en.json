@@ -279,6 +279,8 @@
     "site_settings_error": "Save failed: {error}",
     "inbox_photos": "Photography",
     "inbox_photos_caption": "Upload + manage studio imagery",
+    "inbox_services": "Services",
+    "inbox_services_caption": "Menu, categories, photos",
     "photos": {
       "plate_title": "Photography",
       "eyebrow": "Studio imagery",
@@ -306,7 +308,8 @@
       "upload_error_too_large": "File is too large (max 8 MB)",
       "upload_error_upload_failed": "Upload failed · try again",
       "upload_error_auth": "Sign in as admin to upload",
-      "upload_error_validation": "Some fields are missing"
+      "upload_error_validation": "Some fields are missing",
+      "edit_service": "Edit service"
     }
   },
   "AtelierHours": {

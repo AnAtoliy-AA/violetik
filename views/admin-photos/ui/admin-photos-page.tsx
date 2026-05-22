@@ -3,6 +3,7 @@ import { AppHeader } from "@/widgets/app-header";
 import { listAllPhotoSlots, PhotoUploadRow } from "@/features/photo-upload-admin";
 import { getStudioPhotos } from "@/db/studio-photos";
 import { isPhotoStorageConfigured } from "@/shared/lib/photo-storage";
+import { Link } from "@/i18n/navigation";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import type { ImageAsset } from "@/entities/studio";
@@ -70,12 +71,24 @@ export async function AdminPhotosPage() {
           </h2>
           <div className="flex flex-col gap-3">
             {group.slots.map((slot) => (
-              <PhotoUploadRow
+              <div
                 key={`${slot.kind}-${slot.id}`}
-                slot={slot}
-                current={photosByKind.get(slot.kind)?.get(slot.id) ?? null}
-                storageConfigured={storageConfigured}
-              />
+                className="flex flex-col gap-1.5"
+              >
+                <PhotoUploadRow
+                  slot={slot}
+                  current={photosByKind.get(slot.kind)?.get(slot.id) ?? null}
+                  storageConfigured={storageConfigured}
+                />
+                {slot.kind === "service" ? (
+                  <Link
+                    href={`/admin/services/${slot.id}`}
+                    className="self-end font-mono text-[10px] uppercase tracking-[0.16em] text-accent hover:underline"
+                  >
+                    {t("edit_service")} →
+                  </Link>
+                ) : null}
+              </div>
             ))}
           </div>
         </section>

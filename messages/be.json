@@ -279,6 +279,8 @@
     "site_settings_error": "Не атрымалася захаваць: {error}",
     "inbox_photos": "Фатаграфіі",
     "inbox_photos_caption": "Загрузка і кіраванне выявамі",
+    "inbox_services": "Паслугі",
+    "inbox_services_caption": "Меню, катэгорыі, фота",
     "photos": {
       "plate_title": "Фатаграфіі",
       "eyebrow": "Выявы атэлье",
@@ -306,7 +308,8 @@
       "upload_error_too_large": "Файл занадта вялікі (макс. 8 МБ)",
       "upload_error_upload_failed": "Збой загрузкі · паспрабуйце яшчэ раз",
       "upload_error_auth": "Увайдзіце як адмін для загрузкі",
-      "upload_error_validation": "Запоўніце ўсе палі"
+      "upload_error_validation": "Запоўніце ўсе палі",
+      "edit_service": "Рэдагаваць"
     }
   },
   "AtelierHours": {

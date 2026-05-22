@@ -279,6 +279,8 @@
     "site_settings_error": "Не удалось сохранить: {error}",
     "inbox_photos": "Фотографии",
     "inbox_photos_caption": "Загрузка и управление изображениями",
+    "inbox_services": "Услуги",
+    "inbox_services_caption": "Меню, категории, фото",
     "photos": {
       "plate_title": "Фотографии",
       "eyebrow": "Изображения студии",
@@ -306,7 +308,8 @@
       "upload_error_too_large": "Файл слишком большой (макс. 8 МБ)",
       "upload_error_upload_failed": "Сбой загрузки · попробуйте ещё раз",
       "upload_error_auth": "Войдите как админ для загрузки",
-      "upload_error_validation": "Заполните все поля"
+      "upload_error_validation": "Заполните все поля",
+      "edit_service": "Редактировать"
     }
   },
   "AtelierHours": {
