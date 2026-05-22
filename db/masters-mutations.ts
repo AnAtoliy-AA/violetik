@@ -1,4 +1,4 @@
-import { and, eq, notInArray, sql } from "drizzle-orm";
+import { and, count, eq, gt, ne, notInArray, sql } from "drizzle-orm";
 import { db, schema } from "./index";
 
 /**
@@ -152,12 +152,28 @@ export async function setMasterServices(
 }
 
 /**
- * Phase 1 stub: bookings.master_id doesn't exist yet, so this always
- * returns 0. Phase 2 swaps in a real COUNT(*) query.
+ * Counts upcoming, non-cancelled bookings tied to a master. Used by
+ * archiveMaster to refuse archiving until future bookings have been
+ * reassigned or cancelled.
  */
 export async function countUpcomingBookingsForMaster(
   masterId: string,
 ): Promise<number> {
-  void masterId;
-  return 0;
+  if (!db) return 0;
+  try {
+    const rows = await db
+      .select({ n: count() })
+      .from(schema.bookings)
+      .where(
+        and(
+          eq(schema.bookings.masterId, masterId),
+          gt(schema.bookings.scheduledFor, sql`now()`),
+          ne(schema.bookings.status, "cancelled"),
+        ),
+      );
+    return rows[0]?.n ?? 0;
+  } catch (error) {
+    if (isMissingTable(error)) return 0;
+    throw error;
+  }
 }

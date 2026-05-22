@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import type { CurrencyCode } from "@/db/schema";
+import type { Master } from "@/entities/master";
 import type { Service } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
@@ -19,30 +20,30 @@ export interface ConfirmStepProps {
   services: readonly Service[];
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
   currency?: CurrencyCode;
-  /** Phase 1: first-published-master name; Phase 2 will read from the
-   * booking store after the master step lands. */
-  masterName?: string;
+  masters: readonly Master[];
 }
 
 export function ConfirmStep({
   services,
   pricedServices,
   currency = "EUR",
-  masterName,
+  masters,
 }: ConfirmStepProps) {
   const t = useTranslations("Booking.confirm");
   const locale = useLocale() as Locale;
 
   const serviceId = useBookingStore((s) => s.serviceId);
+  const masterId = useBookingStore((s) => s.masterId);
   const date = useBookingStore((s) => s.date);
   const time = useBookingStore((s) => s.time);
 
   const service = services.find((s) => s.id === serviceId) ?? services[0];
+  const master = masters.find((m) => m.id === masterId);
   const dateLabel = date ? formatLongDate(date, locale) : t("missing_date");
   const timeLabel = time ?? t("missing_time");
 
   const rows: readonly [string, string][] = [
-    [t("row_master"), masterName ?? "—"],
+    [t("row_master"), master?.name ?? "—"],
     [t("row_date"), dateLabel],
     [t("row_time"), timeLabel],
     [t("row_location"), STUDIO_DATA.studio.address],

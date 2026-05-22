@@ -17,6 +17,7 @@ import {
 } from "@/db/bookings";
 import { ensureUserRow } from "@/db/ensure-user";
 import { getServiceById } from "@/db/services";
+import { getMasterById, getMasterIdsForService } from "@/db/masters";
 
 function localizedServiceName(
   service: { nameEn: string; nameRu: string; nameBe: string },
@@ -56,6 +57,7 @@ function localToUtc(dayISO: string, hm: string, timeZone: string): Date {
 
 export interface SubmitBookingInput {
   serviceId: string;
+  masterId: string | null;
   date: string; // "YYYY-MM-DD"
   time: string; // "HH:MM"
   locale: string;
@@ -63,7 +65,16 @@ export interface SubmitBookingInput {
 
 export type SubmitBookingResult =
   | { ok: true; bookingId: string }
-  | { ok: false; error: "slot_taken" | "db_unavailable" | "invalid_input" | "unknown" };
+  | {
+      ok: false;
+      error:
+        | "slot_taken"
+        | "db_unavailable"
+        | "invalid_input"
+        | "no_master_available"
+        | "master_not_eligible"
+        | "unknown";
+    };
 
 /**
  * Server-side booking submission. Validates session + input, inserts a
@@ -94,6 +105,29 @@ export async function submitBooking(
     return { ok: false, error: "invalid_input" };
   }
 
+  // Server-side master eligibility check. If exactly one master is
+  // eligible the server overrides the client's submitted id (defence
+  // against tampering / stale state). If 2+, the client's id must be
+  // in the eligible set AND the master must still be published.
+  const eligibleIds = await getMasterIdsForService(input.serviceId);
+  let masterId: string;
+  if (eligibleIds.length === 0) {
+    // Orphan service — shouldn't be reachable thanks to orphan-hiding
+    // at the catalog read layer; defence-in-depth.
+    return { ok: false, error: "no_master_available" };
+  } else if (eligibleIds.length === 1) {
+    masterId = eligibleIds[0];
+  } else {
+    if (!input.masterId || !eligibleIds.includes(input.masterId)) {
+      return { ok: false, error: "master_not_eligible" };
+    }
+    const master = await getMasterById(input.masterId);
+    if (!master || master.status !== "published") {
+      return { ok: false, error: "master_not_eligible" };
+    }
+    masterId = input.masterId;
+  }
+
   const tz = bookingTimeZone();
   const scheduledFor = localToUtc(input.date, input.time, tz);
   const durationMin = service.durationMinutes;
@@ -117,6 +151,7 @@ export async function submitBooking(
     booking = await createBooking({
       userId: session.user.id,
       serviceId: input.serviceId,
+      masterId,
       scheduledFor,
       durationMinutes: durationMin,
     });
@@ -154,10 +189,12 @@ export async function submitBooking(
       });
       const end = new Date(scheduledFor.getTime() + durationMin * 60_000);
       const customerLabel = session.user.name ?? session.user.id;
+      const master = await getMasterById(masterId);
+      const masterLabel = master ? ` · ${master.nameEn}` : "";
       const eventId = await createCalendarEvent({
         calendarId: token.calendarId,
         accessToken,
-        summary: `${localizedServiceName(service, input.locale)} · ${customerLabel}`,
+        summary: `${localizedServiceName(service, input.locale)}${masterLabel} · ${customerLabel}`,
         description: `Violetta booking ${booking.id}\nStatus: pending`,
         start: scheduledFor,
         end,

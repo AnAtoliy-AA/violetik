@@ -5,9 +5,11 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 export type BookingState = {
   serviceId: string | null;
+  masterId: string | null;
   date: string | null;
   time: string | null;
   setService: (id: string | null) => void;
+  setMaster: (id: string | null) => void;
   setDate: (date: string | null) => void;
   setTime: (time: string | null) => void;
   reset: () => void;
@@ -37,12 +39,17 @@ export const useBookingStore = create<BookingState>()(
   persist(
     (set) => ({
       serviceId: null,
+      masterId: null,
       date: null,
       time: null,
-      setService: (serviceId) => set({ serviceId }),
+      // Picking a different service may shift the eligible-master set,
+      // so clear the master assignment whenever the service changes.
+      setService: (serviceId) => set({ serviceId, masterId: null }),
+      setMaster: (masterId) => set({ masterId }),
       setDate: (date) => set({ date }),
       setTime: (time) => set({ time }),
-      reset: () => set({ serviceId: null, date: null, time: null }),
+      reset: () =>
+        set({ serviceId: null, masterId: null, date: null, time: null }),
     }),
     {
       name: "violetta-booking",

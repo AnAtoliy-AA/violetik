@@ -14,8 +14,26 @@ describe("useBookingStore", () => {
   it("starts with null selections", () => {
     const state = useBookingStore.getState();
     expect(state.serviceId).toBeNull();
+    expect(state.masterId).toBeNull();
     expect(state.date).toBeNull();
     expect(state.time).toBeNull();
+  });
+
+  it("setMaster updates masterId", () => {
+    useBookingStore.getState().setMaster("violetta");
+    expect(useBookingStore.getState().masterId).toBe("violetta");
+  });
+
+  it("setService clears masterId", () => {
+    useBookingStore.setState({ serviceId: "signature", masterId: "violetta" });
+    useBookingStore.getState().setService("editorial");
+    expect(useBookingStore.getState().masterId).toBeNull();
+  });
+
+  it("reset clears masterId too", () => {
+    useBookingStore.getState().setMaster("violetta");
+    useBookingStore.getState().reset();
+    expect(useBookingStore.getState().masterId).toBeNull();
   });
 
   it("setters update individual fields", () => {

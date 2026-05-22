@@ -1,4 +1,10 @@
-export const BOOKING_STEPS = ["service", "date", "time", "confirm"] as const;
+export const BOOKING_STEPS = [
+  "service",
+  "master",
+  "date",
+  "time",
+  "confirm",
+] as const;
 export type BookingStep = (typeof BOOKING_STEPS)[number];
 
 export function isBookingStep(value: string): value is BookingStep {

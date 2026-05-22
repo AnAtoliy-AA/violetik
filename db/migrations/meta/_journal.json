@@ -64,6 +64,13 @@
       "when": 1779439773465,
       "tag": "0008_admin_masters",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1779464027148,
+      "tag": "0009_bookings_master_id",
+      "breakpoints": true
     }
   ]
 }

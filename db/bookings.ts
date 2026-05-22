@@ -5,6 +5,7 @@ import { db, schema } from "./index";
 export interface NewBookingInput {
   userId: string;
   serviceId: string;
+  masterId: string;
   scheduledFor: Date;
   durationMinutes: number;
   notes?: string | null;
@@ -15,6 +16,9 @@ export interface BookingWithUser extends schema.Booking {
   userFirstName: string | null;
   userLastName: string | null;
   username: string | null;
+  masterNameEn: string | null;
+  masterNameRu: string | null;
+  masterNameBe: string | null;
 }
 
 function generateBookingId(): string {
@@ -38,6 +42,7 @@ export async function createBooking(
       id,
       userId: input.userId,
       serviceId: input.serviceId,
+      masterId: input.masterId,
       scheduledFor: input.scheduledFor,
       durationMinutes: input.durationMinutes,
       notes: input.notes ?? null,
@@ -91,9 +96,13 @@ export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
       userFirstName: schema.users.firstName,
       userLastName: schema.users.lastName,
       username: schema.users.username,
+      masterNameEn: schema.masters.nameEn,
+      masterNameRu: schema.masters.nameRu,
+      masterNameBe: schema.masters.nameBe,
     })
     .from(schema.bookings)
     .leftJoin(schema.users, eq(schema.bookings.userId, schema.users.id))
+    .leftJoin(schema.masters, eq(schema.bookings.masterId, schema.masters.id))
     .orderBy(desc(schema.bookings.scheduledFor));
   return rows.map((r) => ({
     ...r.booking,
@@ -101,6 +110,9 @@ export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
     userFirstName: r.userFirstName,
     userLastName: r.userLastName,
     username: r.username,
+    masterNameEn: r.masterNameEn,
+    masterNameRu: r.masterNameRu,
+    masterNameBe: r.masterNameBe,
   }));
 }
 

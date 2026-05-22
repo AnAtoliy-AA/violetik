@@ -92,6 +92,12 @@ export default async function AdminBookingsRoute({
           {bookings.map((b) => {
             const service = serviceById.get(b.serviceId);
             const isPending = b.status === "pending";
+            const masterName =
+              locale === "ru"
+                ? b.masterNameRu
+                : locale === "be"
+                  ? b.masterNameBe
+                  : b.masterNameEn;
             return (
               <li
                 key={b.id}
@@ -104,6 +110,9 @@ export default async function AdminBookingsRoute({
                   <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
                     {tStatus(b.status)}
                   </div>
+                </div>
+                <div className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-text-3">
+                  {masterName ?? "—"}
                 </div>
                 <div className="mt-1 text-[13px] text-text-2">
                   {formatScheduled(b.scheduledFor, locale, tz)} ·{" "}

@@ -77,6 +77,7 @@
     "cta_pick_time": "Pick a time",
     "steps": {
       "service": "Service",
+      "master": "Master",
       "date": "Date",
       "time": "Time",
       "confirm": "Confirm"
@@ -86,15 +87,22 @@
       "title": "Choose your <em>ritual</em>.",
       "paragraph": "Pick one. You can change it any time before payment."
     },
+    "master": {
+      "eyebrow": "Step 02 / Master",
+      "title": "Choose your <em>master</em>.",
+      "subtitle": "Pick who you'd like to spend the hour with.",
+      "years_label": "{years, plural, one {# year} other {# years}}",
+      "no_eligible": "No master is currently set up for this service. Pick a different service or contact the studio."
+    },
     "date": {
-      "eyebrow": "Step 02 / Date",
+      "eyebrow": "Step 03 / Date",
       "title": "Pick a <em>day</em>.",
       "paragraph": "Studio open <gold>Tuesday – Saturday</gold>.",
       "hours_eyebrow": "Studio hours",
       "hours": "Tue – Sat · 10:00 – 19:00 · By appointment only"
     },
     "time": {
-      "eyebrow": "Step 03 / Time",
+      "eyebrow": "Step 04 / Time",
       "title": "Choose your <em>hour</em>.",
       "no_date": "Pick a date first to see availability.",
       "zone_suffix": "Times in studio local time.",
@@ -102,7 +110,7 @@
       "available": "Available"
     },
     "confirm": {
-      "eyebrow": "Step 04 / Confirm",
+      "eyebrow": "Step 05 / Confirm",
       "title": "A quiet <em>review</em>.",
       "paragraph": "Confirm and you'll receive an email invitation.",
       "row_ritual": "Ritual",
