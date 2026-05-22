@@ -50,6 +50,11 @@ export default async function AdminMastersRoute({
   return (
     <div className="pb-16">
       <AppHeader back="/admin" title={t("plate_title")} admin />
+      <section className="px-[22px] py-6">
+        <h1 className="mb-2 mt-2 font-display text-[40px] font-light italic leading-[1.05] tracking-[-0.02em]">
+          {t("plate_title")}
+        </h1>
+      </section>
       <AdminMastersList
         masters={rows}
         reorderMastersAction={reorderMastersAction}
