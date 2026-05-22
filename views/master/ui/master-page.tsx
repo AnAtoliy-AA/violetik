@@ -6,6 +6,7 @@ import {
   type Artist,
   type Testimonial,
 } from "@/entities/studio";
+import type { Master } from "@/entities/master";
 import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
@@ -35,16 +36,29 @@ function ArrowRight() {
 export interface MasterPageProps {
   /** Override the master record (with DB-loaded photo) at the route level. */
   artist?: Artist;
+  /** New shape — DB-backed master record. Takes precedence over `artist`. */
+  master?: Master;
   /** Override the testimonials list (with DB-loaded avatars). */
   testimonials?: readonly Testimonial[];
 }
 
 export function MasterPage({
   artist: artistProp,
+  master,
   testimonials: testimonialsProp,
 }: MasterPageProps = {}) {
   const t = useTranslations("Master");
-  const artist = artistProp ?? STUDIO_DATA.artist;
+  const artist: Artist =
+    master !== undefined
+      ? {
+          name: master.name,
+          role: master.role,
+          years: master.years,
+          bio: master.bio,
+          quote: master.quote,
+          image: master.image,
+        }
+      : (artistProp ?? STUDIO_DATA.artist);
   const testimonials = testimonialsProp ?? STUDIO_DATA.testimonials;
   const [firstName, ...rest] = artist.name.split(" ");
   const lastName = rest.join(" ");

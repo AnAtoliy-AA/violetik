@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { STUDIO_DATA } from "@/entities/studio";
 import { Plate } from "@/shared/ui/plate";
+import type { Master } from "@/entities/master";
 
 function ArrowRight() {
   return (
@@ -20,9 +20,13 @@ function ArrowRight() {
   );
 }
 
-export function MasterStrip() {
+export interface MasterStripProps {
+  master?: Master;
+}
+
+export function MasterStrip({ master }: MasterStripProps = {}) {
   const t = useTranslations("Home");
-  const { artist } = STUDIO_DATA;
+  if (!master) return null;
   return (
     <section className="px-[22px] pb-4 pt-7">
       <Plate number={2} label={t("plate_master").toUpperCase()} />
@@ -49,10 +53,10 @@ export function MasterStrip() {
             {t("master_stat")}
           </div>
           <div className="mt-1.5 font-display text-[24px] italic">
-            {artist.name}
+            {master.name}
           </div>
           <p className="mt-1.5 text-xs italic leading-[1.5] text-text-2">
-            &ldquo;{artist.quote}&rdquo;
+            &ldquo;{master.quote}&rdquo;
           </p>
         </div>
         <ArrowRight />

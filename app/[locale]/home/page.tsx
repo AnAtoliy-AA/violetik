@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { HomePage } from "@/views/home";
+import { loadMastersForLocale } from "@/entities/master/api/load";
+import type { Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
 
@@ -21,5 +23,8 @@ export default async function HomeRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <HomePage />;
+  const masters = await loadMastersForLocale(locale as Locale, {
+    publishedOnly: true,
+  });
+  return <HomePage master={masters[0]} />;
 }
