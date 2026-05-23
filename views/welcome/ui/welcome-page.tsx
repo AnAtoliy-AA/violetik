@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { LocaleSwitcher } from "@/features/locale-switcher";
 import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
@@ -34,6 +35,13 @@ export function WelcomePage() {
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
       <Aurora intensity="vivid" />
       <PaperGrain />
+
+      <motion.div
+        className="absolute top-4 right-[22px] z-20"
+        {...fade(0.4)}
+      >
+        <LocaleSwitcher variant="welcome" />
+      </motion.div>
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
