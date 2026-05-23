@@ -25,6 +25,7 @@ export const masterFormSchema = z.object({
   quoteRu: localeString(280),
   quoteBe: localeString(280),
   years: z.number().int().min(0).max(80),
+  setsLabel: z.string().trim().max(80),
   sortOrder: z.number().int().min(0),
   status: masterStatusSchema,
   serviceIds: z.array(slugSchema).max(200),

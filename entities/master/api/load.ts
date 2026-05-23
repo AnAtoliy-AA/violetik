@@ -40,6 +40,7 @@ async function rowToMaster(row: MasterRow, locale: Locale): Promise<Master> {
     bio: pickLocale(row, locale, "bio"),
     quote: pickLocale(row, locale, "quote"),
     years: row.years,
+    setsLabel: row.setsLabel,
     sortOrder: row.sortOrder,
     status: row.status as MasterStatus,
     image: photo?.image ?? undefined,

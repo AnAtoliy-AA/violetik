@@ -8,6 +8,7 @@ interface DisplayMaster {
   name: string;
   role: string;
   years: number;
+  setsLabel: string;
   bio: string;
   quote: string;
   image?: { src: string; alt?: string; blurDataURL?: string };
@@ -49,6 +50,7 @@ const FALLBACK_MASTER: DisplayMaster = {
   name: "Violetta Marchenko",
   role: "Master nail artist & founder",
   years: 11,
+  setsLabel: "600+",
   bio:
     "Trained in Milan and Kyiv, Violetta runs a one-chair atelier — one guest at a time, by appointment only. " +
     "Specialising in editorial nail design, glass shapes and Japanese gel.",
@@ -71,7 +73,7 @@ export function MasterPage({
   const stats: readonly [string, string][] = [
     [String(artist.years), t("stat_years")],
     ["1", t("stat_chair")],
-    ["600+", t("stat_sets")],
+    [artist.setsLabel || "—", t("stat_sets")],
   ];
 
   return (

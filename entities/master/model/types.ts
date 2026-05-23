@@ -16,6 +16,7 @@ export interface Master {
   bio: string;
   quote: string;
   years: number;
+  setsLabel: string;
   sortOrder: number;
   status: MasterStatus;
   image?: ImageAsset;

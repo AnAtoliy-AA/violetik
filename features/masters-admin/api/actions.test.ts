@@ -36,6 +36,7 @@ const goodMaster = {
   quoteRu: "RU quote",
   quoteBe: "BE quote",
   years: 11,
+  setsLabel: "600+",
   sortOrder: 0,
   status: "published" as const,
   serviceIds: ["signature"],
