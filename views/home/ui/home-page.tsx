@@ -3,6 +3,7 @@ import { AtelierHours } from "@/widgets/atelier-hours";
 import { TabBar } from "@/widgets/tab-bar";
 import type { Master } from "@/entities/master";
 import type { SiteSettings } from "@/entities/site-settings";
+import type { ApprovedTestimonial } from "@/entities/testimonial";
 import type { Locale } from "@/i18n/routing";
 import { Aurora } from "@/shared/ui/aurora";
 import { PaperGrain } from "@/shared/ui/paper-grain";
@@ -20,9 +21,15 @@ export interface HomePageProps {
   master?: Master;
   settings: SiteSettings;
   locale: Locale;
+  testimonial: ApprovedTestimonial | null;
 }
 
-export function HomePage({ master, settings, locale }: HomePageProps) {
+export function HomePage({
+  master,
+  settings,
+  locale,
+  testimonial,
+}: HomePageProps) {
   return (
     <div className="pb-28">
       <AppHeader />
@@ -37,7 +44,7 @@ export function HomePage({ master, settings, locale }: HomePageProps) {
       <MasterStrip master={master} />
       <GalleryStrip />
       <AtelierMotion />
-      <TestimonialCard />
+      <TestimonialCard testimonial={testimonial} />
       <MembershipCard />
       <HomeFooter settings={settings} locale={locale} />
       <TabBar />

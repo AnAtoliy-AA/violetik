@@ -295,6 +295,7 @@
     "inbox_title": "Входящие",
     "inbox_bookings": "Записи",
     "inbox_vip_requests": "Заявки на VIP",
+    "inbox_testimonials": "Отзывы",
     "inbox_pending_suffix": "ожидают",
     "inbox_site_settings": "Настройки сайта",
     "inbox_site_settings_caption": "Умолчания и цены",
@@ -458,6 +459,25 @@
     "cta_show_all_expired": "Показать все {total}",
     "expires_in_days": "истекает через {n}д",
     "expired_ago_days": "истекло {n}д назад"
+  },
+  "AdminTestimonials": {
+    "meta_title": "Отзывы",
+    "eyebrow": "Модерация",
+    "hero_title": "Отзывы на проверке",
+    "hero_paragraph": "Одобрите, чтобы опубликовать на странице мастера и на главной. Отклоните, чтобы сообщить автору без публикации.",
+    "section_pending": "На проверке ({n})",
+    "section_approved": "Опубликованы ({n})",
+    "section_rejected": "Отклонены ({n})",
+    "empty_pending": "Новых отзывов нет. Новые поступления появятся здесь.",
+    "empty_approved": "Пока ничего не опубликовано.",
+    "empty_rejected": "Отклонённых отзывов нет.",
+    "submitted_at": "Подан",
+    "decided_at": "Решено",
+    "status_pending": "На проверке",
+    "status_approved": "Опубликован",
+    "status_rejected": "Отклонён",
+    "cta_approve": "Одобрить",
+    "cta_reject": "Отклонить"
   },
   "AdminGoogle": {
     "meta_title": "Google Календарь",

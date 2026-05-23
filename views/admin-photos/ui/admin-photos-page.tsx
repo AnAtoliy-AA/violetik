@@ -14,7 +14,6 @@ const KINDS: readonly PhotoSlotKind[] = [
   "gallery",
   "atelier",
   "master",
-  "testimonial",
   "profile",
 ];
 

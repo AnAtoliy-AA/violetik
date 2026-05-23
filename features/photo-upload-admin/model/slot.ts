@@ -18,8 +18,8 @@ export interface PhotoSlot {
  * Every (kind, id) the customer pages render — keeps the admin UI as a
  * fixed roster instead of derived strings, so the page lists every slot
  * even before anything is uploaded. Service slots are sourced from the
- * DB; the rest still come from STUDIO_DATA (gallery / testimonials /
- * atelier / master / profile are not part of the Phase 1 migration).
+ * DB; the rest still come from STUDIO_DATA (gallery / atelier / master /
+ * profile are not part of the Phase 1 migration).
  */
 export async function listAllPhotoSlots(): Promise<PhotoSlot[]> {
   const slots: PhotoSlot[] = [];
@@ -38,14 +38,6 @@ export async function listAllPhotoSlots(): Promise<PhotoSlot[]> {
       id: g.id,
       label: `${g.tag} · ${g.id}`,
       hint: "natural ratio · grid + lightbox",
-    });
-  }
-  for (const t of STUDIO_DATA.testimonials) {
-    slots.push({
-      kind: "testimonial",
-      id: t.id,
-      label: `${t.name} · ${t.role}`,
-      hint: "1:1 · 22px disc",
     });
   }
   for (const clip of STUDIO_DATA.atelierClips) {

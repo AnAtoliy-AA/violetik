@@ -51,15 +51,6 @@ export interface MembershipTier {
   featured: boolean;
 }
 
-export interface Testimonial {
-  id: string;
-  name: string;
-  role: string;
-  text: string;
-  /** Optional avatar disc; falls back to a gilded gradient when absent. */
-  avatar?: ImageAsset;
-}
-
 export interface StudioInfo {
   name: string;
   tagline: string;

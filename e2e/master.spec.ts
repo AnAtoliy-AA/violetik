@@ -15,12 +15,14 @@ test("renders the master portrait, stats and pull-quote at /en/master", async ({
   ).toHaveAttribute("href", /\/services$/);
 });
 
-test("renders the three voice cards", async ({ page }) => {
+test("voices section is hidden when no approved testimonials exist", async ({
+  page,
+}) => {
+  // The STUDIO_DATA mock testimonials were removed when admin moderation
+  // landed; voices now come from the DB and CI has none approved.
+  // The section + its eyebrow ("Voices" EN / "Галасы" BE) should be absent.
   await page.goto("/en/master");
-  // Three testimonials from STUDIO_DATA: Lara K., Iris M., Joelle P.
-  await expect(page.getByText("Lara K.")).toBeVisible();
-  await expect(page.getByText("Iris M.")).toBeVisible();
-  await expect(page.getByText("Joelle P.")).toBeVisible();
+  await expect(page.getByText(/^Voices$/)).toHaveCount(0);
 });
 
 test("back arrow returns to /home", async ({ page }) => {
@@ -29,9 +31,4 @@ test("back arrow returns to /home", async ({ page }) => {
     "href",
     /\/home$/,
   );
-});
-
-test("renders Belarusian voices eyebrow at /be/master", async ({ page }) => {
-  await page.goto("/be/master");
-  await expect(page.getByText(/^Галасы$/)).toBeVisible();
 });
