@@ -5,3 +5,5 @@ export type {
   TestimonialFormMaster,
   TestimonialFormProps,
 } from "./ui/testimonial-form";
+export { MyTestimonialsList } from "./ui/my-testimonials-list";
+export type { MyTestimonialsListProps } from "./ui/my-testimonials-list";
