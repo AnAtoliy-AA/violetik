@@ -3,6 +3,7 @@ import {
   bigint,
   boolean,
   check,
+  doublePrecision,
   index,
   integer,
   jsonb,
@@ -229,6 +230,23 @@ export const siteSettings = pgTable(
     discountPercent: integer("discount_percent").notNull().default(0),
     discountActive: boolean("discount_active").notNull().default(false),
     currency: currencyCode("currency").notNull().default("EUR"),
+    addressEn: text("address_en")
+      .notNull()
+      .default("By appointment · Verbena Lane 14, Studio B"),
+    addressRu: text("address_ru")
+      .notNull()
+      .default("По записи · Verbena Lane 14, Studio B"),
+    addressBe: text("address_be")
+      .notNull()
+      .default("Па запісу · Verbena Lane 14, Studio B"),
+    country: text("country").notNull().default("BY"),
+    cityEn: text("city_en").notNull().default(""),
+    cityRu: text("city_ru").notNull().default(""),
+    cityBe: text("city_be").notNull().default(""),
+    timezone: text("timezone").notNull().default("Europe/Minsk"),
+    latitude: doublePrecision("latitude"),
+    longitude: doublePrecision("longitude"),
+    mapVisible: boolean("map_visible").notNull().default(false),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .default(sql`now()`),
@@ -242,6 +260,14 @@ export const siteSettings = pgTable(
     discountRange: check(
       "site_settings_discount_range",
       sql`${table.discountPercent} BETWEEN 0 AND 90`,
+    ),
+    latRange: check(
+      "site_settings_lat_range",
+      sql`${table.latitude} IS NULL OR ${table.latitude} BETWEEN -90 AND 90`,
+    ),
+    lngRange: check(
+      "site_settings_lng_range",
+      sql`${table.longitude} IS NULL OR ${table.longitude} BETWEEN -180 AND 180`,
     ),
   }),
 );
