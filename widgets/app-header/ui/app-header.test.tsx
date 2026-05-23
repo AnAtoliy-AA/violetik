@@ -20,7 +20,7 @@ vi.mock("@/i18n/navigation", () => ({
 import { AppHeader } from "./app-header";
 
 const messages = {
-  LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", be: "Belarusian" },
+  LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", by: "Belarusian" },
 };
 
 function renderHeader(props?: React.ComponentProps<typeof AppHeader>) {

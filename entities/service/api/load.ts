@@ -20,23 +20,23 @@ import type { Locale } from "@/i18n/routing";
 import type { Service, ServiceCategoryRef } from "../model/types";
 import { formatMajorAmount } from "./format-currency";
 
-type I18nNameRow = { nameEn: string; nameRu: string; nameBe: string };
-type I18nBlurbRow = { blurbEn: string; blurbRu: string; blurbBe: string };
+type I18nNameRow = { nameEn: string; nameRu: string; nameBy: string };
+type I18nBlurbRow = { blurbEn: string; blurbRu: string; blurbBy: string };
 
 function pickName(row: I18nNameRow, locale: Locale): string {
   if (locale === "ru") return row.nameRu;
-  if (locale === "be") return row.nameBe;
+  if (locale === "by") return row.nameBy;
   return row.nameEn;
 }
 
 function pickBlurb(row: I18nBlurbRow, locale: Locale): string {
   if (locale === "ru") return row.blurbRu;
-  if (locale === "be") return row.blurbBe;
+  if (locale === "by") return row.blurbBy;
   return row.blurbEn;
 }
 
 function pickInclude(
-  entry: { en: string; ru: string; be: string },
+  entry: { en: string; ru: string; by: string },
   locale: Locale,
 ): string {
   return entry[locale];
@@ -45,7 +45,7 @@ function pickInclude(
 const DURATION_UNIT: Record<Locale, string> = {
   en: "min",
   ru: "мин",
-  be: "хв",
+  by: "хв",
 };
 
 function formatDuration(minutes: number, locale: Locale): string {

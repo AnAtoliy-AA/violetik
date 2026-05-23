@@ -53,7 +53,7 @@ test("/be/home advertises Belarusian locale + description", async ({
 
 test("hreflang alternates link to every locale", async ({ page }) => {
   await page.goto("/en/home");
-  for (const locale of ["en", "ru", "be"]) {
+  for (const locale of ["en", "ru", "by"]) {
     await expect(
       page.locator(`link[rel="alternate"][hreflang="${locale}"]`),
     ).toHaveAttribute("href", new RegExp(`/${locale}$`));

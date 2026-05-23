@@ -9,7 +9,7 @@ vi.mock("@/i18n/navigation", () => ({
 
 import { LocaleSwitcher } from "./locale-switcher";
 
-const messages = { LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", be: "Belarusian" } };
+const messages = { LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", by: "Belarusian" } };
 
 const meta: Meta<typeof LocaleSwitcher> = {
   title: "features/LocaleSwitcher",

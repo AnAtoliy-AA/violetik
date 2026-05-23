@@ -28,14 +28,14 @@ function statusLabel(s: TestimonialStatus, labels: TestimonialRowLabels): string
 
 function masterName(row: AdminTestimonialRow, locale: Locale): string {
   if (locale === "ru") return row.masterNameRu;
-  if (locale === "be") return row.masterNameBe;
+  if (locale === "by") return row.masterNameBy;
   return row.masterNameEn;
 }
 
 const FMT: Record<Locale, Intl.DateTimeFormat> = {
   en: new Intl.DateTimeFormat("en", { dateStyle: "medium" }),
   ru: new Intl.DateTimeFormat("ru", { dateStyle: "medium" }),
-  be: new Intl.DateTimeFormat("be", { dateStyle: "medium" }),
+  by: new Intl.DateTimeFormat("be-BY", { dateStyle: "medium" }),
 };
 
 export function TestimonialRow({

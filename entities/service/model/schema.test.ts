@@ -25,7 +25,7 @@ describe("categoryFormSchema", () => {
     id: "care",
     nameEn: "Care",
     nameRu: "Уход",
-    nameBe: "Догляд",
+    nameBy: "Догляд",
     status: "published" as const,
   };
   it("accepts a complete payload", () => {
@@ -44,13 +44,13 @@ describe("serviceFormSchema", () => {
     categoryId: "care",
     nameEn: "Signature",
     nameRu: "Сигнатур",
-    nameBe: "Сігнатур",
+    nameBy: "Сігнатур",
     blurbEn: "EN",
     blurbRu: "RU",
-    blurbBe: "BE",
+    blurbBy: "BE",
     includes: [
-      { en: "a", ru: "а", be: "а" },
-      { en: "b", ru: "б", be: "б" },
+      { en: "a", ru: "а", by: "а" },
+      { en: "b", ru: "б", by: "б" },
     ],
     priceCents: 9500,
     durationMinutes: 75,
@@ -61,14 +61,14 @@ describe("serviceFormSchema", () => {
   });
   it("rejects empty blurb in any locale", () => {
     expect(
-      serviceFormSchema.safeParse({ ...base, blurbBe: "" }).success,
+      serviceFormSchema.safeParse({ ...base, blurbBy: "" }).success,
     ).toBe(false);
   });
   it("rejects more than 8 bullets", () => {
     const tooMany = Array.from({ length: 9 }, () => ({
       en: "x",
       ru: "x",
-      be: "x",
+      by: "x",
     }));
     expect(
       serviceFormSchema.safeParse({ ...base, includes: tooMany }).success,
@@ -78,7 +78,7 @@ describe("serviceFormSchema", () => {
     expect(
       serviceFormSchema.safeParse({
         ...base,
-        includes: [{ en: "x", ru: "x", be: "" }],
+        includes: [{ en: "x", ru: "x", by: "" }],
       }).success,
     ).toBe(false);
   });

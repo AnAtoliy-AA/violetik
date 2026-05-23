@@ -60,7 +60,7 @@ function makeRow(overrides: Partial<AdminTestimonialRow> = {}): AdminTestimonial
     masterId: "violetta",
     masterNameEn: "Violetta",
     masterNameRu: "Виолетта",
-    masterNameBe: "Віялета",
+    masterNameBy: "Віялета",
     ...overrides,
   };
 }

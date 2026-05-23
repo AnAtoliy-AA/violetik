@@ -101,7 +101,7 @@ export interface AdminTestimonialRow {
   masterId: string;
   masterNameEn: string;
   masterNameRu: string;
-  masterNameBe: string;
+  masterNameBy: string;
 }
 
 export async function listTestimonialsByStatus(
@@ -129,7 +129,7 @@ export async function listTestimonialsByStatus(
         masterId: schema.testimonials.masterId,
         masterNameEn: schema.masters.nameEn,
         masterNameRu: schema.masters.nameRu,
-        masterNameBe: schema.masters.nameBe,
+        masterNameBy: schema.masters.nameBy,
       })
       .from(schema.testimonials)
       .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
@@ -156,7 +156,7 @@ export async function listTestimonialsByStatus(
       masterId: r.masterId,
       masterNameEn: r.masterNameEn ?? "",
       masterNameRu: r.masterNameRu ?? "",
-      masterNameBe: r.masterNameBe ?? "",
+      masterNameBy: r.masterNameBy ?? "",
     }));
   } catch (error) {
     if (isMissingTable(error)) return [];

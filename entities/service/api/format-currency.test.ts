@@ -16,7 +16,7 @@ describe("formatMajorAmount", () => {
     const result = formatMajorAmount({
       amountCents: 9500,
       currency: "BYN",
-      locale: "be",
+      locale: "by",
     });
     expect(result).toMatch(/95[\s  ]*Br/);
   });

@@ -97,8 +97,8 @@ export default async function AdminBookingsRoute({
             const masterName =
               locale === "ru"
                 ? b.masterNameRu
-                : locale === "be"
-                  ? b.masterNameBe
+                : locale === "by"
+                  ? b.masterNameBy
                   : b.masterNameEn;
             return (
               <li

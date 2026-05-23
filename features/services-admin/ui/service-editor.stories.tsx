@@ -36,10 +36,10 @@ export const Create: Story = {
       categoryId: "care",
       nameEn: "",
       nameRu: "",
-      nameBe: "",
+      nameBy: "",
       blurbEn: "",
       blurbRu: "",
-      blurbBe: "",
+      blurbBy: "",
       includes: [],
       priceCents: 0,
       durationMinutes: 60,
@@ -59,23 +59,23 @@ export const EditPopulated: Story = {
       categoryId: "care",
       nameEn: "Signature Manicure",
       nameRu: "Сигнатурный маникюр",
-      nameBe: "Сігнатурны манікюр",
+      nameBy: "Сігнатурны манікюр",
       blurbEn:
         "Russian dry technique, cuticle work, hydration ritual & gloss finish.",
       blurbRu:
         "Русская сухая техника, работа с кутикулой, ритуал увлажнения и финишный блеск.",
-      blurbBe:
+      blurbBy:
         "Расейская сухая тэхніка, праца з кутыкулай, рытуал увільгатнення і фініш-бляск.",
       includes: [
         {
           en: "Hand soak in rose & milk",
           ru: "Ванночка с розой и молоком",
-          be: "Ванначка з ружай і малаком",
+          by: "Ванначка з ружай і малаком",
         },
         {
           en: "Russian e-file manicure",
           ru: "Аппаратный маникюр",
-          be: "Апаратны манікюр",
+          by: "Апаратны манікюр",
         },
       ],
       priceCents: 9500,

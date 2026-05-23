@@ -60,11 +60,11 @@ describe("studio-location fields", () => {
     const ok = siteSettingsPatchSchema.safeParse({
       addressEn: "12 Rose Street",
       addressRu: "12 Розовая",
-      addressBe: "12 Ружовая",
+      addressBy: "12 Ружовая",
       country: "BY",
       cityEn: "Borisov",
       cityRu: "Борисов",
-      cityBe: "Барысаў",
+      cityBy: "Барысаў",
       timezone: "Europe/Minsk",
       latitude: 54.231,
       longitude: 28.491,

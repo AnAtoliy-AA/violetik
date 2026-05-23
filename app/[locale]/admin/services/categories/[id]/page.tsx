@@ -53,7 +53,7 @@ export default async function CategoryEditorRoute({
       id: "",
       nameEn: "",
       nameRu: "",
-      nameBe: "",
+      nameBy: "",
       sortOrder: 0,
       status: "published",
     };
@@ -68,7 +68,7 @@ export default async function CategoryEditorRoute({
       id: row.id,
       nameEn: row.nameEn,
       nameRu: row.nameRu,
-      nameBe: row.nameBe,
+      nameBy: row.nameBy,
       sortOrder: row.sortOrder,
       status: row.status,
     };
@@ -85,7 +85,7 @@ export default async function CategoryEditorRoute({
     const rest: Omit<CategoryFormInput, "id"> = {
       nameEn: patch.nameEn,
       nameRu: patch.nameRu,
-      nameBe: patch.nameBe,
+      nameBy: patch.nameBy,
       sortOrder: patch.sortOrder,
       status: patch.status,
     };

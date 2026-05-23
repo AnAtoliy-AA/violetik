@@ -9,10 +9,10 @@ vi.mock("@/i18n/navigation", () => ({
 }));
 
 const messages = {
-  LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", be: "Belarusian" },
+  LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", by: "Belarusian" },
 };
 
-function renderAt(locale: "en" | "ru" | "be") {
+function renderAt(locale: "en" | "ru" | "by") {
   return render(
     <NextIntlClientProvider locale={locale} messages={messages}>
       <LocaleSwitcher />
@@ -25,7 +25,7 @@ describe("LocaleSwitcher", () => {
     renderAt("en");
     expect(screen.getByRole("radio", { name: "EN" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "RU" })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: "BE" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "BY" })).toBeInTheDocument();
     expect(screen.getByRole("radiogroup", { name: /language/i })).toBeInTheDocument();
   });
 

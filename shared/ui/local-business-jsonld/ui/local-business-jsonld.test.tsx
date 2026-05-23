@@ -33,7 +33,7 @@ describe("LocalBusinessJsonLd", () => {
           ...DEFAULT_SITE_SETTINGS,
           addressEn: "",
           addressRu: "",
-          addressBe: "",
+          addressBy: "",
         }}
         {...BASE_PROPS}
       />,

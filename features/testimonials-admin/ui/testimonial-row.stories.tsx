@@ -31,7 +31,7 @@ const baseRow: TestimonialRowProps["row"] = {
   masterId: "violetta",
   masterNameEn: "Violetta",
   masterNameRu: "Виолетта",
-  masterNameBe: "Віялета",
+  masterNameBy: "Віялета",
 };
 
 const labels = {

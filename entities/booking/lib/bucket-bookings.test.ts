@@ -20,7 +20,7 @@ function row(
     updatedAt: new Date(0),
     masterNameEn: null,
     masterNameRu: null,
-    masterNameBe: null,
+    masterNameBy: null,
     masterTelegramUsername: null,
     ...overrides,
   } as UserBookingRow;

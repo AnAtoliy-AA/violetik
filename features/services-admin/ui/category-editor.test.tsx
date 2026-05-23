@@ -10,7 +10,7 @@ function makeInitial() {
     id: "care",
     nameEn: "Care",
     nameRu: "Уход",
-    nameBe: "Догляд",
+    nameBy: "Догляд",
     sortOrder: 1,
     status: "published" as const,
   };
@@ -37,7 +37,7 @@ describe("CategoryEditor", () => {
       id: "",
       nameEn: "",
       nameRu: "",
-      nameBe: "",
+      nameBy: "",
       sortOrder: 0,
       status: "published",
     });
@@ -61,7 +61,7 @@ describe("CategoryEditor", () => {
         id: "care",
         nameEn: "Care",
         nameRu: "Уход",
-        nameBe: "Догляд",
+        nameBy: "Догляд",
         status: "published",
       }),
     );

@@ -21,7 +21,7 @@ describe("db/services-mutations", () => {
         id: "x",
         nameEn: "x",
         nameRu: "x",
-        nameBe: "x",
+        nameBy: "x",
       });
       await updateCategory("x", { nameEn: "y" });
       await archiveCategory("x");
@@ -31,10 +31,10 @@ describe("db/services-mutations", () => {
         categoryId: "x",
         nameEn: "n",
         nameRu: "n",
-        nameBe: "n",
+        nameBy: "n",
         blurbEn: "b",
         blurbRu: "b",
-        blurbBe: "b",
+        blurbBy: "b",
         includes: [],
         priceCents: 0,
         durationMinutes: 30,

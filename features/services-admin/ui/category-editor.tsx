@@ -14,7 +14,7 @@ export interface CategoryEditorInitial {
   id: string;
   nameEn: string;
   nameRu: string;
-  nameBe: string;
+  nameBy: string;
   sortOrder: number;
   status: Status;
 }
@@ -54,7 +54,7 @@ export function CategoryEditor({
   const [id, setId] = useState(initial.id);
   const [nameEn, setNameEn] = useState(initial.nameEn);
   const [nameRu, setNameRu] = useState(initial.nameRu);
-  const [nameBe, setNameBe] = useState(initial.nameBe);
+  const [nameBy, setNameBe] = useState(initial.nameBy);
   const [rowStatus, setRowStatus] = useState<Status>(initial.status);
 
   function handleSubmit(e: FormEvent) {
@@ -64,7 +64,7 @@ export function CategoryEditor({
       id,
       nameEn,
       nameRu,
-      nameBe,
+      nameBy,
       sortOrder: initial.sortOrder,
       status: rowStatus,
     };
@@ -160,13 +160,13 @@ export function CategoryEditor({
 
       <Field
         id="cat-name-be"
-        label={t("label_name_be")}
-        error={errFor("nameBe")}
+        label={t("label_name_by")}
+        error={errFor("nameBy")}
       >
         <input
           id="cat-name-be"
           type="text"
-          value={nameBe}
+          value={nameBy}
           onChange={(e) => setNameBe(e.target.value)}
           className={inputClass}
         />

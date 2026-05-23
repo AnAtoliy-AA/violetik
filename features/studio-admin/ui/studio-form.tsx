@@ -39,11 +39,11 @@ export function StudioForm({
 
   const [addressEn, setAddressEn] = useState(initial.addressEn);
   const [addressRu, setAddressRu] = useState(initial.addressRu);
-  const [addressBe, setAddressBe] = useState(initial.addressBe);
+  const [addressBy, setAddressBe] = useState(initial.addressBy);
   const [country, setCountry] = useState(initial.country);
   const [cityEn, setCityEn] = useState(initial.cityEn);
   const [cityRu, setCityRu] = useState(initial.cityRu);
-  const [cityBe, setCityBe] = useState(initial.cityBe);
+  const [cityBy, setCityBe] = useState(initial.cityBy);
   const [timezone, setTimezone] = useState(initial.timezone);
   const [latitude, setLatitude] = useState(
     initial.latitude == null ? "" : String(initial.latitude),
@@ -74,11 +74,11 @@ export function StudioForm({
     return {
       addressEn,
       addressRu,
-      addressBe,
+      addressBy,
       country,
       cityEn,
       cityRu,
-      cityBe,
+      cityBy,
       timezone,
       latitude: coordsBothFilled ? latNum : null,
       longitude: coordsBothFilled ? lngNum : null,
@@ -131,11 +131,11 @@ export function StudioForm({
             />
           </label>
           <label className={labelClass}>
-            {t("label_address_be")}
+            {t("label_address_by")}
             <input
               maxLength={200}
               className={cn(inputClass, "mt-1")}
-              value={addressBe}
+              value={addressBy}
               onChange={(e) => setAddressBe(e.target.value)}
             />
           </label>
@@ -186,11 +186,11 @@ export function StudioForm({
             />
           </label>
           <label className={labelClass}>
-            {t("label_city_be")}
+            {t("label_city_by")}
             <input
               maxLength={120}
               className={cn(inputClass, "mt-1")}
-              value={cityBe}
+              value={cityBy}
               onChange={(e) => setCityBe(e.target.value)}
             />
           </label>

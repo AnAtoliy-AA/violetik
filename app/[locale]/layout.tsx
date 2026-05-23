@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Cormorant_Garamond, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { routing, LOCALE_TO_LANG } from "@/i18n/routing";
 import type { Locale } from "@/i18n/routing";
 import { cityForLocale } from "@/entities/site-settings";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
@@ -17,7 +17,7 @@ const SITE_URL =
 const OG_LOCALE: Record<string, string> = {
   en: "en_US",
   ru: "ru_RU",
-  be: "be_BY",
+  by: "be_BY",
 };
 
 const cormorant = Cormorant_Garamond({
@@ -101,7 +101,7 @@ export async function generateMetadata({
     alternates: {
       canonical: `${SITE_URL}/${locale}`,
       languages: Object.fromEntries(
-        routing.locales.map((l) => [l, `${SITE_URL}/${l}`]),
+        routing.locales.map((l) => [LOCALE_TO_LANG[l], `${SITE_URL}/${l}`]),
       ),
     },
   };
@@ -124,7 +124,7 @@ export default async function LocaleLayout({
 
   return (
     <html
-      lang={locale}
+      lang={LOCALE_TO_LANG[locale as Locale]}
       data-palette={settings.defaultPalette}
       className={`${cormorant.variable} ${dmSans.variable} ${jetBrains.variable} h-full antialiased`}
     >

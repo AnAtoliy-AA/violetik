@@ -5,7 +5,7 @@ import { NextIntlClientProvider } from "next-intl";
 import en from "@/messages/en.json";
 import { IncludesFieldset } from "./includes-fieldset";
 
-function render2(items: { en: string; ru: string; be: string }[]) {
+function render2(items: { en: string; ru: string; by: string }[]) {
   const onChange = vi.fn();
   render(
     <NextIntlClientProvider locale="en" messages={en}>
@@ -27,7 +27,7 @@ describe("IncludesFieldset", () => {
     const eight = Array.from({ length: 8 }, () => ({
       en: "a",
       ru: "а",
-      be: "а",
+      by: "а",
     }));
     render2(eight);
     expect(
@@ -36,23 +36,23 @@ describe("IncludesFieldset", () => {
   });
 
   it("fires onChange with a new empty row when Add is clicked", async () => {
-    const { onChange } = render2([{ en: "x", ru: "x", be: "x" }]);
+    const { onChange } = render2([{ en: "x", ru: "x", by: "x" }]);
     await userEvent.setup().click(
       screen.getByRole("button", { name: /Add bullet/i }),
     );
     expect(onChange).toHaveBeenCalledWith([
-      { en: "x", ru: "x", be: "x" },
-      { en: "", ru: "", be: "" },
+      { en: "x", ru: "x", by: "x" },
+      { en: "", ru: "", by: "" },
     ]);
   });
 
   it("fires onChange with the row removed when Remove is clicked", async () => {
     const { onChange } = render2([
-      { en: "a", ru: "а", be: "а" },
-      { en: "b", ru: "б", be: "б" },
+      { en: "a", ru: "а", by: "а" },
+      { en: "b", ru: "б", by: "б" },
     ]);
     const removeButtons = screen.getAllByRole("button", { name: /Remove/i });
     await userEvent.setup().click(removeButtons[0]);
-    expect(onChange).toHaveBeenCalledWith([{ en: "b", ru: "б", be: "б" }]);
+    expect(onChange).toHaveBeenCalledWith([{ en: "b", ru: "б", by: "б" }]);
   });
 });

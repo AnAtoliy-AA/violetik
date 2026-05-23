@@ -40,7 +40,7 @@ export default async function ServicesRoute({
   ]);
   const categories: ServiceCategoryRef[] = categoryRows.map((c) => {
     const name =
-      locale === "ru" ? c.nameRu : locale === "be" ? c.nameBe : c.nameEn;
+      locale === "ru" ? c.nameRu : locale === "by" ? c.nameBy : c.nameEn;
     return { id: c.id, name };
   });
   const currency =

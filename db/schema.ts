@@ -236,13 +236,13 @@ export const siteSettings = pgTable(
     addressRu: text("address_ru")
       .notNull()
       .default("По записи · Verbena Lane 14, Studio B"),
-    addressBe: text("address_be")
+    addressBy: text("address_by")
       .notNull()
       .default("Па запісу · Verbena Lane 14, Studio B"),
     country: text("country").notNull().default("BY"),
     cityEn: text("city_en").notNull().default(""),
     cityRu: text("city_ru").notNull().default(""),
-    cityBe: text("city_be").notNull().default(""),
+    cityBy: text("city_by").notNull().default(""),
     timezone: text("timezone").notNull().default("Europe/Minsk"),
     latitude: doublePrecision("latitude"),
     longitude: doublePrecision("longitude"),
@@ -279,7 +279,7 @@ export const serviceCategories = pgTable(
     id: text("id").primaryKey(),
     nameEn: text("name_en").notNull(),
     nameRu: text("name_ru").notNull(),
-    nameBe: text("name_be").notNull(),
+    nameBy: text("name_by").notNull(),
     sortOrder: integer("sort_order").notNull().default(0),
     status: serviceStatus("status").notNull().default("published"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -305,12 +305,12 @@ export const services = pgTable(
       .references(() => serviceCategories.id, { onDelete: "restrict" }),
     nameEn: text("name_en").notNull(),
     nameRu: text("name_ru").notNull(),
-    nameBe: text("name_be").notNull(),
+    nameBy: text("name_by").notNull(),
     blurbEn: text("blurb_en").notNull(),
     blurbRu: text("blurb_ru").notNull(),
-    blurbBe: text("blurb_be").notNull(),
+    blurbBy: text("blurb_by").notNull(),
     includes: jsonb("includes")
-      .$type<Array<{ en: string; ru: string; be: string }>>()
+      .$type<Array<{ en: string; ru: string; by: string }>>()
       .notNull()
       .default([]),
     priceCents: integer("price_cents").notNull(),
@@ -360,16 +360,16 @@ export const masters = pgTable("masters", {
   id: text("id").primaryKey(),
   nameEn: text("name_en").notNull(),
   nameRu: text("name_ru").notNull(),
-  nameBe: text("name_be").notNull(),
+  nameBy: text("name_by").notNull(),
   roleEn: text("role_en").notNull(),
   roleRu: text("role_ru").notNull(),
-  roleBe: text("role_be").notNull(),
+  roleBy: text("role_by").notNull(),
   bioEn: text("bio_en").notNull(),
   bioRu: text("bio_ru").notNull(),
-  bioBe: text("bio_be").notNull(),
+  bioBy: text("bio_by").notNull(),
   quoteEn: text("quote_en").notNull(),
   quoteRu: text("quote_ru").notNull(),
-  quoteBe: text("quote_be").notNull(),
+  quoteBy: text("quote_by").notNull(),
   years: integer("years").notNull().default(0),
   setsLabel: text("sets_label").notNull().default(""),
   telegramUsername: text("telegram_username"),

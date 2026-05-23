@@ -5,8 +5,8 @@ export function cityForLocale(settings: SiteSettings, locale: Locale): string {
   const direct =
     locale === "ru"
       ? settings.cityRu
-      : locale === "be"
-        ? settings.cityBe
+      : locale === "by"
+        ? settings.cityBy
         : settings.cityEn;
   return direct || settings.cityEn;
 }
@@ -18,8 +18,8 @@ export function addressForLocale(
   const direct =
     locale === "ru"
       ? settings.addressRu
-      : locale === "be"
-        ? settings.addressBe
+      : locale === "by"
+        ? settings.addressBy
         : settings.addressEn;
   return direct || settings.addressEn;
 }

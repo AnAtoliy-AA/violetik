@@ -31,11 +31,11 @@ export const siteSettingsPatchSchema = z
 
     addressEn: z.string().max(200),
     addressRu: z.string().max(200),
-    addressBe: z.string().max(200),
+    addressBy: z.string().max(200),
     country: z.enum(COUNTRY_CODES),
     cityEn: z.string().max(120),
     cityRu: z.string().max(120),
-    cityBe: z.string().max(120),
+    cityBy: z.string().max(120),
     timezone: z.string().refine(isValidTimeZone, { message: "Unknown IANA timezone" }),
     latitude: z.number().min(-90).max(90).nullable(),
     longitude: z.number().min(-180).max(180).nullable(),

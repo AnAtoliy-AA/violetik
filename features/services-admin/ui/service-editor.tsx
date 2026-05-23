@@ -19,10 +19,10 @@ export interface ServiceEditorInitial {
   categoryId: string;
   nameEn: string;
   nameRu: string;
-  nameBe: string;
+  nameBy: string;
   blurbEn: string;
   blurbRu: string;
-  blurbBe: string;
+  blurbBy: string;
   includes: IncludeEntry[];
   priceCents: number;
   durationMinutes: number;
@@ -88,10 +88,10 @@ export function ServiceEditor({
   const [categoryId, setCategoryId] = useState(initial.categoryId);
   const [nameEn, setNameEn] = useState(initial.nameEn);
   const [nameRu, setNameRu] = useState(initial.nameRu);
-  const [nameBe, setNameBe] = useState(initial.nameBe);
+  const [nameBy, setNameBe] = useState(initial.nameBy);
   const [blurbEn, setBlurbEn] = useState(initial.blurbEn);
   const [blurbRu, setBlurbRu] = useState(initial.blurbRu);
-  const [blurbBe, setBlurbBe] = useState(initial.blurbBe);
+  const [blurbBy, setBlurbBe] = useState(initial.blurbBy);
   const [includes, setIncludes] = useState<IncludeEntry[]>(initial.includes);
   const [priceMajor, setPriceMajor] = useState(centsToMajor(initial.priceCents));
   const [durationMinutes, setDurationMinutes] = useState(
@@ -107,10 +107,10 @@ export function ServiceEditor({
       categoryId,
       nameEn,
       nameRu,
-      nameBe,
+      nameBy,
       blurbEn,
       blurbRu,
-      blurbBe,
+      blurbBy,
       includes,
       priceCents: majorToCents(priceMajor),
       durationMinutes: Number(durationMinutes) || 0,
@@ -241,13 +241,13 @@ export function ServiceEditor({
 
       <Field
         id="svc-name-be"
-        label={t("label_name_be")}
-        error={errFor("nameBe")}
+        label={t("label_name_by")}
+        error={errFor("nameBy")}
       >
         <input
           id="svc-name-be"
           type="text"
-          value={nameBe}
+          value={nameBy}
           onChange={(e) => setNameBe(e.target.value)}
           className={inputClass}
         />
@@ -281,12 +281,12 @@ export function ServiceEditor({
 
       <Field
         id="svc-blurb-be"
-        label={t("label_blurb_be")}
-        error={errFor("blurbBe")}
+        label={t("label_blurb_by")}
+        error={errFor("blurbBy")}
       >
         <textarea
           id="svc-blurb-be"
-          value={blurbBe}
+          value={blurbBy}
           onChange={(e) => setBlurbBe(e.target.value)}
           className={textareaClass}
         />

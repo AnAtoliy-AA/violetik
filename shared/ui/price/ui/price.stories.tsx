@@ -36,6 +36,6 @@ export const ByrBe: Story = {
   args: {
     resolved: { base: 95, effective: 95, hasDiscount: false },
     currency: "BYN",
-    locale: "be",
+    locale: "by",
   },
 };

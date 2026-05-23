@@ -1,5 +1,5 @@
 import type { CurrencyCode } from "@/db/schema";
-import type { Locale } from "@/i18n/routing";
+import { LOCALE_TO_LANG, type Locale } from "@/i18n/routing";
 
 export interface FormatMajorAmountInput {
   amountCents: number;
@@ -23,7 +23,7 @@ export function formatMajorAmount({
   locale,
 }: FormatMajorAmountInput): string {
   const major = Math.round(amountCents / 100);
-  return new Intl.NumberFormat(locale, {
+  return new Intl.NumberFormat(LOCALE_TO_LANG[locale], {
     style: "currency",
     currency,
     maximumFractionDigits: 0,
