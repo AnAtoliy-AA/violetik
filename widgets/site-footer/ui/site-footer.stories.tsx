@@ -1,6 +1,12 @@
+import { vi } from "vitest";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { NextIntlClientProvider } from "next-intl";
+
+vi.mock("@/i18n/navigation", () => ({
+  usePathname: () => "/master/violetta",
+}));
+
 import { SiteFooter } from "./site-footer";
+import { NextIntlClientProvider } from "next-intl";
 
 const meta: Meta<typeof SiteFooter> = {
   title: "widgets/SiteFooter",
