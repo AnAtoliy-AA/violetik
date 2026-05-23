@@ -344,6 +344,7 @@ export const masters = pgTable("masters", {
   quoteRu: text("quote_ru").notNull(),
   quoteBe: text("quote_be").notNull(),
   years: integer("years").notNull().default(0),
+  setsLabel: text("sets_label").notNull().default(""),
   sortOrder: integer("sort_order").notNull().default(0),
   status: masterStatus("status").notNull().default("draft"),
   createdAt: timestamp("created_at", { withTimezone: true })

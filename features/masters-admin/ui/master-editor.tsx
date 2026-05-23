@@ -26,6 +26,7 @@ export interface MasterEditorInitial {
   quoteRu: string;
   quoteBe: string;
   years: number;
+  setsLabel: string;
   sortOrder: number;
   status: Status;
   serviceIds: string[];
@@ -86,6 +87,7 @@ export function MasterEditor({
   const [quoteRu, setQuoteRu] = useState(initial.quoteRu);
   const [quoteBe, setQuoteBe] = useState(initial.quoteBe);
   const [years, setYears] = useState(String(initial.years));
+  const [setsLabel, setSetsLabel] = useState(initial.setsLabel);
   const [status, setStatus] = useState<Status>(initial.status);
   const [serviceIds, setServiceIds] = useState<string[]>(initial.serviceIds);
 
@@ -107,6 +109,7 @@ export function MasterEditor({
       quoteRu,
       quoteBe,
       years: Number(years) || 0,
+      setsLabel,
       sortOrder: initial.sortOrder,
       status,
       serviceIds,
@@ -200,6 +203,22 @@ export function MasterEditor({
             value={years}
             onChange={(e) => setYears(e.target.value)}
             className={inputClass}
+          />
+        </Field>
+
+        <Field
+          id="mst-sets"
+          label={t("label_sets")}
+          hint={t("label_sets_hint")}
+          error={errFor("setsLabel")}
+        >
+          <input
+            id="mst-sets"
+            type="text"
+            value={setsLabel}
+            onChange={(e) => setSetsLabel(e.target.value)}
+            className={inputClass}
+            maxLength={80}
           />
         </Field>
 
