@@ -43,8 +43,11 @@
 - `entities/studio/model/types.ts` — delete `address` from `StudioInfo`
 - `views/home/ui/sections/home-footer.tsx` — accept `settings` prop, mount `<StudioMap>`, drop `STUDIO_DATA.studio.address`
 - `views/home/ui/sections/home-footer.test.tsx` — new file (footer has no test today)
-- `views/home/ui/home-page.tsx` — accept `settings` prop, thread to `HomeFooter`
-- `app/[locale]/page.tsx` (home route) — pass `settings` to `<HomePage>`
+- `views/home/ui/home-page.tsx` — accept `settings` + `locale` props, thread to `HomeFooter`
+- `app/[locale]/home/page.tsx` (home route — note `[locale]/page.tsx` is just a `/welcome` redirect) — pass `settings` + `locale` to `<HomePage>`
+- `views/booking/ui/steps/confirm-step.tsx` — accept `location` prop, drop `STUDIO_DATA.studio.address`
+- `views/confirmation/ui/confirmation-page.tsx` — accept `location` prop, drop `STUDIO_DATA.studio.address`
+- the server parents that render the two components above — load settings, pass `studioLocationLine(settings, locale)`
 - `app/[locale]/layout.tsx` — switch `generateMetadata` to templated keys + mount `<LocalBusinessJsonLd>`
 - `app/[locale]/admin/page.tsx` — add "Studio" inbox tile
 - `shared/lib/google-calendar/working-hours.ts` — split into `bookingTimeZoneFromSettings()` + `bookingTimeZoneFallback()`; deprecate `bookingTimeZone()`
@@ -70,6 +73,15 @@
 2. Footer takes `settings` as a prop, threaded from the home view; no extra DB hit.
 3. Booking timezone audit is explicit: 5 callers (`views/booking/api/submit.ts`, `app/[locale]/booking/confirmation/page.tsx`, `app/[locale]/admin/bookings/page.tsx`, `app/api/booking/slots/route.ts`, plus the helper itself).
 4. v1 ships a `window.confirm()` guard for timezone changes — see Task 14.
+
+## Plan-reviewer fixes folded in
+
+5. Home page lives at `app/[locale]/home/page.tsx`; `[locale]/page.tsx` is a `/welcome` redirect — corrected in Tasks 13.
+6. `STUDIO_DATA.studio.address` has three consumers (footer + confirm step + confirmation page) — Task 13 routes all three through settings atomically.
+7. `requireAdmin` returns `reason: "unauthorized" | "forbidden"`, not `"not_admin"` — corrected in Task 7 tests.
+8. `updateStudioAction` calls `invalidateDefaultLocaleCache()` alongside `revalidatePath()` to match the sibling `updateSiteSettingsAction`.
+9. RU/BE translations are pinned inline in Task 9 (not delegated to the implementer).
+10. Task 2's round-trip test is gated on `db != null` to match the existing defensive pattern in `db/site-settings.test.ts`.
 
 ---
 
@@ -161,40 +173,64 @@ git commit -m "feat(db): extend site_settings with studio location columns"
 Add to `db/site-settings.test.ts` (after the existing tests):
 
 ```ts
-it("returns defaults for the studio-location columns when nothing has been saved", async () => {
-  const settings = await getSiteSettings();
-  expect(settings.addressEn).toBe("By appointment · Verbena Lane 14, Studio B");
-  expect(settings.country).toBe("BY");
-  expect(settings.timezone).toBe("Europe/Minsk");
-  expect(settings.latitude).toBeNull();
-  expect(settings.longitude).toBeNull();
-  expect(settings.mapVisible).toBe(false);
-  expect(settings.cityEn).toBe("");
+// Shape-only assertion that works whether DB is null (returns
+// DEFAULT_SITE_SETTINGS) or live (returns the seeded row). Matches the
+// existing defensive try/catch pattern in this file.
+it("exposes the studio-location fields on the SiteSettings shape", async () => {
+  let result: Awaited<ReturnType<typeof getSiteSettings>> | null = null;
+  try {
+    result = await getSiteSettings();
+  } catch {
+    /* pre-migration env — acceptable, fall through to defaults */
+  }
+  const s = result ?? DEFAULT_SITE_SETTINGS;
+  expect(typeof s.addressEn).toBe("string");
+  expect(typeof s.country).toBe("string");
+  expect(typeof s.timezone).toBe("string");
+  expect(s.latitude === null || typeof s.latitude === "number").toBe(true);
+  expect(s.longitude === null || typeof s.longitude === "number").toBe(true);
+  expect(typeof s.mapVisible).toBe("boolean");
 });
 
-it("round-trips a full studio-location patch", async () => {
-  await updateSiteSettings(
-    {
-      addressEn: "12 Rose Street",
-      addressRu: "12 Розовая",
-      addressBe: "12 Ружовая",
-      country: "BY",
-      cityEn: "Borisov",
-      cityRu: "Борисов",
-      cityBe: "Барысаў",
-      timezone: "Europe/Minsk",
-      latitude: 54.231,
-      longitude: 28.491,
-      mapVisible: true,
-    },
-    null,
+it("frozen defaults match the studio-location columns", () => {
+  expect(DEFAULT_SITE_SETTINGS.addressEn).toBe(
+    "By appointment · Verbena Lane 14, Studio B",
   );
-  const settings = await getSiteSettings();
-  expect(settings.cityEn).toBe("Borisov");
-  expect(settings.latitude).toBeCloseTo(54.231, 4);
-  expect(settings.longitude).toBeCloseTo(28.491, 4);
-  expect(settings.mapVisible).toBe(true);
+  expect(DEFAULT_SITE_SETTINGS.country).toBe("BY");
+  expect(DEFAULT_SITE_SETTINGS.timezone).toBe("Europe/Minsk");
+  expect(DEFAULT_SITE_SETTINGS.latitude).toBeNull();
+  expect(DEFAULT_SITE_SETTINGS.longitude).toBeNull();
+  expect(DEFAULT_SITE_SETTINGS.mapVisible).toBe(false);
 });
+
+// Gated on a live DB — mirrors the defensive try/catch the existing
+// tests in this file use so CI / pre-migration environments still pass.
+it.skipIf(!process.env.DATABASE_URL)(
+  "round-trips a full studio-location patch (live DB only)",
+  async () => {
+    await updateSiteSettings(
+      {
+        addressEn: "12 Rose Street",
+        addressRu: "12 Розовая",
+        addressBe: "12 Ружовая",
+        country: "BY",
+        cityEn: "Borisov",
+        cityRu: "Борисов",
+        cityBe: "Барысаў",
+        timezone: "Europe/Minsk",
+        latitude: 54.231,
+        longitude: 28.491,
+        mapVisible: true,
+      },
+      null,
+    );
+    const settings = await getSiteSettings();
+    expect(settings.cityEn).toBe("Borisov");
+    expect(settings.latitude).toBeCloseTo(54.231, 4);
+    expect(settings.longitude).toBeCloseTo(28.491, 4);
+    expect(settings.mapVisible).toBe(true);
+  },
+);
 ```
 
 - [ ] **Step 2: Verify the tests fail**
@@ -351,13 +387,17 @@ npx vitest run shared/config/countries.test.ts
 ```
 Expected: FAIL — file doesn't exist.
 
-- [ ] **Step 3: Implement `shared/config/countries.ts`**
+- [ ] **Step 3: Implement `shared/config/countries.ts` (generate the list at module load)**
 
-Create the file with the full ISO-3166 alpha-2 list. Use the official Wikipedia table or `Intl.DisplayNames` to source names — for the sake of having a deterministic, build-time-stable list, hardcode it. Below is the abbreviated shape; the full file lists all ~250 codes alphabetically by `nameEn`:
+To keep the plan self-contained and avoid pasting 250 lines, derive the list from Node's built-in `Intl.DisplayNames`. The list is computed once at module load and frozen, so there's no per-render cost. Run this in a Node REPL once if you want to inspect / cache the output, but the runtime form below is what ships:
 
 ```ts
 /**
  * ISO-3166 alpha-2 country list, sorted by English name.
+ *
+ * Derived from the standard alpha-2 codes plus Node's
+ * Intl.DisplayNames for English country names. Computed once at
+ * module load and frozen.
  *
  * Used by the studio-admin form to pick the studio's country.
  * Names render in the admin UI only (English); public site copy
@@ -368,15 +408,38 @@ export interface CountryEntry {
   nameEn: string;
 }
 
-export const COUNTRIES: readonly CountryEntry[] = [
-  { code: "AF", nameEn: "Afghanistan" },
-  { code: "AX", nameEn: "Åland Islands" },
-  { code: "AL", nameEn: "Albania" },
-  // … full list, alphabetical by nameEn …
-  { code: "BY", nameEn: "Belarus" },
-  // …
-  { code: "ZW", nameEn: "Zimbabwe" },
-] as const;
+// All officially-assigned ISO-3166-1 alpha-2 codes as of 2026.
+// (Verified against https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2.
+// Reserved / transitional codes intentionally excluded.)
+const ALPHA2_CODES: readonly string[] = [
+  "AD","AE","AF","AG","AI","AL","AM","AO","AQ","AR","AS","AT","AU","AW","AX","AZ",
+  "BA","BB","BD","BE","BF","BG","BH","BI","BJ","BL","BM","BN","BO","BQ","BR","BS",
+  "BT","BV","BW","BY","BZ","CA","CC","CD","CF","CG","CH","CI","CK","CL","CM","CN",
+  "CO","CR","CU","CV","CW","CX","CY","CZ","DE","DJ","DK","DM","DO","DZ","EC","EE",
+  "EG","EH","ER","ES","ET","FI","FJ","FK","FM","FO","FR","GA","GB","GD","GE","GF",
+  "GG","GH","GI","GL","GM","GN","GP","GQ","GR","GS","GT","GU","GW","GY","HK","HM",
+  "HN","HR","HT","HU","ID","IE","IL","IM","IN","IO","IQ","IR","IS","IT","JE","JM",
+  "JO","JP","KE","KG","KH","KI","KM","KN","KP","KR","KW","KY","KZ","LA","LB","LC",
+  "LI","LK","LR","LS","LT","LU","LV","LY","MA","MC","MD","ME","MF","MG","MH","MK",
+  "ML","MM","MN","MO","MP","MQ","MR","MS","MT","MU","MV","MW","MX","MY","MZ","NA",
+  "NC","NE","NF","NG","NI","NL","NO","NP","NR","NU","NZ","OM","PA","PE","PF","PG",
+  "PH","PK","PL","PM","PN","PR","PS","PT","PW","PY","QA","RE","RO","RS","RU","RW",
+  "SA","SB","SC","SD","SE","SG","SH","SI","SJ","SK","SL","SM","SN","SO","SR","SS",
+  "ST","SV","SX","SY","SZ","TC","TD","TF","TG","TH","TJ","TK","TL","TM","TN","TO",
+  "TR","TT","TV","TW","TZ","UA","UG","UM","US","UY","UZ","VA","VC","VE","VG","VI",
+  "VN","VU","WF","WS","YE","YT","ZA","ZM","ZW",
+];
+
+const displayNames = new Intl.DisplayNames(["en"], { type: "region" });
+
+export const COUNTRIES: readonly CountryEntry[] = Object.freeze(
+  ALPHA2_CODES.map((code) => ({
+    code,
+    nameEn: displayNames.of(code) ?? code,
+  }))
+    .sort((a, b) => a.nameEn.localeCompare(b.nameEn, "en"))
+    .map((entry) => Object.freeze(entry)),
+);
 
 const CODE_SET = new Set(COUNTRIES.map((c) => c.code));
 
@@ -386,14 +449,6 @@ export function isValidCountryCode(code: string): boolean {
 
 export type CountryCode = (typeof COUNTRIES)[number]["code"];
 ```
-
-To enumerate the list quickly, run a one-liner once:
-```bash
-node -e "const n=new Intl.DisplayNames('en',{type:'region'});for(const c of Intl.supportedValuesOf?.('currency')??[]){}; for(const cc of ['AD','AE','AF',/*...*/]){console.log(\`{ code: '\${cc}', nameEn: '\${n.of(cc)}' },\`)}"
-```
-or simpler — copy from <https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements> and run them through a small node script (`Intl.DisplayNames` is the right source if you prefer not to copy-paste).
-
-The full list is dev-deterministic, so commit the literal array (no runtime generation).
 
 - [ ] **Step 4: Verify tests pass**
 
@@ -716,6 +771,19 @@ describe("addressForLocale", () => {
     ).toBe("12 Rose Street");
   });
 });
+
+describe("studioLocationLine", () => {
+  it("returns 'address · city' when city is set", () => {
+    expect(studioLocationLine(SAMPLE, "en")).toBe("12 Rose Street · Borisov");
+    expect(studioLocationLine(SAMPLE, "ru")).toBe("12 Розовая · Борисов");
+  });
+
+  it("returns only the address when city is empty", () => {
+    expect(
+      studioLocationLine({ ...SAMPLE, cityEn: "", cityRu: "", cityBe: "" }, "en"),
+    ).toBe("12 Rose Street");
+  });
+});
 ```
 
 - [ ] **Step 2: Verify failure**
@@ -754,11 +822,29 @@ export function addressForLocale(
         : settings.addressEn;
   return direct || settings.addressEn;
 }
+
+/**
+ * Composes the public-facing one-line address. Mirrors the home-footer
+ * convention: `<address> · <city>` when a city is set, otherwise just
+ * the address.
+ */
+export function studioLocationLine(
+  settings: SiteSettings,
+  locale: Locale,
+): string {
+  const address = addressForLocale(settings, locale);
+  const city = cityForLocale(settings, locale);
+  return city ? `${address} · ${city}` : address;
+}
 ```
 
 Re-export from `entities/site-settings/index.ts`:
 ```ts
-export { cityForLocale, addressForLocale } from "./model/locale-fields";
+export {
+  cityForLocale,
+  addressForLocale,
+  studioLocationLine,
+} from "./model/locale-fields";
 ```
 
 - [ ] **Step 4: Verify tests pass**
@@ -839,7 +925,7 @@ describe("updateStudioAction", () => {
   it("refuses non-admin callers when auth is required", async () => {
     vi.mocked(requireAdmin).mockResolvedValueOnce({
       ok: false,
-      reason: "not_admin",
+      reason: "forbidden",
     });
     const result = await updateStudioAction({ cityEn: "X" });
     expect(result.ok).toBe(false);
@@ -873,6 +959,7 @@ import { revalidatePath } from "next/cache";
 import { siteSettingsPatchSchema } from "@/entities/site-settings";
 import { requireAdmin } from "@/shared/lib/auth-server";
 import { updateSiteSettings } from "@/db/site-settings";
+import { invalidateDefaultLocaleCache } from "@/shared/lib/site-settings-cache";
 
 export type UpdateStudioResult =
   | { ok: true }
@@ -899,10 +986,24 @@ export async function updateStudioAction(
   }
 
   await updateSiteSettings(parsed.data, updatedBy);
+  invalidateDefaultLocaleCache(); // same as updateSiteSettingsAction — keep in-proc cache fresh
   revalidatePath("/", "layout");
   return { ok: true };
 }
 ```
+
+> The test in Step 1 should also verify the cache-invalidation call. Add to the imports / mocks at the top:
+> ```ts
+> vi.mock("@/shared/lib/site-settings-cache", () => ({
+>   invalidateDefaultLocaleCache: vi.fn(),
+> }));
+> // …
+> import { invalidateDefaultLocaleCache } from "@/shared/lib/site-settings-cache";
+> ```
+> and to the first test:
+> ```ts
+> expect(invalidateDefaultLocaleCache).toHaveBeenCalledOnce();
+> ```
 
 `features/studio-admin/index.ts`:
 ```ts
@@ -1383,9 +1484,74 @@ Append to `messages/en.json` (and analogous translations to `ru.json` / `be.json
 }
 ```
 
-RU and BE: translate the strings; mirror the key set exactly. (Use Violetta's existing tone — the AdminMasters block in en.json/ru.json/be.json is the calibration.)
+RU (`messages/ru.json`):
+```jsonc
+"AdminStudio": {
+  "meta_title": "Студия",
+  "plate_title": "Студия",
+  "section_address": "Адрес",
+  "section_country": "Страна",
+  "section_city": "Город",
+  "section_coords": "Координаты",
+  "section_timezone": "Часовой пояс",
+  "section_map_visible": "Карта",
+  "label_address_en": "Адрес (английский)",
+  "label_address_ru": "Адрес (русский)",
+  "label_address_be": "Адрес (белорусский)",
+  "label_country": "Страна",
+  "label_city_en": "Город (английский)",
+  "label_city_ru": "Город (русский)",
+  "label_city_be": "Город (белорусский)",
+  "label_latitude": "Широта",
+  "label_longitude": "Долгота",
+  "label_timezone": "Часовой пояс",
+  "label_show_map": "Показывать карту на главной",
+  "coords_hint": "В Google Maps щёлкните правой кнопкой по студии → нажмите на координаты, чтобы скопировать.",
+  "preview_pin": "Посмотреть метку в OpenStreetMap →",
+  "map_visible_disabled_hint": "Сначала введите координаты",
+  "timezone_confirm": "Смена часового пояса повлияет на время записи у гостей. Продолжить?",
+  "save": "Сохранить",
+  "saved": "Сохранено",
+  "error": "Не удалось сохранить: {error}"
+}
+```
 
-Also append `Admin.inbox_studio` + `Admin.inbox_studio_caption` for the dashboard tile (used in Task 12).
+BE (`messages/be.json`):
+```jsonc
+"AdminStudio": {
+  "meta_title": "Студыя",
+  "plate_title": "Студыя",
+  "section_address": "Адрас",
+  "section_country": "Краіна",
+  "section_city": "Горад",
+  "section_coords": "Каардынаты",
+  "section_timezone": "Часавы пояс",
+  "section_map_visible": "Карта",
+  "label_address_en": "Адрас (англійская)",
+  "label_address_ru": "Адрас (руская)",
+  "label_address_be": "Адрас (беларуская)",
+  "label_country": "Краіна",
+  "label_city_en": "Горад (англійская)",
+  "label_city_ru": "Горад (руская)",
+  "label_city_be": "Горад (беларуская)",
+  "label_latitude": "Шырата",
+  "label_longitude": "Даўгата",
+  "label_timezone": "Часавы пояс",
+  "label_show_map": "Паказваць карту на галоўнай",
+  "coords_hint": "У Google Maps пстрыкніце правай кнопкай па студыі → націсніце на каардынаты, каб скапіяваць.",
+  "preview_pin": "Паглядзець метку ў OpenStreetMap →",
+  "map_visible_disabled_hint": "Спачатку ўвядзіце каардынаты",
+  "timezone_confirm": "Змена часавага пояса паўплывае на час запісу для гасцей. Працягнуць?",
+  "save": "Захаваць",
+  "saved": "Захавана",
+  "error": "Не атрымалася захаваць: {error}"
+}
+```
+
+Also append `Admin.inbox_studio` + `Admin.inbox_studio_caption` for the dashboard tile (used in Task 12):
+- EN: `"inbox_studio": "Studio"`, `"inbox_studio_caption": "Address, map, timezone"`
+- RU: `"inbox_studio": "Студия"`, `"inbox_studio_caption": "Адрес, карта, часовой пояс"`
+- BE: `"inbox_studio": "Студыя"`, `"inbox_studio_caption": "Адрас, карта, часавы пояс"`
 
 - [ ] **Step 3: Verify tests pass**
 
@@ -1493,58 +1659,52 @@ git commit -m "feat(studio-admin): StudioForm Storybook stories"
 - Create: `widgets/studio-map/index.ts`
 - Create: `widgets/studio-map/ui/studio-map.tsx` + `.test.tsx` + `.stories.tsx`
 
+**Component design note:** `<StudioMap>` is sync (NOT an async server component) and takes a `dictionary` prop containing the three i18n strings it needs. The footer (server component) calls `useTranslations()` and passes the strings down. This keeps the widget trivially testable in jsdom.
+
 - [ ] **Step 1: Write failing tests**
 
 `widgets/studio-map/ui/studio-map.test.tsx`:
 ```tsx
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
 import { DEFAULT_SITE_SETTINGS } from "@/entities/site-settings";
-import messages from "@/messages/en.json";
 import { StudioMap } from "./studio-map";
 
-function wrap(ui: React.ReactNode) {
-  return (
-    <NextIntlClientProvider locale="en" messages={messages}>
-      {ui}
-    </NextIntlClientProvider>
-  );
-}
+const DICT = {
+  mapAria: "Studio location",
+  mapTitle: "Studio location",
+  getDirections: "Get directions",
+};
 
 describe("StudioMap", () => {
   it("renders nothing when mapVisible is false", () => {
     const { container } = render(
-      wrap(<StudioMap settings={DEFAULT_SITE_SETTINGS} locale="en" />),
+      <StudioMap settings={DEFAULT_SITE_SETTINGS} dictionary={DICT} />,
     );
     expect(container.firstChild).toBeNull();
   });
 
   it("renders nothing when coords are null even with mapVisible true", () => {
     const { container } = render(
-      wrap(
-        <StudioMap
-          settings={{ ...DEFAULT_SITE_SETTINGS, mapVisible: true }}
-          locale="en"
-        />,
-      ),
+      <StudioMap
+        settings={{ ...DEFAULT_SITE_SETTINGS, mapVisible: true }}
+        dictionary={DICT}
+      />,
     );
     expect(container.firstChild).toBeNull();
   });
 
   it("renders an OSM iframe and a Google Maps directions link when enabled", () => {
     const { getByTitle, getByRole } = render(
-      wrap(
-        <StudioMap
-          settings={{
-            ...DEFAULT_SITE_SETTINGS,
-            mapVisible: true,
-            latitude: 54.231,
-            longitude: 28.491,
-          }}
-          locale="en"
-        />,
-      ),
+      <StudioMap
+        settings={{
+          ...DEFAULT_SITE_SETTINGS,
+          mapVisible: true,
+          latitude: 54.231,
+          longitude: 28.491,
+        }}
+        dictionary={DICT}
+      />,
     );
     const iframe = getByTitle(/studio location/i);
     expect(iframe.tagName).toBe("IFRAME");
@@ -1558,7 +1718,7 @@ describe("StudioMap", () => {
       "https://www.google.com/maps/dir/?api=1&destination=54.231,28.491",
     );
     expect(link).toHaveAttribute("target", "_blank");
-    expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+    expect(link.getAttribute("rel") ?? "").toContain("noopener");
   });
 });
 ```
@@ -1570,84 +1730,10 @@ npx vitest run widgets/studio-map/ui/studio-map.test.tsx
 ```
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement `<StudioMap>`**
+- [ ] **Step 3: Implement `<StudioMap>` (sync, dictionary prop)**
 
 `widgets/studio-map/ui/studio-map.tsx`:
 ```tsx
-import { getTranslations } from "next-intl/server";
-import type { Locale } from "@/i18n/routing";
-import type { SiteSettings } from "@/entities/site-settings";
-import { buttonClassName } from "@/shared/ui/button";
-
-export interface StudioMapProps {
-  settings: SiteSettings;
-  locale: Locale;
-}
-
-const BBOX_DELTA = 0.005; // ~500m at typical latitudes
-
-export async function StudioMap({ settings, locale }: StudioMapProps) {
-  if (!settings.mapVisible) return null;
-  if (settings.latitude == null || settings.longitude == null) return null;
-
-  const t = await getTranslations({ locale, namespace: "Footer" });
-  const lat = settings.latitude;
-  const lng = settings.longitude;
-  const minLat = lat - BBOX_DELTA;
-  const maxLat = lat + BBOX_DELTA;
-  const minLng = lng - BBOX_DELTA;
-  const maxLng = lng + BBOX_DELTA;
-
-  const embedSrc =
-    `https://www.openstreetmap.org/export/embed.html` +
-    `?bbox=${minLng},${minLat},${maxLng},${maxLat}` +
-    `&layer=mapnik` +
-    `&marker=${lat},${lng}`;
-
-  const directionsHref =
-    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-
-  return (
-    <section
-      aria-label={t("map_aria")}
-      className="mx-auto mt-4 flex w-full max-w-[420px] flex-col items-center gap-2"
-    >
-      <iframe
-        title={t("map_title")}
-        src={embedSrc}
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-        className="aspect-[16/9] w-full rounded border-[0.5px] border-line"
-      />
-      <a
-        href={directionsHref}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={buttonClassName({ variant: "ghost", size: "sm" })}
-      >
-        {t("get_directions")}
-      </a>
-    </section>
-  );
-}
-```
-
-> **Note on async server components in tests:** `@testing-library/react`'s `render()` in jsdom doesn't natively await async components. If the test framework can't render the async component as-is, refactor the component to be sync by passing the translations in as props from the parent OR by using an inner sync component. **Simpler option:** make `<StudioMap>` sync, accept a `dictionary` prop with the three strings:
->
-> ```ts
-> export interface StudioMapDictionary {
->   mapAria: string;
->   mapTitle: string;
->   getDirections: string;
-> }
-> ```
->
-> and have the home footer (server component) call `getTranslations()` and pass the dictionary down. This keeps the widget pure-sync and trivially testable. **Use this dictionary approach.** Update the test to pass a `dictionary` prop instead of relying on `NextIntlClientProvider`.
-
-Revised component (sync) — replace the implementation above with:
-
-```tsx
-import type { Locale } from "@/i18n/routing";
 import type { SiteSettings } from "@/entities/site-settings";
 import { buttonClassName } from "@/shared/ui/button";
 
@@ -1662,7 +1748,7 @@ export interface StudioMapProps {
   dictionary: StudioMapDictionary;
 }
 
-const BBOX_DELTA = 0.005;
+const BBOX_DELTA = 0.005; // ~500m at typical latitudes
 
 export function StudioMap({ settings, dictionary }: StudioMapProps) {
   if (!settings.mapVisible) return null;
@@ -1707,8 +1793,6 @@ export function StudioMap({ settings, dictionary }: StudioMapProps) {
   );
 }
 ```
-
-Update the test to pass `dictionary` instead of `locale` and drop the provider wrapper.
 
 `widgets/studio-map/index.ts`:
 ```ts
@@ -1905,15 +1989,21 @@ git commit -m "feat(admin): /admin/studio route + dashboard tile"
 
 ---
 
-## Task 13: Home footer reads from settings + renders map
+## Task 13: Public surface — three call sites switch from `STUDIO_DATA.address` to settings
 
 **Files:**
-- Modify: [views/home/ui/sections/home-footer.tsx](../../../views/home/ui/sections/home-footer.tsx)
-- Modify: [views/home/ui/home-page.tsx](../../../views/home/ui/home-page.tsx) — thread `settings` prop
-- Modify: [app/[locale]/page.tsx](../../../app/[locale]/page.tsx) — pass settings + locale to `<HomePage>`
-- Modify: [entities/studio/model/data.ts](../../../entities/studio/model/data.ts) — delete `studio.address`
+- Modify: [views/home/ui/sections/home-footer.tsx](../../../views/home/ui/sections/home-footer.tsx) — accept `settings` + `locale`, mount `<StudioMap>`, use `studioLocationLine()`
+- Modify: [views/home/ui/home-page.tsx](../../../views/home/ui/home-page.tsx) — accept `settings` + `locale`, thread to `HomeFooter`
+- Modify: `app/[locale]/home/page.tsx` (home route — note `[locale]/page.tsx` is just a `/welcome` redirect) — load settings, pass to `<HomePage>`
+- Modify: [views/booking/ui/steps/confirm-step.tsx](../../../views/booking/ui/steps/confirm-step.tsx) — accept `location` prop, drop `STUDIO_DATA` import
+- Modify: the booking step server route that renders `<ConfirmStep>` — load settings, compute `studioLocationLine(settings, locale)`, pass as `location`
+- Modify: [views/confirmation/ui/confirmation-page.tsx](../../../views/confirmation/ui/confirmation-page.tsx) — accept `location` prop, drop `STUDIO_DATA` import
+- Modify: [app/[locale]/booking/confirmation/page.tsx](../../../app/[locale]/booking/confirmation/page.tsx) — load settings, pass `location` to `<ConfirmationPage>`
+- Modify: [entities/studio/model/data.ts](../../../entities/studio/model/data.ts) — delete `studio.address` field
 - Modify: [entities/studio/model/types.ts](../../../entities/studio/model/types.ts) — delete `address` from `StudioInfo`
 - Create: `views/home/ui/sections/home-footer.test.tsx`
+
+> **Why atomic:** TypeScript will fail to compile the moment `studio.address` is deleted from `StudioInfo` if any consumer still reads it. The three rewrites (footer + confirm-step + confirmation-page) and the type/data deletion must land in one commit. The order below writes the new props first, switches each consumer, then drops the field last.
 
 - [ ] **Step 1: Write failing test for the footer**
 
@@ -2073,33 +2163,84 @@ export function HomePage({ master, settings, locale }: HomePageProps) {
 
 - [ ] **Step 5: Update the home route to pass props**
 
-`app/[locale]/page.tsx` — load settings (via `getSiteSettingsServer()` if not already) and pass:
+`app/[locale]/home/page.tsx` (NOT `[locale]/page.tsx` — that one's a `/welcome` redirect):
+
 ```tsx
-const settings = await getSiteSettingsServer();
-// …
-return <HomePage master={master} settings={settings} locale={locale} />;
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+// …existing imports…
+
+export default async function HomeRoute({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const [masters, settings] = await Promise.all([
+    loadMastersForLocale(locale as Locale, { publishedOnly: true }),
+    getSiteSettingsServer(),
+  ]);
+  return (
+    <HomePage
+      master={masters[0]}
+      settings={settings}
+      locale={locale as Locale}
+    />
+  );
+}
 ```
 
-- [ ] **Step 6: Remove the dead `studio.address` field**
+- [ ] **Step 6: Update `<ConfirmStep>` (booking step) to take `location` prop**
+
+In `views/booking/ui/steps/confirm-step.tsx`:
+1. Delete the `import { STUDIO_DATA } from "@/entities/studio";` line.
+2. Add `location: string` to `ConfirmStepProps`.
+3. In the `rows` array, replace `STUDIO_DATA.studio.address` with the `location` prop.
+
+The server parent that renders `<ConfirmStep>` is `app/[locale]/booking/[step]/page.tsx`. Find it (`grep -n ConfirmStep app/...`), load settings, and pass:
+
+```tsx
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import { studioLocationLine } from "@/entities/site-settings";
+// …
+const settings = await getSiteSettingsServer();
+const location = studioLocationLine(settings, locale as Locale);
+// …pass `location={location}` to <ConfirmStep />
+```
+
+- [ ] **Step 7: Update `<ConfirmationPage>` to take `location` prop**
+
+In `views/confirmation/ui/confirmation-page.tsx`:
+1. Delete the `import { STUDIO_DATA } from "@/entities/studio";` line.
+2. Add `location: string` to `ConfirmationPageProps`.
+3. In the `rows` array, replace `STUDIO_DATA.studio.address` with `props.location`.
+
+In `app/[locale]/booking/confirmation/page.tsx`, load settings (likely already loaded for the timezone change in Task 14, so reuse), compute `studioLocationLine(settings, locale)`, and pass as `location` to `<ConfirmationPage>`.
+
+- [ ] **Step 8: Remove the dead `studio.address` field**
 
 In [entities/studio/model/data.ts](../../../entities/studio/model/data.ts), remove the `address` line from the `studio` object literal.
 
-In [entities/studio/model/types.ts](../../../entities/studio/model/types.ts), remove the `address` field from the `StudioInfo` interface (find it with grep first).
+In [entities/studio/model/types.ts](../../../entities/studio/model/types.ts), remove the `address` field from the `StudioInfo` interface.
 
-If any test still references `STUDIO_DATA.studio.address`, update or delete that assertion.
+Verify no other consumer remains:
+```bash
+grep -rn "studio.address\|studio\.address" --include='*.ts' --include='*.tsx'
+```
+Expected: only test files (`views/home/ui/sections/home-footer.test.tsx`) which reference the literal default-seeded string — not the `STUDIO_DATA.studio.address` access.
 
-- [ ] **Step 7: Run the full test + lint pass**
+- [ ] **Step 9: Run the full test + lint pass**
 
 ```bash
 npm run lint && npm test
 ```
-Expected: PASS. If TypeScript shouts about `STUDIO_DATA.studio.address` references somewhere, follow the trail and clean them up (`grep -rn "studio.address" --include='*.ts' --include='*.tsx'`).
+Expected: PASS. If TypeScript shouts, follow the trail.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
-git add views/home/ entities/studio/model/ 'app/[locale]/page.tsx'
-git commit -m "feat(home-footer): read address from site settings, mount StudioMap, drop STUDIO_DATA.address"
+git add views/home/ views/booking/ui/steps/confirm-step.tsx views/confirmation/ui/confirmation-page.tsx 'app/[locale]/home/page.tsx' 'app/[locale]/booking/' entities/studio/model/
+git commit -m "feat(studio): route address through site settings everywhere; drop STUDIO_DATA.address"
 ```
 
 ---
@@ -2544,16 +2685,24 @@ import { cityForLocale } from "@/entities/site-settings";
 
 - [ ] **Step 3: Mount `<LocalBusinessJsonLd>` in the body**
 
-In the `LocaleLayout` component, inside `<body>` and before `<NextIntlClientProvider>`:
+In the `LocaleLayout` component, inside `<body>` and before `<NextIntlClientProvider>` — hoist the translator outside the JSX for readability:
 
 ```tsx
-<LocalBusinessJsonLd
-  settings={settings}
-  locale={locale as Locale}
-  siteUrl={SITE_URL}
-  name={(await getTranslations({ locale, namespace: "Site" }))("name")}
-/>
-<NextIntlClientProvider>{children}</NextIntlClientProvider>
+const tSite = await getTranslations({ locale, namespace: "Site" });
+// …
+return (
+  <html /* … */>
+    <body className="min-h-full flex flex-col">
+      <LocalBusinessJsonLd
+        settings={settings}
+        locale={locale as Locale}
+        siteUrl={SITE_URL}
+        name={tSite("name")}
+      />
+      <NextIntlClientProvider>{children}</NextIntlClientProvider>
+    </body>
+  </html>
+);
 ```
 
 (`settings` is already loaded near the top of `LocaleLayout`.)
@@ -2604,7 +2753,6 @@ test("admin can configure the studio location and the home page reflects it", as
   await page.getByLabel(/city.*belarusian/i).fill("Барысаў");
   await page.getByLabel(/latitude/i).fill("54.231");
   await page.getByLabel(/longitude/i).fill("28.491");
-  // Confirm dialog is for timezone changes only; skipping any.
 
   // Show-map checkbox only enables once coords are filled.
   const showMap = page.getByRole("checkbox", { name: /show map/i });
