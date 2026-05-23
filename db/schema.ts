@@ -456,6 +456,7 @@ export const testimonialStatus = pgEnum("testimonial_status", [
   "pending",
   "approved",
   "rejected",
+  "removed",
 ]);
 
 export const testimonials = pgTable(
@@ -470,6 +471,13 @@ export const testimonials = pgTable(
       .references(() => masters.id, { onDelete: "cascade" }),
     body: text("body").notNull(),
     status: testimonialStatus("status").notNull().default("pending"),
+    // User-initiated change requests on an approved row. Set together
+    // with changeRequestedAt; admin resolution clears all three.
+    pendingEditBody: text("pending_edit_body"),
+    pendingRemoval: boolean("pending_removal").notNull().default(false),
+    changeRequestedAt: timestamp("change_requested_at", {
+      withTimezone: true,
+    }),
     decidedAt: timestamp("decided_at", { withTimezone: true }),
     decidedBy: text("decided_by").references(() => users.id),
     createdAt: timestamp("created_at", { withTimezone: true })
