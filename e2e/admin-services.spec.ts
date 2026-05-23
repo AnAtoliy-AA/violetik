@@ -40,6 +40,10 @@ test("service editor surfaces inline validation error on empty locale", async ({
   const ruBlurb = page.getByLabel(/Blurb \(Russian\)/);
   await expect(ruBlurb).toBeVisible();
   await ruBlurb.fill("");
+  // Wait for React's controlled-input state to commit before clicking
+  // Save — otherwise the click can fire while React still holds the
+  // pre-clear value, Zod passes, and the save succeeds with stale text.
+  await expect(ruBlurb).toHaveValue("");
   await page.getByRole("button", { name: /^Save$/ }).click();
   // The required-locale error surfaces inline next to the blurb input.
   await expect(page.getByText(/Required/).first()).toBeVisible();

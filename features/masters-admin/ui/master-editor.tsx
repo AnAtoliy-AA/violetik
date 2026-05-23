@@ -30,6 +30,7 @@ export interface MasterEditorInitial {
   sortOrder: number;
   status: Status;
   serviceIds: string[];
+  telegramUsername: string | null;
 }
 
 export interface ServiceOption {
@@ -90,6 +91,9 @@ export function MasterEditor({
   const [setsLabel, setSetsLabel] = useState(initial.setsLabel);
   const [status, setStatus] = useState<Status>(initial.status);
   const [serviceIds, setServiceIds] = useState<string[]>(initial.serviceIds);
+  const [telegramUsername, setTelegramUsername] = useState<string | null>(
+    initial.telegramUsername,
+  );
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -113,6 +117,7 @@ export function MasterEditor({
       sortOrder: initial.sortOrder,
       status,
       serviceIds,
+      telegramUsername,
     };
     const parsed = masterFormSchema.safeParse(payload);
     if (!parsed.success) {
@@ -141,6 +146,8 @@ export function MasterEditor({
     if (code === "required") return t("validation_required");
     if (code === "slug_invalid") return t("validation_slug_invalid");
     if (code === "slug_required") return t("validation_required");
+    if (code === "invalid_telegram_username")
+      return t("validation_telegram_username");
     return code;
   };
 
@@ -381,6 +388,24 @@ export function MasterEditor({
           value={serviceIds}
           onChange={setServiceIds}
         />
+
+        <Field
+          id="mst-telegram"
+          label={t("label_telegram")}
+          hint={t("label_telegram_hint")}
+          error={errFor("telegramUsername")}
+        >
+          <input
+            id="mst-telegram"
+            type="text"
+            value={telegramUsername ?? ""}
+            onChange={(e) =>
+              setTelegramUsername(e.target.value || null)
+            }
+            placeholder="violetta"
+            className={inputClass}
+          />
+        </Field>
 
         <div className="flex items-center gap-3">
           <button

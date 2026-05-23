@@ -52,6 +52,9 @@ export function StudioForm({
     initial.longitude == null ? "" : String(initial.longitude),
   );
   const [mapVisible, setMapVisible] = useState(initial.mapVisible);
+  const [telegramUsername, setTelegramUsername] = useState<string | null>(
+    initial.telegramUsername,
+  );
 
   const latNum = latitude === "" ? null : Number(latitude);
   const lngNum = longitude === "" ? null : Number(longitude);
@@ -80,6 +83,7 @@ export function StudioForm({
       latitude: coordsBothFilled ? latNum : null,
       longitude: coordsBothFilled ? lngNum : null,
       mapVisible: coordsBothFilled ? mapVisible : false,
+      telegramUsername,
     };
   }
 
@@ -273,6 +277,26 @@ export function StudioForm({
           />
           {t("label_show_map")}
         </label>
+      </fieldset>
+
+      <fieldset>
+        <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("section_telegram")}
+        </legend>
+        <label className={labelClass}>
+          {t("label_telegram")}
+          <input
+            aria-label={t("label_telegram")}
+            type="text"
+            value={telegramUsername ?? ""}
+            onChange={(e) =>
+              setTelegramUsername(e.target.value || null)
+            }
+            placeholder="violetta"
+            className={cn(inputClass, "mt-1")}
+          />
+        </label>
+        <p className="mt-1 text-[11px] text-text-3">{t("telegram_hint")}</p>
       </fieldset>
 
       <div className="flex items-center gap-3">

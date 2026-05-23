@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { and, desc, eq, gte, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ne, sql } from "drizzle-orm";
 import { db, schema } from "./index";
 
 export interface NewBookingInput {
@@ -138,4 +138,69 @@ export async function setBookingGcalEventId(
     .update(schema.bookings)
     .set({ gcalEventId, updatedAt: new Date() })
     .where(eq(schema.bookings.id, id));
+}
+
+export interface UserBookingRow extends schema.Booking {
+  masterNameEn: string | null;
+  masterNameRu: string | null;
+  masterNameBe: string | null;
+  masterTelegramUsername: string | null;
+}
+
+/**
+ * Bookings for one user, excluding cancelled rows. Sorted ascending
+ * by scheduledFor; the view buckets into upcoming / history using a
+ * single `now` captured server-side.
+ */
+export async function listUserBookings(
+  userId: string,
+): Promise<UserBookingRow[]> {
+  if (!db) return [];
+  const rows = await db
+    .select({
+      booking: schema.bookings,
+      masterNameEn: schema.masters.nameEn,
+      masterNameRu: schema.masters.nameRu,
+      masterNameBe: schema.masters.nameBe,
+      masterTelegramUsername: schema.masters.telegramUsername,
+    })
+    .from(schema.bookings)
+    .leftJoin(schema.masters, eq(schema.bookings.masterId, schema.masters.id))
+    .where(
+      and(
+        eq(schema.bookings.userId, userId),
+        ne(schema.bookings.status, "cancelled"),
+      ),
+    )
+    .orderBy(asc(schema.bookings.scheduledFor));
+  return rows.map((r) => ({
+    ...r.booking,
+    masterNameEn: r.masterNameEn,
+    masterNameRu: r.masterNameRu,
+    masterNameBe: r.masterNameBe,
+    masterTelegramUsername: r.masterTelegramUsername,
+  }));
+}
+
+/**
+ * Race-safe customer cancel: only flips the row when its current
+ * status is pending or confirmed. Returns the updated row when the
+ * update happened, or null when nothing was updated (already cancelled
+ * / completed / no such row / DB disabled).
+ */
+export async function cancelBookingIfOpen(
+  id: string,
+): Promise<schema.Booking | null> {
+  if (!db) return null;
+  const rows = await db
+    .update(schema.bookings)
+    .set({ status: "cancelled", updatedAt: new Date() })
+    .where(
+      and(
+        eq(schema.bookings.id, id),
+        sql`${schema.bookings.status} IN ('pending','confirmed')`,
+      ),
+    )
+    .returning();
+  return rows[0] ?? null;
 }

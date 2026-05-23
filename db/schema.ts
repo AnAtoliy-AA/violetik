@@ -247,6 +247,7 @@ export const siteSettings = pgTable(
     latitude: doublePrecision("latitude"),
     longitude: doublePrecision("longitude"),
     mapVisible: boolean("map_visible").notNull().default(false),
+    telegramUsername: text("telegram_username"),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .default(sql`now()`),
@@ -371,6 +372,7 @@ export const masters = pgTable("masters", {
   quoteBe: text("quote_be").notNull(),
   years: integer("years").notNull().default(0),
   setsLabel: text("sets_label").notNull().default(""),
+  telegramUsername: text("telegram_username"),
   sortOrder: integer("sort_order").notNull().default(0),
   status: masterStatus("status").notNull().default("draft"),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -450,6 +452,43 @@ export const studioPhotos = pgTable(
   }),
 );
 
+export const testimonialStatus = pgEnum("testimonial_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);
+
+export const testimonials = pgTable(
+  "testimonials",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    masterId: text("master_id")
+      .notNull()
+      .references(() => masters.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    status: testimonialStatus("status").notNull().default("pending"),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    decidedBy: text("decided_by").references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => ({
+    userIdx: index("testimonials_user_idx").on(table.userId),
+    masterIdx: index("testimonials_master_idx").on(table.masterId),
+    statusIdx: index("testimonials_status_idx").on(table.status),
+    onePendingPerPair: uniqueIndex("testimonials_one_pending_per_pair")
+      .on(table.userId, table.masterId)
+      .where(sql`status = 'pending'`),
+  }),
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Booking = typeof bookings.$inferSelect;
@@ -473,3 +512,6 @@ export type Master = typeof masters.$inferSelect;
 export type NewMaster = typeof masters.$inferInsert;
 export type MasterServiceRow = typeof masterServices.$inferSelect;
 export type MasterStatus = (typeof masterStatus.enumValues)[number];
+export type Testimonial = typeof testimonials.$inferSelect;
+export type NewTestimonial = typeof testimonials.$inferInsert;
+export type TestimonialStatus = (typeof testimonialStatus.enumValues)[number];

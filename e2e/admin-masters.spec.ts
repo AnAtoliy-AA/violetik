@@ -34,6 +34,9 @@ test("master editor surfaces inline validation on empty locale", async ({
   const ruBio = page.getByLabel(/Bio \(Russian\)/);
   await expect(ruBio).toBeVisible();
   await ruBio.fill("");
+  // Wait for React's controlled-textarea state to commit before clicking
+  // Save (same race that surfaced on admin-services).
+  await expect(ruBio).toHaveValue("");
   await page.getByRole("button", { name: /^Save$/ }).click();
   await expect(page.getByText(/Required/).first()).toBeVisible();
 });

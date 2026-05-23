@@ -1,9 +1,28 @@
 import Image from "next/image";
-import { getTranslations, getLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { STUDIO_DATA, type Visit } from "@/entities/studio";
 import { loadProfileWithPhoto } from "@/entities/studio/api/load-with-photos";
 import { listAllServices } from "@/db/services";
+import { listUserBookings } from "@/db/bookings";
+import { listUserTestimonials } from "@/db/testimonials";
+import { listPublishedMasters } from "@/db/masters";
+import { getSiteSettings } from "@/db/site-settings";
+import {
+  bucketBookings,
+  canSelfCancel,
+  type UserBookingRow,
+} from "@/entities/booking";
+import {
+  cancelBookingAction,
+  CancelBookingButton,
+  ContactMasterLink,
+} from "@/features/booking-cancel";
+import {
+  submitTestimonialAction,
+  TestimonialForm,
+  MyTestimonialsList,
+} from "@/features/testimonial-submit";
 import { Aurora } from "@/shared/ui/aurora";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
@@ -22,38 +41,57 @@ const QUICK_LINKS: ReadonlyArray<{ key: string; href: string }> = [
   { key: "studio", href: "/master" },
 ];
 
-function formatDate(iso: string, locale: string): string {
-  const d = new Date(`${iso}T00:00:00`);
+function formatDateTime(date: Date, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
     weekday: "short",
     day: "numeric",
     month: "short",
-  }).format(d);
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 }
 
 function initialsOf(name: string): string {
   return name
     .split(" ")
     .map((part) => part[0])
+    .filter(Boolean)
     .join("");
 }
 
-export async function ProfilePage() {
-  const t = await getTranslations("Profile");
-  const tCountdown = await getTranslations("Profile.countdown");
-  const tLinks = await getTranslations("Profile.quick_links");
-  const locale = await getLocale();
-
+export async function ProfilePage({ locale }: { locale: string }) {
   const user = await getCurrentSessionUser();
-  const tier = user ? await getCurrentTier(user.id) : { state: "member" as const };
+  if (!user) {
+    redirect(`/${locale}/sign-in?callbackUrl=/${locale}/profile`);
+  }
 
-  const profile = await loadProfileWithPhoto();
-  const services = await listAllServices();
-  const { visits } = STUDIO_DATA;
-  const upcoming: Visit | undefined = visits.find(
-    (v) => v.status === "upcoming",
-  );
-  const history = visits.filter((v) => v.status === "past");
+  const [
+    t,
+    tLinks,
+    profile,
+    services,
+    bookings,
+    testimonials,
+    publishedMasters,
+    settings,
+    tier,
+  ] = await Promise.all([
+    getTranslations("Profile"),
+    getTranslations("Profile.quick_links"),
+    loadProfileWithPhoto(),
+    listAllServices(),
+    listUserBookings(user.id),
+    listUserTestimonials(user.id),
+    listPublishedMasters(),
+    getSiteSettings(),
+    getCurrentTier(user.id),
+  ]);
+
+  const now = new Date();
+  const { upcoming, history } = bucketBookings(bookings, now);
+  const next = upcoming[0];
+  const otherUpcoming = upcoming.slice(1);
+  const completedHistory = history.slice(0, 20);
 
   const serviceName = (id: string): string => {
     const s = services.find((row) => row.id === id);
@@ -61,11 +99,52 @@ export async function ProfilePage() {
     return locale === "ru" ? s.nameRu : locale === "be" ? s.nameBe : s.nameEn;
   };
 
-  const countdownLabel = (days: number): string => {
-    if (days <= 0) return tCountdown("today");
-    if (days === 1) return tCountdown("tomorrow");
-    return tCountdown("in_days", { n: days });
+  const displayName =
+    [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+    user.username ||
+    profile.name;
+  const joinedYear = user.createdAt
+    ? new Date(user.createdAt).getUTCFullYear()
+    : new Date().getUTCFullYear();
+
+  const studioTelegram = settings.telegramUsername ?? null;
+
+  const masterNameInLocale = (row: UserBookingRow): string | null => {
+    if (locale === "ru") return row.masterNameRu;
+    if (locale === "be") return row.masterNameBe;
+    return row.masterNameEn;
   };
+
+  const renderAction = (row: UserBookingRow) => {
+    if (canSelfCancel(now, row.scheduledFor)) {
+      return (
+        <CancelBookingButton
+          bookingId={row.id}
+          action={cancelBookingAction}
+        />
+      );
+    }
+    return (
+      <ContactMasterLink
+        masterName={masterNameInLocale(row) ?? ""}
+        masterTelegram={row.masterTelegramUsername}
+        studioTelegram={studioTelegram}
+      />
+    );
+  };
+
+  const masterNameById = Object.fromEntries(
+    publishedMasters.map((m) => {
+      const name =
+        locale === "ru" ? m.nameRu : locale === "be" ? m.nameBe : m.nameEn;
+      return [m.id, name];
+    }),
+  );
+  const formMasters = publishedMasters.map((m) => ({
+    id: m.id,
+    name:
+      locale === "ru" ? m.nameRu : locale === "be" ? m.nameBe : m.nameEn,
+  }));
 
   return (
     <div className="pb-28">
@@ -79,7 +158,7 @@ export async function ProfilePage() {
             <div className="gilded glass-top relative size-[68px] overflow-hidden rounded-full">
               <Image
                 src={profile.avatar.src}
-                alt={profile.avatar.alt ?? profile.name}
+                alt={profile.avatar.alt ?? displayName}
                 fill
                 sizes="68px"
                 placeholder={profile.avatar.blurDataURL ? "blur" : undefined}
@@ -95,7 +174,7 @@ export async function ProfilePage() {
                 background: `linear-gradient(135deg, ${profile.palette[0]}, ${profile.palette[1]})`,
               }}
             >
-              {initialsOf(profile.name)}
+              {initialsOf(displayName)}
             </div>
           )}
           <div>
@@ -110,43 +189,76 @@ export async function ProfilePage() {
               </span>
             )}
             <h1 className="mt-1.5 font-display text-[40px] font-light italic leading-none tracking-[-0.025em]">
-              {profile.name}
+              {displayName}
             </h1>
             <p className="mt-1.5 text-[12px] text-text-3">
-              {t("joined", { year: profile.joined.toString() })}
+              {t("joined", { year: joinedYear.toString() })}
             </p>
           </div>
         </div>
       </section>
 
-      {upcoming ? (
-        <section className="px-[22px] pb-7">
-          <SpotlightCard
-            as="article"
-            aria-label={t("next_visit_eyebrow")}
-            className="gilded-lift glass-top relative overflow-hidden rounded-[28px] px-5 py-5"
-          >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-8 top-1/2 -translate-y-1/2 opacity-60"
+      <section className="px-[22px] pb-7">
+        <Eyebrow>{t("upcoming_eyebrow")}</Eyebrow>
+        {next ? (
+          <>
+            <SpotlightCard
+              as="article"
+              aria-label={t("next_visit_eyebrow")}
+              className="gilded-lift glass-top relative mt-3 overflow-hidden rounded-[28px] px-5 py-5"
             >
-              <NailFan palette={profile.palette} count={4} lift={4} />
-            </div>
-            <Eyebrow>{t("next_visit_eyebrow")}</Eyebrow>
-            <p className="mt-3 font-display text-[26px] font-normal italic leading-tight">
-              {serviceName(upcoming.serviceId)}
-            </p>
-            <p className="mt-1.5 text-[13px] text-text-2">
-              {formatDate(upcoming.date, locale)} · {upcoming.time}
-            </p>
-            {upcoming.daysAway !== undefined ? (
-              <span className="gilded mt-3.5 inline-flex rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.32em] text-accent">
-                {countdownLabel(upcoming.daysAway)}
-              </span>
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -right-8 top-1/2 -translate-y-1/2 opacity-60"
+              >
+                <NailFan palette={profile.palette} count={4} lift={4} />
+              </div>
+              <Eyebrow>{t("next_visit_eyebrow")}</Eyebrow>
+              <p className="mt-3 font-display text-[26px] font-normal italic leading-tight">
+                {serviceName(next.serviceId)}
+              </p>
+              <p className="mt-1.5 text-[13px] text-text-2">
+                {formatDateTime(next.scheduledFor, locale)}
+              </p>
+              {masterNameInLocale(next) ? (
+                <p className="mt-1 text-[12px] text-text-3">
+                  {t("with_master", { name: masterNameInLocale(next) ?? "" })}
+                </p>
+              ) : null}
+              <div className="mt-3.5">{renderAction(next)}</div>
+            </SpotlightCard>
+            {otherUpcoming.length > 0 ? (
+              <ul className="mt-4 divide-y divide-line">
+                {otherUpcoming.map((row) => (
+                  <li
+                    key={row.id}
+                    className="flex items-baseline justify-between gap-3 py-3.5"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-display text-[18px] font-normal italic leading-tight">
+                        {serviceName(row.serviceId)}
+                      </p>
+                      <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+                        {formatDateTime(row.scheduledFor, locale)}
+                      </p>
+                      {masterNameInLocale(row) ? (
+                        <p className="mt-0.5 text-[12px] text-text-3">
+                          {t("with_master", {
+                            name: masterNameInLocale(row) ?? "",
+                          })}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="shrink-0">{renderAction(row)}</div>
+                  </li>
+                ))}
+              </ul>
             ) : null}
-          </SpotlightCard>
-        </section>
-      ) : null}
+          </>
+        ) : (
+          <p className="mt-3 text-[13px] text-text-3">{t("upcoming_empty")}</p>
+        )}
+      </section>
 
       <nav aria-label={t("quick_links_aria")} className="px-[22px]">
         <LetterpressRule />
@@ -171,26 +283,44 @@ export async function ProfilePage() {
       <section className="px-[22px] pt-9">
         <Eyebrow>{t("history_eyebrow")}</Eyebrow>
         <LetterpressRule className="mt-3" />
-        <ul className="mt-3 divide-y divide-line">
-          {history.map((visit) => (
-            <li
-              key={visit.id}
-              className="flex items-baseline justify-between py-3.5"
-            >
-              <div>
-                <p className="font-display text-[19px] font-normal italic leading-tight">
-                  {serviceName(visit.serviceId)}
-                </p>
-                <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
-                  {formatDate(visit.date, locale)} · {visit.time}
-                </p>
-              </div>
-              <span className="font-display text-[20px] italic text-gold-shimmer">
-                €{visit.price}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {completedHistory.length === 0 ? (
+          <p className="mt-3 text-[13px] text-text-3">{t("history_empty")}</p>
+        ) : (
+          <ul className="mt-3 divide-y divide-line">
+            {completedHistory.map((row) => (
+              <li
+                key={row.id}
+                className="flex items-baseline justify-between py-3.5"
+              >
+                <div>
+                  <p className="font-display text-[19px] font-normal italic leading-tight">
+                    {serviceName(row.serviceId)}
+                  </p>
+                  <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+                    {formatDateTime(row.scheduledFor, locale)}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="px-[22px] pt-9">
+        <Eyebrow>{t("testimonials_eyebrow")}</Eyebrow>
+        <LetterpressRule className="mt-3" />
+        <div className="mt-4">
+          <TestimonialForm
+            masters={formMasters}
+            action={submitTestimonialAction}
+          />
+        </div>
+        <div className="mt-6">
+          <MyTestimonialsList
+            rows={testimonials}
+            masterNameById={masterNameById}
+          />
+        </div>
       </section>
 
       <TabBar />

@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 
-const TAB_ROUTES = ["/en/home", "/en/services", "/en/gallery", "/en/profile"];
+// /en/profile is intentionally excluded — the route now redirects anonymous
+// visitors to /sign-in, where the tab bar is not rendered. The signed-in
+// case is covered by the unit + RTL suite (views/profile/ui/profile-page.test.tsx).
+const TAB_ROUTES = ["/en/home", "/en/services", "/en/gallery"];
 
 test.describe("TabBar — appears on tab-bar routes", () => {
   for (const route of TAB_ROUTES) {

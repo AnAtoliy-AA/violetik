@@ -21,4 +21,5 @@ export interface Master {
   status: MasterStatus;
   image?: ImageAsset;
   serviceIds: string[];
+  telegramUsername: string | null;
 }

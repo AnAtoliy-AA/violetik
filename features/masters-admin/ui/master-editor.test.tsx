@@ -35,6 +35,7 @@ function makeInitial() {
     sortOrder: 0,
     status: "published" as const,
     serviceIds: ["signature"],
+    telegramUsername: null,
   };
 }
 
@@ -88,6 +89,17 @@ describe("MasterEditor", () => {
     const photoForm = screen.getByTestId("photo-form");
     expect(editorForm).not.toBeNull();
     expect(editorForm!.contains(photoForm)).toBe(false);
+  });
+
+  it("rejects an invalid Telegram username with an inline error", async () => {
+    const { onSubmit } = setup("edit");
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/Telegram username/), "bad!");
+    await user.click(screen.getByRole("button", { name: /^Save$/ }));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(
+      screen.getAllByText(/5.32 characters/).length,
+    ).toBeGreaterThan(0);
   });
 
   it("Save submits with serviceIds reflecting the SpecialtyPicker state", async () => {

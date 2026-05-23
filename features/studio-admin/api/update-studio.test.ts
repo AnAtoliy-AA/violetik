@@ -53,6 +53,12 @@ describe("updateStudioAction", () => {
     expect(updateSiteSettings).not.toHaveBeenCalled();
   });
 
+  it("rejects an invalid Telegram username", async () => {
+    const result = await updateStudioAction({ telegramUsername: "bad!" });
+    expect(result.ok).toBe(false);
+    expect(updateSiteSettings).not.toHaveBeenCalled();
+  });
+
   it("refuses non-admin callers when auth is required", async () => {
     vi.mocked(requireAdmin).mockResolvedValueOnce({
       ok: false,

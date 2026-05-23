@@ -17,9 +17,18 @@ vi.mock("@/i18n/navigation", () => ({
   usePathname: () => "/profile",
 }));
 
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn((url: string) => {
+    throw new Error(`REDIRECT:${url}`);
+  }),
+}));
+
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(),
-  getLocale: vi.fn(),
+}));
+
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
 }));
 
 vi.mock("@/db/vip-requests", () => ({
@@ -31,6 +40,44 @@ vi.mock("@/shared/lib/auth-server", () => ({
 }));
 
 vi.mock("@/auth", () => ({ auth: vi.fn() }));
+
+vi.mock("@/db/bookings", () => ({
+  listUserBookings: vi.fn(),
+  getBookingById: vi.fn(),
+  cancelBookingIfOpen: vi.fn(),
+}));
+
+vi.mock("@/db/testimonials", () => ({
+  listUserTestimonials: vi.fn(),
+  createTestimonial: vi.fn(),
+}));
+
+vi.mock("@/db/masters", () => ({
+  listPublishedMasters: vi.fn(),
+  getMasterById: vi.fn(),
+}));
+
+vi.mock("@/db/site-settings", () => ({
+  getSiteSettings: vi.fn(),
+}));
+
+vi.mock("@/db/google-tokens", () => ({
+  getActiveGoogleToken: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock("@/shared/lib/google-calendar", () => ({
+  deleteCalendarEvent: vi.fn(),
+  refreshAccessToken: vi.fn(),
+}));
+
+vi.mock("@/entities/studio/api/load-with-photos", () => ({
+  loadProfileWithPhoto: vi.fn(async () => ({
+    name: "Lara K.",
+    joined: 2024,
+    palette: ["#d9a3b6", "#7d3a6f"] as const,
+    avatar: undefined,
+  })),
+}));
 
 vi.mock("@/db/services", () => ({
   listAllServices: vi.fn(async () => [
@@ -88,30 +135,17 @@ vi.mock("@/db/services", () => ({
       updatedAt: new Date(0),
       updatedBy: null,
     },
-    {
-      id: "pedi",
-      categoryId: "care",
-      nameEn: "Spa Pedicure",
-      nameRu: "Спа-педикюр",
-      nameBe: "Спа-педыкюр",
-      blurbEn: "",
-      blurbRu: "",
-      blurbBe: "",
-      includes: [],
-      priceCents: 11000,
-      durationMinutes: 90,
-      sortOrder: 5,
-      status: "published",
-      createdAt: new Date(0),
-      updatedAt: new Date(0),
-      updatedBy: null,
-    },
   ]),
 }));
 
-import { getTranslations, getLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getCurrentTier } from "@/db/vip-requests";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
+import { listUserBookings } from "@/db/bookings";
+import { listUserTestimonials } from "@/db/testimonials";
+import { listPublishedMasters } from "@/db/masters";
+import { getSiteSettings } from "@/db/site-settings";
 import { ProfilePage } from "./profile-page";
 
 function makeT(messages: Record<string, unknown>) {
@@ -126,17 +160,38 @@ function makeT(messages: Record<string, unknown>) {
   return t;
 }
 
-async function renderPage() {
+function defaultSettings() {
+  return {
+    defaultPalette: "aubergine" as const,
+    defaultLocale: "en" as const,
+    priceOverrides: {},
+    discountPercent: 0,
+    discountActive: false,
+    currency: "EUR" as const,
+    addressEn: "",
+    addressRu: "",
+    addressBe: "",
+    country: "BY",
+    cityEn: "",
+    cityRu: "",
+    cityBe: "",
+    timezone: "Europe/Minsk",
+    latitude: null,
+    longitude: null,
+    mapVisible: false,
+    telegramUsername: null,
+    updatedAt: new Date(0).toISOString(),
+  };
+}
+
+async function renderPage(locale = "en") {
   const t = makeT(en.Profile);
-  const tCountdown = makeT(en.Profile.countdown);
   const tLinks = makeT(en.Profile.quick_links);
   vi.mocked(getTranslations).mockImplementation(async (ns: unknown) => {
-    if (ns === "Profile.countdown") return tCountdown as never;
     if (ns === "Profile.quick_links") return tLinks as never;
     return t as never;
   });
-  vi.mocked(getLocale).mockResolvedValue("en");
-  const page = await ProfilePage();
+  const page = await ProfilePage({ locale });
   return render(
     <NextIntlClientProvider locale="en" messages={en}>
       {page}
@@ -144,14 +199,105 @@ async function renderPage() {
   );
 }
 
+function makeBooking(
+  overrides: Partial<{
+    id: string;
+    userId: string;
+    serviceId: string;
+    masterId: string | null;
+    scheduledFor: Date;
+    durationMinutes: number;
+    status: "pending" | "confirmed" | "completed" | "cancelled";
+    gcalEventId: string | null;
+    notes: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    masterNameEn: string | null;
+    masterNameRu: string | null;
+    masterNameBe: string | null;
+    masterTelegramUsername: string | null;
+  }>,
+) {
+  return {
+    id: "bk_1",
+    userId: "u1",
+    serviceId: "gel",
+    masterId: "m1",
+    scheduledFor: new Date(),
+    durationMinutes: 120,
+    status: "confirmed" as const,
+    gcalEventId: null,
+    notes: null,
+    createdAt: new Date(0),
+    updatedAt: new Date(0),
+    masterNameEn: "Violetta",
+    masterNameRu: "Виолетта",
+    masterNameBe: "Віалета",
+    masterTelegramUsername: "violetta",
+    ...overrides,
+  };
+}
+
+const NOW_MS = Date.now();
+const SIX_HOURS = 6 * 60 * 60 * 1000;
+const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+
 beforeEach(() => {
   vi.mocked(getCurrentSessionUser).mockReset();
   vi.mocked(getCurrentTier).mockReset();
+  vi.mocked(listUserBookings).mockReset();
+  vi.mocked(listUserTestimonials).mockReset();
+  vi.mocked(listPublishedMasters).mockReset();
+  vi.mocked(getSiteSettings).mockReset();
+  vi.mocked(redirect).mockClear();
+
+  // Defaults: authenticated user, no tier, empty data.
+  vi.mocked(getCurrentSessionUser).mockResolvedValue({
+    id: "u1",
+    telegramId: null,
+    googleSub: null,
+    email: null,
+    username: "lara",
+    firstName: "Lara",
+    lastName: "K.",
+    photoUrl: null,
+    role: "customer",
+    createdAt: new Date("2024-03-15T00:00:00Z"),
+    lastSignInAt: null,
+  } as never);
+  vi.mocked(getCurrentTier).mockResolvedValue({ state: "member" });
+  vi.mocked(listUserBookings).mockResolvedValue([]);
+  vi.mocked(listUserTestimonials).mockResolvedValue([]);
+  vi.mocked(listPublishedMasters).mockResolvedValue([
+    {
+      id: "m1",
+      nameEn: "Violetta",
+      nameRu: "Виолетта",
+      nameBe: "Віалета",
+      roleEn: "",
+      roleRu: "",
+      roleBe: "",
+      bioEn: "",
+      bioRu: "",
+      bioBe: "",
+      quoteEn: "",
+      quoteRu: "",
+      quoteBe: "",
+      years: 10,
+      setsLabel: "",
+      telegramUsername: "violetta",
+      sortOrder: 0,
+      status: "published",
+      createdAt: new Date(0),
+      updatedAt: new Date(0),
+    } as never,
+  ]);
+  vi.mocked(getSiteSettings).mockResolvedValue(defaultSettings() as never);
 });
 
 describe("ProfilePage", () => {
   it("renders VIP pill when current tier is vip", async () => {
-    vi.mocked(getCurrentSessionUser).mockResolvedValue({ id: "u1" } as never);
     vi.mocked(getCurrentTier).mockResolvedValue({
       state: "vip",
       activeRequestId: "vipreq_a",
@@ -163,7 +309,6 @@ describe("ProfilePage", () => {
   });
 
   it("renders Pending VIP pill when current tier is member-pending", async () => {
-    vi.mocked(getCurrentSessionUser).mockResolvedValue({ id: "u1" } as never);
     vi.mocked(getCurrentTier).mockResolvedValue({
       state: "member-pending",
       pendingRequestId: "vipreq_x",
@@ -174,15 +319,12 @@ describe("ProfilePage", () => {
   });
 
   it("renders no pill when current tier is member", async () => {
-    vi.mocked(getCurrentSessionUser).mockResolvedValue({ id: "u1" } as never);
-    vi.mocked(getCurrentTier).mockResolvedValue({ state: "member" });
     await renderPage();
     expect(screen.queryByText(/^VIP$/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Pending VIP/i)).not.toBeInTheDocument();
   });
 
-  it("renders the customer name and joined year", async () => {
-    vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+  it("renders the user's display name and joined year", async () => {
     await renderPage();
     expect(
       screen.getByRole("heading", { level: 1, name: /Lara K\./ }),
@@ -190,16 +332,71 @@ describe("ProfilePage", () => {
     expect(screen.getByText(/Joined in 2024/)).toBeInTheDocument();
   });
 
-  it("shows the next-visit card with the service name and countdown chip", async () => {
-    vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+  it("shows the soonest upcoming booking in the spotlight with a Telegram contact link (under 24h)", async () => {
+    vi.mocked(listUserBookings).mockResolvedValue([
+      makeBooking({
+        id: "bk_soon",
+        scheduledFor: new Date(NOW_MS + SIX_HOURS),
+        serviceId: "gel",
+      }),
+      makeBooking({
+        id: "bk_later",
+        scheduledFor: new Date(NOW_MS + FORTY_EIGHT_HOURS),
+        serviceId: "signature",
+      }),
+    ]);
     await renderPage();
     const card = screen.getByRole("article", { name: /Next visit/i });
     expect(within(card).getByText("Couture Gel")).toBeInTheDocument();
-    expect(within(card).getByText(/In 4 days/i)).toBeInTheDocument();
+    const contactLink = within(card).getByRole("link", {
+      name: /Contact Violetta on Telegram/i,
+    });
+    expect(contactLink).toHaveAttribute("href", "https://t.me/violetta");
+    expect(
+      within(card).queryByRole("button", { name: /Cancel visit/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders the second-upcoming row with a Cancel button (>24h away)", async () => {
+    vi.mocked(listUserBookings).mockResolvedValue([
+      makeBooking({
+        id: "bk_soon",
+        scheduledFor: new Date(NOW_MS + SIX_HOURS),
+        serviceId: "gel",
+      }),
+      makeBooking({
+        id: "bk_later",
+        scheduledFor: new Date(NOW_MS + FORTY_EIGHT_HOURS),
+        serviceId: "signature",
+      }),
+    ]);
+    await renderPage();
+    expect(screen.getByText("Signature Manicure")).toBeInTheDocument();
+    const cancelButtons = screen.getAllByRole("button", {
+      name: /Cancel visit/i,
+    });
+    expect(cancelButtons.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("renders the empty-upcoming copy when there are no upcoming bookings", async () => {
+    await renderPage();
+    expect(screen.getByText(/No upcoming visits\./i)).toBeInTheDocument();
+  });
+
+  it("renders the history section with a past completed booking", async () => {
+    vi.mocked(listUserBookings).mockResolvedValue([
+      makeBooking({
+        id: "bk_past",
+        scheduledFor: new Date(NOW_MS - THIRTY_DAYS),
+        status: "completed",
+        serviceId: "editorial",
+      }),
+    ]);
+    await renderPage();
+    expect(screen.getByText("Editorial Art")).toBeInTheDocument();
   });
 
   it("renders the quick-links nav with all four entries", async () => {
-    vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
     await renderPage();
     const nav = screen.getByRole("navigation", { name: /Account links/i });
     const links = within(nav).getAllByRole("link");
@@ -212,13 +409,23 @@ describe("ProfilePage", () => {
     ).toHaveAttribute("href", "/membership");
   });
 
-  it("renders four past visits with euro prices", async () => {
-    vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+  it("renders the testimonial form and the empty 'my testimonials' state", async () => {
     await renderPage();
-    const prices = screen.getAllByText(/^€\d+$/);
-    expect(prices.length).toBeGreaterThanOrEqual(4);
-    expect(screen.getByText("€95")).toBeInTheDocument();
-    expect(screen.getByText("€195")).toBeInTheDocument();
-    expect(screen.getByText("€110")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /^Submit$/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Share a few words about a master\./i),
+    ).toBeInTheDocument();
+  });
+
+  it("redirects unauthenticated visitors to the sign-in page", async () => {
+    vi.mocked(getCurrentSessionUser).mockResolvedValue(null);
+    await expect(renderPage("en")).rejects.toThrow(
+      "REDIRECT:/en/sign-in?callbackUrl=/en/profile",
+    );
+    expect(redirect).toHaveBeenCalledWith(
+      "/en/sign-in?callbackUrl=/en/profile",
+    );
   });
 });

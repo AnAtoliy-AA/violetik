@@ -15,6 +15,11 @@ const overrideKey = z
     "Override keys must be `service:<id>` or `membership:VIP`",
   );
 
+const TELEGRAM_USERNAME = z
+  .string()
+  .regex(/^[A-Za-z][A-Za-z0-9_]{4,31}$/u, "invalid_telegram_username")
+  .nullable();
+
 export const siteSettingsPatchSchema = z
   .object({
     defaultPalette: z.enum(PALETTE_IDS),
@@ -35,6 +40,7 @@ export const siteSettingsPatchSchema = z
     latitude: z.number().min(-90).max(90).nullable(),
     longitude: z.number().min(-180).max(180).nullable(),
     mapVisible: z.boolean(),
+    telegramUsername: TELEGRAM_USERNAME.optional().default(null),
   })
   .partial()
   .superRefine((patch, ctx) => {
