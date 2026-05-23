@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { STUDIO_DATA, type Testimonial } from "@/entities/studio";
+import type { ApprovedTestimonial } from "@/entities/testimonial/model/types";
 import type { Master } from "@/entities/master";
 
 interface DisplayMaster {
@@ -42,8 +42,8 @@ function ArrowRight() {
 export interface MasterPageProps {
   /** DB-backed master record. */
   master?: Master;
-  /** Override the testimonials list (with DB-loaded avatars). */
-  testimonials?: readonly Testimonial[];
+  /** Approved-and-published testimonials for this master. Section hides when empty. */
+  testimonials?: readonly ApprovedTestimonial[];
 }
 
 const FALLBACK_MASTER: DisplayMaster = {
@@ -66,7 +66,7 @@ export function MasterPage({
   // When the masters table is empty (first-run install, db-null), fall
   // back to a static record so the customer-facing page still renders.
   const artist: DisplayMaster = master ?? FALLBACK_MASTER;
-  const testimonials = testimonialsProp ?? STUDIO_DATA.testimonials;
+  const testimonials = testimonialsProp ?? [];
   const [firstName, ...rest] = artist.name.split(" ");
   const lastName = rest.join(" ");
 
@@ -170,49 +170,47 @@ export function MasterPage({
         <LetterpressRule className="mt-5" />
       </section>
 
-      <section className="px-[22px] pb-7">
-        <Eyebrow>{t("voices_eyebrow")}</Eyebrow>
-        <div className="mt-4 flex flex-col gap-3.5">
-          {testimonials.map((tm) => (
-            <SpotlightCard key={tm.id} className="gilded glass-top rounded-[18px] p-[18px]">
-              <p className="m-0 mb-3 font-display text-[18px] font-normal italic leading-[1.35]">
-                &ldquo;{tm.text}&rdquo;
-              </p>
-              <LetterpressRule className="mb-3 max-w-[140px]" />
-              <div className="flex items-center gap-2.5">
-                {tm.avatar ? (
-                  <span className="relative size-[22px] overflow-hidden rounded-full">
-                    <Image
-                      src={tm.avatar.src}
-                      alt={tm.avatar.alt ?? tm.name}
-                      fill
-                      sizes="22px"
-                      placeholder={tm.avatar.blurDataURL ? "blur" : undefined}
-                      blurDataURL={tm.avatar.blurDataURL}
-                      className="object-cover"
+      {testimonials.length > 0 ? (
+        <section className="px-[22px] pb-7">
+          <Eyebrow>{t("voices_eyebrow")}</Eyebrow>
+          <div className="mt-4 flex flex-col gap-3.5">
+            {testimonials.map((tm) => (
+              <SpotlightCard key={tm.id} className="gilded glass-top rounded-[18px] p-[18px]">
+                <p className="m-0 mb-3 font-display text-[18px] font-normal italic leading-[1.35]">
+                  &ldquo;{tm.body}&rdquo;
+                </p>
+                <LetterpressRule className="mb-3 max-w-[140px]" />
+                <div className="flex items-center gap-2.5">
+                  {tm.authorPhotoUrl ? (
+                    <span className="relative size-[22px] overflow-hidden rounded-full">
+                      <Image
+                        src={tm.authorPhotoUrl}
+                        alt={tm.authorDisplay}
+                        fill
+                        sizes="22px"
+                        unoptimized
+                        className="object-cover"
+                      />
+                    </span>
+                  ) : (
+                    <span
+                      aria-hidden
+                      className="size-[22px] rounded-full"
+                      style={{
+                        background:
+                          "color-mix(in oklab, var(--color-rose) 60%, var(--color-accent))",
+                      }}
                     />
-                  </span>
-                ) : (
-                  <span
-                    aria-hidden
-                    className="size-[22px] rounded-full"
-                    style={{
-                      background:
-                        "color-mix(in oklab, var(--color-rose) 60%, var(--color-accent))",
-                    }}
-                  />
-                )}
-                <div className="text-[12px]">
-                  <span className="font-medium">{tm.name}</span>
-                  <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.16em] text-text-3">
-                    {tm.role}
-                  </span>
+                  )}
+                  <div className="text-[12px]">
+                    <span className="font-medium">{tm.authorDisplay}</span>
+                  </div>
                 </div>
-              </div>
-            </SpotlightCard>
-          ))}
-        </div>
-      </section>
+              </SpotlightCard>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="px-[22px] pb-10">
         <MagneticButton className="block w-full">
