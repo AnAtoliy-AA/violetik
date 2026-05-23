@@ -226,7 +226,7 @@ export function StudioForm({
           <a
             href={`https://www.openstreetmap.org/?mlat=${latNum}&mlon=${lngNum}#map=17/${latNum}/${lngNum}`}
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer"
             className="mt-2 inline-block text-[11px] underline"
           >
             {t("preview_pin")}
