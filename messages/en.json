@@ -404,6 +404,9 @@
     "meta_description_with_city": "Editorial nail design in {city}. Manicure, gel, design — quality work at fair prices.",
     "meta_keywords_with_city": "{city} nails, {city} manicure, {city} beauty, {city} gel, cheap quality nails {city}"
   },
+  "SiteFooter": {
+    "credit_prefix": "Created with Love by"
+  },
   "Error": {
     "meta_title": "Something slipped",
     "eyebrow": "Off menu",

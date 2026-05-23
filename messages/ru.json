@@ -404,6 +404,9 @@
     "meta_description_with_city": "Студия дизайна ногтей в {city}. Маникюр, гель, дизайн — качественно и доступно.",
     "meta_keywords_with_city": "маникюр {city}, ногти {city}, красота {city}, гель {city}, дешевый качественный маникюр {city}"
   },
+  "SiteFooter": {
+    "credit_prefix": "Создано с любовью"
+  },
   "Error": {
     "meta_title": "Что-то сорвалось",
     "eyebrow": "Вне меню",

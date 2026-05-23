@@ -8,6 +8,7 @@ import type { Locale } from "@/i18n/routing";
 import { cityForLocale } from "@/entities/site-settings";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { LocalBusinessJsonLd } from "@/shared/ui/local-business-jsonld";
+import { SiteFooter } from "@/widgets/site-footer";
 import "../globals.css";
 
 const SITE_URL =
@@ -135,6 +136,7 @@ export default async function LocaleLayout({
           name={tSite("name")}
         />
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <SiteFooter />
       </body>
     </html>
   );
