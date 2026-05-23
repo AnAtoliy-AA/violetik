@@ -185,7 +185,7 @@ Behavior:
 4. If `booking.status === 'cancelled' || booking.status === 'completed'`, `already_cancelled`.
 5. If `canSelfCancel(new Date(), booking.scheduledFor) === false`, `too_late`.
 6. `setBookingStatus(bookingId, 'cancelled')` ([db/bookings.ts:119](../../../db/bookings.ts#L119)).
-7. **Best-effort GCal cleanup:** if `gcalEventId` present, call the existing calendar delete helper (or no-op if not yet wired into this code path). Failures are `console.error`-logged but do not flip the response to a failure. The cancellation is recorded in the DB regardless.
+7. **Best-effort GCal cleanup:** if `gcalEventId` present, mirror the existing admin-side flow in [features/bookings-admin/api/actions.ts:32](../../../features/bookings-admin/api/actions.ts#L32) (`declineBooking`) — `getActiveGoogleToken()` → `refreshAccessToken(...)` → `deleteCalendarEvent({ calendarId, eventId, accessToken })`. Wrap in try/catch with a `console.warn` matching the admin path's message style. Failures do not flip the response to a failure; the cancellation is recorded in the DB regardless.
 8. `revalidatePath("/", "layout")`.
 
 **Race safety:** the DB update at step 6 is wrapped in a status-conditional UPDATE inside `setBookingStatus` (added on top of the existing helper) — `UPDATE … WHERE id = $1 AND status NOT IN ('cancelled','completed') RETURNING *`. If `RETURNING` is empty, the action returns `already_cancelled`. Two concurrent submits are therefore idempotent: one wins, the loser gets `already_cancelled`.
@@ -349,7 +349,7 @@ Translations: EN authoritative; RU/BE follow existing in-file tone (informal "т
 
 ## 11. Migration & rollout
 
-1. `npm run drizzle:generate` → produces `db/migrations/NNNN_*.sql` containing the three structural changes (two ALTERs, one CREATE TABLE + indices + enum).
+1. `npm run db:generate` → produces `db/migrations/NNNN_*.sql` containing the three structural changes (two ALTERs, one CREATE TABLE + indices + enum). `npm run db:migrate` applies it.
 2. Backfill is unnecessary — both new columns are nullable; the testimonials table starts empty.
 3. After migration, the admin manually populates `masters.telegram_username` for each published master via `/admin/masters` (existing form gets one new field — included in this PR).
 4. The `/admin/studio` form gets one new field for the studio-wide fallback (included in this PR).
