@@ -45,6 +45,7 @@ async function rowToMaster(row: MasterRow, locale: Locale): Promise<Master> {
     status: row.status as MasterStatus,
     image: photo?.image ?? undefined,
     serviceIds,
+    telegramUsername: row.telegramUsername ?? null,
   };
 }
 
