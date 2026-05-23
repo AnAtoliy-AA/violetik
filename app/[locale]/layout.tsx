@@ -135,8 +135,10 @@ export default async function LocaleLayout({
           siteUrl={SITE_URL}
           name={tSite("name")}
         />
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
-        <SiteFooter />
+        <NextIntlClientProvider>
+          {children}
+          <SiteFooter />
+        </NextIntlClientProvider>
       </body>
     </html>
   );
