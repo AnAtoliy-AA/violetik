@@ -93,4 +93,37 @@ describe("SiteSettingsForm", () => {
     expect(patch.discountPercent).toBe(0);
     expect(patch.discountActive).toBe(false);
   });
+
+  describe("palette live preview", () => {
+    it("applies the selected palette to documentElement immediately on click", async () => {
+      document.documentElement.dataset.palette = DEFAULT_SITE_SETTINGS.defaultPalette;
+      const user = userEvent.setup();
+      renderForm();
+      await user.click(screen.getByRole("radio", { name: /Ink/i }));
+      expect(document.documentElement.dataset.palette).toBe("ink");
+    });
+
+    it("reverts the palette on unmount when save was not invoked", async () => {
+      document.documentElement.dataset.palette = DEFAULT_SITE_SETTINGS.defaultPalette;
+      const user = userEvent.setup();
+      const { unmount } = renderForm();
+      await user.click(screen.getByRole("radio", { name: /Ink/i }));
+      expect(document.documentElement.dataset.palette).toBe("ink");
+      unmount();
+      expect(document.documentElement.dataset.palette).toBe(
+        DEFAULT_SITE_SETTINGS.defaultPalette,
+      );
+    });
+
+    it("keeps the palette persisted after a successful save", async () => {
+      document.documentElement.dataset.palette = DEFAULT_SITE_SETTINGS.defaultPalette;
+      const user = userEvent.setup();
+      const { unmount } = renderForm();
+      await user.click(screen.getByRole("radio", { name: /Ink/i }));
+      await user.click(screen.getByRole("button", { name: /Save/i }));
+      await new Promise((r) => setTimeout(r, 0));
+      unmount();
+      expect(document.documentElement.dataset.palette).toBe("ink");
+    });
+  });
 });

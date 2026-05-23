@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import type { FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { PALETTES } from "@/shared/config/palettes";
@@ -60,6 +60,15 @@ export function SiteSettingsForm({
       : "",
   );
 
+  const baselinePaletteRef = useRef(initial.defaultPalette);
+  useEffect(() => {
+    const html = document.documentElement;
+    html.dataset.palette = defaultPalette;
+    return () => {
+      html.dataset.palette = baselinePaletteRef.current;
+    };
+  }, [defaultPalette]);
+
   function buildPatch(): SiteSettingsPatch {
     const priceOverrides: Record<string, number> = {};
     if (vipOverride !== "") {
@@ -84,8 +93,12 @@ export function SiteSettingsForm({
     const patch = buildPatch();
     startTransition(async () => {
       const result = await submit(patch);
-      if (result.ok) setStatus({ kind: "saved" });
-      else setStatus({ kind: "error", message: result.error });
+      if (result.ok) {
+        baselinePaletteRef.current = defaultPalette;
+        setStatus({ kind: "saved" });
+      } else {
+        setStatus({ kind: "error", message: result.error });
+      }
     });
   }
 
