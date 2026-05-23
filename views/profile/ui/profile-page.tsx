@@ -4,11 +4,15 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { loadProfileWithPhoto } from "@/entities/studio/api/load-with-photos";
 import { listAllServices } from "@/db/services";
-import { listUserBookings, type UserBookingRow } from "@/db/bookings";
+import { listUserBookings } from "@/db/bookings";
 import { listUserTestimonials } from "@/db/testimonials";
 import { listPublishedMasters } from "@/db/masters";
 import { getSiteSettings } from "@/db/site-settings";
-import { bucketBookings, canSelfCancel } from "@/entities/booking";
+import {
+  bucketBookings,
+  canSelfCancel,
+  type UserBookingRow,
+} from "@/entities/booking";
 import {
   cancelBookingAction,
   CancelBookingButton,
