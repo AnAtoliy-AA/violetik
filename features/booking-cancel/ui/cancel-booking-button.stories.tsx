@@ -38,3 +38,11 @@ export const ErrorTooLate: Story = {
     action: async () => ({ ok: false, reason: "too_late" }),
   },
 };
+
+export const Confirming: Story = {
+  args: {
+    bookingId: "bk_demo",
+    // Never resolves — captures the pending visual (disabled + "Cancelling…" label).
+    action: () => new Promise(() => {}),
+  },
+};
