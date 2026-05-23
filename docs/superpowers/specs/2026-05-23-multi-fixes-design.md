@@ -47,6 +47,8 @@ Change `aspect-[1/1.2]` → `aspect-[1/1]` and wrap the photo container in `max-
 
 **Mount:** [app/[locale]/layout.tsx](../../../app/[locale]/layout.tsx) — render `<SiteFooter />` after `{children}` inside `<body>`. Welcome page is `min-h-dvh`, not `h-dvh`, so the footer naturally sits below it without clipping.
 
+**Admin route note.** Admin pages get this footer too. Intended — admin routes are not "chromeless" and this is a one-line attribution, not nav. If it visually clutters admin in practice, gate later via the existing `app-header-admin` testid pattern; not blocking for v1.
+
 ### T4 — Locale switcher wired into the app
 **Refactor:** [features/locale-switcher/ui/locale-switcher.tsx](../../../features/locale-switcher/ui/locale-switcher.tsx)
 Replace the plain `<select>` with a compact pill-style segmented control that matches AppHeader's pill aesthetic (`rounded-full border-[0.5px]`, `font-mono text-[11px] uppercase tracking-[0.16em]`). Single-character labels (`EN`, `RU`, `BY`).
@@ -82,42 +84,112 @@ baselineRef.current = defaultPalette;
 
 The cleanup runs on every defaultPalette change (because it's in the deps) — that's fine because the next effect immediately reapplies. The unmount cleanup uses the latest ref value.
 
-Add a Vitest test that asserts `document.documentElement.dataset.palette` flips when a different palette is clicked.
+**React 19 Strict Mode note.** In dev, Strict Mode invokes effects twice (mount → cleanup → re-mount). The first cleanup reads `baselineRef.current` which still holds `initial.defaultPalette` — same as the just-applied value, so the visible state is stable. No flicker expected.
+
+Add a Vitest test that asserts `document.documentElement.dataset.palette` flips when a different palette is clicked, and reverts when the form unmounts before save.
 
 ### T6 — Default-locale regression test
-**File:** new unit test against [proxy.ts](../../../proxy.ts) flow OR more pragmatically against [shared/lib/site-settings-cache.ts](../../../shared/lib/site-settings-cache.ts).
-Document with a comment in `proxy.ts` that admin's chosen default is the fallback used by `next-intl` when the browser's Accept-Language doesn't match any supported locale. Add a unit test that swapping the cached settings's `defaultLocale` to `"en"` makes the proxy pass `defaultLocale: "en"` into `createMiddleware`. No behavior change.
+**File:** new `proxy.test.ts` next to [proxy.ts](../../../proxy.ts).
+Document with a comment in `proxy.ts` that admin's chosen default is the fallback used by `next-intl` when the browser's Accept-Language doesn't match any supported locale.
+
+Test strategy: `vi.mock("@/shared/lib/site-settings-cache", () => ({ getCachedDefaultLocale: vi.fn() }))` and `vi.mock("next-intl/middleware", () => ({ default: vi.fn(() => vi.fn()) }))`. The test sets the cached return to `"en"`, invokes the proxy with a minimal `NextRequest`, and asserts the `createMiddleware` factory was called with `defaultLocale: "en"`. Repeat for `"ru"` to lock in that the cached value flows through. No behavior change in `proxy.ts` for this task — the test exists purely to prevent regressions when next-intl is upgraded or proxy.ts is refactored.
 
 ### T7 — `be` → `by` locale rename
 
 This is the heaviest item. Land as its own commit.
 
-**Routing / i18n:**
-- [i18n/routing.ts](../../../i18n/routing.ts): `locales: ["en", "ru", "be"]` → `["en", "ru", "by"]`.
-- Rename file [messages/be.json](../../../messages/be.json) → `messages/by.json`. In its `LocaleSwitcher` namespace, rename the `"be"` key to `"by"` and update labels. Same key rename in en/ru.
-- The `OG_LOCALE` map in `app/[locale]/layout.tsx` becomes `{ ..., by: "be_BY" }` (the Open Graph value stays `be_BY` — that's the OG locale spec, separate from our internal locale identifier).
+**SEO / language tag mapping (critical).**
+`by` is a country code, not a valid BCP-47 language tag. Putting `lang="by"` or `hreflang="by"` in HTML is invalid and hurts SEO. We use `by` only as our internal routing identifier; for `<html lang>` and hreflang we map back to a proper tag.
 
-**Code-side replacements** (mechanical search-and-replace, scoped to locale identifier usage; not blind):
+Introduce in [i18n/routing.ts](../../../i18n/routing.ts) (or a sibling [i18n/lang.ts](../../../i18n/lang.ts)):
+
+```ts
+export const LOCALE_TO_LANG: Record<Locale, string> = {
+  en: "en",
+  ru: "ru",
+  by: "be-BY",
+};
+```
+
+[app/[locale]/layout.tsx](../../../app/[locale]/layout.tsx) wires it up:
+- `<html lang={LOCALE_TO_LANG[locale]}>` instead of `lang={locale}` (line 126).
+- `alternates.languages` (lines ~100–104) emits `{ [LOCALE_TO_LANG[l]]: \`${SITE_URL}/${l}\` }` — i.e. `hreflang="be-BY"` pointing at `/by`.
+
+OG_LOCALE stays `{ en: "en_US", ru: "ru_RU", by: "be_BY" }`.
+
+**Routing / i18n:**
+- [i18n/routing.ts](../../../i18n/routing.ts): `locales: ["en", "ru", "be"]` → `["en", "ru", "by"]`. Add `LOCALE_TO_LANG` map (above).
+- Rename file [messages/be.json](../../../messages/be.json) → `messages/by.json`. In its `LocaleSwitcher` namespace, rename the `"be"` key to `"by"` and update labels. Same key rename in en/ru.
+- Admin form label keys `label_name_be`, `label_role_be`, `label_bio_be`, `label_quote_be`, `label_blurb_be`, etc. in [messages/en.json](../../../messages/en.json), `ru.json`, and the new `by.json` are renamed to `label_*_by` for consistency. The components that reference these keys (search `t("label_name_be")` across `features/`) update in lockstep.
+
+**Code-side replacements** (search-and-replace, scoped to locale identifier usage; not blind):
 - All `locale === "be"` → `locale === "by"` across views, features, entities, e2e specs (~15 sites grep'd above).
 - Field accessor `c.nameBe` → `c.nameBy`, `row.masterNameBe` → `row.masterNameBy`, `b.nameBe` → `b.nameBy`, etc. — only where these are the field names defined in `db/schema.ts`, not where `Be` is part of an unrelated identifier.
 - The ad-hoc `type Locale = "en" | "ru" | "be"` in [entities/master/api/load.ts](../../../entities/master/api/load.ts) is removed in favor of the canonical import from `@/i18n/routing`. (Quick incidental cleanup since we're touching the line anyway.)
 - The Belarusian-label translation string (e.g. en.json `"be": "Belarusian"` under `LocaleSwitcher`) becomes `"by": "Belarusian"`.
+- **JSON write sites** — call out [features/services-admin/ui/includes-fieldset.tsx:85](../../../features/services-admin/ui/includes-fieldset.tsx) where the literal `"be"` is written into the `includes` JSON column. Must change to `"by"` so writes match the renamed schema.
 
 **Schema rename:** [db/schema.ts](../../../db/schema.ts)
-Columns ending in `_be` (the Drizzle Postgres `text("name_be")` etc.) are renamed to `_by`. Drizzle field names in TS likewise (`nameBe` → `nameBy`).
+- Columns ending in `_be` (the Drizzle Postgres `text("name_be")` etc.) renamed to `_by`. Drizzle TS field names likewise (`nameBe` → `nameBy`).
+- The `services.includes` jsonb generic at `db/schema.ts:313` `$type<Array<{ en: string; ru: string; be: string }>>` must be updated to `…by: string`. Same for any other typed jsonb columns. Without this, Drizzle inference silently breaks at read sites that destructure the value.
 
-**Data migration:** new `db/migrations/0XXX_rename_be_to_by.sql` (number chosen at write-time based on highest existing). For every table that has `*_be` columns or stores JSON with a `"be"` key, do:
-- `ALTER TABLE … RENAME COLUMN name_be TO name_by;` (×N).
-- `UPDATE … SET includes = (includes::jsonb - 'be') || jsonb_build_object('by', includes->'be') WHERE includes ? 'be';` for JSON columns that store multi-locale dictionaries.
-- `UPDATE site_settings SET default_locale = 'by' WHERE default_locale = 'be';`
+**Data migration:** new `db/migrations/0013_rename_be_to_by.sql`.
 
-The full list of columns/tables is discovered from `db/schema.ts` at write time, listed in the migration's leading comment.
+Workflow (Drizzle generates DROP+ADD for column renames, not RENAME — we hand-edit):
+1. Update [db/schema.ts](../../../db/schema.ts) with renamed columns + jsonb generic.
+2. Run `npx drizzle-kit generate` — produces a draft SQL and a new `meta/0013_snapshot.json` + journal entry.
+3. **Replace** the auto-generated DROP COLUMN / ADD COLUMN pairs with `ALTER TABLE … RENAME COLUMN x_be TO x_by;` (preserves data; auto-generated form would discard it).
+4. Append the JSON-key rewrite and `default_locale` update:
+   ```sql
+   UPDATE services
+     SET includes = (
+       SELECT jsonb_agg(
+         (i - 'be') || jsonb_build_object('by', i->'be')
+       )
+       FROM jsonb_array_elements(includes) AS i
+     )
+     WHERE includes::text LIKE '%"be"%';
+   UPDATE site_settings SET default_locale = 'by' WHERE default_locale = 'be';
+   ```
+   (Apply the same `(j - 'be') || jsonb_build_object('by', j->'be')` shape for any other jsonb columns that store `{en, ru, be}` dicts — list is discovered when reading schema.ts at write time.)
+5. Commit the migration SQL **and** the regenerated `meta/0013_snapshot.json` + journal so next `drizzle-kit generate` doesn't produce a spurious diff.
 
-**Compat redirect:** [proxy.ts](../../../proxy.ts) gains a 308 redirect for any URL starting with `/be/` or matching `/be` exactly — issued before next-intl middleware runs, returning a `Response.redirect` to the same path with `be` replaced by `by`. Keeps old bookmarks alive.
+**Proxy: compat redirect + cookie rewrite.** [proxy.ts](../../../proxy.ts) gains pre-handler logic, before constructing next-intl's middleware:
+
+```ts
+const url = new URL(req.url);
+
+// 1) URL redirect: /be → /by (and /be/* → /by/*), preserving query + hash.
+if (url.pathname === "/be" || url.pathname.startsWith("/be/")) {
+  const target = new URL(req.url);
+  target.pathname = "/by" + url.pathname.slice(3); // "/be".length === 3
+  return Response.redirect(target.toString(), 308);
+}
+
+// 2) Cookie rewrite: NEXT_LOCALE=be → by. next-intl uses this for locale
+//    detection on cookie-bearing returning visitors; with `be` no longer
+//    in routing.locales it would otherwise be treated as unknown and
+//    fall back to the admin default, surprising the user.
+const cookie = req.cookies.get("NEXT_LOCALE");
+if (cookie?.value === "be") {
+  // Rewrite the value in the incoming request before next-intl reads it.
+  req.cookies.set("NEXT_LOCALE", "by");
+  // …then run the handler. Set-Cookie on the response is written by
+  // next-intl as part of its normal flow.
+}
+```
+
+The `matcher` already excludes `api`, `_next`, `_vercel`, and dotted paths, so the redirect only fires for app routes.
 
 **Tests/stories:** e2e specs in [e2e/](../../../e2e/) that iterate `["en", "ru", "be"]` → `["en", "ru", "by"]`. View tests that mount the `be` locale (e.g. [views/home/ui/sections/atelier-motion.test.tsx](../../../views/home/ui/sections/atelier-motion.test.tsx)) likewise. Stories using `locale: "be"` (e.g. [shared/ui/price/ui/price.stories.tsx](../../../shared/ui/price/ui/price.stories.tsx)) likewise.
 
-**Acceptance:** `npm run lint && npm test && npm run build && npm run e2e` all pass. Visiting `/be/home` issues a redirect to `/by/home`.
+Add a focused proxy unit test (or e2e) that:
+- `GET /be/home` returns 308 with `Location: /by/home`.
+- A request carrying `Cookie: NEXT_LOCALE=be` to `/` lands on `/by` (not the admin default).
+
+**Sitemap transition window.** [app/sitemap.ts](../../../app/sitemap.ts) iterates `routing.locales`, so it auto-emits `/by/*` URLs only — `/be/*` disappears from the sitemap. Existing crawler-indexed `/be/*` URLs will be reconciled via the 308 the next time the crawler visits. Acceptable; no transitional dual-listing.
+
+**Acceptance:** `npm run lint && npm test && npm run build && npm run e2e` all pass. Visiting `/be/home` returns 308 → `/by/home`. A request carrying `NEXT_LOCALE=be` cookie does not fall back to the admin default.
 
 ## Order of work and commit boundaries
 
