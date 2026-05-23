@@ -40,3 +40,51 @@ describe("listUserTestimonials (no DB)", () => {
     },
   );
 });
+
+import {
+  listTestimonialsByStatus,
+  decideTestimonial,
+  countPendingTestimonials,
+} from "./testimonials";
+
+describe("listTestimonialsByStatus (no DB)", () => {
+  it.skipIf(Boolean(process.env.DATABASE_URL))(
+    "returns an empty array when DATABASE_URL is unset",
+    async () => {
+      expect(await listTestimonialsByStatus("pending")).toEqual([]);
+      expect(await listTestimonialsByStatus("approved")).toEqual([]);
+      expect(await listTestimonialsByStatus("rejected")).toEqual([]);
+    },
+  );
+});
+
+describe("decideTestimonial (no DB)", () => {
+  it.skipIf(Boolean(process.env.DATABASE_URL))(
+    "returns null when DATABASE_URL is unset",
+    async () => {
+      expect(
+        await decideTestimonial({
+          id: "tst_1",
+          action: "approve",
+          decidedBy: "tg:1",
+        }),
+      ).toBeNull();
+      expect(
+        await decideTestimonial({
+          id: "tst_1",
+          action: "reject",
+          decidedBy: "tg:1",
+        }),
+      ).toBeNull();
+    },
+  );
+});
+
+describe("countPendingTestimonials (no DB)", () => {
+  it.skipIf(Boolean(process.env.DATABASE_URL))(
+    "returns 0 when DATABASE_URL is unset",
+    async () => {
+      expect(await countPendingTestimonials()).toBe(0);
+    },
+  );
+});
