@@ -97,7 +97,7 @@ Extend `siteSettingsPatchSchema` (still `.partial()`):
 - `addressEn` / `addressRu` / `addressBe`: `z.string().max(200)`
 - `country`: `z.enum(ISO_3166_ALPHA2)` from a new constant
 - `cityEn` / `cityRu` / `cityBe`: `z.string().max(120)`
-- `timezone`: `z.string().refine((tz) => isValidTimeZone(tz))` — the validator wraps `Intl.supportedValuesOf("timeZone")`; if the runtime predates that API, fall back to constructing `new Intl.DateTimeFormat(undefined, { timeZone: tz })` and catching
+- `timezone`: `z.string().refine((tz) => isValidTimeZone(tz))` — the validator checks membership in `Intl.supportedValuesOf("timeZone")` (Node 18+ guarantees it; no fallback needed)
 - `latitude`: `z.number().min(-90).max(90).nullable()`
 - `longitude`: `z.number().min(-180).max(180).nullable()`
 - `mapVisible`: `z.boolean()`
@@ -180,7 +180,7 @@ export async function updateStudio(
 
 Refactor:
 
-- Replace `STUDIO_DATA.studio.address` with the per-locale address+city read from site settings. The home footer becomes async (server component) and calls `getSiteSettingsServer()` directly (or accepts settings as a prop if the home view already has them in scope — preferred, fewer DB hits).
+- Replace `STUDIO_DATA.studio.address` with the per-locale address+city read from site settings. **The home footer accepts `settings: SiteSettings` as a prop** (the locale layout already loads settings via `getSiteSettingsServer()` for `generateMetadata` and the JSON-LD block — one fetch, threaded down). The footer stays a regular server component; no extra DB hit.
 - Insert `<StudioMap />` between the monogram and the address line, no-op when the widget decides not to render.
 - Address line composition: `"{addressXx} · {cityXx}"` when city is non-empty, else just `{addressXx}`. Per locale.
 
@@ -230,13 +230,12 @@ Remove the `address` field from [entities/studio/model/data.ts](../../../entitie
 - `bookingTimeZoneFromSettings(settings: SiteSettings): string` — pure, returns `settings.timezone`.
 - `bookingTimeZoneFallback(): string` — keeps the env-var + `Europe/Minsk` fallback, used when no settings object is in scope (build-time SSG, unit tests).
 
-Audit and update call sites:
-- [views/booking/api/submit.ts](../../../views/booking/api/submit.ts) — server action; has DB access, switches to `bookingTimeZoneFromSettings()`.
-- [views/booking/lib/booking-steps.ts](../../../views/booking/lib/booking-steps.ts) — currently uses `"UTC"`; out of scope (cosmetic strings only, no behavior change).
-- Anywhere else `bookingTimeZone()` is called inside a server context where settings are already loaded (locale layout) — pass through.
-- Google Calendar event creation ([shared/lib/google-calendar/events.ts](../../../shared/lib/google-calendar/events.ts)) — caller already supplies `timeZone`; the caller updates to source it from settings.
+Audit and update call sites (every current caller of `bookingTimeZone()` plus every place that hands a `timeZone` string to the Google Calendar helpers):
+- [views/booking/api/submit.ts](../../../views/booking/api/submit.ts) — server action that builds the booking UTC and (in the GCal path) constructs the calendar event. Loads settings, passes `bookingTimeZoneFromSettings(settings)` to both the slot conversion (`localTimeToUtc` in `shared/lib/google-calendar/slots.ts`) and to `createCalendarEvent` in [shared/lib/google-calendar/events.ts](../../../shared/lib/google-calendar/events.ts).
+- Any other server module that reads `bookingTimeZone()` — the plan must grep `bookingTimeZone\b` across `app/`, `views/`, `shared/`, `features/`, `widgets/` and route each call through settings when it has them in scope. The env-var fallback (`bookingTimeZoneFallback()`) remains valid for the few cases without settings (build-time SSG, unit fixtures).
+- [views/booking/lib/booking-steps.ts](../../../views/booking/lib/booking-steps.ts) — currently uses `"UTC"` for cosmetic step labels; out of scope (no behavior change).
 
-Leave the env var working as a safety net.
+Leave the env var working as a safety net for `bookingTimeZoneFallback()` only.
 
 ## 7. SEO
 
@@ -379,7 +378,7 @@ The migration is non-destructive (column additions with safe defaults); no backf
 
 - **Map iframe blocked by strict ad-blockers / DNS filters.** Mitigation: the iframe degrades to a blank box; the "Get directions" link still works.
 - **OSM tile reliability.** Mitigation: OSM has been stable for years; if it ever degrades, swapping the iframe `src` to a Google Maps share URL is a one-line change.
-- **Timezone changes during active bookings.** If the admin changes the timezone while bookings exist, displayed slot times shift. Mitigation: confirm dialog in the admin form ("Changing timezone affects how upcoming booking times are shown to guests. Continue?") — flagged as a v1.1 polish if time allows; the v1 behaviour is "admin owns this change."
+- **Timezone changes during active bookings.** If the admin changes the timezone while bookings exist, displayed slot times shift. **v1 ships a `window.confirm()` guard** in the timezone field's onChange handler ("Changing the timezone affects how upcoming booking times appear to guests. Continue?"). Simple, no new component, no styling work. A native modal is out of scope.
 - **Empty city + `mapVisible: true`.** Allowed by the schema (city is for SEO copy, not map). Map still shows because coords drive the iframe.
 - **Half-pair lat/lng.** Rejected at the Zod boundary so the DB never sees an inconsistent pair.
 
