@@ -323,7 +323,7 @@ export async function ProfilePage({ locale }: { locale: string }) {
         </div>
       </section>
 
-      <TabBar />
+      <TabBar showAdmin={user.role === "admin"} />
     </div>
   );
 }

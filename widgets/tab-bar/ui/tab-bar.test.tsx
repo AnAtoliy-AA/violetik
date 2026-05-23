@@ -26,10 +26,10 @@ vi.mock("motion/react", async (importOriginal) => {
 
 import { TabBar } from "./tab-bar";
 
-function renderTabBar() {
+function renderTabBar(showAdmin = false) {
   return render(
     <NextIntlClientProvider locale="en" messages={en}>
-      <TabBar />
+      <TabBar showAdmin={showAdmin} />
     </NextIntlClientProvider>,
   );
 }
@@ -59,5 +59,21 @@ describe("TabBar", () => {
     renderTabBar();
     const active = screen.getByRole("link", { current: "page" });
     expect(active).toHaveAttribute("href", "/home");
+  });
+
+  it("appends an Admin tab when showAdmin is true", () => {
+    pathnameMock.current = "/home";
+    renderTabBar(true);
+    const nav = screen.getByRole("navigation");
+    const links = within(nav).getAllByRole("link");
+    expect(links).toHaveLength(5);
+    expect(links[4]).toHaveAttribute("href", "/admin");
+  });
+
+  it("marks the admin tab active on any /admin/* route", () => {
+    pathnameMock.current = "/admin/site-settings";
+    renderTabBar(true);
+    const active = screen.getByRole("link", { current: "page" });
+    expect(active).toHaveAttribute("href", "/admin");
   });
 });

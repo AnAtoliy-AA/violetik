@@ -284,6 +284,9 @@
     },
     "profile": {
       "label": "Вы"
+    },
+    "admin": {
+      "label": "Админ"
     }
   },
   "Admin": {

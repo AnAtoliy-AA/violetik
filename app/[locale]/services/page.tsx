@@ -6,6 +6,7 @@ import type { ServiceCategoryRef } from "@/entities/service";
 import type { CurrencyCode } from "@/db/schema";
 import { ServicesCatalogPage } from "@/views/services-catalog";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 import { routing, type Locale } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 
@@ -33,10 +34,11 @@ export default async function ServicesRoute({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
-  const [settings, services, categoryRows] = await Promise.all([
+  const [settings, services, categoryRows, sessionUser] = await Promise.all([
     getSiteSettingsServer(),
     loadServicesForLocale(locale),
     listPublishedCategories(),
+    getCurrentSessionUser(),
   ]);
   const categories: ServiceCategoryRef[] = categoryRows.map((c) => {
     const name =
@@ -51,6 +53,7 @@ export default async function ServicesRoute({
       categories={categories}
       currency={currency}
       locale={locale}
+      showAdmin={sessionUser?.role === "admin"}
     />
   );
 }

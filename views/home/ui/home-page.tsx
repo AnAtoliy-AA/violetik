@@ -22,6 +22,7 @@ export interface HomePageProps {
   settings: SiteSettings;
   locale: Locale;
   testimonial: ApprovedTestimonial | null;
+  showAdmin?: boolean;
 }
 
 export function HomePage({
@@ -29,6 +30,7 @@ export function HomePage({
   settings,
   locale,
   testimonial,
+  showAdmin = false,
 }: HomePageProps) {
   return (
     <div className="pb-28">
@@ -47,7 +49,7 @@ export function HomePage({
       <TestimonialCard testimonial={testimonial} />
       <MembershipCard />
       <HomeFooter settings={settings} locale={locale} />
-      <TabBar />
+      <TabBar showAdmin={showAdmin} />
     </div>
   );
 }
