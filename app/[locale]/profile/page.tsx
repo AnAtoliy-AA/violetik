@@ -21,5 +21,5 @@ export default async function ProfileRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ProfilePage />;
+  return <ProfilePage locale={locale} />;
 }
