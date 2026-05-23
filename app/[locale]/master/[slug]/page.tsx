@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { loadMasterBySlugForLocale } from "@/entities/master/api/load";
-import { loadTestimonialsWithPhotos } from "@/entities/studio/api/load-with-photos";
+import { listApprovedTestimonials } from "@/entities/testimonial";
 import { MasterPage } from "@/views/master";
 import type { Locale } from "@/i18n/routing";
 
@@ -29,6 +29,9 @@ export default async function MasterDetailRoute({
   setRequestLocale(locale);
   const master = await loadMasterBySlugForLocale(slug, locale as Locale);
   if (!master || master.status !== "published") notFound();
-  const testimonials = await loadTestimonialsWithPhotos();
+  const testimonials = await listApprovedTestimonials({
+    masterId: master.id,
+    limit: 10,
+  });
   return <MasterPage master={master} testimonials={testimonials} />;
 }

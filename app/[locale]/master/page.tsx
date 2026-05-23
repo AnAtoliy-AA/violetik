@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { loadMastersForLocale } from "@/entities/master/api/load";
-import { loadTestimonialsWithPhotos } from "@/entities/studio/api/load-with-photos";
+import { listApprovedTestimonials } from "@/entities/testimonial";
 import { MasterPage } from "@/views/master";
 import { MastersListPage } from "@/views/masters-list";
 import type { Locale } from "@/i18n/routing";
@@ -29,7 +29,10 @@ export default async function MasterRoute({
     publishedOnly: true,
   });
   if (masters.length === 1) {
-    const testimonials = await loadTestimonialsWithPhotos();
+    const testimonials = await listApprovedTestimonials({
+      masterId: masters[0].id,
+      limit: 10,
+    });
     return <MasterPage master={masters[0]} testimonials={testimonials} />;
   }
   return <MastersListPage masters={masters} />;
