@@ -37,7 +37,7 @@ export function HomePage({ master, settings, locale }: HomePageProps) {
       <MasterStrip master={master} />
       <GalleryStrip />
       <AtelierMotion />
-      <TestimonialCard />
+      <TestimonialCard testimonial={null} />
       <MembershipCard />
       <HomeFooter settings={settings} locale={locale} />
       <TabBar />

@@ -1,11 +1,16 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { STUDIO_DATA } from "@/entities/studio";
+import type { ApprovedTestimonial } from "@/entities/testimonial";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Plate } from "@/shared/ui/plate";
 
-export function TestimonialCard() {
+export interface TestimonialCardProps {
+  testimonial: ApprovedTestimonial | null;
+}
+
+export function TestimonialCard({ testimonial }: TestimonialCardProps) {
   const t = useTranslations("Home");
-  const item = STUDIO_DATA.testimonials[0];
+  if (!testimonial) return null;
   return (
     <section className="px-[22px] py-7">
       <Plate number={3} label={t("plate_word").toUpperCase()} />
@@ -17,23 +22,33 @@ export function TestimonialCard() {
           &ldquo;
         </div>
         <p className="m-0 mb-5 pl-12 font-display text-[26px] font-normal italic leading-[1.3]">
-          {item.text}
+          {testimonial.body}
         </p>
         <LetterpressRule className="mb-4 max-w-[200px]" />
         <div className="flex items-center gap-2.5">
-          <span
-            aria-hidden
-            className="size-7 rounded-full border-[0.5px] border-accent"
-            style={{
-              background:
-                "radial-gradient(circle at 35% 30%, var(--color-rose), var(--color-plum))",
-            }}
-          />
+          {testimonial.authorPhotoUrl ? (
+            <span className="relative size-7 overflow-hidden rounded-full border-[0.5px] border-accent">
+              <Image
+                src={testimonial.authorPhotoUrl}
+                alt={testimonial.authorDisplay}
+                fill
+                sizes="28px"
+                unoptimized
+                className="object-cover"
+              />
+            </span>
+          ) : (
+            <span
+              aria-hidden
+              className="size-7 rounded-full border-[0.5px] border-accent"
+              style={{
+                background:
+                  "radial-gradient(circle at 35% 30%, var(--color-rose), var(--color-plum))",
+              }}
+            />
+          )}
           <div>
-            <div className="text-[13px] font-medium">{item.name}</div>
-            <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
-              {item.role}
-            </div>
+            <div className="text-[13px] font-medium">{testimonial.authorDisplay}</div>
           </div>
         </div>
       </div>
