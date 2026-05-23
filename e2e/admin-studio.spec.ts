@@ -29,7 +29,9 @@ test("admin can configure the studio location and the home page reflects it", as
   await page.getByRole("button", { name: /save/i }).click();
   await expect(page.getByText(/saved/i)).toBeVisible();
 
-  await page.goto("/en");
+  // `/en` is a /welcome redirect — the home (with the footer + map widget)
+  // lives at `/en/home`.
+  await page.goto("/en/home");
   await expect(
     page.getByRole("link", { name: /get directions/i }),
   ).toBeVisible();
