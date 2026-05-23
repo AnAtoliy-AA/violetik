@@ -110,6 +110,12 @@ describe("studio-location fields", () => {
     expect(half.success).toBe(false);
   });
 
+  it("rejects a single-key lat-only patch (longitude key absent)", () => {
+    expect(
+      siteSettingsPatchSchema.safeParse({ latitude: 54.2 }).success,
+    ).toBe(false);
+  });
+
   it("accepts a fully-null coordinate patch (clearing coords)", () => {
     const ok = siteSettingsPatchSchema.safeParse({
       latitude: null,
