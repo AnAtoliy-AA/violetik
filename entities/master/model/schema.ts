@@ -10,6 +10,11 @@ export const masterStatusSchema = z.enum(["draft", "published", "archived"]);
 const localeString = (max: number) =>
   z.string().trim().min(1, "required").max(max);
 
+const TELEGRAM_USERNAME = z
+  .string()
+  .regex(/^[A-Za-z][A-Za-z0-9_]{4,31}$/u, "invalid_telegram_username")
+  .nullable();
+
 export const masterFormSchema = z.object({
   id: slugSchema,
   nameEn: localeString(80),
@@ -29,6 +34,7 @@ export const masterFormSchema = z.object({
   sortOrder: z.number().int().min(0),
   status: masterStatusSchema,
   serviceIds: z.array(slugSchema).max(200),
+  telegramUsername: TELEGRAM_USERNAME.optional().default(null),
 });
 
 export type MasterFormInput = z.infer<typeof masterFormSchema>;

@@ -542,6 +542,9 @@
     "archive_blocked": "{count, plural, one {# upcoming booking} other {# upcoming bookings}} — reassign or cancel first.",
     "validation_required": "Required",
     "validation_slug_invalid": "Lowercase letters, numbers, hyphens only.",
+    "validation_telegram_username": "Must start with a letter and be 5–32 characters (letters, numbers, underscores).",
+    "label_telegram": "Telegram username",
+    "label_telegram_hint": "Optional. Without the @ sign — e.g. violetta",
     "empty_published": "No published masters yet.",
     "empty_archived": "Nothing in the archive."
   },

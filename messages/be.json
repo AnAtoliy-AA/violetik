@@ -542,6 +542,9 @@
     "archive_blocked": "{count, plural, one {# будучы запіс} few {# будучыя запісы} many {# будучых запісаў} other {# будучых запісаў}} — спачатку пераназначце або скасуйце іх.",
     "validation_required": "Абавязковае поле",
     "validation_slug_invalid": "Толькі лацінскія літары ў ніжнім рэгістры, лічбы і злучкі.",
+    "validation_telegram_username": "Павінна пачынацца з літары і змяшчаць 5–32 сімвалы (літары, лічбы, падкрэслівання).",
+    "label_telegram": "Telegram username",
+    "label_telegram_hint": "Неабавязкова. Без сімвала @ — напрыклад violetta",
     "empty_published": "Пакуль няма апублікаваных майстроў.",
     "empty_archived": "Архіў пусты."
   },

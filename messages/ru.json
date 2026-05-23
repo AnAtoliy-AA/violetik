@@ -542,6 +542,9 @@
     "archive_blocked": "{count, plural, one {# предстоящая запись} few {# предстоящие записи} many {# предстоящих записей} other {# предстоящих записей}} — сначала переназначьте или отмените их.",
     "validation_required": "Обязательное поле",
     "validation_slug_invalid": "Только латинские буквы в нижнем регистре, цифры и дефисы.",
+    "validation_telegram_username": "Должно начинаться с буквы и содержать 5–32 символа (буквы, цифры, подчёркивания).",
+    "label_telegram": "Telegram username",
+    "label_telegram_hint": "Необязательно. Без символа @ — например violetta",
     "empty_published": "Пока нет опубликованных мастеров.",
     "empty_archived": "Архив пуст."
   },
