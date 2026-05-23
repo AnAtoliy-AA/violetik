@@ -58,6 +58,10 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "Site" });
   const settings = await getSiteSettingsServer();
   const typedLocale = locale as Locale;
+  // cityForLocale falls back to cityEn when the locale-specific city is
+  // empty — intentional, so admin can ship city-driven SEO before
+  // translating the city name into RU/BE. The admin form prompts for
+  // all three locales to keep copy idiomatic.
   const city = cityForLocale(settings, typedLocale);
 
   const baseName = t("name");
