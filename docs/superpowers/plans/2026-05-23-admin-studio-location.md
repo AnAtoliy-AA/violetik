@@ -2087,7 +2087,7 @@ Expected: FAIL — the current `HomeFooter` takes no props.
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
 import type { SiteSettings } from "@/entities/site-settings";
-import { addressForLocale, cityForLocale } from "@/entities/site-settings";
+import { studioLocationLine } from "@/entities/site-settings";
 import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { Ornament } from "@/shared/ui/ornament";
 import { StudioMap } from "@/widgets/studio-map";
@@ -2101,9 +2101,7 @@ export function HomeFooter({ settings, locale }: HomeFooterProps) {
   const t = useTranslations("Home");
   const tFooter = useTranslations("Footer");
 
-  const address = addressForLocale(settings, locale);
-  const city = cityForLocale(settings, locale);
-  const addressLine = city ? `${address} · ${city}` : address;
+  const addressLine = studioLocationLine(settings, locale);
 
   return (
     <footer className="px-[22px] pb-7 pt-10 text-center text-text-3">
