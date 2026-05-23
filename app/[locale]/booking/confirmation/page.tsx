@@ -4,7 +4,7 @@ import { ConfirmationPage } from "@/views/confirmation";
 import { getBookingById } from "@/db/bookings";
 import { loadServiceByIdForLocale } from "@/entities/service/api/load";
 import { studioLocationLine } from "@/entities/site-settings";
-import { bookingTimeZone } from "@/shared/lib/google-calendar";
+import { bookingTimeZoneFromSettings } from "@/shared/lib/google-calendar";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { routing, type Locale } from "@/i18n/routing";
 
@@ -72,7 +72,7 @@ export default async function ConfirmationRoute({
     return <ConfirmationPage location={location} />;
   }
 
-  const tz = bookingTimeZone();
+  const tz = bookingTimeZoneFromSettings(settings);
   const service = await loadServiceByIdForLocale(booking.serviceId, safeLocale);
   return (
     <ConfirmationPage

@@ -6,7 +6,8 @@ import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { listBookingsForAdmin } from "@/db/bookings";
 import { listAllServices } from "@/db/services";
-import { bookingTimeZone } from "@/shared/lib/google-calendar";
+import { bookingTimeZoneFromSettings } from "@/shared/lib/google-calendar";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { BookingActions } from "@/features/bookings-admin";
 
 export const dynamic = "force-dynamic";
@@ -62,11 +63,12 @@ export default async function AdminBookingsRoute({
   setRequestLocale(locale);
   const t = await getTranslations("AdminBookings");
   const tStatus = await getTranslations("AdminBookings.status");
-  const tz = bookingTimeZone();
-  const [bookings, allServices] = await Promise.all([
+  const [settings, bookings, allServices] = await Promise.all([
+    getSiteSettingsServer(),
     listBookingsForAdmin(),
     listAllServices(),
   ]);
+  const tz = bookingTimeZoneFromSettings(settings);
   const serviceById = new Map(allServices.map((s) => [s.id, s]));
 
   return (

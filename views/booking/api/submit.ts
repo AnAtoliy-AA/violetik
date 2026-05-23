@@ -3,10 +3,11 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import {
-  bookingTimeZone,
+  bookingTimeZoneFromSettings,
   createCalendarEvent,
   refreshAccessToken,
 } from "@/shared/lib/google-calendar";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import {
   getActiveGoogleToken,
   updateLastRefresh,
@@ -128,7 +129,8 @@ export async function submitBooking(
     masterId = input.masterId;
   }
 
-  const tz = bookingTimeZone();
+  const settings = await getSiteSettingsServer();
+  const tz = bookingTimeZoneFromSettings(settings);
   const scheduledFor = localToUtc(input.date, input.time, tz);
   const durationMin = service.durationMinutes;
 
