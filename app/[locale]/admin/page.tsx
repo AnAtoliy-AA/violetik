@@ -7,6 +7,7 @@ import { Eyebrow } from "@/shared/ui/eyebrow";
 import { SignOutButton } from "@/features/telegram-login";
 import { listBookingsForAdmin } from "@/db/bookings";
 import { listPendingVipRequests } from "@/db/vip-requests";
+import { countPendingTestimonials } from "@/db/testimonials";
 
 type Params = { locale: string };
 
@@ -49,9 +50,10 @@ export default async function AdminRoute({
   const t = await getTranslations("Admin");
   const tSignIn = await getTranslations("SignIn");
 
-  const [bookings, pendingVip] = await Promise.all([
+  const [bookings, pendingVip, pendingTestimonials] = await Promise.all([
     listBookingsForAdmin(),
     listPendingVipRequests(),
+    countPendingTestimonials(),
   ]);
   const pendingBookings = bookings.filter((b) => b.status === "pending").length;
 
@@ -93,6 +95,17 @@ export default async function AdminRoute({
               <div className="font-display text-[16px] italic">{t("inbox_vip_requests")}</div>
               <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
                 {pendingVip.length} {t("inbox_pending_suffix")}
+              </div>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/admin/testimonials"
+              className="gilded block rounded-[18px] p-5 transition-colors duration-fast ease-out hover:bg-surface-2"
+            >
+              <div className="font-display text-[16px] italic">{t("inbox_testimonials")}</div>
+              <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+                {pendingTestimonials} {t("inbox_pending_suffix")}
               </div>
             </Link>
           </li>
