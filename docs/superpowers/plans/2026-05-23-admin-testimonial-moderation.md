@@ -23,7 +23,7 @@
 - **Auth gate posture:** all admin sub-routes use unconditional `requireAdmin()` + `redirect({ href: "/sign-in", locale })`, mirroring [app/[locale]/admin/vip-requests/page.tsx:60-61](app/[locale]/admin/vip-requests/page.tsx#L60). Only the `/admin` root is env-gated.
 - **i18n shape:** add one key to `Admin.*` (`inbox_testimonials`) and the full `AdminTestimonials.*` namespace; existing `Profile.testimonial_*` keys remain.
 - **Don't touch `node_modules/`, `package.json`, or `package-lock.json`** — no new dependencies.
-- **`db/` integration tests** use `it.skipIf(Boolean(process.env.DATABASE_URL))` for the no-DB branch and the inverse for true integration. PR #51 added live-DB integration tests; this PR adds the no-DB branches (test runner has no Postgres) and keeps the live-DB tests guarded.
+- **`db/` tests** follow the repo's existing pattern: `it.skipIf(Boolean(process.env.DATABASE_URL))` no-DB branches only. The spec (§11.1) calls for live-DB integration tests for the new admin queries, but the repo has no precedent for live-DB tests in `db/*.test.ts` (verified against `db/testimonials.test.ts`, `db/bookings.test.ts`). We **defer live-DB integration tests as a follow-up**; this PR ships the no-DB contract tests + the unit tests on the entity loader / actions / UI which cover the call paths.
 - **`revalidatePath("/", "layout")`** after every successful admin action — the master + home + admin pages all need to refresh.
 
 ---
@@ -52,6 +52,8 @@ features/testimonials-admin/ui/testimonial-row.test.tsx    # Task 6
 views/admin-testimonials/index.ts                     # Task 7
 views/admin-testimonials/ui/admin-testimonials-page.tsx # Task 7
 views/admin-testimonials/ui/admin-testimonials-page.test.tsx # Task 7
+views/master/ui/master-page.test.tsx                  # Task 11 (new — none existed)
+views/home/ui/sections/testimonial-card.test.tsx      # Task 13 (new — none existed)
 app/[locale]/admin/testimonials/page.tsx              # Task 8
 e2e/admin-testimonials.spec.ts                        # Task 17
 ```
@@ -287,6 +289,8 @@ npx vitest run db/testimonials.test.ts
 Expected: import errors on the three new symbols.
 
 - [ ] **Step 2.3: Implement the three exports**
+
+> Note: `db/testimonials.ts` already defines a private `isMissingTable` helper at line 19. The appended code reuses it — **do not redeclare it**.
 
 Append to `db/testimonials.ts`:
 
@@ -1292,6 +1296,8 @@ git commit -m "feat(testimonials-admin): TestimonialRow server component + stori
 
 Composes the three sections from pre-loaded arrays. Pure server component taking props — testable without DB.
 
+> **Ordering:** The view test imports `messages/en.json` directly and asserts on rendered i18n strings. **Complete Task 10 (i18n keys) before starting this task.** The plan keeps the numeric ordering for narrative flow (UI → i18n → route), but execute Task 10 first.
+
 **Files:**
 - Create: `views/admin-testimonials/index.ts`
 - Create: `views/admin-testimonials/ui/admin-testimonials-page.tsx`
@@ -1529,11 +1535,9 @@ export { AdminTestimonialsPage } from "./ui/admin-testimonials-page";
 export type { AdminTestimonialsPageProps } from "./ui/admin-testimonials-page";
 ```
 
-- [ ] **Step 7.4: The test references i18n keys that don't exist yet — temporarily stub the messages**
+- [ ] **Step 7.4: Run the view test**
 
-Three options: either add the i18n keys now (Task 10 ordering choice) or stub messages locally. **Add the i18n keys now.** Jump to Task 10 ahead of order — write the keys, then return here to run the test.
-
-After Task 10 completes for the en/ru/be keys, return and run:
+With Task 10 already done (per ordering note at the top of this task), the i18n keys resolve.
 
 ```
 npx vitest run views/admin-testimonials/
@@ -1862,6 +1866,20 @@ describe("MasterPage voices section", () => {
     expect(screen.getByText("Lara K.")).toBeInTheDocument();
   });
 
+  it("renders an <img> avatar when authorPhotoUrl is set", () => {
+    const tm: ApprovedTestimonial = {
+      id: "tst_2",
+      body: "Beautiful chrome finish.",
+      createdAt: new Date(),
+      authorDisplay: "Iris M.",
+      authorPhotoUrl: "https://t.me/i/userpic/320/iris.jpg",
+      masterId: "violetta",
+    };
+    renderWithIntl(<MasterPage testimonials={[tm]} />);
+    const img = screen.getByAltText("Iris M.") as HTMLImageElement;
+    expect(img.src).toContain("iris.jpg");
+  });
+
   it("omits the voices section entirely when testimonials is empty", () => {
     renderWithIntl(<MasterPage testimonials={[]} />);
     // The voices eyebrow shouldn't render
@@ -1876,7 +1894,7 @@ describe("MasterPage voices section", () => {
 npx vitest run views/master/ui/master-page.test.tsx
 ```
 
-Expected: type errors (testimonials prop is `Testimonial[]` not `ApprovedTestimonial[]`) and/or the empty case still renders the section because the fallback fills it.
+Expected: TS errors (the prop type is currently `Testimonial[]` from `entities/studio`, not `ApprovedTestimonial[]`), plus the empty-array test failing because the current implementation maps `[]` and still emits the `<section>` with the eyebrow.
 
 - [ ] **Step 11.4: Rewrite the file**
 
@@ -2085,6 +2103,20 @@ describe("TestimonialCard", () => {
     renderWithIntl(<TestimonialCard testimonial={tm} />);
     expect(screen.getByText(/Quiet, private, exquisite/)).toBeInTheDocument();
     expect(screen.getByText("Iris M.")).toBeInTheDocument();
+  });
+
+  it("renders an <img> avatar when authorPhotoUrl is set", () => {
+    const tm: ApprovedTestimonial = {
+      id: "tst_2",
+      body: "Magical experience.",
+      createdAt: new Date(),
+      authorDisplay: "Joelle P.",
+      authorPhotoUrl: "https://t.me/i/userpic/320/joelle.jpg",
+      masterId: "violetta",
+    };
+    renderWithIntl(<TestimonialCard testimonial={tm} />);
+    const img = screen.getByAltText("Joelle P.") as HTMLImageElement;
+    expect(img.src).toContain("joelle.jpg");
   });
 
   it("returns null when testimonial is null", () => {
@@ -2465,7 +2497,7 @@ Expected: clean.
 npm test
 ```
 
-Expected: existing 580 + new tests added in this PR (build-author-display 6, db 3, load-approved 1, actions 6, decision-actions 3, testimonial-row 4, admin-testimonials view 3, master-page 2, testimonial-card 2 ≈ 30 new), all passing.
+Expected: existing 580 + new tests added in this PR (build-author-display 6, db 3, load-approved 1, actions 6, decision-actions 3, testimonial-row 4, admin-testimonials view 3, master-page 3, testimonial-card 3 ≈ 32 new), all passing.
 
 - [ ] **Step 18.3: Build**
 
