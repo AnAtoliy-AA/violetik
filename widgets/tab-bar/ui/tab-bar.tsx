@@ -45,7 +45,7 @@ export function TabBar() {
   return (
     <nav
       aria-label={t("aria_label")}
-      className="fixed bottom-0 left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 px-4 pb-3 pt-2"
+      className="fixed bottom-[22px] left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 px-4 pb-3 pt-2"
     >
       <ul
         className={cn(

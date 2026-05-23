@@ -1,12 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-
-const pathnameMock = vi.fn<() => string>(() => "/master/violetta");
-vi.mock("@/i18n/navigation", () => ({
-  usePathname: () => pathnameMock(),
-}));
-
 import { SiteFooter } from "./site-footer";
 
 const messages = {
@@ -22,8 +16,7 @@ function renderWithIntl(ui: React.ReactNode) {
 }
 
 describe("SiteFooter", () => {
-  it("renders translated credit prefix and brand link on non-TabBar routes", () => {
-    pathnameMock.mockReturnValue("/master/violetta");
+  it("renders translated credit prefix and brand link", () => {
     renderWithIntl(<SiteFooter />);
     expect(screen.getByText(/Created with Love by/)).toBeInTheDocument();
     const link = screen.getByRole("link", { name: /Arcadeum Games Studio/i });
@@ -32,12 +25,10 @@ describe("SiteFooter", () => {
     expect(link.getAttribute("rel") ?? "").toMatch(/noopener/);
   });
 
-  it.each(["/home", "/services", "/gallery", "/profile"])(
-    "hides itself on the TabBar route %s",
-    (path) => {
-      pathnameMock.mockReturnValue(path);
-      const { container } = renderWithIntl(<SiteFooter />);
-      expect(container.firstChild).toBeNull();
-    },
-  );
+  it("is fixed to the viewport bottom (above-tabbar layout)", () => {
+    const { container } = renderWithIntl(<SiteFooter />);
+    const footer = container.querySelector("footer");
+    expect(footer?.className).toMatch(/fixed/);
+    expect(footer?.className).toMatch(/bottom-0/);
+  });
 });
