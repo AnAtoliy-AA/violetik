@@ -36,6 +36,7 @@ const initial = {
   sortOrder: 0,
   status: "published" as const,
   serviceIds: ["signature"],
+  telegramUsername: null,
 };
 
 export const Edit: StoryObj<typeof MasterEditor> = {

@@ -91,6 +91,7 @@ export default async function MasterEditorRoute({
       sortOrder: 0,
       status: "draft",
       serviceIds: [],
+      telegramUsername: null,
     };
   } else {
     const [master, p] = await Promise.all([
@@ -125,6 +126,7 @@ export default async function MasterEditorRoute({
       sortOrder: row.sortOrder,
       status: row.status,
       serviceIds: master.serviceIds,
+      telegramUsername: row.telegramUsername,
     };
   }
 
@@ -155,6 +157,7 @@ export default async function MasterEditorRoute({
       sortOrder: patch.sortOrder,
       status: patch.status,
       serviceIds: patch.serviceIds,
+      telegramUsername: patch.telegramUsername,
     };
     const r = await updateMasterAction(id, rest);
     return r.ok ? { ok: true } : { ok: false, error: r.error };
