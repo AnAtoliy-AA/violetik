@@ -18,6 +18,8 @@ vi.mock("@/i18n/navigation", () => ({
       {children}
     </a>
   ),
+  usePathname: () => "/admin/testimonials",
+  useRouter: () => ({ replace: vi.fn() }),
 }));
 
 import { AdminTestimonialsPage } from "./admin-testimonials-page";

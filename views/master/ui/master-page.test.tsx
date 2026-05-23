@@ -15,6 +15,7 @@ vi.mock("@/i18n/navigation", () => ({
     </a>
   ),
   usePathname: () => "/master",
+  useRouter: () => ({ replace: vi.fn() }),
 }));
 
 import { MasterPage } from "./master-page";

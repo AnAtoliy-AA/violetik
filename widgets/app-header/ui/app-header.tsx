@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
+import { LocaleSwitcher } from "@/features/locale-switcher";
 import { cn } from "@/shared/lib/cn";
 import { Wordmark } from "@/shared/ui/wordmark";
 
@@ -123,7 +124,10 @@ export function AppHeader({
             {title}
           </span>
         ) : null}
-        {menu}
+        <div className="flex items-center gap-2">
+          <LocaleSwitcher />
+          {menu}
+        </div>
       </div>
       {admin ? (
         <div

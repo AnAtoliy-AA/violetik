@@ -1,4 +1,21 @@
+import { vi } from "vitest";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
+vi.mock("@/i18n/navigation", () => ({
+  Link: ({
+    href,
+    children,
+    ...rest
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+  usePathname: () => "/",
+  useRouter: () => ({ replace: vi.fn() }),
+}));
+
+import React from "react";
 import { AppHeader } from "./app-header";
 
 const meta: Meta<typeof AppHeader> = {
