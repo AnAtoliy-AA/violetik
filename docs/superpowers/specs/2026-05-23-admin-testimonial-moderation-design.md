@@ -48,7 +48,6 @@ Both FKs use `onDelete: cascade`. So:
 db/
   testimonials.ts                              # extend: AdminTestimonialRow, listTestimonialsByStatus,
                                                #         decideTestimonial, countPendingTestimonials
-  lib/pg-error-codes.ts                        # NEW: hoist isMissingTable + isUniqueViolation here
 features/
   testimonials-admin/                          # NEW slice (mirrors vip-requests-admin)
     api/
@@ -205,7 +204,7 @@ export async function listApprovedTestimonials(
 - `WHERE status = 'approved'` plus optional `AND master_id = $masterId`
 - `ORDER BY decided_at DESC` (most recently approved surfaces first)
 - `LIMIT $limit` (caller passes `1` on home, `10` on master page)
-- Joins `users` for the author display fields and `masters` for the locale name fields
+- Joins `users` for the author display fields. No `masters` join — the entity shape doesn't carry master names (the caller already has the master loaded, or the home card doesn't display a master name).
 - `authorDisplay` is computed in JS, not SQL — extracted as a shared helper `entities/testimonial/lib/build-author-display.ts` so both the public loader (§6.2) and the admin row UI (§8.2) can call it:
   ```ts
   function buildAuthorDisplay(u: {
@@ -231,7 +230,7 @@ export async function listApprovedTestimonials(
 
   Pure function — unit-tested separately so the loader test can stay an integration test.
 
-Returns `[]` when DB is null or table is missing. The existing `isMissingTable` walker in `db/testimonials.ts` is hoisted to a sibling file `db/lib/pg-error-codes.ts` so both `db/testimonials.ts` and the new `entities/testimonial/api/load-approved.ts` import it (no duplication). `isUniqueViolation` moves with it for symmetry.
+Returns `[]` when DB is null or table is missing. The new loader duplicates the six-line `isMissingTable` walker that already lives privately in `db/testimonials.ts`, `db/masters.ts`, `db/services.ts`, and others — promoting it to a shared `db/lib/` module is out of scope for this PR (would touch six unrelated files for a marginal benefit). The duplication is intentional and matches the existing repo pattern; cleanup is a separate refactor task.
 
 ## 7. Server Actions — `features/testimonials-admin/api/actions.ts`
 
@@ -480,7 +479,6 @@ Decision-button click behavior is unit-covered; e2e stays on render + navigation
 No DB migration. The PR adds code only:
 
 - New module files under `features/testimonials-admin/`, `entities/testimonial/`, `views/admin-testimonials/`, `app/[locale]/admin/testimonials/`.
-- Hoist `isMissingTable`/`isUniqueViolation` from `db/testimonials.ts` to `db/lib/pg-error-codes.ts`.
 - Deletes `loadTestimonialsWithPhotos` + the `STUDIO_DATA.testimonials` array + the `Testimonial` type + the testimonial photo-slot loop.
 - Adds i18n keys (one on `Admin.*`, twelve on the new `AdminTestimonials.*` namespace, per locale).
 
