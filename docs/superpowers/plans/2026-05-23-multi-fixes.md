@@ -572,21 +572,58 @@ git commit -m "feat(welcome): mount compact LocaleSwitcher top-right"
 - Modify: `features/site-settings-admin/ui/site-settings-form.tsx`
 - Modify: `features/site-settings-admin/ui/site-settings-form.test.tsx`
 
-- [ ] **Step 8.1: Write the failing tests**
+- [ ] **Step 8.1a: Read the existing test scaffolding**
 
-Open `features/site-settings-admin/ui/site-settings-form.test.tsx` and add:
+Read `features/site-settings-admin/ui/site-settings-form.test.tsx` end-to-end. Note: (a) how `SiteSettingsForm` is rendered, (b) the `initial` fixture shape, (c) the existing `onSubmit` mock, (d) the actual palette ids from `shared/config/palettes/palettes.ts` (run `grep -n '^  id:' shared/config/palettes/palettes.ts` to enumerate). The plan's example uses `"rose"` and `"lilac"` — confirm these are real ids; substitute if names differ.
+
+- [ ] **Step 8.1b: Add a small helper at the top of the test file**
+
+Above the existing tests, add:
+
+```tsx
+import { useState } from "react";
+import { userEvent } from "@testing-library/user-event";
+
+const baseInitial = {
+  defaultPalette: "rose" as const,
+  defaultLocale: "en" as const,
+  currency: "EUR" as const,
+  priceOverrides: {},
+  discountPercent: 0,
+  discountActive: false,
+  // … include other required SiteSettings fields, copied from the existing test file's fixture
+};
+
+function renderForm(overrides?: Partial<typeof baseInitial>, submit = vi.fn().mockResolvedValue({ ok: true })) {
+  return render(
+    <NextIntlClientProvider locale="en" messages={messagesFixture}>
+      <SiteSettingsForm
+        initial={{ ...baseInitial, ...overrides }}
+        vipBasePrice={300}
+        onSubmit={submit}
+      />
+    </NextIntlClientProvider>,
+  );
+}
+```
+
+Adapt `messagesFixture` from whatever the existing tests use. If the existing tests already export an equivalent helper, reuse it instead of duplicating.
+
+- [ ] **Step 8.1c: Write the three failing tests**
 
 ```tsx
 it("applies the selected palette to document.documentElement immediately on click", async () => {
   document.documentElement.dataset.palette = "rose";
-  render(<SiteSettingsForm initial={{ ...initial, defaultPalette: "rose" }} vipBasePrice={…} onSubmit={…} />);
+  const user = userEvent.setup();
+  renderForm({ defaultPalette: "rose" });
   await user.click(screen.getByRole("radio", { name: /Lilac/i }));
   expect(document.documentElement.dataset.palette).toBe("lilac");
 });
 
 it("reverts the palette on unmount when save was not invoked", async () => {
   document.documentElement.dataset.palette = "rose";
-  const { unmount } = render(<SiteSettingsForm initial={{ ...initial, defaultPalette: "rose" }} vipBasePrice={…} onSubmit={…} />);
+  const user = userEvent.setup();
+  const { unmount } = renderForm({ defaultPalette: "rose" });
   await user.click(screen.getByRole("radio", { name: /Lilac/i }));
   expect(document.documentElement.dataset.palette).toBe("lilac");
   unmount();
@@ -595,8 +632,9 @@ it("reverts the palette on unmount when save was not invoked", async () => {
 
 it("keeps the palette persisted after a successful save", async () => {
   document.documentElement.dataset.palette = "rose";
+  const user = userEvent.setup();
   const submit = vi.fn().mockResolvedValue({ ok: true });
-  const { unmount } = render(<SiteSettingsForm initial={{ ...initial, defaultPalette: "rose" }} vipBasePrice={…} onSubmit={submit} />);
+  const { unmount } = renderForm({ defaultPalette: "rose" }, submit);
   await user.click(screen.getByRole("radio", { name: /Lilac/i }));
   await user.click(screen.getByRole("button", { name: /save/i }));
   await waitFor(() => expect(submit).toHaveBeenCalled());
@@ -605,7 +643,7 @@ it("keeps the palette persisted after a successful save", async () => {
 });
 ```
 
-Read the existing test file first — pull in its render-helpers and fixtures (`initial`, palette names). Match the names of palette radios from the actual `PALETTES` config rather than guessing.
+Substitute `Lilac` with the actual palette display name if needed — the radio is rendered with `aria-label`/visible text from `p.name` in [features/site-settings-admin/ui/site-settings-form.tsx:126](../../../features/site-settings-admin/ui/site-settings-form.tsx).
 
 - [ ] **Step 8.2: Run to confirm fail**
 
@@ -670,48 +708,65 @@ This task pins existing behavior: when admin sets a default locale and a visitor
 
 - [ ] **Step 9.1: Write the test**
 
-Create `proxy.test.ts` at repo root:
+Create `proxy.test.ts` at repo root. **Important mock hoisting note:** `vi.mock` is hoisted above imports, so any spy defined at module scope is `undefined` when the factory runs. Use `vi.hoisted` to lift the spies, then reference them in factories and in tests:
 
 ```ts
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { NextRequest } from "next/server";
 
-const createMiddleware = vi.fn(() => vi.fn(() => new Response()));
-vi.mock("next-intl/middleware", () => ({ default: createMiddleware }));
+const mocks = vi.hoisted(() => ({
+  createMiddleware: vi.fn(() => vi.fn(() => new Response())),
+  getCachedDefaultLocale: vi.fn<[], Promise<"en" | "ru" | "by">>(),
+}));
 
-const getCachedDefaultLocale = vi.fn();
+vi.mock("next-intl/middleware", () => ({ default: mocks.createMiddleware }));
 vi.mock("@/shared/lib/site-settings-cache", () => ({
-  getCachedDefaultLocale,
+  getCachedDefaultLocale: mocks.getCachedDefaultLocale,
   invalidateDefaultLocaleCache: vi.fn(),
 }));
 
+function fakeReq(url = "http://localhost/", cookieValue?: string): NextRequest {
+  const cookies = new Map<string, { value: string }>();
+  if (cookieValue) cookies.set("NEXT_LOCALE", { value: cookieValue });
+  return {
+    url,
+    nextUrl: new URL(url),
+    cookies: {
+      get: (k: string) => cookies.get(k),
+      set: (k: string, v: string) => cookies.set(k, { value: v }),
+    },
+  } as unknown as NextRequest;
+}
+
 describe("proxy", () => {
   beforeEach(() => {
-    createMiddleware.mockClear();
-    getCachedDefaultLocale.mockReset();
+    mocks.createMiddleware.mockClear();
+    mocks.getCachedDefaultLocale.mockReset();
   });
 
   it("forwards the admin-chosen default locale to next-intl", async () => {
-    getCachedDefaultLocale.mockResolvedValue("en");
+    mocks.getCachedDefaultLocale.mockResolvedValue("en");
     const proxy = (await import("./proxy")).default;
-    await proxy({ url: "http://localhost/", cookies: { get: () => undefined }, nextUrl: new URL("http://localhost/") } as unknown as NextRequest);
-    expect(createMiddleware).toHaveBeenCalledWith(
+    await proxy(fakeReq());
+    expect(mocks.createMiddleware).toHaveBeenCalledWith(
       expect.objectContaining({ defaultLocale: "en" }),
     );
   });
 
   it("flows a different cached default through unchanged", async () => {
-    getCachedDefaultLocale.mockResolvedValue("ru");
+    mocks.getCachedDefaultLocale.mockResolvedValue("ru");
     const proxy = (await import("./proxy")).default;
-    await proxy({ url: "http://localhost/", cookies: { get: () => undefined }, nextUrl: new URL("http://localhost/") } as unknown as NextRequest);
-    expect(createMiddleware).toHaveBeenCalledWith(
+    await proxy(fakeReq());
+    expect(mocks.createMiddleware).toHaveBeenCalledWith(
       expect.objectContaining({ defaultLocale: "ru" }),
     );
   });
 });
 ```
 
-The minimal `NextRequest` shape above is enough — next-intl's middleware will get its handler call but we don't assert on the response. Adjust the mock shape if `proxy.ts` reads other request fields after task 18 lands.
+`vi.hoisted` is the idiomatic way to share a spy between hoisted `vi.mock` factories and the test body — without it the spy is `undefined` when the factory runs.
+
+The `fakeReq` helper above is reused by task 18's new tests. Keep it in the same file.
 
 - [ ] **Step 9.2: Update `proxy.ts` comment**
 
@@ -737,6 +792,12 @@ git commit -m "test(proxy): pin admin default-locale fallback behavior"
 ```
 
 ---
+
+## ⚠️ Tasks 10–18: atomic working-tree change set
+
+Tasks 10 through 18 jointly perform the `be → by` rename. **Do not `git commit` between these tasks** — the tree is intentionally type-broken in intermediate states (renaming `Locale` in `i18n/routing.ts` immediately breaks every consumer until task 15 fixes them; renaming Drizzle columns immediately breaks every reader until same). One atomic commit lands at step 19.4 to keep history coherent and revertable.
+
+Run lint / Vitest at the *end* of each task to catch new mistakes, but expect failures in unrelated files until tasks 15 and 16 are done. The final `19.1` sweep is the load-bearing green light.
 
 ## Task 10 — `i18n/routing.ts`: rename `be` → `by` + `LOCALE_TO_LANG`
 
@@ -981,15 +1042,21 @@ If the auto-generated snapshot embedded the destructive change, regenerate by ed
 
 - [ ] **Step 14.4: Apply locally to a scratch DB and verify**
 
-Spin up a throwaway Postgres (e.g. `pg_dump` the dev DB, restore to a temp one), run `npm run db:migrate` or whatever the project uses. Confirm:
+The project ships `npm run db:migrate` (delegates to `drizzle-kit migrate`). Optional sanity pass:
 
-```sql
-\d services        -- includes name_by, blurb_by; no _be
-SELECT default_locale FROM site_settings;  -- 'by' if it was 'be'
-SELECT includes->0 FROM services LIMIT 1;  -- has "by" key, no "be"
-```
+1. Point `DATABASE_URL` at a throwaway DB (e.g. a Docker `postgres:16` you can drop), or `pg_dump` the dev DB and restore to a temp DB:
+   ```
+   docker run --rm -d -p 55432:5432 -e POSTGRES_PASSWORD=x -e POSTGRES_DB=violetik_scratch postgres:16
+   DATABASE_URL=postgres://postgres:x@localhost:55432/violetik_scratch npm run db:migrate
+   ```
+2. Connect and verify:
+   ```sql
+   \d services                                       -- has name_by, blurb_by; no _be
+   SELECT default_locale FROM site_settings;         -- 'by' if it was 'be'
+   SELECT includes->0 FROM services LIMIT 1;         -- includes a "by" key, no "be"
+   ```
 
-Skip this step if a scratch DB isn't available, but flag it for the reviewer.
+Skip if a scratch DB isn't readily available — but flag in the commit message that the migration is unverified against live data so reviewers run it on staging first.
 
 - [ ] **Step 14.5: Lint sweep**
 
@@ -1031,44 +1098,54 @@ grep -rn "label_.*_be" --include="*.tsx" --include="*.ts" app entities features 
 
 Save the union list before editing.
 
-- [ ] **Step 15.2: Apply replacements**
+- [ ] **Step 15.2a: app/ replacements**
 
-For each match:
-- `locale === "be"` → `locale === "by"`
-- `nameBe` → `nameBy`, `roleBe` → `roleBy`, …, `masterNameBe` → `masterNameBy`
-- `label_name_be` → `label_name_by`, etc.
-- `locale: "be"` (story/test fixture) → `locale: "by"`
+Apply locale-literal + field-name replacements in:
+- `app/[locale]/admin/bookings/page.tsx:100` — `locale === "be"` → `locale === "by"`
+- `app/[locale]/services/page.tsx:43` — same + `c.nameBe` → `c.nameBy`
 
-Use Edit tool per file. Do NOT use `sed` blind replace — there may be `Be` strings that mean other things (e.g. a master named "Bea"). Eyeball each diff.
+- [ ] **Step 15.2b: entities/ replacements**
 
-- [ ] **Step 15.3: Special case — `entities/master/api/load.ts` ad-hoc type**
+- `entities/master/api/load.ts` — lines 14, 24: drop ad-hoc `type Locale`, import from `@/i18n/routing`; replace `locale === "be"` and any `*Be` field accessors.
+- `entities/service/api/load.ts:28,34` — `locale === "be"` + `row.nameBe` / `row.blurbBe`.
+- `entities/site-settings/model/locale-fields.ts:8,21` — locale literal replacements.
+- `entities/site-settings/model/schema.ts` and `schema.test.ts:36` — if they reference "be" literals or *Be fields.
+- `entities/site-settings/model/types.ts` — any *Be field name in the type definition.
 
-Replace:
-```ts
-type Locale = "en" | "ru" | "be";
-```
-with:
-```ts
-import type { Locale } from "@/i18n/routing";
-```
-(Ensure it doesn't shadow another import.)
+- [ ] **Step 15.2c: features/ replacements (note: includes-fieldset is step 15.4)**
 
-- [ ] **Step 15.4: Special case — `features/services-admin/ui/includes-fieldset.tsx:85`**
+- `features/testimonials-admin/ui/testimonial-row.tsx:31,38` — `locale === "be"` + `row.masterNameBe` → `masterNameBy`; the `new Intl.DateTimeFormat("be", …)` literal becomes `new Intl.DateTimeFormat("be-BY", …)` (BCP-47 — Intl APIs need a valid tag, NOT `"by"`).
 
-The `onChange={(e) => update(i, "be", e.target.value)}` literal — change `"be"` → `"by"`. This is the JSON write path; without this, the admin form would save `{"en":"…","ru":"…","be":""}` against a schema that no longer reads `be`.
+- [ ] **Step 15.2d: views/ replacements**
 
-- [ ] **Step 15.5: Special case — `app/[locale]/layout.tsx` OG_LOCALE**
+- `views/booking/api/submit.ts:28` — `locale === "be"` + `service.nameBe` → `nameBy`.
+- `views/profile/ui/profile-page.tsx:99,114,139,146` — all four `locale === "be"` ternaries + their `*.nameBe` / `row.masterNameBe` accessors.
+- `views/profile/ui/profile-page.test.tsx` — fixture object `defaultLocale: "be"` (if any) + any `*Be` field on master/booking fixtures.
+- `views/home/ui/sections/atelier-motion.test.tsx:9,33` — the locale union and the `renderWithLocale("be", be)` call become `("by", by)` — also update the imported `be` symbol if the file aliases `import be from "@/messages/be.json"` → `import by from "@/messages/by.json"`.
 
-Already done in task 12.
+- [ ] **Step 15.2e: stories**
 
-- [ ] **Step 15.6: Lint + test**
+- `shared/ui/price/ui/price.stories.tsx:39` — `locale: "be"` → `locale: "by"`.
+- Any other `*.stories.tsx` with `locale: "be"` (re-run the grep from step 15.1).
+
+- [ ] **Step 15.2f: messages JSON LocaleSwitcher labels**
+
+Already handled by task 11 (key rename `LocaleSwitcher.be` → `LocaleSwitcher.by`). Re-grep to confirm.
+
+DO NOT use `sed` blind replace anywhere — there may be `Be` substrings that mean other things (e.g. a master named "Bea"). Eyeball each diff per Edit call.
+
+- [ ] **Step 15.3: Special case — `features/services-admin/ui/includes-fieldset.tsx:85`**
+
+The `onChange={(e) => update(i, "be", e.target.value)}` literal — change `"be"` → `"by"`. This is the JSON write path; without this, the admin form would save `{"en":"…","ru":"…","be":""}` against a schema that no longer reads `be`. Also scan the surrounding component for any `_be` references in the form fields/headers (e.g. label text or column index) and update.
+
+- [ ] **Step 15.4: Lint + test**
 
 ```
 npm run lint
 npx vitest run
 ```
 
-Expected: PASS. Surface any failing test files and rerun task 15 against the missed identifiers.
+Expected: PASS (mostly — e2e specs still need task 16). Surface any failing test files and rerun the relevant step against missed identifiers.
 
 ---
 
@@ -1126,6 +1203,14 @@ grep -rn "be.json\|messages/be" --include="*.ts" --include="*.tsx" .
 ```
 Expected: zero.
 
+- [ ] **Step 17.3: Sitemap sanity**
+
+```
+grep -n "be\|locales" app/sitemap.ts
+```
+
+`app/sitemap.ts` should iterate `routing.locales` (no `"be"` literals). The spec notes that crawler-indexed `/be/*` URLs reconcile via the 308 on next crawl — no code action here, just confirm there's no hardcoded `be`.
+
 ---
 
 ## Task 18 — proxy.ts: 308 redirect + NEXT_LOCALE cookie rewrite
@@ -1136,34 +1221,35 @@ Expected: zero.
 
 - [ ] **Step 18.1: Add failing tests**
 
-In `proxy.test.ts`, append:
+Append to `proxy.test.ts`, reusing the `fakeReq` helper from task 9:
 
 ```ts
-it("redirects /be → /by with 308", async () => {
-  getCachedDefaultLocale.mockResolvedValue("en");
+it("redirects /be → /by with 308 preserving the query string", async () => {
+  mocks.getCachedDefaultLocale.mockResolvedValue("en");
   const proxy = (await import("./proxy")).default;
-  const req = new Request("https://x.test/be/home?foo=bar", { redirect: "manual" });
-  const res = await proxy(req as unknown as NextRequest);
+  const res = await proxy(fakeReq("https://x.test/be/home?foo=bar"));
   expect(res.status).toBe(308);
   expect(res.headers.get("location")).toBe("https://x.test/by/home?foo=bar");
 });
 
-it("rewrites NEXT_LOCALE=be cookie before next-intl reads it", async () => {
-  getCachedDefaultLocale.mockResolvedValue("en");
+it("redirects bare /be (no trailing slash) to /by", async () => {
+  mocks.getCachedDefaultLocale.mockResolvedValue("en");
   const proxy = (await import("./proxy")).default;
-  const setCookie = vi.fn();
-  const getCookie = vi.fn().mockReturnValue({ value: "be" });
-  const req = {
-    url: "https://x.test/",
-    nextUrl: new URL("https://x.test/"),
-    cookies: { get: getCookie, set: setCookie },
-  } as unknown as NextRequest;
+  const res = await proxy(fakeReq("https://x.test/be"));
+  expect(res.status).toBe(308);
+  expect(res.headers.get("location")).toBe("https://x.test/by");
+});
+
+it("rewrites NEXT_LOCALE=be cookie on the incoming request before next-intl reads it", async () => {
+  mocks.getCachedDefaultLocale.mockResolvedValue("en");
+  const proxy = (await import("./proxy")).default;
+  const req = fakeReq("https://x.test/", "be");
   await proxy(req);
-  expect(setCookie).toHaveBeenCalledWith("NEXT_LOCALE", "by");
+  expect(req.cookies.get("NEXT_LOCALE")?.value).toBe("by");
 });
 ```
 
-Adjust to match `proxy.test.ts`'s actual mock surface — `NextRequest.cookies.set` is a real method on the Next.js side; if testing the wrapper interface is awkward, mock `req.cookies` as a Map-like.
+The cookie test asserts the rewrite at the request-cookie level; the e2e sweep in step 19.2 covers the end-to-end path (browser receives Set-Cookie with the new value via next-intl's normal flow). URL hashes are never sent to the server, so the spec's "preserve hash" is a non-concern — query strings are the actual portable surface.
 
 - [ ] **Step 18.2: Run to confirm fail**
 
