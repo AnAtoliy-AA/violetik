@@ -847,6 +847,7 @@ import {
 } from "@/db/bookings";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 import { getActiveGoogleToken } from "@/db/google-tokens";
+import { deleteCalendarEvent, refreshAccessToken } from "@/shared/lib/google-calendar";
 
 export type CancelBookingResult =
   | { ok: true }
@@ -884,20 +885,12 @@ export async function cancelBookingAction(
     }
 
     if (cancelled.gcalEventId) {
-      // Best-effort GCal cleanup — mirrors features/bookings-admin/api/actions.ts
+      // Best-effort GCal cleanup — verbatim from features/bookings-admin/api/actions.ts:32
       try {
         const token = await getActiveGoogleToken();
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
         if (token && clientId && clientSecret) {
-          const { refreshAccessToken } = await import("@/db/google-tokens");
-          const { deleteCalendarEvent } = await import(
-            "@/entities/studio/api/google-calendar"
-          ).catch(async () => ({
-            deleteCalendarEvent: (await import(
-              "@/features/google-calendar-connect/api/delete-calendar-event"
-            )).deleteCalendarEvent,
-          }));
           const { accessToken } = await refreshAccessToken({
             clientId,
             clientSecret,
@@ -926,12 +919,7 @@ export async function cancelBookingAction(
 }
 ```
 
-**Sanity check on the imports above before pasting blindly.** Run:
-```bash
-grep -rn 'deleteCalendarEvent\b' --include='*.ts' --include='*.tsx'
-grep -rn 'refreshAccessToken\b' --include='*.ts' --include='*.tsx'
-```
-The exact import paths in the project may differ from the speculative ones in the snippet. Wire your `cancelBookingAction` to whatever module owns these helpers today (the admin's `declineBooking` in [features/bookings-admin/api/actions.ts:32](../../../features/bookings-admin/api/actions.ts#L32) imports them directly — copy its top-of-file import lines verbatim). Replace the snippet's dynamic `import()` block with static top-level imports if that's how the admin path does it.
+The imports above are verified against [features/bookings-admin/api/actions.ts:5-10](../../../features/bookings-admin/api/actions.ts#L5-L10): `getActiveGoogleToken` from `@/db/google-tokens`, and `deleteCalendarEvent` + `refreshAccessToken` from the `@/shared/lib/google-calendar` barrel. No dynamic imports needed.
 
 - [ ] **Step 4: Create the slice index**
 
@@ -1808,7 +1796,7 @@ export function TestimonialForm({ masters, action }: TestimonialFormProps) {
       <button
         type="submit"
         disabled={pending}
-        className={cn(buttonClassName({ variant: "primary", size: "md" }))}
+        className={cn(buttonClassName({ variant: "solid", size: "md" }))}
       >
         {pending ? t("testimonial_form_submitting") : t("testimonial_form_submit")}
       </button>
@@ -1828,7 +1816,7 @@ export function TestimonialForm({ masters, action }: TestimonialFormProps) {
 
 function serverErrorMessage(
   reason: Exclude<SubmitTestimonialResult & { ok: false }, never>["reason"],
-  t: ReturnType<typeof useTranslations<"Profile">>,
+  t: (key: string) => string,
 ): string {
   switch (reason) {
     case "body_required":
@@ -1847,7 +1835,7 @@ function serverErrorMessage(
 }
 ```
 
-If `buttonClassName({ variant: "primary" })` doesn't exist with that variant name, swap for whatever the project's primary CTA uses (check existing forms like `features/studio-admin/ui/studio-form.tsx` for the canonical button class).
+The button variants are `solid | gold | outline | ghost` (verified in [shared/ui/button/ui/button.tsx:14](../../../shared/ui/button/ui/button.tsx#L14)); use `solid` for primary submit and `outline` for the cancel button in Task 7.
 
 - [ ] **Step 4: Create the story**
 
@@ -2232,13 +2220,17 @@ grep -rn 'studioFormSchema\|studio_admin' features/studio-admin/ entities/site-s
 
 - [ ] **Step 2: Extend the Zod schema with `telegramUsername`** (same regex as Task 12).
 
-- [ ] **Step 3: Add the input + state to the form** (mirror Task 12's input snippet).
+- [ ] **Step 3: Update `SiteSettings` type + `DEFAULT_SITE_SETTINGS` in [entities/site-settings/model/types.ts:34](../../../entities/site-settings/model/types.ts#L34)**
 
-- [ ] **Step 4: Wire the action + `db/site-settings.ts` update path** to include `telegramUsername` in the patch.
+Add `telegramUsername: string | null` to the `SiteSettings` interface. Add `telegramUsername: null,` to the `DEFAULT_SITE_SETTINGS` object. **This step is load-bearing** — both [features/studio-admin/ui/studio-form.test.tsx](../../../features/studio-admin/ui/studio-form.test.tsx) and [features/studio-admin/ui/studio-form.stories.tsx](../../../features/studio-admin/ui/studio-form.stories.tsx) spread `DEFAULT_SITE_SETTINGS`, so omitting this will break unrelated tests.
 
-- [ ] **Step 5: Add a rejection test to `studio-form.test.tsx`** (mirror Task 12's test).
+- [ ] **Step 4: Add the input + state to the form** (mirror Task 12's input snippet).
 
-- [ ] **Step 6: Run studio-admin tests**
+- [ ] **Step 5: Wire the action + `db/site-settings.ts` update path** to include `telegramUsername` in the patch.
+
+- [ ] **Step 6: Add a rejection test to `studio-form.test.tsx`** (mirror Task 12's test).
+
+- [ ] **Step 7: Run studio-admin tests**
 
 Run:
 ```bash
@@ -2246,7 +2238,7 @@ npx vitest run features/studio-admin entities/site-settings db/site-settings
 ```
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add features/studio-admin/ entities/site-settings/ db/site-settings.ts
