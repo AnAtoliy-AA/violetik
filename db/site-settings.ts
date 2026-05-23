@@ -19,6 +19,17 @@ function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
     discountPercent: row.discountPercent,
     discountActive: row.discountActive,
     currency: row.currency,
+    addressEn: row.addressEn,
+    addressRu: row.addressRu,
+    addressBe: row.addressBe,
+    country: row.country,
+    cityEn: row.cityEn,
+    cityRu: row.cityRu,
+    cityBe: row.cityBe,
+    timezone: row.timezone,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    mapVisible: row.mapVisible,
     updatedAt: row.updatedAt.toISOString(),
   };
 }
