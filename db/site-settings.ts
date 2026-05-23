@@ -30,6 +30,7 @@ function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
     latitude: row.latitude,
     longitude: row.longitude,
     mapVisible: row.mapVisible,
+    telegramUsername: row.telegramUsername ?? null,
     updatedAt: row.updatedAt.toISOString(),
   };
 }

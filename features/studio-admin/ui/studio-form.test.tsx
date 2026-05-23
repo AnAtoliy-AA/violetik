@@ -68,6 +68,16 @@ describe("StudioForm", () => {
     expect(await screen.findByText(/boom/i)).toBeInTheDocument();
   });
 
+  it("includes telegramUsername in the submitted patch", async () => {
+    const { submit } = renderForm();
+    fireEvent.change(screen.getByLabelText(/telegram username/i), {
+      target: { value: "violetta_studio" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    await waitFor(() => expect(submit).toHaveBeenCalledOnce());
+    expect(submit.mock.calls[0][0].telegramUsername).toBe("violetta_studio");
+  });
+
   it("warns via window.confirm when timezone is changed", async () => {
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
     renderForm();

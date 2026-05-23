@@ -22,6 +22,7 @@ export interface SiteSettings {
   latitude: number | null;
   longitude: number | null;
   mapVisible: boolean;
+  telegramUsername: string | null;
   updatedAt: string;
 }
 
@@ -49,5 +50,6 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = Object.freeze({
   latitude: null,
   longitude: null,
   mapVisible: false,
+  telegramUsername: null,
   updatedAt: new Date(0).toISOString(),
 });
