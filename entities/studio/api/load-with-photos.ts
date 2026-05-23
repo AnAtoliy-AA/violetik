@@ -8,7 +8,6 @@ import type {
   CustomerProfile,
   GalleryItem,
   ImageAsset,
-  Testimonial,
 } from "../model/types";
 import { getStudioPhoto, getStudioPhotos } from "@/db/studio-photos";
 import type { PhotoSlotKind } from "@/db/schema";
@@ -28,15 +27,6 @@ export async function loadGalleryWithPhotos(): Promise<GalleryItem[]> {
   return STUDIO_DATA.gallery.map((g) => ({
     ...g,
     image: photos.get(g.id) ?? g.image,
-  }));
-}
-
-/** Returns the testimonials list with `avatar` populated. */
-export async function loadTestimonialsWithPhotos(): Promise<Testimonial[]> {
-  const photos = await imagesByKind("testimonial");
-  return STUDIO_DATA.testimonials.map((t) => ({
-    ...t,
-    avatar: photos.get(t.id) ?? t.avatar,
   }));
 }
 

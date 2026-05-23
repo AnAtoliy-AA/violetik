@@ -4,7 +4,6 @@ import type {
   GalleryItem,
   MembershipTier,
   StudioInfo,
-  Testimonial,
   Visit,
 } from "./types";
 
@@ -24,29 +23,6 @@ const gallery: GalleryItem[] = [
   { id: "g6", tag: "Editorial", palette: ["#7d3a6f", "#14091a"], h: 300 },
   { id: "g7", tag: "Bridal", palette: ["#f3ead8", "#d9a3b6"], h: 220 },
   { id: "g8", tag: "Gel", palette: ["#9d7bc7", "#c9a96e"], h: 250 },
-];
-
-const testimonials: Testimonial[] = [
-  {
-    id: "t1",
-    name: "Lara K.",
-    role: "Member · 3y",
-    text:
-      "It's a ritual, not a manicure. The studio smells of fig and amber. I never go anywhere else.",
-  },
-  {
-    id: "t2",
-    name: "Iris M.",
-    role: "Member · 1y",
-    text:
-      "Violetta's hands are a museum. I came for nails and left with art on my fingertips.",
-  },
-  {
-    id: "t3",
-    name: "Joelle P.",
-    role: "Member · 2y",
-    text: "Quiet, private, exquisite. The kind of hour you don't share — you keep.",
-  },
 ];
 
 const membership: MembershipTier[] = [
@@ -137,7 +113,6 @@ const atelierClips: AtelierClip[] = [
 export const STUDIO_DATA = {
   studio,
   gallery,
-  testimonials,
   membership,
   profile,
   visits,

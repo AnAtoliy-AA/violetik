@@ -8,7 +8,6 @@ export type {
   ImageAsset,
   MembershipTier,
   StudioInfo,
-  Testimonial,
   VideoAsset,
   Visit,
   VisitStatus,
