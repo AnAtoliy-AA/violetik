@@ -99,7 +99,13 @@ export function AppHeader({
   );
 
   return (
-    <header className={cn(className)} {...rest}>
+    <header
+      className={cn(
+        "sticky top-0 z-40 bg-bg/85 backdrop-blur",
+        className,
+      )}
+      {...rest}
+    >
       <div className="relative flex items-center justify-between px-[22px] pb-2 pt-[10px]">
         <div className="flex items-center gap-3">
           {left}
