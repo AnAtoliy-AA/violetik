@@ -82,46 +82,48 @@ export function MasterPage({
 
       <div className="relative px-[22px]">
         <Aurora intensity="subtle" />
-        <div className="gilded-lift glass-top relative aspect-[1/1.2] overflow-hidden rounded-[28px]">
-          {artist.image ? (
-            <Image
-              src={artist.image.src}
-              alt={artist.image.alt ?? artist.name}
-              fill
-              priority
-              sizes="(max-width: 420px) 100vw, 420px"
-              placeholder={artist.image.blurDataURL ? "blur" : undefined}
-              blurDataURL={artist.image.blurDataURL}
-              className="object-cover"
-            />
-          ) : (
+        <div className="mx-auto max-w-[320px] md:max-w-[400px]">
+          <div className="gilded-lift glass-top relative aspect-[1/1] overflow-hidden rounded-[28px]">
+            {artist.image ? (
+              <Image
+                src={artist.image.src}
+                alt={artist.image.alt ?? artist.name}
+                fill
+                priority
+                sizes="(max-width: 420px) 100vw, 420px"
+                placeholder={artist.image.blurDataURL ? "blur" : undefined}
+                blurDataURL={artist.image.blurDataURL}
+                className="object-cover"
+              />
+            ) : (
+              <div
+                aria-hidden
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 65% 60% at 50% 35%, #f3ead8 0%, #c9a96e 30%, #7d3a6f 70%, #14091a 100%)",
+                }}
+              />
+            )}
+            <PaperGrain className="opacity-[0.06]" />
             <div
               aria-hidden
               className="absolute inset-0"
               style={{
                 background:
-                  "radial-gradient(ellipse 65% 60% at 50% 35%, #f3ead8 0%, #c9a96e 30%, #7d3a6f 70%, #14091a 100%)",
+                  "linear-gradient(to bottom, transparent 40%, color-mix(in oklab, var(--color-bg) 90%, transparent))",
               }}
             />
-          )}
-          <PaperGrain className="opacity-[0.06]" />
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to bottom, transparent 40%, color-mix(in oklab, var(--color-bg) 90%, transparent))",
-            }}
-          />
-          <div className="absolute left-[18px] top-[18px]">
-            <Eyebrow gold>{t("frame_mark")}</Eyebrow>
-          </div>
-          <div className="absolute inset-x-[18px] bottom-[18px]">
-            <h1 className="m-0 font-display text-h1 font-light italic leading-[0.96] tracking-[-0.02em]">
-              {firstName}
-              <br />
-              <span className="not-italic">{lastName}.</span>
-            </h1>
+            <div className="absolute left-[18px] top-[18px]">
+              <Eyebrow gold>{t("frame_mark")}</Eyebrow>
+            </div>
+            <div className="absolute inset-x-[18px] bottom-[18px]">
+              <h1 className="m-0 font-display text-h1 font-light italic leading-[0.96] tracking-[-0.02em]">
+                {firstName}
+                <br />
+                <span className="not-italic">{lastName}.</span>
+              </h1>
+            </div>
           </div>
         </div>
       </div>
