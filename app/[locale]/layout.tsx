@@ -4,7 +4,10 @@ import { Cormorant_Garamond, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import type { Locale } from "@/i18n/routing";
+import { cityForLocale } from "@/entities/site-settings";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import { LocalBusinessJsonLd } from "@/shared/ui/local-business-jsonld";
 import "../globals.css";
 
 const SITE_URL =
@@ -53,25 +56,35 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Site" });
-  const name = t("name");
-  const description = t("description");
+  const settings = await getSiteSettingsServer();
+  const typedLocale = locale as Locale;
+  const city = cityForLocale(settings, typedLocale);
+
+  const baseName = t("name");
+  const baseDescription = t("description");
+  const title = city ? t("meta_title_with_city", { city }) : baseName;
+  const description = city
+    ? t("meta_description_with_city", { city })
+    : baseDescription;
+  const keywords = city ? t("meta_keywords_with_city", { city }) : undefined;
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: name,
+    title,
     description,
+    keywords,
     manifest: "/manifest.webmanifest",
     openGraph: {
-      title: name,
+      title,
       description,
       type: "website",
-      siteName: name,
+      siteName: baseName,
       locale: OG_LOCALE[locale] ?? OG_LOCALE.en,
       url: `${SITE_URL}/${locale}`,
     },
     twitter: {
       card: "summary_large_image",
-      title: name,
+      title,
       description,
     },
     icons: {
@@ -101,6 +114,7 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
+  const tSite = await getTranslations({ locale, namespace: "Site" });
   const settings = await getSiteSettingsServer();
 
   return (
@@ -110,6 +124,12 @@ export default async function LocaleLayout({
       className={`${cormorant.variable} ${dmSans.variable} ${jetBrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <LocalBusinessJsonLd
+          settings={settings}
+          locale={locale as Locale}
+          siteUrl={SITE_URL}
+          name={tSite("name")}
+        />
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>

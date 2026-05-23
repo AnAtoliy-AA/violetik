@@ -370,7 +370,10 @@
     "name": "Violetta Beauty",
     "description": "Прыватнае нэйл-атэлье — адно крэсла, адна гадзіна, адзін ціхі рытуал за раз.",
     "tagline": "Прыватнае нэйл-атэлье",
-    "og_title": "Violetta Beauty"
+    "og_title": "Violetta Beauty",
+    "meta_title_with_city": "Violetta — манікюр і прыгажосць у {city}",
+    "meta_description_with_city": "Студыя дызайну пазногцяў у {city}. Манікюр, гель, дызайн — якасна і даступна.",
+    "meta_keywords_with_city": "манікюр {city}, пазногці {city}, прыгажосць {city}, гель {city}, недарагі якасны манікюр {city}"
   },
   "Error": {
     "meta_title": "Нешта зрушылася",

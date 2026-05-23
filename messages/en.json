@@ -370,7 +370,10 @@
     "name": "Violetta Beauty",
     "description": "A private nail atelier — one chair, one hour, one quiet ritual at a time.",
     "tagline": "A private nail atelier",
-    "og_title": "Violetta Beauty"
+    "og_title": "Violetta Beauty",
+    "meta_title_with_city": "Violetta — nails & beauty in {city}",
+    "meta_description_with_city": "Editorial nail design in {city}. Manicure, gel, design — quality work at fair prices.",
+    "meta_keywords_with_city": "{city} nails, {city} manicure, {city} beauty, {city} gel, cheap quality nails {city}"
   },
   "Error": {
     "meta_title": "Something slipped",
