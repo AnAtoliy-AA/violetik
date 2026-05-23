@@ -292,6 +292,8 @@
     "inbox_services_caption": "Меню, категории, фото",
     "inbox_masters": "Мастера",
     "inbox_masters_caption": "Добавляйте, редактируйте и архивируйте команду ателье",
+    "inbox_studio": "Студия",
+    "inbox_studio_caption": "Адрес, карта, часовой пояс",
     "photos": {
       "plate_title": "Фотографии",
       "eyebrow": "Изображения студии",
@@ -322,6 +324,34 @@
       "upload_error_validation": "Заполните все поля",
       "edit_service": "Редактировать"
     }
+  },
+  "AdminStudio": {
+    "meta_title": "Студия",
+    "plate_title": "Студия",
+    "section_address": "Адрес",
+    "section_country": "Страна",
+    "section_city": "Город",
+    "section_coords": "Координаты",
+    "section_timezone": "Часовой пояс",
+    "section_map_visible": "Карта",
+    "label_address_en": "Адрес (английский)",
+    "label_address_ru": "Адрес (русский)",
+    "label_address_be": "Адрес (белорусский)",
+    "label_country": "Страна",
+    "label_city_en": "Город (английский)",
+    "label_city_ru": "Город (русский)",
+    "label_city_be": "Город (белорусский)",
+    "label_latitude": "Широта",
+    "label_longitude": "Долгота",
+    "label_timezone": "Часовой пояс",
+    "label_show_map": "Показывать карту на главной",
+    "coords_hint": "В Google Maps щёлкните правой кнопкой по студии → нажмите на координаты, чтобы скопировать.",
+    "preview_pin": "Посмотреть метку в OpenStreetMap →",
+    "map_visible_disabled_hint": "Сначала введите координаты",
+    "timezone_confirm": "Смена часового пояса повлияет на время записи у гостей. Продолжить?",
+    "save": "Сохранить",
+    "saved": "Сохранено",
+    "error": "Не удалось сохранить: {error}"
   },
   "AtelierHours": {
     "open_until": "Открыто · до {time}",

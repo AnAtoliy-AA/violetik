@@ -292,6 +292,8 @@
     "inbox_services_caption": "Menu, categories, photos",
     "inbox_masters": "Masters",
     "inbox_masters_caption": "Add, edit, archive the team behind the chair",
+    "inbox_studio": "Studio",
+    "inbox_studio_caption": "Address, map, timezone",
     "photos": {
       "plate_title": "Photography",
       "eyebrow": "Studio imagery",
@@ -322,6 +324,34 @@
       "upload_error_validation": "Some fields are missing",
       "edit_service": "Edit service"
     }
+  },
+  "AdminStudio": {
+    "meta_title": "Studio",
+    "plate_title": "Studio",
+    "section_address": "Address",
+    "section_country": "Country",
+    "section_city": "City / town",
+    "section_coords": "Coordinates",
+    "section_timezone": "Timezone",
+    "section_map_visible": "Map",
+    "label_address_en": "Address (English)",
+    "label_address_ru": "Address (Russian)",
+    "label_address_be": "Address (Belarusian)",
+    "label_country": "Country",
+    "label_city_en": "City (English)",
+    "label_city_ru": "City (Russian)",
+    "label_city_be": "City (Belarusian)",
+    "label_latitude": "Latitude",
+    "label_longitude": "Longitude",
+    "label_timezone": "Timezone",
+    "label_show_map": "Show map on home",
+    "coords_hint": "Right-click your studio in Google Maps → click the coords to copy.",
+    "preview_pin": "Preview the pin on OpenStreetMap →",
+    "map_visible_disabled_hint": "Add coordinates first",
+    "timezone_confirm": "Changing the timezone affects how upcoming booking times appear to guests. Continue?",
+    "save": "Save",
+    "saved": "Saved",
+    "error": "Save failed: {error}"
   },
   "AtelierHours": {
     "open_until": "Open · until {time}",
