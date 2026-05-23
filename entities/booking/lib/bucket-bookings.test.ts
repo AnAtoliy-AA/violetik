@@ -1,18 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { bucketBookings } from "./bucket-bookings";
-import type { UserBookingRow } from "@/db/bookings";
+import type { UserBookingRow } from "../model/types";
 
 function row(
-  overrides: Partial<UserBookingRow> & { id: string; scheduledFor: Date; status: UserBookingRow["status"] },
+  overrides: Partial<UserBookingRow> & {
+    id: string;
+    scheduledFor: Date;
+    status: UserBookingRow["status"];
+  },
 ): UserBookingRow {
   return {
-    id: overrides.id,
     userId: "tg:1",
     serviceId: "svc",
     masterId: null,
-    scheduledFor: overrides.scheduledFor,
     durationMinutes: 60,
-    status: overrides.status,
     gcalEventId: null,
     notes: null,
     createdAt: new Date(0),
