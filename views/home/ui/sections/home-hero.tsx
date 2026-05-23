@@ -10,13 +10,11 @@ import {
 } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
-import { NailFan } from "@/shared/ui/nail-fan";
-import { PaperGrain } from "@/shared/ui/paper-grain";
+import { FlameMonogram } from "@/shared/ui/flame-monogram";
 
 export function HomeHero() {
   const t = useTranslations("Home");
@@ -42,10 +40,15 @@ export function HomeHero() {
 
   return (
     <div className="relative">
-      <Aurora intensity="subtle" />
-      <PaperGrain />
+      {/* Aurora + PaperGrain live on the parent <section> now so they bleed
+       * to the section's full width (including the padding zone) rather than
+       * being clipped to this inner content box. */}
+      {/* Text block stays in a narrow column on the left so the title +
+       * paragraph remain readable on wide viewports. The FlameMonogram below
+       * anchors to this full-width relative container so its `-right-10` puts
+       * it at the section's right edge (inset by the section's padding). */}
       <motion.div
-        className="relative z-10 mt-9 max-w-[calc(100%-120px)]"
+        className="relative z-10 mt-9 max-w-[760px]"
         style={styledHero}
       >
         <Eyebrow>—— {t("hero_cover_story")}</Eyebrow>
@@ -63,8 +66,8 @@ export function HomeHero() {
             {t("hero_title_word")}
           </span>
         </h1>
-        <LetterpressRule className="mt-5 max-w-[260px]" />
-        <p className="dropcap mt-6 max-w-[320px] text-[14.5px] leading-[1.55] text-text-2">
+        <LetterpressRule className="mt-5 max-w-[440px]" />
+        <p className="dropcap mt-6 max-w-[540px] text-[14.5px] leading-[1.55] text-text-2">
           {t("hero_paragraph")}
         </p>
         <div className="mt-7 flex gap-2.5">
@@ -87,10 +90,10 @@ export function HomeHero() {
 
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -right-10 top-[60px] z-0 h-[250px] w-[190px] rotate-[10deg]"
+        className="pointer-events-none absolute -right-10 top-[60px] z-0 h-[250px] w-[190px]"
         style={styledFan}
       >
-        <NailFan palette={["#c9a96e", "#7d3a6f"]} className="size-full" />
+        <FlameMonogram />
       </motion.div>
     </div>
   );

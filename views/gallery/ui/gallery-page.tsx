@@ -86,8 +86,8 @@ export function GalleryPage({ items }: GalleryPageProps = {}) {
           <h1 className="mt-3 font-display text-h1 font-light italic leading-[0.95] tracking-[-0.025em]">
             {t("hero_title")}
           </h1>
-          <LetterpressRule className="mt-3.5 max-w-[260px]" />
-          <p className="dropcap mt-4 max-w-[320px] text-[14px] text-text-2">
+          <LetterpressRule className="mt-3.5 max-w-[440px]" />
+          <p className="dropcap mt-4 max-w-[540px] text-[14px] text-text-2">
             {t("hero_paragraph")}
           </p>
         </div>

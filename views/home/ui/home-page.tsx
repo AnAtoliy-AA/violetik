@@ -2,6 +2,8 @@ import { AppHeader } from "@/widgets/app-header";
 import { AtelierHours } from "@/widgets/atelier-hours";
 import { TabBar } from "@/widgets/tab-bar";
 import type { Master } from "@/entities/master";
+import { Aurora } from "@/shared/ui/aurora";
+import { PaperGrain } from "@/shared/ui/paper-grain";
 import { AnnouncementCapsule } from "./sections/announcement-capsule";
 import { AtelierMotion } from "./sections/atelier-motion";
 import { GalleryStrip } from "./sections/gallery-strip";
@@ -21,7 +23,9 @@ export function HomePage({ master }: HomePageProps = {}) {
     <div className="pb-28">
       <AppHeader />
       <AtelierHours />
-      <section className="relative px-[22px] pb-9 pt-2.5">
+      <section className="relative px-[22px] pb-9 pt-2.5 md:px-12 md:pb-14 md:pt-6">
+        <Aurora intensity="subtle" />
+        <PaperGrain />
         <HomeHero />
       </section>
       <AnnouncementCapsule />

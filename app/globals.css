@@ -414,6 +414,41 @@
   }
 }
 
+/* Metaball flame: a single ember rises from the base and fades near the top.
+ * Combined with siblings on randomized delays inside a `blur + contrast`
+ * container, the embers coalesce into a wavering flame silhouette. */
+@keyframes flameRise {
+  0%,
+  15% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  85%,
+  100% {
+    transform: translate(0, -200px);
+    opacity: 0;
+  }
+}
+
+/* Free sparks fly off the flame body — they rise faster than the metaball
+ * embers and drift horizontally by a per-spark amount supplied via the
+ * `--sparkDriftX` CSS variable. They fade in briefly then fade out near the
+ * apex so they read as individual points of light, not particles snapping
+ * in and out. */
+@keyframes sparkRise {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(var(--sparkDriftX, 0px), -230px);
+    opacity: 0;
+  }
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);
@@ -471,7 +506,7 @@ body {
     animation: none;
   }
   .spotlight::after,
-  .stroke-draw {
+  .stroke-draw::after {
     transition: none !important;
   }
   *,
@@ -541,19 +576,27 @@ body {
   opacity: 1;
 }
 
-/* Stroke-drawn underline for italic display text. Toggle with [data-revealed="true"]. */
+/* Stroke-drawn underline for italic display text. Toggle with [data-revealed="true"].
+ * Uses ::after so the element's own background stays free for siblings like .text-gold-shimmer. */
 .stroke-draw {
-  background-image: linear-gradient(
-    transparent calc(100% - 1px),
-    currentColor 1px
-  );
-  background-size: 0% 100%;
-  background-repeat: no-repeat;
-  transition: background-size 700ms var(--ease-out);
+  position: relative;
+  display: inline-block;
 }
-.stroke-draw:hover,
-.stroke-draw[data-revealed="true"] {
-  background-size: 100% 100%;
+.stroke-draw::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 700ms var(--ease-out);
+}
+.stroke-draw:hover::after,
+.stroke-draw[data-revealed="true"]::after {
+  transform: scaleX(1);
 }
 
 /* Edge-lit gilded card — gilded with a soft gold glow + 2px lift on hover. */
