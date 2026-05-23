@@ -18,21 +18,25 @@ describe("generateTestimonialId", () => {
 });
 
 describe("createTestimonial (no DB)", () => {
-  it("returns null when DATABASE_URL is unset", async () => {
-    if (process.env.DATABASE_URL) return; // skip when DB is configured
-    const row = await createTestimonial({
-      userId: "tg:1",
-      masterId: "m1",
-      body: "Hello",
-    });
-    expect(row).toBeNull();
-  });
+  it.skipIf(Boolean(process.env.DATABASE_URL))(
+    "returns null when DATABASE_URL is unset",
+    async () => {
+      const row = await createTestimonial({
+        userId: "tg:1",
+        masterId: "m1",
+        body: "Hello",
+      });
+      expect(row).toBeNull();
+    },
+  );
 });
 
 describe("listUserTestimonials (no DB)", () => {
-  it("returns an empty array when DATABASE_URL is unset", async () => {
-    if (process.env.DATABASE_URL) return;
-    const rows = await listUserTestimonials("tg:1");
-    expect(rows).toEqual([]);
-  });
+  it.skipIf(Boolean(process.env.DATABASE_URL))(
+    "returns an empty array when DATABASE_URL is unset",
+    async () => {
+      const rows = await listUserTestimonials("tg:1");
+      expect(rows).toEqual([]);
+    },
+  );
 });
