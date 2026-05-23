@@ -1,36 +1,23 @@
 import { test, expect } from "@playwright/test";
 
-test("renders the profile hero at /en/profile", async ({ page }) => {
+// The profile page now requires a real session (replaces the previous
+// mock-rendering pre-Task-15 behaviour). Playwright CI runs without
+// TELEGRAM_BOT_TOKEN, so there's no sign-in fixture — v1 e2e covers
+// only the anonymous-redirect contract. Authenticated-flow coverage
+// lives at the unit + RTL layer (see views/profile/ui/profile-page.test.tsx).
+
+test("anonymous visit to /en/profile redirects to /en/sign-in with callbackUrl", async ({
+  page,
+}) => {
   await page.goto("/en/profile");
-  await expect(
-    page.getByRole("heading", { level: 1, name: /Lara K\./ }),
-  ).toBeVisible();
-  await expect(page.getByText(/Joined in 2024/)).toBeVisible();
+  await expect(page).toHaveURL(/\/en\/sign-in/);
+  expect(page.url()).toMatch(/callbackUrl=(\/en\/profile|%2Fen%2Fprofile)/);
 });
 
-test("shows next-visit card with service and countdown", async ({ page }) => {
-  await page.goto("/en/profile");
-  const card = page.getByRole("article", { name: /Next visit/i });
-  await expect(card).toBeVisible();
-  await expect(card.getByText("Couture Gel")).toBeVisible();
-  await expect(card.getByText(/In 4 days/i)).toBeVisible();
-});
-
-test("quick-links nav routes to the canonical sections", async ({ page }) => {
-  await page.goto("/en/profile");
-  const nav = page.getByRole("navigation", { name: /Account links/i });
-  await expect(
-    nav.getByRole("link", { name: /My bookings/i }),
-  ).toHaveAttribute("href", /\/en\/booking\/service$/);
-  await expect(
-    nav.getByRole("link", { name: /Member card/i }),
-  ).toHaveAttribute("href", /\/en\/membership$/);
-});
-
-test("renders the Belarusian profile labels at /be/profile", async ({
+test("anonymous visit to /be/profile redirects to /be/sign-in with callbackUrl", async ({
   page,
 }) => {
   await page.goto("/be/profile");
-  await expect(page.getByText(/Далучылася ў/i)).toBeVisible();
-  await expect(page.getByText(/Наступны візіт/i)).toBeVisible();
+  await expect(page).toHaveURL(/\/be\/sign-in/);
+  expect(page.url()).toMatch(/callbackUrl=(\/be\/profile|%2Fbe%2Fprofile)/);
 });
