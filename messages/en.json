@@ -295,6 +295,7 @@
     "inbox_title": "Inbox",
     "inbox_bookings": "Bookings",
     "inbox_vip_requests": "VIP requests",
+    "inbox_testimonials": "Testimonials",
     "inbox_pending_suffix": "pending",
     "inbox_site_settings": "Site settings",
     "inbox_site_settings_caption": "Defaults & pricing",
@@ -458,6 +459,25 @@
     "cta_show_all_expired": "Show all {total}",
     "expires_in_days": "expires in {n}d",
     "expired_ago_days": "expired {n}d ago"
+  },
+  "AdminTestimonials": {
+    "meta_title": "Testimonials",
+    "eyebrow": "Moderation",
+    "hero_title": "Pending reviews",
+    "hero_paragraph": "Approve to publish on the master page and home. Reject to keep the submitter informed without going live.",
+    "section_pending": "Pending ({n})",
+    "section_approved": "Approved ({n})",
+    "section_rejected": "Rejected ({n})",
+    "empty_pending": "No pending reviews. New submissions land here.",
+    "empty_approved": "Nothing approved yet.",
+    "empty_rejected": "No rejected reviews.",
+    "submitted_at": "Submitted",
+    "decided_at": "Decided",
+    "status_pending": "Pending",
+    "status_approved": "Approved",
+    "status_rejected": "Rejected",
+    "cta_approve": "Approve",
+    "cta_reject": "Reject"
   },
   "AdminGoogle": {
     "meta_title": "Google Calendar",

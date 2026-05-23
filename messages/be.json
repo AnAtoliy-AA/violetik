@@ -295,6 +295,7 @@
     "inbox_title": "Уваходныя",
     "inbox_bookings": "Запісы",
     "inbox_vip_requests": "Заяўкі на VIP",
+    "inbox_testimonials": "Водгукі",
     "inbox_pending_suffix": "чакаюць",
     "inbox_site_settings": "Налады сайта",
     "inbox_site_settings_caption": "Змаўчанні і цэны",
@@ -458,6 +459,25 @@
     "cta_show_all_expired": "Паказаць усе {total}",
     "expires_in_days": "заканчваецца праз {n}д",
     "expired_ago_days": "закончылася {n}д таму"
+  },
+  "AdminTestimonials": {
+    "meta_title": "Водгукі",
+    "eyebrow": "Мадэрацыя",
+    "hero_title": "Водгукі на праверцы",
+    "hero_paragraph": "Адобрыце, каб апублікаваць на старонцы майстра і на галоўнай. Адхіліце, каб паведаміць аўтару без публікацыі.",
+    "section_pending": "На праверцы ({n})",
+    "section_approved": "Апублікаваныя ({n})",
+    "section_rejected": "Адхіленыя ({n})",
+    "empty_pending": "Новых водгукаў няма. Новыя паступленні з'явяцца тут.",
+    "empty_approved": "Пакуль нічога не апублікавана.",
+    "empty_rejected": "Адхіленых водгукаў няма.",
+    "submitted_at": "Пададзены",
+    "decided_at": "Вырашана",
+    "status_pending": "На праверцы",
+    "status_approved": "Апублікаваны",
+    "status_rejected": "Адхілены",
+    "cta_approve": "Адобрыць",
+    "cta_reject": "Адхіліць"
   },
   "AdminGoogle": {
     "meta_title": "Google Каляндар",
