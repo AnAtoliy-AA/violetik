@@ -11,6 +11,17 @@ export interface SiteSettings {
   discountPercent: number;
   discountActive: boolean;
   currency: CurrencyCode;
+  addressEn: string;
+  addressRu: string;
+  addressBe: string;
+  country: string;
+  cityEn: string;
+  cityRu: string;
+  cityBe: string;
+  timezone: string;
+  latitude: number | null;
+  longitude: number | null;
+  mapVisible: boolean;
   updatedAt: string;
 }
 
@@ -27,5 +38,16 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = Object.freeze({
   discountPercent: 0,
   discountActive: false,
   currency: "EUR" as CurrencyCode,
+  addressEn: "By appointment · Verbena Lane 14, Studio B",
+  addressRu: "По записи · Verbena Lane 14, Studio B",
+  addressBe: "Па запісу · Verbena Lane 14, Studio B",
+  country: "BY",
+  cityEn: "",
+  cityRu: "",
+  cityBe: "",
+  timezone: "Europe/Minsk",
+  latitude: null,
+  longitude: null,
+  mapVisible: false,
   updatedAt: new Date(0).toISOString(),
 });

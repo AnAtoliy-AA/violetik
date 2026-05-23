@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { _toService } from "./load";
 import type { Service as DbService, ServiceCategoryRow } from "@/db/schema";
-import type { SiteSettings } from "@/entities/site-settings";
+import { DEFAULT_SITE_SETTINGS, type SiteSettings } from "@/entities/site-settings";
 
 const baseSettings: SiteSettings = {
+  ...DEFAULT_SITE_SETTINGS,
   defaultPalette: "aubergine",
   defaultLocale: "en",
   priceOverrides: {},

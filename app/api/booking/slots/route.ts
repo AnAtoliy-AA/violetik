@@ -1,10 +1,11 @@
 import {
   WEEKLY_DEFAULT_HOURS,
-  bookingTimeZone,
+  bookingTimeZoneFromSettings,
   computeAvailableSlots,
   fetchBusyWindows,
   refreshAccessToken,
 } from "@/shared/lib/google-calendar";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import {
   getActiveGoogleToken,
   updateLastRefresh,
@@ -24,9 +25,12 @@ export async function GET(req: Request): Promise<Response> {
     return Response.json({ error: "missing_params" }, { status: 400 });
   }
 
-  const service = await getServiceById(serviceId);
+  const [service, settings] = await Promise.all([
+    getServiceById(serviceId),
+    getSiteSettingsServer(),
+  ]);
   const durationMin = service?.durationMinutes ?? DEFAULT_DURATION_MIN;
-  const tz = bookingTimeZone();
+  const tz = bookingTimeZoneFromSettings(settings);
   const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
   const cacheKey = `${calendarId}:${dayISO}:${durationMin}`;
   const cached = slotCache.get(cacheKey);

@@ -7,3 +7,8 @@ export type {
 } from "./model/types";
 export { siteSettingsPatchSchema } from "./model/schema";
 export type { SiteSettingsPatch } from "./model/schema";
+export {
+  cityForLocale,
+  addressForLocale,
+  studioLocationLine,
+} from "./model/locale-fields";

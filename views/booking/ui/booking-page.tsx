@@ -53,6 +53,7 @@ export interface BookingPageProps {
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
   currency?: CurrencyCode;
   masters: readonly Master[];
+  location: string;
 }
 
 export function BookingPage({
@@ -61,6 +62,7 @@ export function BookingPage({
   pricedServices,
   currency = "EUR",
   masters,
+  location,
 }: BookingPageProps) {
   const t = useTranslations("Booking");
   const tSteps = useTranslations("Booking.steps");
@@ -160,6 +162,7 @@ export function BookingPage({
                 pricedServices={pricedServices}
                 currency={currency}
                 masters={masters}
+                location={location}
               />
             ) : null}
           </motion.div>

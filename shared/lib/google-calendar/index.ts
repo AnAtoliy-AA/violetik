@@ -8,9 +8,11 @@ export {
   revokeToken,
 } from "./oauth";
 export {
-  WEEKLY_DEFAULT_HOURS,
-  DEFAULT_TIMEZONE,
   bookingTimeZone,
+  bookingTimeZoneFromSettings,
+  bookingTimeZoneFallback,
+  DEFAULT_TIMEZONE,
+  WEEKLY_DEFAULT_HOURS,
 } from "./working-hours";
 export type {
   WorkingWindow,

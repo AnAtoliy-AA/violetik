@@ -292,6 +292,8 @@
     "inbox_services_caption": "Menu, categories, photos",
     "inbox_masters": "Masters",
     "inbox_masters_caption": "Add, edit, archive the team behind the chair",
+    "inbox_studio": "Studio",
+    "inbox_studio_caption": "Address, map, timezone",
     "photos": {
       "plate_title": "Photography",
       "eyebrow": "Studio imagery",
@@ -323,6 +325,34 @@
       "edit_service": "Edit service"
     }
   },
+  "AdminStudio": {
+    "meta_title": "Studio",
+    "plate_title": "Studio",
+    "section_address": "Address",
+    "section_country": "Country",
+    "section_city": "City / town",
+    "section_coords": "Coordinates",
+    "section_timezone": "Timezone",
+    "section_map_visible": "Map",
+    "label_address_en": "Address (English)",
+    "label_address_ru": "Address (Russian)",
+    "label_address_be": "Address (Belarusian)",
+    "label_country": "Country",
+    "label_city_en": "City (English)",
+    "label_city_ru": "City (Russian)",
+    "label_city_be": "City (Belarusian)",
+    "label_latitude": "Latitude",
+    "label_longitude": "Longitude",
+    "label_timezone": "Timezone",
+    "label_show_map": "Show map on home",
+    "coords_hint": "Right-click your studio in Google Maps → click the coords to copy.",
+    "preview_pin": "Preview the pin on OpenStreetMap →",
+    "map_visible_disabled_hint": "Add coordinates first",
+    "timezone_confirm": "Changing the timezone affects how upcoming booking times appear to guests. Continue?",
+    "save": "Save",
+    "saved": "Saved",
+    "error": "Save failed: {error}"
+  },
   "AtelierHours": {
     "open_until": "Open · until {time}",
     "opens_on": "Closed · opens {day} at {time}"
@@ -340,7 +370,10 @@
     "name": "Violetta Beauty",
     "description": "A private nail atelier — one chair, one hour, one quiet ritual at a time.",
     "tagline": "A private nail atelier",
-    "og_title": "Violetta Beauty"
+    "og_title": "Violetta Beauty",
+    "meta_title_with_city": "Violetta — nails & beauty in {city}",
+    "meta_description_with_city": "Editorial nail design in {city}. Manicure, gel, design — quality work at fair prices.",
+    "meta_keywords_with_city": "{city} nails, {city} manicure, {city} beauty, {city} gel, cheap quality nails {city}"
   },
   "Error": {
     "meta_title": "Something slipped",
@@ -511,5 +544,10 @@
     "validation_slug_invalid": "Lowercase letters, numbers, hyphens only.",
     "empty_published": "No published masters yet.",
     "empty_archived": "Nothing in the archive."
+  },
+  "Footer": {
+    "map_aria": "Studio location",
+    "map_title": "Studio location",
+    "get_directions": "Get directions"
   }
 }

@@ -3,7 +3,9 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { ConfirmationPage } from "@/views/confirmation";
 import { getBookingById } from "@/db/bookings";
 import { loadServiceByIdForLocale } from "@/entities/service/api/load";
-import { bookingTimeZone } from "@/shared/lib/google-calendar";
+import { studioLocationLine } from "@/entities/site-settings";
+import { bookingTimeZoneFromSettings } from "@/shared/lib/google-calendar";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { routing, type Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
@@ -55,19 +57,22 @@ export default async function ConfirmationRoute({
   const { id } = await searchParams;
   setRequestLocale(locale);
 
+  const safeLocale = (routing.locales as readonly string[]).includes(locale)
+    ? (locale as Locale)
+    : routing.defaultLocale;
+  const settings = await getSiteSettingsServer();
+  const location = studioLocationLine(settings, safeLocale);
+
   if (!id) {
-    return <ConfirmationPage />;
+    return <ConfirmationPage location={location} />;
   }
 
   const booking = await getBookingById(id);
   if (!booking) {
-    return <ConfirmationPage />;
+    return <ConfirmationPage location={location} />;
   }
 
-  const tz = bookingTimeZone();
-  const safeLocale = (routing.locales as readonly string[]).includes(locale)
-    ? (locale as Locale)
-    : routing.defaultLocale;
+  const tz = bookingTimeZoneFromSettings(settings);
   const service = await loadServiceByIdForLocale(booking.serviceId, safeLocale);
   return (
     <ConfirmationPage
@@ -77,6 +82,7 @@ export default async function ConfirmationRoute({
       time={formatLocalTime(booking.scheduledFor, tz)}
       status={booking.status}
       service={service}
+      location={location}
     />
   );
 }

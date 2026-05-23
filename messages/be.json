@@ -292,6 +292,8 @@
     "inbox_services_caption": "Меню, катэгорыі, фота",
     "inbox_masters": "Майстры",
     "inbox_masters_caption": "Дадавайце, рэдагуйце і архівуйце каманду атэлье",
+    "inbox_studio": "Студыя",
+    "inbox_studio_caption": "Адрас, карта, часавы пояс",
     "photos": {
       "plate_title": "Фатаграфіі",
       "eyebrow": "Выявы атэлье",
@@ -323,6 +325,34 @@
       "edit_service": "Рэдагаваць"
     }
   },
+  "AdminStudio": {
+    "meta_title": "Студыя",
+    "plate_title": "Студыя",
+    "section_address": "Адрас",
+    "section_country": "Краіна",
+    "section_city": "Горад",
+    "section_coords": "Каардынаты",
+    "section_timezone": "Часавы пояс",
+    "section_map_visible": "Карта",
+    "label_address_en": "Адрас (англійская)",
+    "label_address_ru": "Адрас (руская)",
+    "label_address_be": "Адрас (беларуская)",
+    "label_country": "Краіна",
+    "label_city_en": "Горад (англійская)",
+    "label_city_ru": "Горад (руская)",
+    "label_city_be": "Горад (беларуская)",
+    "label_latitude": "Шырата",
+    "label_longitude": "Даўгата",
+    "label_timezone": "Часавы пояс",
+    "label_show_map": "Паказваць карту на галоўнай",
+    "coords_hint": "У Google Maps пстрыкніце правай кнопкай па студыі → націсніце на каардынаты, каб скапіяваць.",
+    "preview_pin": "Паглядзець метку ў OpenStreetMap →",
+    "map_visible_disabled_hint": "Спачатку ўвядзіце каардынаты",
+    "timezone_confirm": "Змена часавага пояса паўплывае на час запісу для гасцей. Працягнуць?",
+    "save": "Захаваць",
+    "saved": "Захавана",
+    "error": "Не атрымалася захаваць: {error}"
+  },
   "AtelierHours": {
     "open_until": "Адкрыта · да {time}",
     "opens_on": "Зачынена · адкрыецца ў {day} а {time}"
@@ -340,7 +370,10 @@
     "name": "Violetta Beauty",
     "description": "Прыватнае нэйл-атэлье — адно крэсла, адна гадзіна, адзін ціхі рытуал за раз.",
     "tagline": "Прыватнае нэйл-атэлье",
-    "og_title": "Violetta Beauty"
+    "og_title": "Violetta Beauty",
+    "meta_title_with_city": "Violetta — манікюр і прыгажосць у {city}",
+    "meta_description_with_city": "Студыя дызайну пазногцяў у {city}. Манікюр, гель, дызайн — якасна і даступна.",
+    "meta_keywords_with_city": "манікюр {city}, пазногці {city}, прыгажосць {city}, гель {city}, недарагі якасны манікюр {city}"
   },
   "Error": {
     "meta_title": "Нешта зрушылася",
@@ -511,5 +544,10 @@
     "validation_slug_invalid": "Толькі лацінскія літары ў ніжнім рэгістры, лічбы і злучкі.",
     "empty_published": "Пакуль няма апублікаваных майстроў.",
     "empty_archived": "Архіў пусты."
+  },
+  "Footer": {
+    "map_aria": "Размяшчэнне студыі",
+    "map_title": "Размяшчэнне студыі",
+    "get_directions": "Пракласці маршрут"
   }
 }

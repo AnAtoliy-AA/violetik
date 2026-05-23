@@ -78,6 +78,13 @@
       "when": 1779516849185,
       "tag": "0010_masters_sets_label",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1779522141113,
+      "tag": "0011_studio_location",
+      "breakpoints": true
     }
   ]
 }
