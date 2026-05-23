@@ -5,7 +5,6 @@ import type { CurrencyCode } from "@/db/schema";
 import type { Master } from "@/entities/master";
 import type { Service } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
-import { STUDIO_DATA } from "@/entities/studio";
 import type { Locale } from "@/i18n/routing";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
@@ -21,6 +20,7 @@ export interface ConfirmStepProps {
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
   currency?: CurrencyCode;
   masters: readonly Master[];
+  location: string;
 }
 
 export function ConfirmStep({
@@ -28,6 +28,7 @@ export function ConfirmStep({
   pricedServices,
   currency = "EUR",
   masters,
+  location,
 }: ConfirmStepProps) {
   const t = useTranslations("Booking.confirm");
   const locale = useLocale() as Locale;
@@ -46,7 +47,7 @@ export function ConfirmStep({
     [t("row_master"), master?.name ?? "—"],
     [t("row_date"), dateLabel],
     [t("row_time"), timeLabel],
-    [t("row_location"), STUDIO_DATA.studio.address],
+    [t("row_location"), location],
   ];
 
   // When the catalog is empty (DB unset), `service` is undefined — fall

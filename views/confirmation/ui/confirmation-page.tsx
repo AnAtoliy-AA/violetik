@@ -5,7 +5,6 @@ import { motion, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Service } from "@/entities/service";
-import { STUDIO_DATA } from "@/entities/studio";
 import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
@@ -80,9 +79,14 @@ export interface ConfirmationPageProps {
    * the page falls back to "—" labels.
    */
   service?: Service | null;
+  /**
+   * Studio location line (address + optional city), composed by the
+   * server route from `SiteSettings` via `studioLocationLine()`.
+   */
+  location: string;
 }
 
-export function ConfirmationPage(props: ConfirmationPageProps = {}) {
+export function ConfirmationPage(props: ConfirmationPageProps) {
   const t = useTranslations("Confirmation");
   const locale = useLocale();
   const reduceMotion = useReducedMotion();
@@ -110,7 +114,7 @@ export function ConfirmationPage(props: ConfirmationPageProps = {}) {
   const rows: readonly [string, string][] = [
     [t("row_date"), dateLabel],
     [t("row_time"), timeLabel],
-    [t("row_where"), STUDIO_DATA.studio.address],
+    [t("row_where"), props.location],
     [t("row_duration"), service?.duration ?? t("missing_date")],
   ];
 

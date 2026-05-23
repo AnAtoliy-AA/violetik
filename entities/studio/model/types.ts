@@ -63,7 +63,6 @@ export interface Testimonial {
 export interface StudioInfo {
   name: string;
   tagline: string;
-  address: string;
   hours: string;
   instagram: string;
 }

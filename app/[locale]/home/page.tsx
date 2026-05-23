@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { HomePage } from "@/views/home";
 import { loadMastersForLocale } from "@/entities/master/api/load";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import type { Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
@@ -23,8 +24,15 @@ export default async function HomeRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const masters = await loadMastersForLocale(locale as Locale, {
-    publishedOnly: true,
-  });
-  return <HomePage master={masters[0]} />;
+  const [masters, settings] = await Promise.all([
+    loadMastersForLocale(locale as Locale, { publishedOnly: true }),
+    getSiteSettingsServer(),
+  ]);
+  return (
+    <HomePage
+      master={masters[0]}
+      settings={settings}
+      locale={locale as Locale}
+    />
+  );
 }

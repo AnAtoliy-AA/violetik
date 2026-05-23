@@ -11,7 +11,6 @@ import type {
 const studio: StudioInfo = {
   name: "Violetta Beauty",
   tagline: "A private nail atelier",
-  address: "By appointment · Verbena Lane 14, Studio B",
   hours: "Tue – Sat · 10:00 – 19:00",
   instagram: "@violetta.atelier",
 };
