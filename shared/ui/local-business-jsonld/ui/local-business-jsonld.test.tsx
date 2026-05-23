@@ -80,4 +80,25 @@ describe("LocalBusinessJsonLd", () => {
       longitude: 28.491,
     });
   });
+
+  it("escapes </script> in string values to prevent JSON-LD XSS breakout", () => {
+    const { container } = render(
+      <LocalBusinessJsonLd
+        settings={{
+          ...DEFAULT_SITE_SETTINGS,
+          addressEn: "</script><x>",
+        }}
+        {...BASE_PROPS}
+      />,
+    );
+    const script = container.querySelector(
+      'script[type="application/ld+json"]',
+    );
+    if (!script) throw new Error("JSON-LD script not found");
+    // The raw HTML must not contain a literal `</script>` substring.
+    expect(script.innerHTML).not.toContain("</script>");
+    // It must still parse cleanly back to the original string.
+    const parsed = JSON.parse(script.textContent ?? "");
+    expect(parsed.address.streetAddress).toBe("</script><x>");
+  });
 });

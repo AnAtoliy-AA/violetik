@@ -42,10 +42,15 @@ export function LocalBusinessJsonLd({
     };
   }
 
+  // Escape `<` so a string containing `</script>` can't break out of the
+  // inline JSON-LD block and execute as JS. JSON.parse still accepts the
+  // resulting unicode-escaped form.
+  const serialized = JSON.stringify(data).replace(/</g, "\\u003c");
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: serialized }}
     />
   );
 }
