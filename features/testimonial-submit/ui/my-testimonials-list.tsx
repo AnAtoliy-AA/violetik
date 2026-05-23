@@ -1,3 +1,7 @@
+// Client-marked: jsdom (RTL) cannot run next-intl/server's `getTranslations`,
+// and mocking it across the slice is heavier than just using `useTranslations`
+// here. The component is pure presentation — rows + lookup-map come in as
+// props, so flipping to client has no rendering or data-fetching consequences.
 "use client";
 
 import { useTranslations } from "next-intl";

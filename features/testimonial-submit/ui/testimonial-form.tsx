@@ -138,6 +138,6 @@ function serverErrorMessage(
     case "unauthenticated":
     case "unknown":
     default:
-      return t("testimonial_form_required");
+      return t("testimonial_form_generic_error");
   }
 }
