@@ -541,5 +541,10 @@
     "validation_slug_invalid": "Lowercase letters, numbers, hyphens only.",
     "empty_published": "No published masters yet.",
     "empty_archived": "Nothing in the archive."
+  },
+  "Footer": {
+    "map_aria": "Studio location",
+    "map_title": "Studio location",
+    "get_directions": "Get directions"
   }
 }
