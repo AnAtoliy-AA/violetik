@@ -94,9 +94,13 @@ export function buildDateStrip(
 
 The Sun/Mon rule stays. No new "past" rule is needed at this layer because the strip starts at today by construction — past days are simply not generated.
 
+Note: the existing implementation advances days with `setUTCDate`. The new helper must advance in `timeZone`, not UTC. If the studio is in `Europe/Minsk` (UTC+3) and the request hits at 23:30 local on a Saturday, UTC has rolled to Sunday but the studio's civil "today" is still Saturday — the strip must start at Saturday. Implementation: compute the civil date in `timeZone` via `Intl.DateTimeFormat`, then iterate by adding ISO days (`day + i`) and re-formatting, not by mutating a UTC `Date`.
+
 **5. `views/booking/ui/steps/date-step.tsx` — receive timezone prop**
 
 The booking view's server entry (the page that mounts the stepper) already fetches `getSiteSettingsServer()` for other reasons; thread `bookingTimeZoneFromSettings(settings)` down to `DateStep` as a prop. Don't try to derive timezone client-side from `Intl.DateTimeFormat().resolvedOptions().timeZone` — that's the visitor's timezone, not the studio's.
+
+Note: this component also calls `formatMonthYear(BOOKING_START_ISO, locale)` (current line 24). When the constant is removed, this call must use a `now`-derived ISO too — easiest is `formatMonthYear(bookingStartISO(now, tz), locale)`.
 
 **6. `views/booking/ui/steps/time-step.tsx` — empty-state**
 
@@ -108,10 +112,12 @@ Map the new `too_soon` server error to a translated message in `Booking.confirm`
 
 ### Translation keys
 
-Three new keys per locale (`en`, `ru`, `be`):
+New keys per locale (`en`, `ru`, `be`):
 
 - `Booking.time.none_available` — "No times available for this date. Please pick another day."
-- `Booking.confirm.error_too_soon` — "This time is too close to now. Bookings need at least 3 hours' notice. Please pick another time."
+- `Booking.errors.too_soon` — "This time is too close to now. Bookings need at least 3 hours' notice. Please pick another time."
+
+(`Booking.errors` is the existing namespace where `slot_taken`, `db_unavailable`, etc. live — consumed by [views/booking/ui/booking-page.tsx](../../../views/booking/ui/booking-page.tsx) via `useTranslations("Booking.errors")`. Add `too_soon` to that namespace rather than introducing a new `Booking.confirm.error_*` family.)
 
 The exact copy can be polished during implementation.
 
