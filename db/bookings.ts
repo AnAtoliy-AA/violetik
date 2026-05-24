@@ -206,9 +206,11 @@ export async function cancelBookingIfOpen(
 }
 
 /**
- * Confirmed bookings whose scheduled_for lands in the 23–25 h window
- * from now. The hourly cron uses this + the notification_log dedup
- * check to send each booking exactly one 24-hour reminder.
+ * Confirmed bookings scheduled within the next 36 h. Vercel Hobby tier
+ * caps crons at once-per-day; pairing a 36-hour lookahead with the
+ * 48-hour notification_log dedup guarantees each booking gets exactly
+ * one reminder regardless of when the cron tick lands relative to the
+ * booking time.
  */
 export async function listBookingsDueForReminder(): Promise<schema.Booking[]> {
   if (!db) return [];
@@ -218,7 +220,7 @@ export async function listBookingsDueForReminder(): Promise<schema.Booking[]> {
     .where(
       and(
         eq(schema.bookings.status, "confirmed"),
-        sql`${schema.bookings.scheduledFor} BETWEEN now() + interval '23 hours' AND now() + interval '25 hours'`,
+        sql`${schema.bookings.scheduledFor} BETWEEN now() AND now() + interval '36 hours'`,
       ),
     );
 }
