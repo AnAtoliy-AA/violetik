@@ -4,11 +4,12 @@ import { db, schema } from "./index";
 import { activeVipSubquery } from "./vip-requests";
 import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
 
-// Admin SSR budget — same rationale as db/site-settings.ts. The Supabase
+// SSR read budget — same rationale as db/site-settings.ts. The Supabase
 // Transaction pooler ignores client-side statement_timeout, so we cap
-// reads here to keep the admin page from hanging on the 2-minute
-// server-side default.
-const ADMIN_READ_TIMEOUT_MS = 5_000;
+// reads here to keep page rendering from hanging on the 2-minute
+// server-side default if a pooled conn is half-broken.
+const SSR_READ_TIMEOUT_MS = 5_000;
+const ADMIN_READ_TIMEOUT_MS = SSR_READ_TIMEOUT_MS;
 
 export interface NewBookingInput {
   userId: string;
@@ -64,12 +65,24 @@ export async function getBookingById(
   id: string,
 ): Promise<schema.Booking | null> {
   if (!db) return null;
-  const rows = await db
-    .select()
-    .from(schema.bookings)
-    .where(eq(schema.bookings.id, id))
-    .limit(1);
-  return rows[0] ?? null;
+  try {
+    const rows = await withQueryTimeout(
+      db
+        .select()
+        .from(schema.bookings)
+        .where(eq(schema.bookings.id, id))
+        .limit(1),
+      SSR_READ_TIMEOUT_MS,
+      "bookings.getById",
+    );
+    return rows[0] ?? null;
+  } catch (error) {
+    if (error instanceof QueryTimeoutError) {
+      console.warn("[db/bookings] getBookingById timed out:", error.message);
+      return null;
+    }
+    throw error;
+  }
 }
 
 /**
@@ -81,15 +94,30 @@ export async function listActiveBookingsFrom(
   since: Date,
 ): Promise<schema.Booking[]> {
   if (!db) return [];
-  return db
-    .select()
-    .from(schema.bookings)
-    .where(
-      and(
-        gte(schema.bookings.scheduledFor, since),
-        ne(schema.bookings.status, "cancelled"),
-      ),
+  try {
+    return await withQueryTimeout(
+      db
+        .select()
+        .from(schema.bookings)
+        .where(
+          and(
+            gte(schema.bookings.scheduledFor, since),
+            ne(schema.bookings.status, "cancelled"),
+          ),
+        ),
+      SSR_READ_TIMEOUT_MS,
+      "bookings.listActiveFrom",
     );
+  } catch (error) {
+    if (error instanceof QueryTimeoutError) {
+      console.warn(
+        "[db/bookings] listActiveBookingsFrom timed out:",
+        error.message,
+      );
+      return [];
+    }
+    throw error;
+  }
 }
 
 /**
@@ -181,30 +209,45 @@ export async function listUserBookings(
   userId: string,
 ): Promise<UserBookingRow[]> {
   if (!db) return [];
-  const rows = await db
-    .select({
-      booking: schema.bookings,
-      masterNameEn: schema.masters.nameEn,
-      masterNameRu: schema.masters.nameRu,
-      masterNameBy: schema.masters.nameBy,
-      masterTelegramUsername: schema.masters.telegramUsername,
-    })
-    .from(schema.bookings)
-    .leftJoin(schema.masters, eq(schema.bookings.masterId, schema.masters.id))
-    .where(
-      and(
-        eq(schema.bookings.userId, userId),
-        ne(schema.bookings.status, "cancelled"),
-      ),
-    )
-    .orderBy(asc(schema.bookings.scheduledFor));
-  return rows.map((r) => ({
-    ...r.booking,
-    masterNameEn: r.masterNameEn,
-    masterNameRu: r.masterNameRu,
-    masterNameBy: r.masterNameBy,
-    masterTelegramUsername: r.masterTelegramUsername,
-  }));
+  try {
+    const rows = await withQueryTimeout(
+      db
+        .select({
+          booking: schema.bookings,
+          masterNameEn: schema.masters.nameEn,
+          masterNameRu: schema.masters.nameRu,
+          masterNameBy: schema.masters.nameBy,
+          masterTelegramUsername: schema.masters.telegramUsername,
+        })
+        .from(schema.bookings)
+        .leftJoin(
+          schema.masters,
+          eq(schema.bookings.masterId, schema.masters.id),
+        )
+        .where(
+          and(
+            eq(schema.bookings.userId, userId),
+            ne(schema.bookings.status, "cancelled"),
+          ),
+        )
+        .orderBy(asc(schema.bookings.scheduledFor)),
+      SSR_READ_TIMEOUT_MS,
+      "bookings.listUser",
+    );
+    return rows.map((r) => ({
+      ...r.booking,
+      masterNameEn: r.masterNameEn,
+      masterNameRu: r.masterNameRu,
+      masterNameBy: r.masterNameBy,
+      masterTelegramUsername: r.masterTelegramUsername,
+    }));
+  } catch (error) {
+    if (error instanceof QueryTimeoutError) {
+      console.warn("[db/bookings] listUserBookings timed out:", error.message);
+      return [];
+    }
+    throw error;
+  }
 }
 
 /**

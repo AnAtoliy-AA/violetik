@@ -4,8 +4,9 @@ import { db, schema } from "./index";
 import { activeVipSubquery } from "./vip-requests";
 import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
 
-// Admin SSR budget — same rationale as db/site-settings.ts.
-const ADMIN_READ_TIMEOUT_MS = 5_000;
+// SSR read budget — same rationale as db/site-settings.ts.
+const SSR_READ_TIMEOUT_MS = 5_000;
+const ADMIN_READ_TIMEOUT_MS = SSR_READ_TIMEOUT_MS;
 
 export function generateTestimonialId(): string {
   return `tst_${randomBytes(8).toString("hex")}`;
@@ -80,13 +81,24 @@ export async function listUserTestimonials(
 ): Promise<schema.Testimonial[]> {
   if (!db) return [];
   try {
-    return await db
-      .select()
-      .from(schema.testimonials)
-      .where(eq(schema.testimonials.userId, userId))
-      .orderBy(desc(schema.testimonials.createdAt));
+    return await withQueryTimeout(
+      db
+        .select()
+        .from(schema.testimonials)
+        .where(eq(schema.testimonials.userId, userId))
+        .orderBy(desc(schema.testimonials.createdAt)),
+      SSR_READ_TIMEOUT_MS,
+      "testimonials.listUser",
+    );
   } catch (error) {
     if (isMissingTable(error)) return [];
+    if (error instanceof QueryTimeoutError) {
+      console.warn(
+        "[db/testimonials] listUserTestimonials timed out:",
+        error.message,
+      );
+      return [];
+    }
     throw error;
   }
 }
@@ -123,34 +135,38 @@ export async function listTestimonialsByStatus(
         ? desc(schema.testimonials.decidedAt)
         : desc(schema.testimonials.createdAt);
     const activeVip = activeVipSubquery();
-    const rows = await db
-      .select({
-        id: schema.testimonials.id,
-        body: schema.testimonials.body,
-        status: schema.testimonials.status,
-        createdAt: schema.testimonials.createdAt,
-        decidedAt: schema.testimonials.decidedAt,
-        userId: schema.testimonials.userId,
-        authorFirstName: schema.users.firstName,
-        authorLastName: schema.users.lastName,
-        authorUsername: schema.users.username,
-        authorEmail: schema.users.email,
-        authorPhotoUrl: schema.users.photoUrl,
-        vipUserId: activeVip.userId,
-        masterId: schema.testimonials.masterId,
-        masterNameEn: schema.masters.nameEn,
-        masterNameRu: schema.masters.nameRu,
-        masterNameBy: schema.masters.nameBy,
-      })
-      .from(schema.testimonials)
-      .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
-      .leftJoin(activeVip, eq(activeVip.userId, schema.testimonials.userId))
-      .leftJoin(
-        schema.masters,
-        eq(schema.testimonials.masterId, schema.masters.id),
-      )
-      .where(eq(schema.testimonials.status, status))
-      .orderBy(orderCol);
+    const rows = await withQueryTimeout(
+      db
+        .select({
+          id: schema.testimonials.id,
+          body: schema.testimonials.body,
+          status: schema.testimonials.status,
+          createdAt: schema.testimonials.createdAt,
+          decidedAt: schema.testimonials.decidedAt,
+          userId: schema.testimonials.userId,
+          authorFirstName: schema.users.firstName,
+          authorLastName: schema.users.lastName,
+          authorUsername: schema.users.username,
+          authorEmail: schema.users.email,
+          authorPhotoUrl: schema.users.photoUrl,
+          vipUserId: activeVip.userId,
+          masterId: schema.testimonials.masterId,
+          masterNameEn: schema.masters.nameEn,
+          masterNameRu: schema.masters.nameRu,
+          masterNameBy: schema.masters.nameBy,
+        })
+        .from(schema.testimonials)
+        .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
+        .leftJoin(activeVip, eq(activeVip.userId, schema.testimonials.userId))
+        .leftJoin(
+          schema.masters,
+          eq(schema.testimonials.masterId, schema.masters.id),
+        )
+        .where(eq(schema.testimonials.status, status))
+        .orderBy(orderCol),
+      ADMIN_READ_TIMEOUT_MS,
+      "testimonials.listByStatus",
+    );
     // leftJoin nullables — the FK in schema is NOT NULL, so in practice
     // master/user fields are always present. Coerce defensively.
     return rows.map((r) => ({
@@ -173,6 +189,13 @@ export async function listTestimonialsByStatus(
     }));
   } catch (error) {
     if (isMissingTable(error)) return [];
+    if (error instanceof QueryTimeoutError) {
+      console.warn(
+        "[db/testimonials] listTestimonialsByStatus timed out:",
+        error.message,
+      );
+      return [];
+    }
     throw error;
   }
 }
@@ -358,38 +381,45 @@ export async function listTestimonialsWithChangeRequests(): Promise<AdminTestimo
   if (!db) return [];
   try {
     const activeVip = activeVipSubquery();
-    const rows = await db
-      .select({
-        id: schema.testimonials.id,
-        body: schema.testimonials.body,
-        status: schema.testimonials.status,
-        pendingEditBody: schema.testimonials.pendingEditBody,
-        pendingRemoval: schema.testimonials.pendingRemoval,
-        changeRequestedAt: schema.testimonials.changeRequestedAt,
-        createdAt: schema.testimonials.createdAt,
-        decidedAt: schema.testimonials.decidedAt,
-        userId: schema.testimonials.userId,
-        authorFirstName: schema.users.firstName,
-        authorLastName: schema.users.lastName,
-        authorUsername: schema.users.username,
-        authorEmail: schema.users.email,
-        authorPhotoUrl: schema.users.photoUrl,
-        vipUserId: activeVip.userId,
-        masterId: schema.testimonials.masterId,
-        masterNameEn: schema.masters.nameEn,
-        masterNameRu: schema.masters.nameRu,
-        masterNameBy: schema.masters.nameBy,
-      })
-      .from(schema.testimonials)
-      .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
-      .leftJoin(activeVip, eq(activeVip.userId, schema.testimonials.userId))
-      .leftJoin(schema.masters, eq(schema.testimonials.masterId, schema.masters.id))
-      .where(
-        sql`${schema.testimonials.status} = 'approved'
-            AND (${schema.testimonials.pendingEditBody} IS NOT NULL
-                 OR ${schema.testimonials.pendingRemoval} = true)`,
-      )
-      .orderBy(desc(schema.testimonials.changeRequestedAt));
+    const rows = await withQueryTimeout(
+      db
+        .select({
+          id: schema.testimonials.id,
+          body: schema.testimonials.body,
+          status: schema.testimonials.status,
+          pendingEditBody: schema.testimonials.pendingEditBody,
+          pendingRemoval: schema.testimonials.pendingRemoval,
+          changeRequestedAt: schema.testimonials.changeRequestedAt,
+          createdAt: schema.testimonials.createdAt,
+          decidedAt: schema.testimonials.decidedAt,
+          userId: schema.testimonials.userId,
+          authorFirstName: schema.users.firstName,
+          authorLastName: schema.users.lastName,
+          authorUsername: schema.users.username,
+          authorEmail: schema.users.email,
+          authorPhotoUrl: schema.users.photoUrl,
+          vipUserId: activeVip.userId,
+          masterId: schema.testimonials.masterId,
+          masterNameEn: schema.masters.nameEn,
+          masterNameRu: schema.masters.nameRu,
+          masterNameBy: schema.masters.nameBy,
+        })
+        .from(schema.testimonials)
+        .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
+        .leftJoin(activeVip, eq(activeVip.userId, schema.testimonials.userId))
+        .leftJoin(
+          schema.masters,
+          eq(schema.testimonials.masterId, schema.masters.id),
+        )
+        .where(
+          sql`${schema.testimonials.status} = 'approved'
+              AND (${schema.testimonials.pendingEditBody} IS NOT NULL
+                   OR ${schema.testimonials.pendingRemoval} = true)`,
+        )
+        .orderBy(desc(schema.testimonials.changeRequestedAt)),
+      ADMIN_READ_TIMEOUT_MS,
+      "testimonials.listWithChangeRequests",
+    );
     return rows.map((r) => ({
       id: r.id,
       body: r.body,
@@ -413,6 +443,13 @@ export async function listTestimonialsWithChangeRequests(): Promise<AdminTestimo
     }));
   } catch (error) {
     if (isMissingTable(error)) return [];
+    if (error instanceof QueryTimeoutError) {
+      console.warn(
+        "[db/testimonials] listTestimonialsWithChangeRequests timed out:",
+        error.message,
+      );
+      return [];
+    }
     throw error;
   }
 }
@@ -519,17 +556,28 @@ export async function adminSoftDeleteTestimonial(
 export async function countPendingChangeRequests(): Promise<number> {
   if (!db) return 0;
   try {
-    const rows = await db
-      .select({ n: sql<number>`count(*)::int` })
-      .from(schema.testimonials)
-      .where(
-        sql`${schema.testimonials.status} = 'approved'
-            AND (${schema.testimonials.pendingEditBody} IS NOT NULL
-                 OR ${schema.testimonials.pendingRemoval} = true)`,
-      );
+    const rows = await withQueryTimeout(
+      db
+        .select({ n: sql<number>`count(*)::int` })
+        .from(schema.testimonials)
+        .where(
+          sql`${schema.testimonials.status} = 'approved'
+              AND (${schema.testimonials.pendingEditBody} IS NOT NULL
+                   OR ${schema.testimonials.pendingRemoval} = true)`,
+        ),
+      ADMIN_READ_TIMEOUT_MS,
+      "testimonials.countPendingChangeRequests",
+    );
     return rows[0]?.n ?? 0;
   } catch (error) {
     if (isMissingTable(error)) return 0;
+    if (error instanceof QueryTimeoutError) {
+      console.warn(
+        "[db/testimonials] countPendingChangeRequests timed out:",
+        error.message,
+      );
+      return 0;
+    }
     throw error;
   }
 }
