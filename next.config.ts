@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSerwist } from "@serwist/turbopack";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+
+// @serwist/turbopack is the Next 16/Turbopack-compatible variant. It
+// emits the compiled service worker via a route handler in
+// app/serwist/[path]/route.ts; the bundle lands at /serwist/sw.js
+// rather than /sw.js.
 
 const nextConfig: NextConfig = {
   // Next.js 16 blocks cross-origin dev requests by default. Allow the
@@ -27,4 +33,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withSerwist(withNextIntl(nextConfig));
+

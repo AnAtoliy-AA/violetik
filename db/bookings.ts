@@ -204,3 +204,23 @@ export async function cancelBookingIfOpen(
     .returning();
   return rows[0] ?? null;
 }
+
+/**
+ * Confirmed bookings scheduled within the next 36 h. Vercel Hobby tier
+ * caps crons at once-per-day; pairing a 36-hour lookahead with the
+ * 48-hour notification_log dedup guarantees each booking gets exactly
+ * one reminder regardless of when the cron tick lands relative to the
+ * booking time.
+ */
+export async function listBookingsDueForReminder(): Promise<schema.Booking[]> {
+  if (!db) return [];
+  return db
+    .select()
+    .from(schema.bookings)
+    .where(
+      and(
+        eq(schema.bookings.status, "confirmed"),
+        sql`${schema.bookings.scheduledFor} BETWEEN now() AND now() + interval '36 hours'`,
+      ),
+    );
+}

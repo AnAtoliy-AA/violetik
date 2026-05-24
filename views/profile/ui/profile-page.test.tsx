@@ -397,17 +397,20 @@ describe("ProfilePage", () => {
     expect(screen.getByText("Editorial Art")).toBeInTheDocument();
   });
 
-  it("renders the quick-links nav with all four entries", async () => {
+  it("renders the quick-links nav with all entries", async () => {
     await renderPage();
     const nav = screen.getByRole("navigation", { name: /Account links/i });
     const links = within(nav).getAllByRole("link");
-    expect(links).toHaveLength(4);
+    expect(links).toHaveLength(5);
     expect(
       within(nav).getByRole("link", { name: /My bookings/i }),
     ).toHaveAttribute("href", "/booking/service");
     expect(
       within(nav).getByRole("link", { name: /Member card/i }),
     ).toHaveAttribute("href", "/membership");
+    expect(
+      within(nav).getByRole("link", { name: /Notifications/i }),
+    ).toHaveAttribute("href", "/profile/notifications");
   });
 
   it("renders the testimonial form and the empty 'my testimonials' state", async () => {

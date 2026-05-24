@@ -692,3 +692,17 @@ export async function mergeUsers(
       throw err;
     });
 }
+
+/**
+ * Returns the ids of every admin user, in no particular order. Used by
+ * the notification dispatcher to fan out admin-targeted categories
+ * (booking_created, vip_request_submitted, testimonial_submitted).
+ */
+export async function listAdminUserIds(): Promise<string[]> {
+  if (!db) return [];
+  const rows = await db
+    .select({ id: schema.users.id })
+    .from(schema.users)
+    .where(eq(schema.users.role, "admin"));
+  return rows.map((r) => r.id);
+}

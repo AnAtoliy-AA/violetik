@@ -19,6 +19,8 @@ import {
 import { ensureUserRow } from "@/db/ensure-user";
 import { getServiceById } from "@/db/services";
 import { getMasterById, getMasterIdsForService } from "@/db/masters";
+import { listAdminUserIds } from "@/db/users-admin";
+import { dispatchNotification } from "@/shared/lib/notifications";
 
 function localizedServiceName(
   service: { nameEn: string; nameRu: string; nameBy: string },
@@ -210,6 +212,26 @@ export async function submitBooking(
       "[submitBooking] GCal sync failed; booking persisted without event:",
       err,
     );
+  }
+
+  // Notify each admin about the new booking. Dispatcher is null-tolerant
+  // and never throws — booking is already persisted at this point.
+  try {
+    const adminIds = await listAdminUserIds();
+    for (const adminId of adminIds) {
+      await dispatchNotification(adminId, "booking_created", {
+        titleKey: "category_booking_created_push_title",
+        bodyKey: "category_booking_created_push_body",
+        bodyParams: {
+          customer: session.user.name ?? session.user.id,
+          service: localizedServiceName(service, input.locale),
+        },
+        url: "/admin/bookings",
+        meta: { bookingId: booking.id },
+      });
+    }
+  } catch (err) {
+    console.error("[submitBooking] admin notification fan-out failed:", err);
   }
 
   redirect(`/${input.locale}/booking/confirmation?id=${booking.id}`);

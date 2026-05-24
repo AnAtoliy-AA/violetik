@@ -7,6 +7,8 @@ import {
   createVipRequest,
   getCurrentTier,
 } from "@/db/vip-requests";
+import { listAdminUserIds } from "@/db/users-admin";
+import { dispatchNotification } from "@/shared/lib/notifications";
 
 export interface SubmitVipRequestInput {
   note?: string | null;
@@ -38,6 +40,17 @@ export async function submitVipRequest(
     note: input.note ?? null,
   });
   if (!row) return { ok: false, reason: "db-unavailable" };
+
+  const adminIds = await listAdminUserIds();
+  for (const adminId of adminIds) {
+    await dispatchNotification(adminId, "vip_request_submitted", {
+      titleKey: "category_vip_request_submitted_push_title",
+      bodyKey: "category_vip_request_submitted_push_body",
+      bodyParams: { customer: session.user.name ?? session.user.id },
+      url: "/admin/vip-requests",
+      meta: { vipRequestId: row.id },
+    });
+  }
 
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };

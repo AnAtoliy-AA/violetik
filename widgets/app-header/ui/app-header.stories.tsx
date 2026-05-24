@@ -15,6 +15,12 @@ vi.mock("@/i18n/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
 }));
 
+// LocaleSwitcher (inside AppHeader) imports a server action that pulls
+// in next-auth — which throws at import time in the chromium runner.
+vi.mock("@/features/locale-switcher/api/save-locale", () => ({
+  saveLocalePreferenceAction: vi.fn(),
+}));
+
 import React from "react";
 import { AppHeader } from "./app-header";
 

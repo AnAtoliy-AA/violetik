@@ -17,7 +17,11 @@ function createClient() {
   const url = process.env.DATABASE_URL;
   if (!url) return null;
   try {
-    const client = postgres(url, { prepare: false });
+    // `max: 1` keeps each worker to one pooled connection. With many
+    // SSG workers building in parallel (× locales × routes) the default
+    // pool size easily exceeded Supabase PgBouncer's 200-conn cap and
+    // tripped EMAXCONN mid-build.
+    const client = postgres(url, { prepare: false, max: 1 });
     return drizzle(client, { schema });
   } catch (error) {
     // Malformed DATABASE_URL (e.g. a quoted value with a trailing comma

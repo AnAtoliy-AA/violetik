@@ -6,6 +6,17 @@ import {
   decideVipRequest,
   downgradeVipRequest,
 } from "@/db/vip-requests";
+import { dispatchNotification } from "@/shared/lib/notifications";
+
+async function notifyDecision(row: { id: string; userId: string; status: string }) {
+  await dispatchNotification(row.userId, "vip_decision", {
+    titleKey: "category_vip_decision_push_title",
+    bodyKey: "category_vip_decision_push_body",
+    bodyParams: { status: row.status },
+    url: "/membership",
+    meta: { vipRequestId: row.id },
+  });
+}
 
 export type AdminActionResult =
   | { ok: true; id: string }
@@ -26,6 +37,7 @@ export async function approveRequest(input: ApproveInput): Promise<AdminActionRe
     expiresAt: input.expiresAt,
   });
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyDecision(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }
@@ -45,6 +57,7 @@ export async function declineRequest(input: DeclineInput): Promise<AdminActionRe
     declineReason: input.reason ?? null,
   });
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyDecision(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }
@@ -54,6 +67,7 @@ export async function downgradeVip(id: string): Promise<AdminActionResult> {
   if (!gate.ok) return { ok: false, reason: gate.reason };
   const row = await downgradeVipRequest(id);
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyDecision(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }

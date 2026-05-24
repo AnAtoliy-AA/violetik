@@ -159,3 +159,10 @@ describe("mergeUsers", () => {
     if (!result.ok) expect(["not-found", "conflicts"]).toContain(result.reason);
   });
 });
+
+describe("listAdminUserIds", () => {
+  it("returns an array", async () => {
+    const { listAdminUserIds } = await import("./users-admin");
+    expect(Array.isArray(await listAdminUserIds())).toBe(true);
+  });
+});

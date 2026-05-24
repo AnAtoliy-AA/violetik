@@ -8,6 +8,7 @@ import {
   deleteCalendarEvent,
   refreshAccessToken,
 } from "@/shared/lib/google-calendar";
+import { dispatchNotification } from "@/shared/lib/notifications";
 
 async function requireAdmin(): Promise<boolean> {
   const session = await auth();
@@ -22,6 +23,16 @@ async function requireAdmin(): Promise<boolean> {
 export async function confirmBooking(bookingId: string): Promise<void> {
   if (!(await requireAdmin())) return;
   await setBookingStatus(bookingId, "confirmed");
+
+  const booking = await getBookingById(bookingId);
+  if (booking) {
+    await dispatchNotification(booking.userId, "booking_confirmed", {
+      titleKey: "category_booking_confirmed_push_title",
+      bodyKey: "category_booking_confirmed_push_body",
+      url: "/profile",
+      meta: { bookingId, scheduledFor: booking.scheduledFor.toISOString() },
+    });
+  }
   revalidatePath("/", "layout");
 }
 
@@ -60,5 +71,12 @@ export async function declineBooking(bookingId: string): Promise<void> {
       );
     }
   }
+
+  await dispatchNotification(booking.userId, "booking_cancelled", {
+    titleKey: "category_booking_cancelled_push_title",
+    bodyKey: "category_booking_cancelled_push_body",
+    url: "/profile",
+    meta: { bookingId, scheduledFor: booking.scheduledFor.toISOString() },
+  });
   revalidatePath("/", "layout");
 }

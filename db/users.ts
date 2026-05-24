@@ -64,3 +64,21 @@ export async function getUserById(
     .limit(1);
   return rows[0] ?? null;
 }
+
+/**
+ * Persists the user's locale preference. The booking + notification
+ * flows read this value to translate user-facing copy when no request
+ * locale is available (background cron, server-initiated push).
+ */
+export async function setUserPreferredLocale(
+  userId: string,
+  locale: string,
+): Promise<schema.User | null> {
+  if (!db) return null;
+  const rows = await db
+    .update(schema.users)
+    .set({ preferredLocale: locale })
+    .where(eq(schema.users.id, userId))
+    .returning();
+  return rows[0] ?? null;
+}

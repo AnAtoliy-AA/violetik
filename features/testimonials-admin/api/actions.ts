@@ -8,6 +8,21 @@ import {
   resolveTestimonialEdit,
   resolveTestimonialRemoval,
 } from "@/db/testimonials";
+import { dispatchNotification } from "@/shared/lib/notifications";
+
+async function notifyTestimonialOwner(row: {
+  id: string;
+  userId: string;
+  status: string;
+}) {
+  await dispatchNotification(row.userId, "testimonial_decision", {
+    titleKey: "category_testimonial_decision_push_title",
+    bodyKey: "category_testimonial_decision_push_body",
+    bodyParams: { status: row.status },
+    url: "/profile",
+    meta: { testimonialId: row.id },
+  });
+}
 
 export type AdminTestimonialActionResult =
   | { ok: true; id: string }
@@ -24,6 +39,7 @@ export async function approveTestimonial(
     decidedBy: gate.user.id,
   });
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyTestimonialOwner(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }
@@ -39,6 +55,7 @@ export async function rejectTestimonial(
     decidedBy: gate.user.id,
   });
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyTestimonialOwner(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }
@@ -50,6 +67,7 @@ export async function approveEditRequest(
   if (!gate.ok) return { ok: false, reason: gate.reason };
   const row = await resolveTestimonialEdit(id, gate.user.id, true);
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyTestimonialOwner(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }
@@ -61,6 +79,7 @@ export async function rejectEditRequest(
   if (!gate.ok) return { ok: false, reason: gate.reason };
   const row = await resolveTestimonialEdit(id, gate.user.id, false);
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyTestimonialOwner(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }
@@ -72,6 +91,7 @@ export async function approveRemovalRequest(
   if (!gate.ok) return { ok: false, reason: gate.reason };
   const row = await resolveTestimonialRemoval(id, gate.user.id, true);
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyTestimonialOwner(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }
@@ -83,6 +103,7 @@ export async function rejectRemovalRequest(
   if (!gate.ok) return { ok: false, reason: gate.reason };
   const row = await resolveTestimonialRemoval(id, gate.user.id, false);
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyTestimonialOwner(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }
@@ -94,6 +115,7 @@ export async function adminDeleteTestimonial(
   if (!gate.ok) return { ok: false, reason: gate.reason };
   const row = await adminSoftDeleteTestimonial(id, gate.user.id);
   if (!row) return { ok: false, reason: "not-found" };
+  await notifyTestimonialOwner(row);
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };
 }
