@@ -1,5 +1,8 @@
 import { eq, sql } from "drizzle-orm";
 import { db, schema } from "./index";
+import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
+
+const SSR_READ_TIMEOUT_MS = 5_000;
 
 export type NotificationCategoryMap = Partial<Record<string, boolean>>;
 
@@ -11,12 +14,27 @@ export async function getNotificationPreferences(
   userId: string,
 ): Promise<NotificationCategoryMap> {
   if (!db) return {};
-  const rows = await db
-    .select({ categories: schema.notificationPreferences.categories })
-    .from(schema.notificationPreferences)
-    .where(eq(schema.notificationPreferences.userId, userId))
-    .limit(1);
-  return rows[0]?.categories ?? {};
+  try {
+    const rows = await withQueryTimeout(
+      db
+        .select({ categories: schema.notificationPreferences.categories })
+        .from(schema.notificationPreferences)
+        .where(eq(schema.notificationPreferences.userId, userId))
+        .limit(1),
+      SSR_READ_TIMEOUT_MS,
+      "notification_prefs.get",
+    );
+    return rows[0]?.categories ?? {};
+  } catch (error) {
+    if (error instanceof QueryTimeoutError) {
+      console.warn(
+        "[db/notification-preferences] getNotificationPreferences timed out:",
+        error.message,
+      );
+      return {};
+    }
+    throw error;
+  }
 }
 
 /**

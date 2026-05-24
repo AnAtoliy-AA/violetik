@@ -1,6 +1,9 @@
 import { and, eq } from "drizzle-orm";
 import { db, schema } from "./index";
+import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
 import type { ImageAsset } from "@/entities/studio";
+
+const SSR_READ_TIMEOUT_MS = 5_000;
 
 export type StudioPhotoSlotKind = schema.PhotoSlotKind;
 
@@ -60,13 +63,21 @@ export async function getStudioPhotos(
 ): Promise<StudioPhotoRecord[]> {
   if (!db) return [];
   try {
-    const rows = await db
-      .select()
-      .from(schema.studioPhotos)
-      .where(eq(schema.studioPhotos.slotKind, kind));
+    const rows = await withQueryTimeout(
+      db
+        .select()
+        .from(schema.studioPhotos)
+        .where(eq(schema.studioPhotos.slotKind, kind)),
+      SSR_READ_TIMEOUT_MS,
+      "studio_photos.getByKind",
+    );
     return rows.map(rowToRecord);
   } catch (error) {
     if (isMissingTable(error)) return [];
+    if (error instanceof QueryTimeoutError) {
+      console.warn("[db/studio-photos] getStudioPhotos timed out:", error.message);
+      return [];
+    }
     throw error;
   }
 }
@@ -78,19 +89,27 @@ export async function getStudioPhoto(
 ): Promise<StudioPhotoRecord | null> {
   if (!db) return null;
   try {
-    const rows = await db
-      .select()
-      .from(schema.studioPhotos)
-      .where(
-        and(
-          eq(schema.studioPhotos.slotKind, slotKind),
-          eq(schema.studioPhotos.slotId, slotId),
-        ),
-      )
-      .limit(1);
+    const rows = await withQueryTimeout(
+      db
+        .select()
+        .from(schema.studioPhotos)
+        .where(
+          and(
+            eq(schema.studioPhotos.slotKind, slotKind),
+            eq(schema.studioPhotos.slotId, slotId),
+          ),
+        )
+        .limit(1),
+      SSR_READ_TIMEOUT_MS,
+      "studio_photos.get",
+    );
     return rows.length ? rowToRecord(rows[0]) : null;
   } catch (error) {
     if (isMissingTable(error)) return null;
+    if (error instanceof QueryTimeoutError) {
+      console.warn("[db/studio-photos] getStudioPhoto timed out:", error.message);
+      return null;
+    }
     throw error;
   }
 }
