@@ -1,8 +1,14 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { activeVipSubquery } from "@/db/vip-requests";
+import {
+  QueryTimeoutError,
+  withQueryTimeout,
+} from "@/db/with-query-timeout";
 import { buildAuthorDisplay } from "../lib/build-author-display";
 import type { ApprovedTestimonial } from "../model/types";
+
+const SSR_READ_TIMEOUT_MS = 5_000;
 
 export interface ListApprovedTestimonialsOptions {
   masterId?: string;
@@ -33,25 +39,29 @@ export async function listApprovedTestimonials(
     : eq(schema.testimonials.status, "approved");
   try {
     const activeVip = activeVipSubquery();
-    const rows = await db
-      .select({
-        id: schema.testimonials.id,
-        body: schema.testimonials.body,
-        createdAt: schema.testimonials.createdAt,
-        masterId: schema.testimonials.masterId,
-        firstName: schema.users.firstName,
-        lastName: schema.users.lastName,
-        username: schema.users.username,
-        email: schema.users.email,
-        photoUrl: schema.users.photoUrl,
-        vipUserId: activeVip.userId,
-      })
-      .from(schema.testimonials)
-      .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
-      .leftJoin(activeVip, eq(activeVip.userId, schema.testimonials.userId))
-      .where(where)
-      .orderBy(desc(schema.testimonials.decidedAt))
-      .limit(limit);
+    const rows = await withQueryTimeout(
+      db
+        .select({
+          id: schema.testimonials.id,
+          body: schema.testimonials.body,
+          createdAt: schema.testimonials.createdAt,
+          masterId: schema.testimonials.masterId,
+          firstName: schema.users.firstName,
+          lastName: schema.users.lastName,
+          username: schema.users.username,
+          email: schema.users.email,
+          photoUrl: schema.users.photoUrl,
+          vipUserId: activeVip.userId,
+        })
+        .from(schema.testimonials)
+        .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
+        .leftJoin(activeVip, eq(activeVip.userId, schema.testimonials.userId))
+        .where(where)
+        .orderBy(desc(schema.testimonials.decidedAt))
+        .limit(limit),
+      SSR_READ_TIMEOUT_MS,
+      "testimonials.listApproved",
+    );
     return rows.map((r) => ({
       id: r.id,
       body: r.body,
@@ -68,6 +78,13 @@ export async function listApprovedTestimonials(
     }));
   } catch (error) {
     if (isMissingTable(error)) return [];
+    if (error instanceof QueryTimeoutError) {
+      console.warn(
+        "[entities/testimonial] listApprovedTestimonials timed out:",
+        error.message,
+      );
+      return [];
+    }
     throw error;
   }
 }
