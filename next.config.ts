@@ -1,18 +1,13 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
-import withSerwistInit from "@serwist/next";
+import { withSerwist } from "@serwist/turbopack";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-// Compiles `app/sw.ts` → `public/sw.js`. Disabled in dev so HMR isn't
-// poisoned by cached chunks; in prod the service worker takes over
-// caching + push/notificationclick handling.
-const withSerwist = withSerwistInit({
-  swSrc: "app/sw.ts",
-  swDest: "public/sw.js",
-  disable: process.env.NODE_ENV === "development",
-  reloadOnOnline: true,
-});
+// @serwist/turbopack is the Next 16/Turbopack-compatible variant. It
+// emits the compiled service worker via a route handler in
+// app/serwist/[path]/route.ts; the bundle lands at /serwist/sw.js
+// rather than /sw.js.
 
 const nextConfig: NextConfig = {
   // Next.js 16 blocks cross-origin dev requests by default. Allow the
@@ -39,3 +34,4 @@ const nextConfig: NextConfig = {
 };
 
 export default withSerwist(withNextIntl(nextConfig));
+

@@ -82,7 +82,7 @@ export async function dispatchNotification(
       await recordNotification({
         userId,
         category,
-        payload,
+        payload: { ...payload },
         status: "no_subscriptions",
         error: null,
       });
@@ -93,7 +93,7 @@ export async function dispatchNotification(
       await recordNotification({
         userId,
         category,
-        payload,
+        payload: { ...payload },
         status: "all_failed",
         error: "vapid_not_configured",
       });
@@ -137,7 +137,10 @@ export async function dispatchNotification(
     await recordNotification({
       userId,
       category,
-      payload: { ...(payload.meta ?? {}), ...payload },
+      payload: { ...(payload.meta ?? {}), ...payload } as Record<
+        string,
+        unknown
+      >,
       status: anySuccess ? "sent" : "all_failed",
       error: anySuccess ? null : lastErr,
     });

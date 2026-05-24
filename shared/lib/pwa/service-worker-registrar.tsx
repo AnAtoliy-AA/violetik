@@ -16,7 +16,9 @@ export function ServiceWorkerRegistrar() {
 
     const register = () => {
       navigator.serviceWorker
-        .register("/sw.js", { scope: "/" })
+        // @serwist/turbopack serves the compiled SW from a route
+        // handler, not /sw.js. Path matches app/serwist/[path]/route.ts.
+        .register("/serwist/sw.js", { scope: "/" })
         .catch((err) => console.warn("[sw] register failed:", err));
     };
 
