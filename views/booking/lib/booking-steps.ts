@@ -38,7 +38,7 @@ export const BOOKING_TIMES = [
   "19:00",
 ] as const;
 
-export const BOOKING_START_ISO = "2026-05-19";
+export const MIN_BOOKING_LEAD_MINUTES = 180;
 
 export interface DateCell {
   iso: string;
@@ -47,20 +47,65 @@ export interface DateCell {
   disabled: boolean;
 }
 
-export function buildDateStrip(locale: string): DateCell[] {
-  const start = new Date(`${BOOKING_START_ISO}T00:00:00Z`);
+/**
+ * Today's civil date (YYYY-MM-DD) in the given timezone. Used as the
+ * first cell of the booking date strip — never UTC, because the
+ * studio's "today" can differ from UTC by ±3h.
+ */
+export function bookingStartISO(now: Date, timeZone: string): string {
+  // en-CA always formats as YYYY-MM-DD.
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+}
+
+const DOW_FROM_EN = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+} as const;
+
+function dayOfWeekInTZ(iso: string, timeZone: string): number {
+  // 12:00 UTC anchor avoids DST edges.
+  const anchor = new Date(`${iso}T12:00:00Z`);
+  const wd = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    weekday: "short",
+  }).format(anchor);
+  return DOW_FROM_EN[wd as keyof typeof DOW_FROM_EN];
+}
+
+function addCivilDays(iso: string, n: number): string {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+export function buildDateStrip(
+  locale: string,
+  timeZone: string,
+  now: Date = new Date(),
+): DateCell[] {
+  const start = bookingStartISO(now, timeZone);
   const dowFmt = new Intl.DateTimeFormat(locale, {
     weekday: "short",
     timeZone: "UTC",
   });
   return Array.from({ length: 14 }, (_, i) => {
-    const d = new Date(start);
-    d.setUTCDate(start.getUTCDate() + i);
-    const dayOfWeek = d.getUTCDay(); // 0 = Sun, 1 = Mon
+    const iso = addCivilDays(start, i);
+    const dayOfWeek = dayOfWeekInTZ(iso, timeZone);
+    const dayNum = Number.parseInt(iso.slice(8, 10), 10);
     return {
-      iso: d.toISOString().slice(0, 10),
-      day: d.getUTCDate(),
-      dow: dowFmt.format(d),
+      iso,
+      day: dayNum,
+      dow: dowFmt.format(new Date(`${iso}T12:00:00Z`)),
       disabled: dayOfWeek === 0 || dayOfWeek === 1,
     };
   });

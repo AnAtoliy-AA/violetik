@@ -17,6 +17,7 @@ import {
   isBookingStep,
 } from "@/views/booking";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import { bookingTimeZoneFromSettings } from "@/shared/lib/google-calendar";
 
 type Params = { locale: string; step: string };
 
@@ -62,6 +63,7 @@ export default async function BookingRoute({
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
   const location = studioLocationLine(settings, locale);
+  const timeZone = bookingTimeZoneFromSettings(settings);
   return (
     <Suspense fallback={null}>
       <BookingPage
@@ -71,6 +73,7 @@ export default async function BookingRoute({
         currency={currency}
         masters={masters}
         location={location}
+        timeZone={timeZone}
       />
     </Suspense>
   );
