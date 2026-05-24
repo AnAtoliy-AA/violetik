@@ -1234,7 +1234,18 @@ export async function mergeUsers(
         .where(eq(schema.googleOauthTokens.userId, input.loserId));
     }
 
-    // 3. Absorb provider id + per-field overrides onto the survivor row.
+    // 3. Delete the loser row BEFORE patching the survivor. Step
+    //    ordering matters: `users.telegramId` and `users.googleSub`
+    //    both carry UNIQUE constraints (see db/schema.ts:34-35). If
+    //    we updated the survivor's `telegramId`/`googleSub` while the
+    //    loser still held those values, Postgres would abort with a
+    //    unique-constraint violation. Re-points in steps 1-2 already
+    //    moved every FK off the loser, so DELETE has no real data to
+    //    cascade onto.
+    await tx.delete(schema.users).where(eq(schema.users.id, input.loserId));
+
+    // 4. Absorb provider id + per-field overrides + audit note onto
+    //    the survivor row.
     const patch: Partial<typeof schema.users.$inferInsert> = {};
     if (!survivor.telegramId && loser.telegramId) {
       patch.telegramId = loser.telegramId;
@@ -1263,7 +1274,6 @@ export async function mergeUsers(
       loser.photoUrl,
     );
 
-    // 4. Append an audit line to admin_note.
     const today = new Date().toISOString().slice(0, 10);
     const auditLine = `[merged ${today} — absorbed ${input.loserId} by ${input.auditByAdmin}]`;
     patch.adminNote = survivor.adminNote
@@ -1274,10 +1284,6 @@ export async function mergeUsers(
       .update(schema.users)
       .set(patch)
       .where(eq(schema.users.id, input.survivorId));
-
-    // 5. Delete loser row. All FKs are migrated above, so the cascade
-    //    has nothing to destroy.
-    await tx.delete(schema.users).where(eq(schema.users.id, input.loserId));
 
     return { ok: true as const, survivorId: input.survivorId };
   }).catch((err): MergeUsersResult => {

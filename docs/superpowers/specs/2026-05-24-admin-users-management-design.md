@@ -129,16 +129,16 @@ Re-runs conflict check (defence in depth). If clean, runs everything below insid
    - `UPDATE services SET updated_by = $survivor WHERE updated_by = $loser`
    - `UPDATE studio_photos SET uploaded_by = $survivor WHERE uploaded_by = $loser`
 2. **`google_oauth_tokens`** — PK is `userId`. If loser has a row and survivor doesn't, re-point the row's `user_id`. If both have rows, keep the survivor's (drop loser's).
-3. **Absorb provider id** — update survivor row:
-   - If loser has `telegramId` and survivor doesn't, copy it.
-   - If loser has `googleSub` and survivor doesn't, copy it.
-4. **Apply per-field overrides** — `firstName`, `lastName`, `email`, `photoUrl` on survivor as chosen.
-5. **Append audit line** to survivor's `admin_note`:
-   ```
-   [merged 2026-05-24 — absorbed tg:12345 by google:abcdef]
-   ```
-   (Prepended onto existing note with a blank line separator; admin can edit afterward.)
-6. **Delete loser row** — `DELETE FROM users WHERE id = $loser`. Step ordering is load-bearing: `bookings`, `vip_requests`, `testimonials`, and `google_oauth_tokens` all have `ON DELETE CASCADE` to `users.id`. The FK re-pointing in steps 1–2 must complete before this `DELETE`, or the cascade would silently destroy data we just merged.
+3. **Delete loser row** — `DELETE FROM users WHERE id = $loser`. This step runs **before** the survivor patch in step 4 because both `users.telegramId` and `users.googleSub` carry `UNIQUE` constraints; updating the survivor with the loser's provider id while the loser row still holds it would abort the transaction with a unique-constraint violation. Step ordering is also load-bearing for cascades: `bookings`, `vip_requests`, `testimonials`, and `google_oauth_tokens` all have `ON DELETE CASCADE` to `users.id`. The FK re-pointing in steps 1–2 must complete before this `DELETE`, or the cascade would silently destroy data we just merged.
+4. **Absorb provider id + per-field overrides + audit note** — single `UPDATE` on the survivor row:
+   - If loser had `telegramId` and survivor doesn't, copy it.
+   - If loser had `googleSub` and survivor doesn't, copy it.
+   - Apply per-field overrides for `firstName`, `lastName`, `email`, `photoUrl`.
+   - Prepend an audit line to `admin_note`:
+     ```
+     [merged 2026-05-24 — absorbed tg:12345 by google:abcdef]
+     ```
+     (Existing note kept after a blank-line separator; admin can edit afterward.)
 
 If anything fails, the transaction rolls back and the action returns a typed error rendered on the merge page. On success, redirect to `/admin/users/[survivor]`.
 
