@@ -1,9 +1,25 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/turbopack/worker";
-import { Serwist } from "serwist";
+import { NetworkFirst, Serwist } from "serwist";
 
 declare const self: ServiceWorkerGlobalScope & {
   __SW_MANIFEST: (string | { url: string; revision: string | null })[];
+};
+
+// Bounded navigation handler — must come before defaultCache so it
+// matches first. defaultCache's own NetworkFirst for navigations has no
+// timeout, so a slow SSR (DB stall, cold lambda) leaves the user
+// staring at a blank chrome until the response eventually comes in or
+// the fetch errors. With networkTimeoutSeconds, the SW gives up on the
+// network after 4s and serves the cached version (or falls through to
+// the offline fallback below) — perceived latency stays bounded.
+const navigationHandler = {
+  matcher: ({ request, sameOrigin }: { request: Request; sameOrigin: boolean }) =>
+    sameOrigin && request.mode === "navigate",
+  handler: new NetworkFirst({
+    cacheName: "pages",
+    networkTimeoutSeconds: 4,
+  }),
 };
 
 const serwist = new Serwist({
@@ -11,7 +27,7 @@ const serwist = new Serwist({
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: defaultCache,
+  runtimeCaching: [navigationHandler, ...defaultCache],
   fallbacks: {
     entries: [
       {
