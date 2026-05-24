@@ -9,6 +9,7 @@ import {
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 import { getActiveGoogleToken } from "@/db/google-tokens";
 import { deleteCalendarEvent, refreshAccessToken } from "@/shared/lib/google-calendar";
+import { dispatchNotification } from "@/shared/lib/notifications";
 
 export type CancelBookingResult =
   | { ok: true }
@@ -71,6 +72,18 @@ export async function cancelBookingAction(
         );
       }
     }
+
+    // Surface to the user's other devices so any open booking screens
+    // refresh and the customer sees a confirmation push.
+    await dispatchNotification(user.id, "booking_cancelled", {
+      titleKey: "category_booking_cancelled_push_title",
+      bodyKey: "category_booking_cancelled_push_body",
+      url: "/profile",
+      meta: {
+        bookingId: cancelled.id,
+        scheduledFor: cancelled.scheduledFor.toISOString(),
+      },
+    });
 
     revalidatePath("/", "layout");
     return { ok: true };

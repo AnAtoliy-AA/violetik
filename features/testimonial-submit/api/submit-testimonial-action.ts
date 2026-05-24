@@ -5,6 +5,8 @@ import { z } from "zod";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 import { getMasterById } from "@/db/masters";
 import { createTestimonial } from "@/db/testimonials";
+import { listAdminUserIds } from "@/db/users-admin";
+import { dispatchNotification } from "@/shared/lib/notifications";
 
 const inputSchema = z.object({
   masterId: z.string().min(1),
@@ -53,6 +55,17 @@ export async function submitTestimonialAction(
     }
     if (!result.ok) {
       return { ok: false, reason: result.reason };
+    }
+
+    const adminIds = await listAdminUserIds();
+    for (const adminId of adminIds) {
+      await dispatchNotification(adminId, "testimonial_submitted", {
+        titleKey: "category_testimonial_submitted_push_title",
+        bodyKey: "category_testimonial_submitted_push_body",
+        bodyParams: { customer: user.firstName ?? user.id },
+        url: "/admin/testimonials",
+        meta: { testimonialId: result.row.id, kind: "new" },
+      });
     }
 
     revalidatePath("/", "layout");

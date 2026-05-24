@@ -8,6 +8,25 @@ import {
   requestTestimonialEdit,
   requestTestimonialRemoval,
 } from "@/db/testimonials";
+import { listAdminUserIds } from "@/db/users-admin";
+import { dispatchNotification } from "@/shared/lib/notifications";
+
+async function notifyAdminsOfChangeRequest(
+  testimonialId: string,
+  customerLabel: string,
+  kind: "edit" | "removal",
+) {
+  const adminIds = await listAdminUserIds();
+  for (const adminId of adminIds) {
+    await dispatchNotification(adminId, "testimonial_submitted", {
+      titleKey: "category_testimonial_submitted_push_title",
+      bodyKey: "category_testimonial_submitted_push_body",
+      bodyParams: { customer: customerLabel },
+      url: "/admin/testimonials",
+      meta: { testimonialId, kind },
+    });
+  }
+}
 
 export type ChangeRequestActionResult =
   | { ok: true }
@@ -47,6 +66,11 @@ export async function requestTestimonialEditAction(
     );
     if (!result) return { ok: false, reason: "unknown" };
     if (!result.ok) return { ok: false, reason: result.reason };
+    await notifyAdminsOfChangeRequest(
+      parsed.data.testimonialId,
+      user.firstName ?? user.id,
+      "edit",
+    );
     revalidatePath("/", "layout");
     return { ok: true };
   } catch (err) {
@@ -71,6 +95,11 @@ export async function requestTestimonialRemovalAction(
     );
     if (!result) return { ok: false, reason: "unknown" };
     if (!result.ok) return { ok: false, reason: result.reason };
+    await notifyAdminsOfChangeRequest(
+      parsed.data.testimonialId,
+      user.firstName ?? user.id,
+      "removal",
+    );
     revalidatePath("/", "layout");
     return { ok: true };
   } catch (err) {
