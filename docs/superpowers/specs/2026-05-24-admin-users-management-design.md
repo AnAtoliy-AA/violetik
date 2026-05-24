@@ -37,7 +37,7 @@ Drizzle schema add to [db/schema.ts](../../../db/schema.ts):
 adminNote: text("admin_note"),
 ```
 
-**VIP is not a column on `users`.** It continues to live in `vip_requests`. Admin-granted VIP becomes a `status='approved'` row created directly (skipping the `pending` step). A lifetime VIP is `status='approved' AND expires_at IS NULL`. Three existing functions in [db/vip-requests.ts](../../../db/vip-requests.ts) need updating:
+**VIP is not a column on `users`.** It continues to live in `vip_requests`. Admin-granted VIP becomes a `status='approved'` row created directly (skipping the `pending` step). A lifetime VIP is `status='approved' AND expires_at IS NULL`. Four existing functions in [db/vip-requests.ts](../../../db/vip-requests.ts) need updating:
 
 - `getCurrentTier(userId)` — treat `expires_at IS NULL` as never-expires (lifetime VIP).
 - `listActiveVips()` — include rows with `expires_at IS NULL`. Sort `expires_at NULLS LAST` so lifetime VIPs land at the end.
@@ -138,7 +138,7 @@ Re-runs conflict check (defence in depth). If clean, runs everything below insid
    [merged 2026-05-24 — absorbed tg:12345 by google:abcdef]
    ```
    (Prepended onto existing note with a blank line separator; admin can edit afterward.)
-6. **Delete loser row** — `DELETE FROM users WHERE id = $loser`. (FKs are now all migrated, so this won't cascade-delete real data.)
+6. **Delete loser row** — `DELETE FROM users WHERE id = $loser`. Step ordering is load-bearing: `bookings`, `vip_requests`, `testimonials`, and `google_oauth_tokens` all have `ON DELETE CASCADE` to `users.id`. The FK re-pointing in steps 1–2 must complete before this `DELETE`, or the cascade would silently destroy data we just merged.
 
 If anything fails, the transaction rolls back and the action returns a typed error rendered on the merge page. On success, redirect to `/admin/users/[survivor]`.
 
