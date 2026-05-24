@@ -1,6 +1,10 @@
 import { randomBytes } from "node:crypto";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "./index";
+import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
+
+// Admin SSR budget — same rationale as db/site-settings.ts.
+const ADMIN_READ_TIMEOUT_MS = 5_000;
 
 export function generateTestimonialId(): string {
   return `tst_${randomBytes(8).toString("hex")}`;
@@ -203,13 +207,24 @@ export async function decideTestimonial(
 export async function countPendingTestimonials(): Promise<number> {
   if (!db) return 0;
   try {
-    const rows = await db
-      .select({ n: sql<number>`count(*)::int` })
-      .from(schema.testimonials)
-      .where(eq(schema.testimonials.status, "pending"));
+    const rows = await withQueryTimeout(
+      db
+        .select({ n: sql<number>`count(*)::int` })
+        .from(schema.testimonials)
+        .where(eq(schema.testimonials.status, "pending")),
+      ADMIN_READ_TIMEOUT_MS,
+      "testimonials.countPending",
+    );
     return rows[0]?.n ?? 0;
   } catch (error) {
     if (isMissingTable(error)) return 0;
+    if (error instanceof QueryTimeoutError) {
+      console.warn(
+        "[db/testimonials] countPendingTestimonials timed out:",
+        error.message,
+      );
+      return 0;
+    }
     throw error;
   }
 }

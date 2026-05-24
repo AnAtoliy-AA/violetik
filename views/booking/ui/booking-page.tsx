@@ -54,6 +54,7 @@ export interface BookingPageProps {
   currency?: CurrencyCode;
   masters: readonly Master[];
   location: string;
+  timeZone: string;
 }
 
 export function BookingPage({
@@ -63,6 +64,7 @@ export function BookingPage({
   currency = "EUR",
   masters,
   location,
+  timeZone,
 }: BookingPageProps) {
   const t = useTranslations("Booking");
   const tSteps = useTranslations("Booking.steps");
@@ -154,7 +156,7 @@ export function BookingPage({
               />
             ) : null}
             {step === "master" ? <MasterStep masters={masters} /> : null}
-            {step === "date" ? <DateStep /> : null}
+            {step === "date" ? <DateStep timeZone={timeZone} /> : null}
             {step === "time" ? <TimeStep /> : null}
             {step === "confirm" ? (
               <ConfirmStep

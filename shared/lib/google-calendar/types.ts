@@ -26,4 +26,8 @@ export interface SlotComputationInput {
   dayISO: string;
   timeZone: string;
   granularityMin?: number;
+  /** Server "now" — used together with `minLeadMinutes` to drop stale candidates. */
+  now?: Date;
+  /** Minimum lead time in minutes. Ignored when `now` is omitted. */
+  minLeadMinutes?: number;
 }

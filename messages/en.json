@@ -106,6 +106,7 @@
       "eyebrow": "Step 04 / Time",
       "title": "Choose your <em>hour</em>.",
       "no_date": "Pick a date first to see availability.",
+      "none_available": "No times left for this date — please pick another day.",
       "zone_suffix": "Times in studio local time.",
       "reserved": "Reserved",
       "available": "Available"
@@ -129,6 +130,7 @@
       "slot_taken": "That slot was just taken. Please pick another.",
       "db_unavailable": "Bookings are temporarily offline. Please try again in a moment.",
       "invalid_input": "Pick a service, date and time before confirming.",
+      "too_soon": "This time is too close to now. Bookings need at least 3 hours' notice — please pick another time.",
       "unknown": "Something slipped. Please try again."
     }
   },

@@ -7,22 +7,28 @@ import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import {
-  BOOKING_START_ISO,
   buildDateStrip,
   formatMonthYear,
 } from "@/views/booking/lib/booking-steps";
 import { useBookingStore } from "@/views/booking/model/booking-store";
 
-export function DateStep() {
+export interface DateStepProps {
+  timeZone: string;
+}
+
+export function DateStep({ timeZone }: DateStepProps) {
   const t = useTranslations("Booking.date");
   const locale = useLocale();
   const selected = useBookingStore((s) => s.date);
   const setDate = useBookingStore((s) => s.setDate);
 
-  const days = useMemo(() => buildDateStrip(locale), [locale]);
+  const days = useMemo(
+    () => buildDateStrip(locale, timeZone),
+    [locale, timeZone],
+  );
   const monthLabel = useMemo(
-    () => formatMonthYear(BOOKING_START_ISO, locale),
-    [locale],
+    () => formatMonthYear(days[0].iso, locale),
+    [days, locale],
   );
 
   return (

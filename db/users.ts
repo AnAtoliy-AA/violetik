@@ -1,5 +1,12 @@
 import { eq, sql } from "drizzle-orm";
 import { db, schema } from "./index";
+import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
+
+// SSR auth-path read budget — `getUserById` runs sequentially before
+// any other admin/page query (via requireAdmin). If it hangs on a
+// sick Supabase pooler, the whole page hangs. Same rationale as
+// db/site-settings.ts.
+const AUTH_READ_TIMEOUT_MS = 5_000;
 
 export interface TelegramUserPayload {
   telegramId: number;
@@ -57,12 +64,24 @@ export async function getUserById(
   id: string,
 ): Promise<schema.User | null> {
   if (!db) return null;
-  const rows = await db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.id, id))
-    .limit(1);
-  return rows[0] ?? null;
+  try {
+    const rows = await withQueryTimeout(
+      db
+        .select()
+        .from(schema.users)
+        .where(eq(schema.users.id, id))
+        .limit(1),
+      AUTH_READ_TIMEOUT_MS,
+      "users.getById",
+    );
+    return rows[0] ?? null;
+  } catch (error) {
+    if (error instanceof QueryTimeoutError) {
+      console.warn("[db/users] getUserById timed out:", error.message);
+      return null;
+    }
+    throw error;
+  }
 }
 
 /**

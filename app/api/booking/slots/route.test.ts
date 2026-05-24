@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("@/db/google-tokens", () => ({
   getActiveGoogleToken: vi.fn(async () => null),
@@ -16,9 +16,18 @@ describe("GET /api/booking/slots", () => {
   beforeEach(() => {
     slotCache.clear();
     vi.restoreAllMocks();
+    // Only fake Date so the route's `new Date()` is deterministic; leaving
+    // setTimeout/queueMicrotask real keeps async/fetch from deadlocking.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    // Tue 2026-05-19 08:00 Europe/Minsk (= 05:00 UTC). Lead cutoff = 11:00 local.
+    vi.setSystemTime(new Date("2026-05-19T05:00:00Z"));
     vi.stubEnv("NEXT_PUBLIC_BOOKING_TIMEZONE", "Europe/Minsk");
     vi.stubEnv("GOOGLE_CLIENT_ID", "id");
     vi.stubEnv("GOOGLE_CLIENT_SECRET", "sec");
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("falls back to static slots when no token row exists", async () => {
@@ -32,7 +41,7 @@ describe("GET /api/booking/slots", () => {
     const json = (await res.json()) as { source: string; slots: string[] };
     expect(json.source).toBe("static");
     expect(json.slots.length).toBeGreaterThan(0);
-    expect(json.slots[0]).toBe("10:00");
+    expect(json.slots[0]).toBe("11:00");
   });
 
   it("returns slots derived from freeBusy when a token exists", async () => {

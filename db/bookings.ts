@@ -1,6 +1,13 @@
 import { randomBytes } from "node:crypto";
 import { and, asc, desc, eq, gte, ne, sql } from "drizzle-orm";
 import { db, schema } from "./index";
+import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
+
+// Admin SSR budget — same rationale as db/site-settings.ts. The Supabase
+// Transaction pooler ignores client-side statement_timeout, so we cap
+// reads here to keep the admin page from hanging on the 2-minute
+// server-side default.
+const ADMIN_READ_TIMEOUT_MS = 5_000;
 
 export interface NewBookingInput {
   userId: string;
@@ -89,31 +96,43 @@ export async function listActiveBookingsFrom(
  */
 export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
   if (!db) return [];
-  const rows = await db
-    .select({
-      booking: schema.bookings,
-      userEmail: schema.users.email,
-      userFirstName: schema.users.firstName,
-      userLastName: schema.users.lastName,
-      username: schema.users.username,
-      masterNameEn: schema.masters.nameEn,
-      masterNameRu: schema.masters.nameRu,
-      masterNameBy: schema.masters.nameBy,
-    })
-    .from(schema.bookings)
-    .leftJoin(schema.users, eq(schema.bookings.userId, schema.users.id))
-    .leftJoin(schema.masters, eq(schema.bookings.masterId, schema.masters.id))
-    .orderBy(desc(schema.bookings.scheduledFor));
-  return rows.map((r) => ({
-    ...r.booking,
-    userEmail: r.userEmail,
-    userFirstName: r.userFirstName,
-    userLastName: r.userLastName,
-    username: r.username,
-    masterNameEn: r.masterNameEn,
-    masterNameRu: r.masterNameRu,
-    masterNameBy: r.masterNameBy,
-  }));
+  try {
+    const rows = await withQueryTimeout(
+      db
+        .select({
+          booking: schema.bookings,
+          userEmail: schema.users.email,
+          userFirstName: schema.users.firstName,
+          userLastName: schema.users.lastName,
+          username: schema.users.username,
+          masterNameEn: schema.masters.nameEn,
+          masterNameRu: schema.masters.nameRu,
+          masterNameBy: schema.masters.nameBy,
+        })
+        .from(schema.bookings)
+        .leftJoin(schema.users, eq(schema.bookings.userId, schema.users.id))
+        .leftJoin(schema.masters, eq(schema.bookings.masterId, schema.masters.id))
+        .orderBy(desc(schema.bookings.scheduledFor)),
+      ADMIN_READ_TIMEOUT_MS,
+      "bookings.listForAdmin",
+    );
+    return rows.map((r) => ({
+      ...r.booking,
+      userEmail: r.userEmail,
+      userFirstName: r.userFirstName,
+      userLastName: r.userLastName,
+      username: r.username,
+      masterNameEn: r.masterNameEn,
+      masterNameRu: r.masterNameRu,
+      masterNameBy: r.masterNameBy,
+    }));
+  } catch (error) {
+    if (error instanceof QueryTimeoutError) {
+      console.warn("[db/bookings] listBookingsForAdmin timed out:", error.message);
+      return [];
+    }
+    throw error;
+  }
 }
 
 export async function setBookingStatus(
