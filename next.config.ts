@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import withSerwistInit from "@serwist/next";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+
+// Compiles `app/sw.ts` → `public/sw.js`. Disabled in dev so HMR isn't
+// poisoned by cached chunks; in prod the service worker takes over
+// caching + push/notificationclick handling.
+const withSerwist = withSerwistInit({
+  swSrc: "app/sw.ts",
+  swDest: "public/sw.js",
+  disable: process.env.NODE_ENV === "development",
+  reloadOnOnline: true,
+});
 
 const nextConfig: NextConfig = {
   // Next.js 16 blocks cross-origin dev requests by default. Allow the
@@ -27,4 +38,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withSerwist(withNextIntl(nextConfig));

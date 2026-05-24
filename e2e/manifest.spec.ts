@@ -13,6 +13,15 @@ test("manifest.webmanifest serves valid PWA JSON", async ({ request }) => {
   expect(Array.isArray(body.icons)).toBe(true);
   expect(body.icons.length).toBeGreaterThanOrEqual(1);
   expect(body.icons[0].src).toBe("/icon.svg");
+  const icons: Array<{ src: string; purpose?: string; sizes?: string }> =
+    body.icons;
+  expect(
+    icons.some((i) => i.src === "/icon-192.png" && i.sizes === "192x192"),
+  ).toBe(true);
+  expect(
+    icons.some((i) => i.src === "/icon-512.png" && i.sizes === "512x512"),
+  ).toBe(true);
+  expect(icons.some((i) => i.purpose === "maskable")).toBe(true);
 });
 
 test("home page emits the manifest link + theme-color meta", async ({ page }) => {

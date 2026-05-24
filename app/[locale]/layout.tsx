@@ -8,6 +8,7 @@ import type { Locale } from "@/i18n/routing";
 import { cityForLocale } from "@/entities/site-settings";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { LocalBusinessJsonLd } from "@/shared/ui/local-business-jsonld";
+import { ServiceWorkerRegistrar } from "@/shared/lib/pwa/service-worker-registrar";
 import { SiteFooter } from "@/widgets/site-footer";
 import "../globals.css";
 
@@ -97,6 +98,7 @@ export async function generateMetadata({
         { url: "/icon.svg", type: "image/svg+xml" },
         { url: "/favicon.ico", sizes: "any" },
       ],
+      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
     },
     alternates: {
       canonical: `${SITE_URL}/${locale}`,
@@ -136,6 +138,7 @@ export default async function LocaleLayout({
           name={tSite("name")}
         />
         <NextIntlClientProvider>
+          <ServiceWorkerRegistrar />
           {children}
           <SiteFooter />
         </NextIntlClientProvider>
