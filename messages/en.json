@@ -565,7 +565,12 @@
       "bookings_link": "All bookings →",
       "testimonials_pending": "{n} pending",
       "testimonials_approved": "{n} approved",
-      "duplicates_empty": "No likely duplicates."
+      "duplicates_empty": "No likely duplicates.",
+      "section_merge_with": "Merge with another user",
+      "merge_with_hint": "Pick any other user to start a merge — useful when two same-provider rows are the same human and the auto-suggest doesn't see it.",
+      "merge_with_placeholder": "Select another user…",
+      "merge_with_cta": "Merge with…",
+      "merge_with_empty": "No other users to merge with."
     },
     "merge": {
       "meta_title": "Merge users",

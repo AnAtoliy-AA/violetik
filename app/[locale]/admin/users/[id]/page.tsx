@@ -5,14 +5,20 @@ import { Link, redirect } from "@/i18n/navigation";
 import { requireAdmin } from "@/shared/lib/auth-server";
 import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
-import { getUserDetail, suggestMergeCandidates } from "@/db/users-admin";
+import {
+  getUserDetail,
+  listUsers,
+  suggestMergeCandidates,
+} from "@/db/users-admin";
 import {
   RoleToggle,
   AdminNoteForm,
   VipGrantForm,
   VipRevokeButton,
   SuggestedMerges,
+  MergePicker,
   type SuggestedMergeRow,
+  type MergePickerOption,
 } from "@/features/users-admin";
 
 export const dynamic = "force-dynamic";
@@ -69,13 +75,19 @@ export default async function AdminUserDetailRoute({
   const t = await getTranslations("AdminUsers");
   const tDetail = await getTranslations("AdminUsers.detail");
 
-  const suggestions = await suggestMergeCandidates({ scope: "for", userId: id });
+  const [suggestions, allUsers] = await Promise.all([
+    suggestMergeCandidates({ scope: "for", userId: id }),
+    listUsers({ q: "", role: "all", vip: "all", page: 1 }),
+  ]);
   const dupRows: SuggestedMergeRow[] = suggestions.map((c) => ({
     a: { id: c.a.id, displayName: displayName(c.a), photoUrl: c.a.photoUrl },
     b: { id: c.b.id, displayName: displayName(c.b), photoUrl: c.b.photoUrl },
     score: c.score,
     signals: c.signals,
   }));
+  const otherUsers: MergePickerOption[] = allUsers
+    .filter((u) => u.id !== id)
+    .map((u) => ({ id: u.id, displayName: displayName(u) }));
 
   const now = new Date();
   const defaultExpiry = new Date(now.getTime() + 30 * 86400_000)
@@ -222,6 +234,22 @@ export default async function AdminUserDetailRoute({
           <p className="text-[13px] text-text-3">{tDetail("duplicates_empty")}</p>
         </section>
       )}
+
+      <section className="px-[22px] pb-6">
+        <h2 className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {tDetail("section_merge_with")}
+        </h2>
+        <p className="mb-3 text-[12px] text-text-3">
+          {tDetail("merge_with_hint")}
+        </p>
+        <MergePicker
+          userId={user.id}
+          options={otherUsers}
+          placeholderLabel={tDetail("merge_with_placeholder")}
+          mergeWithLabel={tDetail("merge_with_cta")}
+          emptyLabel={tDetail("merge_with_empty")}
+        />
+      </section>
     </div>
   );
 }
