@@ -84,4 +84,36 @@ describe("computeAvailableSlots", () => {
     expect(slots[0]).toBe("00:30");
     expect(slots).toContain("03:00");
   });
+
+  it("drops slots that start within minLeadMinutes of `now`", () => {
+    // 2026-05-19 (Tue) 11:00 Europe/Minsk = 08:00 UTC
+    const now = new Date("2026-05-19T08:00:00Z");
+    const slots = computeAvailableSlots({
+      workingHours: MINSK_TUE_10_TO_19,
+      busy: [],
+      serviceDurationMin: 60,
+      dayISO: "2026-05-19",
+      timeZone: "Europe/Minsk",
+      now,
+      minLeadMinutes: 180,
+    });
+    // Cutoff = 14:00 Europe/Minsk. Slots earlier than 14:00 are dropped;
+    // 14:00 itself sits exactly at the boundary and is kept.
+    expect(slots).not.toContain("10:00");
+    expect(slots).not.toContain("13:30");
+    expect(slots).toContain("14:00");
+    expect(slots).toContain("17:00");
+  });
+
+  it("does not filter when `now` is omitted (backwards compatible)", () => {
+    const slots = computeAvailableSlots({
+      workingHours: MINSK_TUE_10_TO_19,
+      busy: [],
+      serviceDurationMin: 60,
+      dayISO: "2026-05-19",
+      timeZone: "Europe/Minsk",
+      minLeadMinutes: 180, // ignored without `now`
+    });
+    expect(slots[0]).toBe("10:00");
+  });
 });
