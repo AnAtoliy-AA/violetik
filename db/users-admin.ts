@@ -217,7 +217,7 @@ export async function getUserDetail(id: string): Promise<UserDetail | null> {
             eq(schema.vipRequests.status, "approved"),
             or(
               isNull(schema.vipRequests.expiresAt),
-              sql`${schema.vipRequests.expiresAt} > ${now}`,
+              gt(schema.vipRequests.expiresAt, now),
             ),
           ),
         )
