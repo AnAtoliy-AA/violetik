@@ -2,6 +2,8 @@ import { useTranslations } from "next-intl";
 import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import {
+  AdminDeleteButton,
+  ChangeRequestActions,
   DecisionActions,
   TestimonialRow,
   type TestimonialRowLabels,
@@ -14,6 +16,7 @@ export interface AdminTestimonialsPageProps {
   pending: readonly AdminTestimonialRow[];
   approved: readonly AdminTestimonialRow[];
   rejected: readonly AdminTestimonialRow[];
+  changeRequests: readonly AdminTestimonialRow[];
 }
 
 export function AdminTestimonialsPage({
@@ -21,6 +24,7 @@ export function AdminTestimonialsPage({
   pending,
   approved,
   rejected,
+  changeRequests,
 }: AdminTestimonialsPageProps) {
   const t = useTranslations("AdminTestimonials");
   const labels: TestimonialRowLabels = {
@@ -32,6 +36,11 @@ export function AdminTestimonialsPage({
   };
   const approveLabel = t("cta_approve");
   const rejectLabel = t("cta_reject");
+  const deleteLabel = t("cta_delete");
+  const confirmDeleteLabel = t("cta_confirm_delete");
+  const cancelLabel = t("cta_cancel");
+  const acceptChangeLabel = t("cta_accept_change");
+  const rejectChangeLabel = t("cta_reject_change");
 
   return (
     <div className="pb-16">
@@ -76,6 +85,53 @@ export function AdminTestimonialsPage({
 
       <section className="px-[22px] pb-6">
         <h2 className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("section_change_requests", { n: changeRequests.length })}
+        </h2>
+        {changeRequests.length === 0 ? (
+          <p className="text-[13px] text-text-3">{t("empty_change_requests")}</p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {changeRequests.map((row) => {
+              const kind: "edit" | "removal" = row.pendingRemoval
+                ? "removal"
+                : "edit";
+              return (
+                <TestimonialRow
+                  key={row.id}
+                  row={row}
+                  locale={locale}
+                  labels={labels}
+                  decisionSlot={
+                    <div className="flex flex-col gap-2">
+                      <div className="rounded-md border-[0.5px] border-line-strong/70 bg-surface-2/50 px-3 py-2">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+                          {kind === "removal"
+                            ? t("request_kind_removal")
+                            : t("request_kind_edit")}
+                        </span>
+                        {kind === "edit" && row.pendingEditBody ? (
+                          <p className="mt-1 text-[13px] text-text-2">
+                            {row.pendingEditBody}
+                          </p>
+                        ) : null}
+                      </div>
+                      <ChangeRequestActions
+                        testimonialId={row.id}
+                        kind={kind}
+                        approveLabel={acceptChangeLabel}
+                        rejectLabel={rejectChangeLabel}
+                      />
+                    </div>
+                  }
+                />
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section className="px-[22px] pb-6">
+        <h2 className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
           {t("section_approved", { n: approved.length })}
         </h2>
         {approved.length === 0 ? (
@@ -88,6 +144,14 @@ export function AdminTestimonialsPage({
                 row={row}
                 locale={locale}
                 labels={labels}
+                decisionSlot={
+                  <AdminDeleteButton
+                    testimonialId={row.id}
+                    deleteLabel={deleteLabel}
+                    confirmLabel={confirmDeleteLabel}
+                    cancelLabel={cancelLabel}
+                  />
+                }
               />
             ))}
           </ul>

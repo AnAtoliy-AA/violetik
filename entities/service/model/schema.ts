@@ -11,7 +11,7 @@ const requiredLocaleString = z.string().trim().min(1, "required").max(280);
 const includeEntrySchema = z.object({
   en: requiredLocaleString,
   ru: requiredLocaleString,
-  be: requiredLocaleString,
+  by: requiredLocaleString,
 });
 
 export const statusSchema = z.enum(["draft", "published", "archived"]);
@@ -20,7 +20,7 @@ export const categoryFormSchema = z.object({
   id: slugSchema,
   nameEn: requiredLocaleString,
   nameRu: requiredLocaleString,
-  nameBe: requiredLocaleString,
+  nameBy: requiredLocaleString,
   sortOrder: z.number().int().min(0).optional(),
   status: statusSchema,
 });
@@ -32,10 +32,10 @@ export const serviceFormSchema = z.object({
   categoryId: slugSchema,
   nameEn: requiredLocaleString,
   nameRu: requiredLocaleString,
-  nameBe: requiredLocaleString,
+  nameBy: requiredLocaleString,
   blurbEn: requiredLocaleString,
   blurbRu: requiredLocaleString,
-  blurbBe: requiredLocaleString,
+  blurbBy: requiredLocaleString,
   includes: z.array(includeEntrySchema).max(8),
   priceCents: z.number().int().min(0).max(10_000_000),
   durationMinutes: z.number().int().min(1).max(1_440),

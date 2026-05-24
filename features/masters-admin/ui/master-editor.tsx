@@ -15,16 +15,16 @@ export interface MasterEditorInitial {
   id: string;
   nameEn: string;
   nameRu: string;
-  nameBe: string;
+  nameBy: string;
   roleEn: string;
   roleRu: string;
-  roleBe: string;
+  roleBy: string;
   bioEn: string;
   bioRu: string;
-  bioBe: string;
+  bioBy: string;
   quoteEn: string;
   quoteRu: string;
-  quoteBe: string;
+  quoteBy: string;
   years: number;
   setsLabel: string;
   sortOrder: number;
@@ -77,16 +77,16 @@ export function MasterEditor({
   const [id, setId] = useState(initial.id);
   const [nameEn, setNameEn] = useState(initial.nameEn);
   const [nameRu, setNameRu] = useState(initial.nameRu);
-  const [nameBe, setNameBe] = useState(initial.nameBe);
+  const [nameBy, setNameBe] = useState(initial.nameBy);
   const [roleEn, setRoleEn] = useState(initial.roleEn);
   const [roleRu, setRoleRu] = useState(initial.roleRu);
-  const [roleBe, setRoleBe] = useState(initial.roleBe);
+  const [roleBy, setRoleBe] = useState(initial.roleBy);
   const [bioEn, setBioEn] = useState(initial.bioEn);
   const [bioRu, setBioRu] = useState(initial.bioRu);
-  const [bioBe, setBioBe] = useState(initial.bioBe);
+  const [bioBy, setBioBe] = useState(initial.bioBy);
   const [quoteEn, setQuoteEn] = useState(initial.quoteEn);
   const [quoteRu, setQuoteRu] = useState(initial.quoteRu);
-  const [quoteBe, setQuoteBe] = useState(initial.quoteBe);
+  const [quoteBy, setQuoteBe] = useState(initial.quoteBy);
   const [years, setYears] = useState(String(initial.years));
   const [setsLabel, setSetsLabel] = useState(initial.setsLabel);
   const [status, setStatus] = useState<Status>(initial.status);
@@ -102,16 +102,16 @@ export function MasterEditor({
       id,
       nameEn,
       nameRu,
-      nameBe,
+      nameBy,
       roleEn,
       roleRu,
-      roleBe,
+      roleBy,
       bioEn,
       bioRu,
-      bioBe,
+      bioBy,
       quoteEn,
       quoteRu,
-      quoteBe,
+      quoteBy,
       years: Number(years) || 0,
       setsLabel,
       sortOrder: initial.sortOrder,
@@ -257,13 +257,13 @@ export function MasterEditor({
         </Field>
         <Field
           id="mst-name-be"
-          label={t("label_name_be")}
-          error={errFor("nameBe")}
+          label={t("label_name_by")}
+          error={errFor("nameBy")}
         >
           <input
             id="mst-name-be"
             type="text"
-            value={nameBe}
+            value={nameBy}
             onChange={(e) => setNameBe(e.target.value)}
             className={inputClass}
           />
@@ -297,13 +297,13 @@ export function MasterEditor({
         </Field>
         <Field
           id="mst-role-be"
-          label={t("label_role_be")}
-          error={errFor("roleBe")}
+          label={t("label_role_by")}
+          error={errFor("roleBy")}
         >
           <input
             id="mst-role-be"
             type="text"
-            value={roleBe}
+            value={roleBy}
             onChange={(e) => setRoleBe(e.target.value)}
             className={inputClass}
           />
@@ -335,12 +335,12 @@ export function MasterEditor({
         </Field>
         <Field
           id="mst-bio-be"
-          label={t("label_bio_be")}
-          error={errFor("bioBe")}
+          label={t("label_bio_by")}
+          error={errFor("bioBy")}
         >
           <textarea
             id="mst-bio-be"
-            value={bioBe}
+            value={bioBy}
             onChange={(e) => setBioBe(e.target.value)}
             className={textareaClass}
           />
@@ -372,12 +372,12 @@ export function MasterEditor({
         </Field>
         <Field
           id="mst-quote-be"
-          label={t("label_quote_be")}
-          error={errFor("quoteBe")}
+          label={t("label_quote_by")}
+          error={errFor("quoteBy")}
         >
           <textarea
             id="mst-quote-be"
-            value={quoteBe}
+            value={quoteBy}
             onChange={(e) => setQuoteBe(e.target.value)}
             className={textareaClass}
           />

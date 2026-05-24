@@ -30,7 +30,7 @@ const goodCategory = {
   id: "care",
   nameEn: "Care",
   nameRu: "Уход",
-  nameBe: "Догляд",
+  nameBy: "Догляд",
   status: "published" as const,
 };
 
@@ -39,10 +39,10 @@ const goodService = {
   categoryId: "care",
   nameEn: "Signature",
   nameRu: "С",
-  nameBe: "С",
+  nameBy: "С",
   blurbEn: "b",
   blurbRu: "b",
-  blurbBe: "b",
+  blurbBy: "b",
   includes: [],
   priceCents: 9500,
   durationMinutes: 75,
@@ -98,7 +98,7 @@ describe("services-admin actions", () => {
     const tooMany = Array.from({ length: 9 }, () => ({
       en: "x",
       ru: "x",
-      be: "x",
+      by: "x",
     }));
     const result = await createServiceAction({
       ...goodService,

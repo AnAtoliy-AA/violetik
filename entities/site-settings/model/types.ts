@@ -13,11 +13,11 @@ export interface SiteSettings {
   currency: CurrencyCode;
   addressEn: string;
   addressRu: string;
-  addressBe: string;
+  addressBy: string;
   country: string;
   cityEn: string;
   cityRu: string;
-  cityBe: string;
+  cityBy: string;
   timezone: string;
   latitude: number | null;
   longitude: number | null;
@@ -41,11 +41,11 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = Object.freeze({
   currency: "EUR" as CurrencyCode,
   addressEn: "By appointment · Verbena Lane 14, Studio B",
   addressRu: "По записи · Verbena Lane 14, Studio B",
-  addressBe: "Па запісу · Verbena Lane 14, Studio B",
+  addressBy: "Па запісу · Verbena Lane 14, Studio B",
   country: "BY",
   cityEn: "",
   cityRu: "",
-  cityBe: "",
+  cityBy: "",
   timezone: "Europe/Minsk",
   latitude: null,
   longitude: null,

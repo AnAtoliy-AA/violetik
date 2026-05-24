@@ -200,7 +200,7 @@
     "label": "Язык",
     "en": "Английский",
     "ru": "Русский",
-    "be": "Белорусский"
+    "by": "Белорусский"
   },
   "Gallery": {
     "meta_title": "Портфолио",
@@ -269,7 +269,24 @@
     "testimonial_form_generic_error": "Что-то пошло не так. Попробуйте ещё раз.",
     "status_pending": "На модерации",
     "status_approved": "Опубликовано",
-    "status_rejected": "Не опубликовано"
+    "status_rejected": "Не опубликовано",
+    "testimonials_request_edit": "Запросить правку",
+    "testimonials_request_removal": "Запросить удаление",
+    "testimonials_request_edit_pending": "Правка ожидает модерации",
+    "testimonials_request_removal_pending": "Удаление ожидает модерации",
+    "testimonials_cancel_request": "Отменить запрос",
+    "testimonials_submit_edit": "Сохранить правку",
+    "testimonials_cancel": "Отмена",
+    "testimonials_confirm_removal": "Это попросит админа удалить ваш отзыв. До решения он остаётся опубликованным.",
+    "testimonials_confirm_removal_yes": "Да, запросить удаление",
+    "testimonials_error_unauthenticated": "Сначала войдите.",
+    "testimonials_error_not_found": "Не нашли этот отзыв.",
+    "testimonials_error_not_owner": "Менять можно только свои отзывы.",
+    "testimonials_error_not_approved": "Менять можно только опубликованные отзывы.",
+    "testimonials_error_request_already_pending": "По этому отзыву уже есть открытый запрос.",
+    "testimonials_error_body_required": "Напишите несколько слов.",
+    "testimonials_error_body_too_long": "До 800 символов.",
+    "testimonials_error_unknown": "Что-то пошло не так. Попробуйте ещё раз."
   },
   "TabBar": {
     "aria_label": "Основная навигация",
@@ -284,6 +301,9 @@
     },
     "profile": {
       "label": "Вы"
+    },
+    "admin": {
+      "label": "Админ"
     }
   },
   "Admin": {
@@ -363,11 +383,11 @@
     "section_telegram": "Telegram",
     "label_address_en": "Адрес (английский)",
     "label_address_ru": "Адрес (русский)",
-    "label_address_be": "Адрес (белорусский)",
+    "label_address_by": "Адрес (белорусский)",
     "label_country": "Страна",
     "label_city_en": "Город (английский)",
     "label_city_ru": "Город (русский)",
-    "label_city_be": "Город (белорусский)",
+    "label_city_by": "Город (белорусский)",
     "label_latitude": "Широта",
     "label_longitude": "Долгота",
     "label_timezone": "Часовой пояс",
@@ -403,6 +423,9 @@
     "meta_title_with_city": "Violetta — маникюр и красота в {city}",
     "meta_description_with_city": "Студия дизайна ногтей в {city}. Маникюр, гель, дизайн — качественно и доступно.",
     "meta_keywords_with_city": "маникюр {city}, ногти {city}, красота {city}, гель {city}, дешевый качественный маникюр {city}"
+  },
+  "SiteFooter": {
+    "credit_prefix": "Создано с любовью"
   },
   "Error": {
     "meta_title": "Что-то сорвалось",
@@ -466,9 +489,11 @@
     "hero_title": "Отзывы на проверке",
     "hero_paragraph": "Одобрите, чтобы опубликовать на странице мастера и на главной. Отклоните, чтобы сообщить автору без публикации.",
     "section_pending": "На проверке ({n})",
+    "section_change_requests": "Запросы на изменение ({n})",
     "section_approved": "Опубликованы ({n})",
     "section_rejected": "Отклонены ({n})",
     "empty_pending": "Новых отзывов нет. Новые поступления появятся здесь.",
+    "empty_change_requests": "Нет запросов на правку или удаление.",
     "empty_approved": "Пока ничего не опубликовано.",
     "empty_rejected": "Отклонённых отзывов нет.",
     "submitted_at": "Подан",
@@ -477,7 +502,14 @@
     "status_approved": "Опубликован",
     "status_rejected": "Отклонён",
     "cta_approve": "Одобрить",
-    "cta_reject": "Отклонить"
+    "cta_reject": "Отклонить",
+    "cta_delete": "Удалить",
+    "cta_confirm_delete": "Подтвердить удаление",
+    "cta_cancel": "Отмена",
+    "cta_accept_change": "Принять",
+    "cta_reject_change": "Отклонить",
+    "request_kind_edit": "Пользователь хочет заменить на:",
+    "request_kind_removal": "Пользователь просит удалить"
   },
   "AdminGoogle": {
     "meta_title": "Google Календарь",
@@ -520,16 +552,16 @@
     "status_archived": "В архиве",
     "label_name_en": "Название (английский)",
     "label_name_ru": "Название (русский)",
-    "label_name_be": "Название (беларуский)",
+    "label_name_by": "Название (беларуский)",
     "label_blurb_en": "Описание (английский)",
     "label_blurb_ru": "Описание (русский)",
-    "label_blurb_be": "Описание (беларуский)",
+    "label_blurb_by": "Описание (беларуский)",
     "label_includes": "Что входит",
     "cta_add_bullet": "+ Добавить пункт",
     "cta_remove_bullet": "Удалить",
     "bullet_en": "EN",
     "bullet_ru": "RU",
-    "bullet_be": "BE",
+    "bullet_by": "BY",
     "label_price": "Цена",
     "label_duration": "Длительность (минуты)",
     "label_category": "Категория",
@@ -564,16 +596,16 @@
     "label_sets_hint": "Отображается на главной рядом с годами. Произвольный текст — напр. «600+» или «≈700».",
     "label_name_en": "Имя (английский)",
     "label_name_ru": "Имя (русский)",
-    "label_name_be": "Имя (беларусский)",
+    "label_name_by": "Имя (беларусский)",
     "label_role_en": "Роль (английский)",
     "label_role_ru": "Роль (русский)",
-    "label_role_be": "Роль (беларусский)",
+    "label_role_by": "Роль (беларусский)",
     "label_bio_en": "Био (английский)",
     "label_bio_ru": "Био (русский)",
-    "label_bio_be": "Био (беларусский)",
+    "label_bio_by": "Био (беларусский)",
     "label_quote_en": "Цитата (английский)",
     "label_quote_ru": "Цитата (русский)",
-    "label_quote_be": "Цитата (беларусский)",
+    "label_quote_by": "Цитата (беларусский)",
     "label_photo": "Портрет",
     "label_photo_hint": "1:1.2 портрет — герой страницы мастера",
     "label_specialties": "Специализация",

@@ -96,7 +96,7 @@ export async function ProfilePage({ locale }: { locale: string }) {
   const serviceName = (id: string): string => {
     const s = services.find((row) => row.id === id);
     if (!s) return id;
-    return locale === "ru" ? s.nameRu : locale === "be" ? s.nameBe : s.nameEn;
+    return locale === "ru" ? s.nameRu : locale === "by" ? s.nameBy : s.nameEn;
   };
 
   const displayName =
@@ -111,7 +111,7 @@ export async function ProfilePage({ locale }: { locale: string }) {
 
   const masterNameInLocale = (row: UserBookingRow): string | null => {
     if (locale === "ru") return row.masterNameRu;
-    if (locale === "be") return row.masterNameBe;
+    if (locale === "by") return row.masterNameBy;
     return row.masterNameEn;
   };
 
@@ -136,14 +136,14 @@ export async function ProfilePage({ locale }: { locale: string }) {
   const masterNameById = Object.fromEntries(
     publishedMasters.map((m) => {
       const name =
-        locale === "ru" ? m.nameRu : locale === "be" ? m.nameBe : m.nameEn;
+        locale === "ru" ? m.nameRu : locale === "by" ? m.nameBy : m.nameEn;
       return [m.id, name];
     }),
   );
   const formMasters = publishedMasters.map((m) => ({
     id: m.id,
     name:
-      locale === "ru" ? m.nameRu : locale === "be" ? m.nameBe : m.nameEn,
+      locale === "ru" ? m.nameRu : locale === "by" ? m.nameBy : m.nameEn,
   }));
 
   return (
@@ -323,7 +323,7 @@ export async function ProfilePage({ locale }: { locale: string }) {
         </div>
       </section>
 
-      <TabBar />
+      <TabBar showAdmin={user.role === "admin"} />
     </div>
   );
 }

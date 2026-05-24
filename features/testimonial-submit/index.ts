@@ -7,3 +7,9 @@ export type {
 } from "./ui/testimonial-form";
 export { MyTestimonialsList } from "./ui/my-testimonials-list";
 export type { MyTestimonialsListProps } from "./ui/my-testimonials-list";
+export {
+  requestTestimonialEditAction,
+  requestTestimonialRemovalAction,
+  cancelTestimonialChangeRequestAction,
+} from "./api/change-request-actions";
+export type { ChangeRequestActionResult } from "./api/change-request-actions";

@@ -3,11 +3,12 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { LocaleSwitcher } from "@/features/locale-switcher";
 import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { MonogramSeal } from "@/shared/ui/monogram-seal";
-import { NailFan } from "@/shared/ui/nail-fan";
+import { FlameMonogram } from "@/shared/ui/flame-monogram";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { LetterReveal } from "./letter-reveal";
@@ -34,6 +35,13 @@ export function WelcomePage() {
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
       <Aurora intensity="vivid" />
       <PaperGrain />
+
+      <motion.div
+        className="absolute top-4 right-[22px] z-20"
+        {...fade(0.4)}
+      >
+        <LocaleSwitcher variant="welcome" />
+      </motion.div>
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
@@ -64,15 +72,12 @@ export function WelcomePage() {
           </motion.div>
 
           <motion.div
-            className="mx-auto mt-[30px] h-[150px] w-[240px]"
+            className="mx-auto mt-[30px] h-[250px] w-[190px]"
             initial={reduceMotion ? false : { opacity: 0, y: 30 }}
             animate={{ opacity: 0.92, y: 0 }}
             transition={{ duration: reduceMotion ? 0 : 1.2, ease: EASE_OUT, delay: 1.9 }}
           >
-            <NailFan
-              palette={["#c9a96e", "#7d3a6f"]}
-              className="size-full"
-            />
+            <FlameMonogram letter="V" className="size-full" />
           </motion.div>
 
           <motion.p

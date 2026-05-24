@@ -2,7 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/shared/lib/auth-server";
-import { decideTestimonial } from "@/db/testimonials";
+import {
+  adminSoftDeleteTestimonial,
+  decideTestimonial,
+  resolveTestimonialEdit,
+  resolveTestimonialRemoval,
+} from "@/db/testimonials";
 
 export type AdminTestimonialActionResult =
   | { ok: true; id: string }
@@ -33,6 +38,61 @@ export async function rejectTestimonial(
     action: "reject",
     decidedBy: gate.user.id,
   });
+  if (!row) return { ok: false, reason: "not-found" };
+  revalidatePath("/", "layout");
+  return { ok: true, id: row.id };
+}
+
+export async function approveEditRequest(
+  id: string,
+): Promise<AdminTestimonialActionResult> {
+  const gate = await requireAdmin();
+  if (!gate.ok) return { ok: false, reason: gate.reason };
+  const row = await resolveTestimonialEdit(id, gate.user.id, true);
+  if (!row) return { ok: false, reason: "not-found" };
+  revalidatePath("/", "layout");
+  return { ok: true, id: row.id };
+}
+
+export async function rejectEditRequest(
+  id: string,
+): Promise<AdminTestimonialActionResult> {
+  const gate = await requireAdmin();
+  if (!gate.ok) return { ok: false, reason: gate.reason };
+  const row = await resolveTestimonialEdit(id, gate.user.id, false);
+  if (!row) return { ok: false, reason: "not-found" };
+  revalidatePath("/", "layout");
+  return { ok: true, id: row.id };
+}
+
+export async function approveRemovalRequest(
+  id: string,
+): Promise<AdminTestimonialActionResult> {
+  const gate = await requireAdmin();
+  if (!gate.ok) return { ok: false, reason: gate.reason };
+  const row = await resolveTestimonialRemoval(id, gate.user.id, true);
+  if (!row) return { ok: false, reason: "not-found" };
+  revalidatePath("/", "layout");
+  return { ok: true, id: row.id };
+}
+
+export async function rejectRemovalRequest(
+  id: string,
+): Promise<AdminTestimonialActionResult> {
+  const gate = await requireAdmin();
+  if (!gate.ok) return { ok: false, reason: gate.reason };
+  const row = await resolveTestimonialRemoval(id, gate.user.id, false);
+  if (!row) return { ok: false, reason: "not-found" };
+  revalidatePath("/", "layout");
+  return { ok: true, id: row.id };
+}
+
+export async function adminDeleteTestimonial(
+  id: string,
+): Promise<AdminTestimonialActionResult> {
+  const gate = await requireAdmin();
+  if (!gate.ok) return { ok: false, reason: gate.reason };
+  const row = await adminSoftDeleteTestimonial(id, gate.user.id);
   if (!row) return { ok: false, reason: "not-found" };
   revalidatePath("/", "layout");
   return { ok: true, id: row.id };

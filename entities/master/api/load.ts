@@ -10,8 +10,7 @@ import {
 import { getStudioPhoto } from "@/db/studio-photos";
 import type { Master, MasterStatus } from "../model/types";
 import type { Master as MasterRow } from "@/db/schema";
-
-type Locale = "en" | "ru" | "be";
+import type { Locale } from "@/i18n/routing";
 
 function pickLocale(
   row: MasterRow,
@@ -21,8 +20,8 @@ function pickLocale(
   const key =
     locale === "ru"
       ? (`${field}Ru` as const)
-      : locale === "be"
-        ? (`${field}Be` as const)
+      : locale === "by"
+        ? (`${field}By` as const)
         : (`${field}En` as const);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (row as any)[key] ?? "";

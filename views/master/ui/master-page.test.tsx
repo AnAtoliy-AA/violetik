@@ -15,6 +15,7 @@ vi.mock("@/i18n/navigation", () => ({
     </a>
   ),
   usePathname: () => "/master",
+  useRouter: () => ({ replace: vi.fn() }),
 }));
 
 import { MasterPage } from "./master-page";
@@ -61,5 +62,17 @@ describe("MasterPage voices section", () => {
     renderWithIntl(<MasterPage testimonials={[]} />);
     // The voices eyebrow shouldn't render
     expect(screen.queryByText(/Voices/i)).not.toBeInTheDocument();
+  });
+});
+
+describe("MasterPage photo", () => {
+  it("centres the photo, capped at 320px on mobile and 400px on md+", () => {
+    const { container } = renderWithIntl(<MasterPage />);
+    const frame = container.querySelector('[class*="aspect-"]') as HTMLElement;
+    expect(frame).not.toBeNull();
+    expect(frame.className).toMatch(/aspect-\[1\/1\]/);
+    expect(frame.parentElement?.className).toMatch(/max-w-\[320px\]/);
+    expect(frame.parentElement?.className).toMatch(/md:max-w-\[400px\]/);
+    expect(frame.parentElement?.className).toMatch(/mx-auto/);
   });
 });

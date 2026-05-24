@@ -18,6 +18,8 @@ vi.mock("@/i18n/navigation", () => ({
       {children}
     </a>
   ),
+  usePathname: () => "/admin/testimonials",
+  useRouter: () => ({ replace: vi.fn() }),
 }));
 
 import { AdminTestimonialsPage } from "./admin-testimonials-page";
@@ -27,6 +29,14 @@ import { AdminTestimonialsPage } from "./admin-testimonials-page";
 vi.mock("@/features/testimonials-admin", () => ({
   DecisionActions: (props: { testimonialId: string }) => (
     <div data-testid="slot">slot-{props.testimonialId}</div>
+  ),
+  ChangeRequestActions: (props: { testimonialId: string; kind: string }) => (
+    <div data-testid="change-slot">
+      change-{props.kind}-{props.testimonialId}
+    </div>
+  ),
+  AdminDeleteButton: (props: { testimonialId: string }) => (
+    <div data-testid="delete-slot">delete-{props.testimonialId}</div>
   ),
   TestimonialRow: ({
     row,
@@ -58,7 +68,7 @@ function makeRow(overrides: Partial<AdminTestimonialRow> = {}): AdminTestimonial
     masterId: "violetta",
     masterNameEn: "Violetta",
     masterNameRu: "Виолетта",
-    masterNameBe: "Віялета",
+    masterNameBy: "Віялета",
     ...overrides,
   };
 }
@@ -78,7 +88,7 @@ describe("AdminTestimonialsPage", () => {
         locale="en"
         pending={[makeRow({ id: "tst_p" })]}
         approved={[makeRow({ id: "tst_a", status: "approved" })]}
-        rejected={[]}
+        rejected={[]} changeRequests={[]}
       />,
     );
     expect(screen.getByText(/Pending \(1\)/)).toBeInTheDocument();
@@ -92,7 +102,7 @@ describe("AdminTestimonialsPage", () => {
         locale="en"
         pending={[makeRow({ id: "tst_p" })]}
         approved={[makeRow({ id: "tst_a", status: "approved" })]}
-        rejected={[makeRow({ id: "tst_r", status: "rejected" })]}
+        rejected={[makeRow({ id: "tst_r", status: "rejected" })]} changeRequests={[]}
       />,
     );
     expect(screen.getByTestId("slot")).toHaveTextContent("slot-tst_p");
@@ -101,7 +111,7 @@ describe("AdminTestimonialsPage", () => {
 
   it("shows empty-state copy per section", () => {
     renderWithIntl(
-      <AdminTestimonialsPage locale="en" pending={[]} approved={[]} rejected={[]} />,
+      <AdminTestimonialsPage locale="en" pending={[]} approved={[]} rejected={[]} changeRequests={[]} />,
     );
     expect(
       screen.getByText(/No pending reviews\. New submissions land here\./),

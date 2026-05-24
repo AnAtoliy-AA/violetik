@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
+import { LocaleSwitcher } from "@/features/locale-switcher";
 import { cn } from "@/shared/lib/cn";
 import { Wordmark } from "@/shared/ui/wordmark";
 
@@ -99,7 +100,13 @@ export function AppHeader({
   );
 
   return (
-    <header className={cn(className)} {...rest}>
+    <header
+      className={cn(
+        "sticky top-0 z-40 bg-bg/85 backdrop-blur",
+        className,
+      )}
+      {...rest}
+    >
       <div className="relative flex items-center justify-between px-[22px] pb-2 pt-[10px]">
         <div className="flex items-center gap-3">
           {left}
@@ -117,7 +124,10 @@ export function AppHeader({
             {title}
           </span>
         ) : null}
-        {menu}
+        <div className="flex items-center gap-2">
+          <LocaleSwitcher />
+          {menu}
+        </div>
       </div>
       {admin ? (
         <div

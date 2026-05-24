@@ -27,6 +27,7 @@ export interface ServicesCatalogPageProps {
   pricedServices?: Readonly<Record<string, ResolvedPrice>>;
   currency?: CurrencyCode;
   locale?: Locale;
+  showAdmin?: boolean;
 }
 
 export function ServicesCatalogPage({
@@ -35,6 +36,7 @@ export function ServicesCatalogPage({
   pricedServices,
   currency = "EUR",
   locale = "en",
+  showAdmin = false,
 }: ServicesCatalogPageProps) {
   const t = useTranslations("Services");
   const [active, setActive] = useState<ChipValue>(ALL);
@@ -118,7 +120,7 @@ export function ServicesCatalogPage({
           ))
         )}
       </div>
-      <TabBar />
+      <TabBar showAdmin={showAdmin} />
     </div>
   );
 }

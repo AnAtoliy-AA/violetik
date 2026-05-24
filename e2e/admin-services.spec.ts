@@ -35,14 +35,17 @@ test("service editor surfaces inline validation error on empty locale", async ({
   page,
 }) => {
   await page.goto("/en/admin/services/signature");
-  // The seeded "signature" service has populated RU/BE blurbs from the
+  // The seeded "signature" service has populated RU/BY blurbs from the
   // migration; blanking RU forces a validation error.
   const ruBlurb = page.getByLabel(/Blurb \(Russian\)/);
   await expect(ruBlurb).toBeVisible();
-  await ruBlurb.fill("");
-  // Wait for React's controlled-input state to commit before clicking
-  // Save — otherwise the click can fire while React still holds the
-  // pre-clear value, Zod passes, and the save succeeds with stale text.
+  // fill('') doesn't reliably reset a controlled React textarea — the
+  // direct value mutation gets overwritten by React's next render from
+  // state. Real keystrokes (select-all + backspace) trigger onChange and
+  // commit setState.
+  await ruBlurb.focus();
+  await page.keyboard.press("ControlOrMeta+A");
+  await page.keyboard.press("Backspace");
   await expect(ruBlurb).toHaveValue("");
   await page.getByRole("button", { name: /^Save$/ }).click();
   // The required-locale error surfaces inline next to the blurb input.

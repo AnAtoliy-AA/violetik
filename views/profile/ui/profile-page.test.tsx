@@ -15,6 +15,7 @@ vi.mock("@/i18n/navigation", () => ({
     </a>
   ),
   usePathname: () => "/profile",
+  useRouter: () => ({ replace: vi.fn() }),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -86,10 +87,10 @@ vi.mock("@/db/services", () => ({
       categoryId: "gel",
       nameEn: "Couture Gel",
       nameRu: "Кутюр-гель",
-      nameBe: "Кутюр-гель",
+      nameBy: "Кутюр-гель",
       blurbEn: "",
       blurbRu: "",
-      blurbBe: "",
+      blurbBy: "",
       includes: [],
       priceCents: 14500,
       durationMinutes: 120,
@@ -104,10 +105,10 @@ vi.mock("@/db/services", () => ({
       categoryId: "care",
       nameEn: "Signature Manicure",
       nameRu: "Сигнатурный маникюр",
-      nameBe: "Сігнатурны манікюр",
+      nameBy: "Сігнатурны манікюр",
       blurbEn: "",
       blurbRu: "",
-      blurbBe: "",
+      blurbBy: "",
       includes: [],
       priceCents: 9500,
       durationMinutes: 75,
@@ -122,10 +123,10 @@ vi.mock("@/db/services", () => ({
       categoryId: "design",
       nameEn: "Editorial Art",
       nameRu: "Эдиториал-арт",
-      nameBe: "Эдыторыял-арт",
+      nameBy: "Эдыторыял-арт",
       blurbEn: "",
       blurbRu: "",
-      blurbBe: "",
+      blurbBy: "",
       includes: [],
       priceCents: 19500,
       durationMinutes: 150,
@@ -170,11 +171,11 @@ function defaultSettings() {
     currency: "EUR" as const,
     addressEn: "",
     addressRu: "",
-    addressBe: "",
+    addressBy: "",
     country: "BY",
     cityEn: "",
     cityRu: "",
-    cityBe: "",
+    cityBy: "",
     timezone: "Europe/Minsk",
     latitude: null,
     longitude: null,
@@ -214,7 +215,7 @@ function makeBooking(
     updatedAt: Date;
     masterNameEn: string | null;
     masterNameRu: string | null;
-    masterNameBe: string | null;
+    masterNameBy: string | null;
     masterTelegramUsername: string | null;
   }>,
 ) {
@@ -232,7 +233,7 @@ function makeBooking(
     updatedAt: new Date(0),
     masterNameEn: "Violetta",
     masterNameRu: "Виолетта",
-    masterNameBe: "Віалета",
+    masterNameBy: "Віалета",
     masterTelegramUsername: "violetta",
     ...overrides,
   };
@@ -274,16 +275,16 @@ beforeEach(() => {
       id: "m1",
       nameEn: "Violetta",
       nameRu: "Виолетта",
-      nameBe: "Віалета",
+      nameBy: "Віалета",
       roleEn: "",
       roleRu: "",
-      roleBe: "",
+      roleBy: "",
       bioEn: "",
       bioRu: "",
-      bioBe: "",
+      bioBy: "",
       quoteEn: "",
       quoteRu: "",
-      quoteBe: "",
+      quoteBy: "",
       years: 10,
       setsLabel: "",
       telegramUsername: "violetta",

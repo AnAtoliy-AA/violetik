@@ -21,11 +21,11 @@ import { getServiceById } from "@/db/services";
 import { getMasterById, getMasterIdsForService } from "@/db/masters";
 
 function localizedServiceName(
-  service: { nameEn: string; nameRu: string; nameBe: string },
+  service: { nameEn: string; nameRu: string; nameBy: string },
   locale: string,
 ): string {
   if (locale === "ru") return service.nameRu;
-  if (locale === "be") return service.nameBe;
+  if (locale === "by") return service.nameBy;
   return service.nameEn;
 }
 

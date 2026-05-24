@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { loadGalleryWithPhotos } from "@/entities/studio/api/load-with-photos";
 import { GalleryPage } from "@/views/gallery";
+import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 
 type Params = { locale: string };
 
@@ -22,6 +23,11 @@ export default async function GalleryRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const items = await loadGalleryWithPhotos();
-  return <GalleryPage items={items} />;
+  const [items, sessionUser] = await Promise.all([
+    loadGalleryWithPhotos(),
+    getCurrentSessionUser(),
+  ]);
+  return (
+    <GalleryPage items={items} showAdmin={sessionUser?.role === "admin"} />
+  );
 }

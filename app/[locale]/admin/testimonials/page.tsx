@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { requireAdmin } from "@/shared/lib/auth-server";
-import { listTestimonialsByStatus } from "@/db/testimonials";
+import {
+  listTestimonialsByStatus,
+  listTestimonialsWithChangeRequests,
+} from "@/db/testimonials";
 import { AdminTestimonialsPage } from "@/views/admin-testimonials";
 import type { Locale } from "@/i18n/routing";
 
@@ -39,10 +42,11 @@ export default async function AdminTestimonialsRoute({
 
   setRequestLocale(locale);
 
-  const [pending, approved, rejected] = await Promise.all([
+  const [pending, approved, rejected, changeRequests] = await Promise.all([
     listTestimonialsByStatus("pending"),
     listTestimonialsByStatus("approved"),
     listTestimonialsByStatus("rejected"),
+    listTestimonialsWithChangeRequests(),
   ]);
 
   return (
@@ -51,6 +55,7 @@ export default async function AdminTestimonialsRoute({
       pending={pending}
       approved={approved}
       rejected={rejected}
+      changeRequests={changeRequests}
     />
   );
 }

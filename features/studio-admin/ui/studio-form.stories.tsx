@@ -37,7 +37,7 @@ export const Populated: Story = {
       ...DEFAULT_SITE_SETTINGS,
       cityEn: "Borisov",
       cityRu: "Борисов",
-      cityBe: "Барысаў",
+      cityBy: "Барысаў",
       latitude: 54.231,
       longitude: 28.491,
       mapVisible: true,

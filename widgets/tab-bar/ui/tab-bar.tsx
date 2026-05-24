@@ -8,11 +8,12 @@ import {
   Menu as MenuIcon,
   Image as ImageIcon,
   User as UserIcon,
+  Shield as ShieldIcon,
 } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/cn";
 
-type TabKey = "home" | "services" | "gallery" | "profile";
+type TabKey = "home" | "services" | "gallery" | "profile" | "admin";
 
 interface Tab {
   key: TabKey;
@@ -20,32 +21,42 @@ interface Tab {
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
 }
 
-const TABS: readonly Tab[] = [
+const BASE_TABS: readonly Tab[] = [
   { key: "home", href: "/home", Icon: HomeIcon },
   { key: "services", href: "/services", Icon: MenuIcon },
   { key: "gallery", href: "/gallery", Icon: ImageIcon },
   { key: "profile", href: "/profile", Icon: UserIcon },
 ];
 
-function activeTabKey(pathname: string): TabKey {
+const ADMIN_TAB: Tab = { key: "admin", href: "/admin", Icon: ShieldIcon };
+
+function activeTabKey(pathname: string, tabs: readonly Tab[]): TabKey {
+  // The /admin tab stays active on every nested admin route.
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return "admin";
   // Services keeps the tab bar active on the catalog page, not on the
   // detail page (/services/[id]) where the spec explicitly omits the bar.
-  for (const tab of TABS) {
+  for (const tab of tabs) {
     if (pathname === tab.href) return tab.key;
   }
   return "home";
 }
 
-export function TabBar() {
+export interface TabBarProps {
+  /** Show the admin tab — set by the route after resolving session role. */
+  showAdmin?: boolean;
+}
+
+export function TabBar({ showAdmin = false }: TabBarProps = {}) {
   const t = useTranslations("TabBar");
   const pathname = usePathname();
   const reduceMotion = useReducedMotion();
-  const active = activeTabKey(pathname);
+  const tabs = showAdmin ? [...BASE_TABS, ADMIN_TAB] : BASE_TABS;
+  const active = activeTabKey(pathname, tabs);
 
   return (
     <nav
       aria-label={t("aria_label")}
-      className="fixed bottom-0 left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 px-4 pb-3 pt-2"
+      className="fixed bottom-[22px] left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 px-4 pb-3 pt-2"
     >
       <ul
         className={cn(
@@ -57,7 +68,7 @@ export function TabBar() {
           WebkitBackdropFilter: "var(--backdrop-blur-lg)",
         }}
       >
-        {TABS.map(({ key, href, Icon }) => {
+        {tabs.map(({ key, href, Icon }) => {
           const isActive = key === active;
           return (
             <li key={key} className="relative">

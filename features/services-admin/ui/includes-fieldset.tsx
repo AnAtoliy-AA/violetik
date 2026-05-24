@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 export interface IncludeEntry {
   en: string;
   ru: string;
-  be: string;
+  by: string;
 }
 
 export interface IncludesFieldsetProps {
@@ -38,7 +38,7 @@ export function IncludesFieldset({
 
   function add() {
     if (items.length >= max) return;
-    onChange([...items, { en: "", ru: "", be: "" }]);
+    onChange([...items, { en: "", ru: "", by: "" }]);
   }
 
   return (
@@ -77,12 +77,12 @@ export function IncludesFieldset({
               </label>
               <label className="flex flex-col gap-1 text-[11px] text-text-3">
                 <span className="font-mono uppercase tracking-[0.12em]">
-                  {t("bullet_be")}
+                  {t("bullet_by")}
                 </span>
                 <input
                   type="text"
-                  value={entry.be}
-                  onChange={(e) => update(i, "be", e.target.value)}
+                  value={entry.by}
+                  onChange={(e) => update(i, "by", e.target.value)}
                   className={inputClass}
                 />
               </label>

@@ -22,6 +22,7 @@ vi.mock("@/i18n/navigation", () => ({
     </a>
   ),
   usePathname: () => "/services",
+  useRouter: () => ({ replace: vi.fn() }),
 }));
 
 import { ServicesCatalogPage } from "./services-catalog-page";

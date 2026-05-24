@@ -32,9 +32,13 @@ export interface GalleryPageProps {
    * When omitted, falls back to the in-memory STUDIO_DATA.gallery.
    */
   items?: readonly GalleryItem[];
+  showAdmin?: boolean;
 }
 
-export function GalleryPage({ items }: GalleryPageProps = {}) {
+export function GalleryPage({
+  items,
+  showAdmin = false,
+}: GalleryPageProps = {}) {
   const t = useTranslations("Gallery");
   const tCat = useTranslations("Gallery.category");
   const [active, setActive] = useState<TagFilterValue>("All");
@@ -145,7 +149,7 @@ export function GalleryPage({ items }: GalleryPageProps = {}) {
         ) : null}
       </AnimatePresence>
 
-      <TabBar />
+      <TabBar showAdmin={showAdmin} />
     </div>
   );
 }

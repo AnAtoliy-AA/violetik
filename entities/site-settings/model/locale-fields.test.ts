@@ -10,17 +10,17 @@ const SAMPLE = {
   ...DEFAULT_SITE_SETTINGS,
   cityEn: "Borisov",
   cityRu: "Борисов",
-  cityBe: "Барысаў",
+  cityBy: "Барысаў",
   addressEn: "12 Rose Street",
   addressRu: "12 Розовая",
-  addressBe: "12 Ружовая",
+  addressBy: "12 Ружовая",
 };
 
 describe("cityForLocale", () => {
   it("returns the matching per-locale city", () => {
     expect(cityForLocale(SAMPLE, "en")).toBe("Borisov");
     expect(cityForLocale(SAMPLE, "ru")).toBe("Борисов");
-    expect(cityForLocale(SAMPLE, "be")).toBe("Барысаў");
+    expect(cityForLocale(SAMPLE, "by")).toBe("Барысаў");
   });
 
   it("falls back to EN when the locale-specific city is empty", () => {
@@ -34,11 +34,11 @@ describe("cityForLocale", () => {
 
 describe("addressForLocale", () => {
   it("returns the matching per-locale address", () => {
-    expect(addressForLocale(SAMPLE, "be")).toBe("12 Ружовая");
+    expect(addressForLocale(SAMPLE, "by")).toBe("12 Ружовая");
   });
 
   it("falls back to EN when the locale-specific address is empty", () => {
-    expect(addressForLocale({ ...SAMPLE, addressBe: "" }, "be")).toBe(
+    expect(addressForLocale({ ...SAMPLE, addressBy: "" }, "by")).toBe(
       "12 Rose Street",
     );
   });
@@ -53,7 +53,7 @@ describe("studioLocationLine", () => {
   it("returns only the address when city is empty", () => {
     expect(
       studioLocationLine(
-        { ...SAMPLE, cityEn: "", cityRu: "", cityBe: "" },
+        { ...SAMPLE, cityEn: "", cityRu: "", cityBy: "" },
         "en",
       ),
     ).toBe("12 Rose Street");

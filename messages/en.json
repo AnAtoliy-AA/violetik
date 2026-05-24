@@ -200,7 +200,7 @@
     "label": "Language",
     "en": "English",
     "ru": "Russian",
-    "be": "Belarusian"
+    "by": "Belarusian"
   },
   "Gallery": {
     "meta_title": "Portfolio",
@@ -269,7 +269,24 @@
     "testimonial_form_generic_error": "Something went wrong. Please try again.",
     "status_pending": "Pending review",
     "status_approved": "Published",
-    "status_rejected": "Not published"
+    "status_rejected": "Not published",
+    "testimonials_request_edit": "Request edit",
+    "testimonials_request_removal": "Request removal",
+    "testimonials_request_edit_pending": "Edit pending admin review",
+    "testimonials_request_removal_pending": "Removal pending admin review",
+    "testimonials_cancel_request": "Cancel request",
+    "testimonials_submit_edit": "Submit edit",
+    "testimonials_cancel": "Cancel",
+    "testimonials_confirm_removal": "This will ask the admin to remove your testimonial. The text stays public until they decide.",
+    "testimonials_confirm_removal_yes": "Yes, request removal",
+    "testimonials_error_unauthenticated": "Please sign in first.",
+    "testimonials_error_not_found": "We couldn't find that testimonial.",
+    "testimonials_error_not_owner": "You can only change your own testimonials.",
+    "testimonials_error_not_approved": "Only published testimonials can be edited or removed.",
+    "testimonials_error_request_already_pending": "You already have a pending request on this testimonial.",
+    "testimonials_error_body_required": "Please write a few words.",
+    "testimonials_error_body_too_long": "Please keep it under 800 characters.",
+    "testimonials_error_unknown": "Something went wrong. Please try again."
   },
   "TabBar": {
     "aria_label": "Primary navigation",
@@ -284,6 +301,9 @@
     },
     "profile": {
       "label": "You"
+    },
+    "admin": {
+      "label": "Admin"
     }
   },
   "Admin": {
@@ -363,11 +383,11 @@
     "section_telegram": "Telegram",
     "label_address_en": "Address (English)",
     "label_address_ru": "Address (Russian)",
-    "label_address_be": "Address (Belarusian)",
+    "label_address_by": "Address (Belarusian)",
     "label_country": "Country",
     "label_city_en": "City (English)",
     "label_city_ru": "City (Russian)",
-    "label_city_be": "City (Belarusian)",
+    "label_city_by": "City (Belarusian)",
     "label_latitude": "Latitude",
     "label_longitude": "Longitude",
     "label_timezone": "Timezone",
@@ -403,6 +423,9 @@
     "meta_title_with_city": "Violetta — nails & beauty in {city}",
     "meta_description_with_city": "Editorial nail design in {city}. Manicure, gel, design — quality work at fair prices.",
     "meta_keywords_with_city": "{city} nails, {city} manicure, {city} beauty, {city} gel, cheap quality nails {city}"
+  },
+  "SiteFooter": {
+    "credit_prefix": "Created with Love by"
   },
   "Error": {
     "meta_title": "Something slipped",
@@ -466,9 +489,11 @@
     "hero_title": "Pending reviews",
     "hero_paragraph": "Approve to publish on the master page and home. Reject to keep the submitter informed without going live.",
     "section_pending": "Pending ({n})",
+    "section_change_requests": "Change requests ({n})",
     "section_approved": "Approved ({n})",
     "section_rejected": "Rejected ({n})",
     "empty_pending": "No pending reviews. New submissions land here.",
+    "empty_change_requests": "No edit or removal requests waiting.",
     "empty_approved": "Nothing approved yet.",
     "empty_rejected": "No rejected reviews.",
     "submitted_at": "Submitted",
@@ -477,7 +502,14 @@
     "status_approved": "Approved",
     "status_rejected": "Rejected",
     "cta_approve": "Approve",
-    "cta_reject": "Reject"
+    "cta_reject": "Reject",
+    "cta_delete": "Delete",
+    "cta_confirm_delete": "Confirm delete",
+    "cta_cancel": "Cancel",
+    "cta_accept_change": "Accept",
+    "cta_reject_change": "Reject",
+    "request_kind_edit": "User wants to change to:",
+    "request_kind_removal": "User wants this removed"
   },
   "AdminGoogle": {
     "meta_title": "Google Calendar",
@@ -520,16 +552,16 @@
     "status_archived": "Archived",
     "label_name_en": "Name (English)",
     "label_name_ru": "Name (Russian)",
-    "label_name_be": "Name (Belarusian)",
+    "label_name_by": "Name (Belarusian)",
     "label_blurb_en": "Blurb (English)",
     "label_blurb_ru": "Blurb (Russian)",
-    "label_blurb_be": "Blurb (Belarusian)",
+    "label_blurb_by": "Blurb (Belarusian)",
     "label_includes": "Includes",
     "cta_add_bullet": "+ Add bullet",
     "cta_remove_bullet": "Remove",
     "bullet_en": "EN",
     "bullet_ru": "RU",
-    "bullet_be": "BE",
+    "bullet_by": "BY",
     "label_price": "Price",
     "label_duration": "Duration (minutes)",
     "label_category": "Category",
@@ -564,16 +596,16 @@
     "label_sets_hint": "Shown on the home strip next to years. Free text — e.g. \"600+\" or \"≈700\".",
     "label_name_en": "Name (English)",
     "label_name_ru": "Name (Russian)",
-    "label_name_be": "Name (Belarusian)",
+    "label_name_by": "Name (Belarusian)",
     "label_role_en": "Role (English)",
     "label_role_ru": "Role (Russian)",
-    "label_role_be": "Role (Belarusian)",
+    "label_role_by": "Role (Belarusian)",
     "label_bio_en": "Bio (English)",
     "label_bio_ru": "Bio (Russian)",
-    "label_bio_be": "Bio (Belarusian)",
+    "label_bio_by": "Bio (Belarusian)",
     "label_quote_en": "Quote (English)",
     "label_quote_ru": "Quote (Russian)",
-    "label_quote_be": "Quote (Belarusian)",
+    "label_quote_by": "Quote (Belarusian)",
     "label_photo": "Portrait",
     "label_photo_hint": "1:1.2 portrait — master page hero",
     "label_specialties": "Specialties",

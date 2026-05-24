@@ -18,7 +18,7 @@ const baseRow: AdminTestimonialRow = {
   masterId: "violetta",
   masterNameEn: "Violetta",
   masterNameRu: "Виолетта",
-  masterNameBe: "Віялета",
+  masterNameBy: "Віялета",
 };
 
 const labels = {

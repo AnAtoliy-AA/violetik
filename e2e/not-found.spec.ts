@@ -26,7 +26,7 @@ test("sitemap.xml lists welcome and service-detail URLs for every locale", async
   const res = await request.get("/sitemap.xml");
   expect(res.status()).toBe(200);
   const xml = await res.text();
-  for (const locale of ["en", "ru", "be"]) {
+  for (const locale of ["en", "ru", "by"]) {
     expect(xml).toContain(`/${locale}/welcome`);
     expect(xml).toContain(`/${locale}/services/signature`);
   }

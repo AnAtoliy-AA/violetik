@@ -18,7 +18,7 @@ export interface BookingWithUser extends schema.Booking {
   username: string | null;
   masterNameEn: string | null;
   masterNameRu: string | null;
-  masterNameBe: string | null;
+  masterNameBy: string | null;
 }
 
 function generateBookingId(): string {
@@ -98,7 +98,7 @@ export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
       username: schema.users.username,
       masterNameEn: schema.masters.nameEn,
       masterNameRu: schema.masters.nameRu,
-      masterNameBe: schema.masters.nameBe,
+      masterNameBy: schema.masters.nameBy,
     })
     .from(schema.bookings)
     .leftJoin(schema.users, eq(schema.bookings.userId, schema.users.id))
@@ -112,7 +112,7 @@ export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
     username: r.username,
     masterNameEn: r.masterNameEn,
     masterNameRu: r.masterNameRu,
-    masterNameBe: r.masterNameBe,
+    masterNameBy: r.masterNameBy,
   }));
 }
 
@@ -143,7 +143,7 @@ export async function setBookingGcalEventId(
 export interface UserBookingRow extends schema.Booking {
   masterNameEn: string | null;
   masterNameRu: string | null;
-  masterNameBe: string | null;
+  masterNameBy: string | null;
   masterTelegramUsername: string | null;
 }
 
@@ -161,7 +161,7 @@ export async function listUserBookings(
       booking: schema.bookings,
       masterNameEn: schema.masters.nameEn,
       masterNameRu: schema.masters.nameRu,
-      masterNameBe: schema.masters.nameBe,
+      masterNameBy: schema.masters.nameBy,
       masterTelegramUsername: schema.masters.telegramUsername,
     })
     .from(schema.bookings)
@@ -177,7 +177,7 @@ export async function listUserBookings(
     ...r.booking,
     masterNameEn: r.masterNameEn,
     masterNameRu: r.masterNameRu,
-    masterNameBe: r.masterNameBe,
+    masterNameBy: r.masterNameBy,
     masterTelegramUsername: r.masterTelegramUsername,
   }));
 }

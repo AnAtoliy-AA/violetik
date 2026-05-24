@@ -15,6 +15,8 @@ vi.mock("@/i18n/navigation", () => ({
       {children}
     </a>
   ),
+  usePathname: () => "/membership",
+  useRouter: () => ({ replace: vi.fn() }),
 }));
 
 vi.mock("next-intl/server", () => ({
