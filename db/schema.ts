@@ -38,6 +38,7 @@ export const users = pgTable(
     firstName: text("first_name"),
     lastName: text("last_name"),
     photoUrl: text("photo_url"),
+    adminNote: text("admin_note"),
     role: userRole("role").notNull().default("customer"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

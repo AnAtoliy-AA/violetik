@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { and, desc, eq, gt, lte, or, sql } from "drizzle-orm";
+import { and, desc, eq, gt, isNull, lte, or, sql } from "drizzle-orm";
 import { db, schema } from "./index";
 
 export function generateVipRequestId(): string {
@@ -110,7 +110,7 @@ export async function downgradeVipRequest(
 export type CurrentTier =
   | { state: "member" }
   | { state: "member-pending"; pendingRequestId: string }
-  | { state: "vip"; activeRequestId: string; expiresAt: Date };
+  | { state: "vip"; activeRequestId: string; expiresAt: Date | null };
 
 export async function getCurrentTier(userId: string): Promise<CurrentTier> {
   if (!db) return { state: "member" };
@@ -132,14 +132,13 @@ export async function getCurrentTier(userId: string): Promise<CurrentTier> {
   const activeVip = rows.find(
     (r) =>
       r.status === "approved" &&
-      r.expiresAt !== null &&
-      r.expiresAt > now,
+      (r.expiresAt === null || r.expiresAt > now),
   );
   if (activeVip) {
     return {
       state: "vip",
       activeRequestId: activeVip.id,
-      expiresAt: activeVip.expiresAt!,
+      expiresAt: activeVip.expiresAt,
     };
   }
   const pending = rows.find((r) => r.status === "pending");
@@ -202,10 +201,13 @@ export async function listActiveVips(): Promise<VipRequestWithUser[]> {
     .where(
       and(
         eq(schema.vipRequests.status, "approved"),
-        gt(schema.vipRequests.expiresAt, now),
+        or(
+          isNull(schema.vipRequests.expiresAt),
+          gt(schema.vipRequests.expiresAt, now),
+        ),
       ),
     )
-    .orderBy(schema.vipRequests.expiresAt);
+    .orderBy(sql`${schema.vipRequests.expiresAt} ASC NULLS LAST`);
   return rows.map(withUserShape);
 }
 

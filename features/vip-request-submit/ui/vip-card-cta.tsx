@@ -9,7 +9,7 @@ export type VipCardCtaState =
   | { kind: "visitor"; locale: string }
   | { kind: "member" }
   | { kind: "pending" }
-  | { kind: "vip"; expiresAt: Date };
+  | { kind: "vip"; expiresAt: Date | null };
 
 export interface VipCardCtaProps {
   state: VipCardCtaState;
