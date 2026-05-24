@@ -204,3 +204,21 @@ export async function cancelBookingIfOpen(
     .returning();
   return rows[0] ?? null;
 }
+
+/**
+ * Confirmed bookings whose scheduled_for lands in the 23–25 h window
+ * from now. The hourly cron uses this + the notification_log dedup
+ * check to send each booking exactly one 24-hour reminder.
+ */
+export async function listBookingsDueForReminder(): Promise<schema.Booking[]> {
+  if (!db) return [];
+  return db
+    .select()
+    .from(schema.bookings)
+    .where(
+      and(
+        eq(schema.bookings.status, "confirmed"),
+        sql`${schema.bookings.scheduledFor} BETWEEN now() + interval '23 hours' AND now() + interval '25 hours'`,
+      ),
+    );
+}
