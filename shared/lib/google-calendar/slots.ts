@@ -81,6 +81,8 @@ function localTimeToUtc(
   return new Date(naive.getTime() - tzOffsetMs);
 }
 
+// Local duplicate of views/booking/lib/lead-time.ts#isTooSoon —
+// shared/ cannot import from views/ per FSD. Two lines; unlikely to drift.
 function isBeforeLead(
   slotStart: Date,
   now: Date | undefined,
