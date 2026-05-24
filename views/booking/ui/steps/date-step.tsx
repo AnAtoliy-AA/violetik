@@ -7,7 +7,6 @@ import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import {
-  bookingStartISO,
   buildDateStrip,
   formatMonthYear,
 } from "@/views/booking/lib/booking-steps";
@@ -28,8 +27,8 @@ export function DateStep({ timeZone }: DateStepProps) {
     [locale, timeZone],
   );
   const monthLabel = useMemo(
-    () => formatMonthYear(bookingStartISO(new Date(), timeZone), locale),
-    [locale, timeZone],
+    () => formatMonthYear(days[0].iso, locale),
+    [days, locale],
   );
 
   return (

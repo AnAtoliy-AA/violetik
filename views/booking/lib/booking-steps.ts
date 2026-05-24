@@ -73,7 +73,8 @@ const DOW_FROM_EN = {
 } as const;
 
 function dayOfWeekInTZ(iso: string, timeZone: string): number {
-  // 12:00 UTC anchor avoids DST edges.
+  // 12:00 UTC sits ~11h from either DST transition edge in any
+  // real-world studio tz, so the studio-local civil date is invariant.
   const anchor = new Date(`${iso}T12:00:00Z`);
   const wd = new Intl.DateTimeFormat("en-US", {
     timeZone,
