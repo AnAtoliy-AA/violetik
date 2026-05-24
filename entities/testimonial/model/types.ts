@@ -4,5 +4,6 @@ export interface ApprovedTestimonial {
   createdAt: Date;
   authorDisplay: string;
   authorPhotoUrl: string | null;
+  authorIsVip: boolean;
   masterId: string;
 }

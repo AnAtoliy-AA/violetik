@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import type { ApprovedTestimonial } from "@/entities/testimonial";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Plate } from "@/shared/ui/plate";
+import { VipBadge } from "@/shared/ui/vip-badge";
 
 export interface TestimonialCardProps {
   testimonial: ApprovedTestimonial | null;
@@ -47,8 +48,9 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
               }}
             />
           )}
-          <div>
+          <div className="flex items-center gap-2">
             <div className="text-[13px] font-medium">{testimonial.authorDisplay}</div>
+            {testimonial.authorIsVip ? <VipBadge size="xs" /> : null}
           </div>
         </div>
       </div>

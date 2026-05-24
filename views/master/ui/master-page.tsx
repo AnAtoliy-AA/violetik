@@ -20,6 +20,7 @@ import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { SpotlightCard } from "@/shared/ui/spotlight-card";
+import { VipBadge } from "@/shared/ui/vip-badge";
 import { AppHeader } from "@/widgets/app-header";
 
 function ArrowRight() {
@@ -204,8 +205,9 @@ export function MasterPage({
                       }}
                     />
                   )}
-                  <div className="text-[12px]">
+                  <div className="flex items-center gap-2 text-[12px]">
                     <span className="font-medium">{tm.authorDisplay}</span>
+                    {tm.authorIsVip ? <VipBadge size="xs" /> : null}
                   </div>
                 </div>
               </SpotlightCard>

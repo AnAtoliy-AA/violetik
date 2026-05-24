@@ -37,11 +37,27 @@ describe("MasterPage voices section", () => {
       createdAt: new Date(),
       authorDisplay: "Lara K.",
       authorPhotoUrl: null,
+      authorIsVip: false,
       masterId: "violetta",
     };
     renderWithIntl(<MasterPage testimonials={[tm]} />);
     expect(screen.getByText(/Magic hands/)).toBeInTheDocument();
     expect(screen.getByText("Lara K.")).toBeInTheDocument();
+  });
+
+  it("renders a VIP badge next to a VIP author's name", () => {
+    const tm: ApprovedTestimonial = {
+      id: "tst_vip",
+      body: "Couture finish — perfection.",
+      createdAt: new Date(),
+      authorDisplay: "Nina V.",
+      authorPhotoUrl: null,
+      authorIsVip: true,
+      masterId: "violetta",
+    };
+    renderWithIntl(<MasterPage testimonials={[tm]} />);
+    expect(screen.getByText("Nina V.")).toBeInTheDocument();
+    expect(screen.getByLabelText("VIP member")).toBeInTheDocument();
   });
 
   it("renders an <img> avatar when authorPhotoUrl is set", () => {
@@ -51,6 +67,7 @@ describe("MasterPage voices section", () => {
       createdAt: new Date(),
       authorDisplay: "Iris M.",
       authorPhotoUrl: "https://t.me/i/userpic/320/iris.jpg",
+      authorIsVip: false,
       masterId: "violetta",
     };
     renderWithIntl(<MasterPage testimonials={[tm]} />);

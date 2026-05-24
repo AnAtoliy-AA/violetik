@@ -9,6 +9,29 @@ import { listAllServices } from "@/db/services";
 import { bookingTimeZoneFromSettings } from "@/shared/lib/google-calendar";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { BookingActions } from "@/features/bookings-admin";
+import { VipBadge } from "@/shared/ui/vip-badge";
+import type { Booking } from "@/db/schema";
+import { cn } from "@/shared/lib/cn";
+
+type BookingStatus = Booking["status"];
+
+const STATUS_PILL_CLASS: Record<BookingStatus, string> = {
+  pending:
+    "border border-accent/40 bg-accent/15 text-accent",
+  confirmed:
+    "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+  cancelled:
+    "border border-line bg-transparent text-text-3 line-through decoration-text-3/60",
+  completed:
+    "border border-line-strong bg-transparent text-text-2",
+};
+
+const STATUS_CARD_CLASS: Record<BookingStatus, string> = {
+  pending: "",
+  confirmed: "",
+  cancelled: "opacity-55 saturate-50",
+  completed: "opacity-80",
+};
 
 export const dynamic = "force-dynamic";
 
@@ -103,13 +126,22 @@ export default async function AdminBookingsRoute({
             return (
               <li
                 key={b.id}
-                className="gilded rounded-[18px] p-5"
+                data-status={b.status}
+                className={cn(
+                  "gilded rounded-[18px] p-5 transition-opacity",
+                  STATUS_CARD_CLASS[b.status],
+                )}
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="font-display text-[22px] italic">
                     {service?.nameEn ?? b.serviceId}
                   </div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
+                  <div
+                    className={cn(
+                      "inline-flex items-center rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em]",
+                      STATUS_PILL_CLASS[b.status],
+                    )}
+                  >
                     {tStatus(b.status)}
                   </div>
                 </div>
@@ -120,8 +152,9 @@ export default async function AdminBookingsRoute({
                   {formatScheduled(b.scheduledFor, locale, tz)} ·{" "}
                   {b.durationMinutes} min
                 </div>
-                <div className="mt-1 text-[13px] text-text">
-                  {customerLabel(b)}
+                <div className="mt-1 flex items-center gap-2 text-[13px] text-text">
+                  <span>{customerLabel(b)}</span>
+                  {b.userIsVip ? <VipBadge size="xs" /> : null}
                 </div>
                 {isPending ? (
                   <div className="mt-3">

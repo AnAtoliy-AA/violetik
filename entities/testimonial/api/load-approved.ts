@@ -1,5 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
+import { activeVipSubquery } from "@/db/vip-requests";
 import { buildAuthorDisplay } from "../lib/build-author-display";
 import type { ApprovedTestimonial } from "../model/types";
 
@@ -31,6 +32,7 @@ export async function listApprovedTestimonials(
       )
     : eq(schema.testimonials.status, "approved");
   try {
+    const activeVip = activeVipSubquery();
     const rows = await db
       .select({
         id: schema.testimonials.id,
@@ -42,9 +44,11 @@ export async function listApprovedTestimonials(
         username: schema.users.username,
         email: schema.users.email,
         photoUrl: schema.users.photoUrl,
+        vipUserId: activeVip.userId,
       })
       .from(schema.testimonials)
       .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
+      .leftJoin(activeVip, eq(activeVip.userId, schema.testimonials.userId))
       .where(where)
       .orderBy(desc(schema.testimonials.decidedAt))
       .limit(limit);
@@ -60,6 +64,7 @@ export async function listApprovedTestimonials(
         email: r.email,
       }),
       authorPhotoUrl: r.photoUrl,
+      authorIsVip: r.vipUserId !== null,
     }));
   } catch (error) {
     if (isMissingTable(error)) return [];
