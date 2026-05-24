@@ -123,7 +123,9 @@ export default async function AdminVipRequestsRoute({
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="font-display text-[20px] italic">{customerLabel(r)}</div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
-                    {t("expires_in_days", { n: daysFromNow(r.expiresAt!) })}
+                    {r.expiresAt
+                      ? t("expires_in_days", { n: daysFromNow(r.expiresAt) })
+                      : t("expires_lifetime")}
                   </div>
                 </div>
                 <div className="mt-3">

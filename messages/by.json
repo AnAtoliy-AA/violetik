@@ -481,6 +481,7 @@
     "cta_downgrade": "Зніжыць",
     "cta_show_all_expired": "Паказаць усе {total}",
     "expires_in_days": "заканчваецца праз {n}д",
+    "expires_lifetime": "назаўсёды",
     "expired_ago_days": "закончылася {n}д таму"
   },
   "AdminTestimonials": {

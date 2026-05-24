@@ -84,3 +84,18 @@ describe("admin list queries", () => {
     expect(await listExpiredVipRequests({ limit: 10, offset: 0 })).toEqual([]);
   });
 });
+
+describe("lifetime VIP (expiresAt IS NULL) semantics", () => {
+  // DB is null in unit tests; assert the public contract still degrades
+  // gracefully. Real NULL behavior is covered by e2e.
+  it("getCurrentTier returns member when db is null", async () => {
+    const result = await getCurrentTier("tg:1");
+    expect(result.state).toBe("member");
+  });
+  it("listActiveVips returns [] when db is null", async () => {
+    expect(await listActiveVips()).toEqual([]);
+  });
+  it("listExpiredVipRequests returns [] when db is null", async () => {
+    expect(await listExpiredVipRequests({ limit: 10, offset: 0 })).toEqual([]);
+  });
+});

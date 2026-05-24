@@ -481,6 +481,7 @@
     "cta_downgrade": "Downgrade",
     "cta_show_all_expired": "Show all {total}",
     "expires_in_days": "expires in {n}d",
+    "expires_lifetime": "lifetime",
     "expired_ago_days": "expired {n}d ago"
   },
   "AdminTestimonials": {
