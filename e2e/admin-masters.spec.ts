@@ -33,9 +33,13 @@ test("master editor surfaces inline validation on empty locale", async ({
   await page.goto("/en/admin/masters/violetta");
   const ruBio = page.getByLabel(/Bio \(Russian\)/);
   await expect(ruBio).toBeVisible();
-  await ruBio.fill("");
-  // Wait for React's controlled-textarea state to commit before clicking
-  // Save (same race that surfaced on admin-services).
+  // fill('') doesn't reliably reset a controlled React textarea — the
+  // direct value mutation gets overwritten by React's next render from
+  // state. Real keystrokes (select-all + backspace) trigger onChange and
+  // commit setState.
+  await ruBio.focus();
+  await page.keyboard.press("ControlOrMeta+A");
+  await page.keyboard.press("Backspace");
   await expect(ruBio).toHaveValue("");
   await page.getByRole("button", { name: /^Save$/ }).click();
   await expect(page.getByText(/Required/).first()).toBeVisible();

@@ -35,10 +35,10 @@ test("/en/home emits canonical Open Graph + Twitter meta tags", async ({
   await expect(page.locator('link[rel="icon"]').first()).toBeAttached();
 });
 
-test("/be/home advertises Belarusian locale + description", async ({
+test("/by/home advertises Belarusian locale + description", async ({
   page,
 }) => {
-  await page.goto("/be/home");
+  await page.goto("/by/home");
   await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute(
     "content",
     "be_BY",
@@ -53,10 +53,18 @@ test("/be/home advertises Belarusian locale + description", async ({
 
 test("hreflang alternates link to every locale", async ({ page }) => {
   await page.goto("/en/home");
-  for (const locale of ["en", "ru", "by"]) {
+  // hreflang uses BCP-47 language tags via LOCALE_TO_LANG. The URL
+  // prefix is the internal locale id ("by"), but the language tag
+  // emitted in <link rel="alternate"> for that prefix is "be-BY".
+  const PAIRS: ReadonlyArray<readonly [string, string]> = [
+    ["en", "en"],
+    ["ru", "ru"],
+    ["by", "be-BY"],
+  ];
+  for (const [prefix, lang] of PAIRS) {
     await expect(
-      page.locator(`link[rel="alternate"][hreflang="${locale}"]`),
-    ).toHaveAttribute("href", new RegExp(`/${locale}$`));
+      page.locator(`link[rel="alternate"][hreflang="${lang}"]`),
+    ).toHaveAttribute("href", new RegExp(`/${prefix}$`));
   }
 });
 
