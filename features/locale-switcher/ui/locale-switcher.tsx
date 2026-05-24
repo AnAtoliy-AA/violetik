@@ -5,6 +5,7 @@ import { useTransition } from "react";
 import { routing } from "@/i18n/routing";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/cn";
+import { saveLocalePreferenceAction } from "../api/save-locale";
 
 export interface LocaleSwitcherProps {
   variant?: "header" | "welcome";
@@ -39,6 +40,11 @@ export function LocaleSwitcher({ variant = "header" }: LocaleSwitcherProps) {
             disabled={isPending}
             onClick={() => {
               if (l === locale) return;
+              // Persist the choice for signed-in users so the
+              // notification dispatcher can localise pushes that fire
+              // outside a request context (cron, server-initiated).
+              // Failure is silent — anonymous visitors just no-op.
+              void saveLocalePreferenceAction(l).catch(() => {});
               startTransition(() => {
                 router.replace(pathname, { locale: l });
               });

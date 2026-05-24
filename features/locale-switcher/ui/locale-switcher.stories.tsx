@@ -7,6 +7,10 @@ vi.mock("@/i18n/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
 }));
 
+vi.mock("../api/save-locale", () => ({
+  saveLocalePreferenceAction: vi.fn(),
+}));
+
 import { LocaleSwitcher } from "./locale-switcher";
 
 const messages = { LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", by: "Belarusian" } };

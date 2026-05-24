@@ -29,6 +29,14 @@ vi.mock("@/shared/lib/notifications", () => ({
   ]),
 }));
 
+// LocaleSwitcher's `saveLocalePreferenceAction` imports `@/auth` (next-auth),
+// which throws at module load in jsdom (next/server CJS/ESM mismatch).
+// Any test that renders a tree containing LocaleSwitcher would 500
+// without this stub.
+vi.mock("@/features/locale-switcher/api/save-locale", () => ({
+  saveLocalePreferenceAction: vi.fn(async () => ({ ok: true })),
+}));
+
 // jsdom doesn't implement matchMedia. Polyfill with a no-op so components
 // that consult media queries (useReducedMotion, hover-only effects) can mount.
 if (typeof window !== "undefined" && typeof window.matchMedia !== "function") {
