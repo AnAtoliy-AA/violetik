@@ -13,7 +13,6 @@ import {
   type VipFilter,
 } from "@/db/users-admin";
 import {
-  RoleToggle,
   SuggestedMerges,
   type SuggestedMergeRow,
 } from "@/features/users-admin";
@@ -188,37 +187,47 @@ export default async function AdminUsersRoute({
           <p className="text-[13px] text-text-3">{t("empty_list")}</p>
         ) : (
           <ul className="flex flex-col gap-2">
-            {users.map((u) => (
-              <li key={u.id} className="gilded rounded-[12px] px-4 py-3">
-                <div className="flex flex-wrap items-center gap-3">
+            {users.map((u) => {
+              const vipLabel =
+                u.vipState === "lifetime"
+                  ? t("vip_state_lifetime")
+                  : u.vipState === "active"
+                    ? t("vip_state_active", {
+                        date: u.vipExpiresAt!.toISOString().slice(0, 10),
+                      })
+                    : null;
+              return (
+                <li key={u.id} className="gilded rounded-[12px] px-4 py-3">
                   <Link
                     href={`/admin/users/${encodeURIComponent(u.id)}`}
-                    className="min-w-[200px] flex-1"
+                    className="flex flex-wrap items-center gap-3"
                   >
-                    <div className="font-display text-[18px] italic">
-                      {displayName(u)}
+                    <div className="min-w-[200px] flex-1">
+                      <div className="font-display text-[18px] italic">
+                        {displayName(u)}
+                      </div>
+                      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+                        {u.id}
+                      </div>
                     </div>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
-                      {u.id} ·{" "}
-                      {u.vipState === "lifetime"
-                        ? t("vip_state_lifetime")
-                        : u.vipState === "active"
-                          ? t("vip_state_active", {
-                              date: u.vipExpiresAt!.toISOString().slice(0, 10),
-                            })
-                          : t("vip_state_member")}
-                    </div>
+                    <span
+                      className={`rounded-full border-[0.5px] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${
+                        u.role === "admin"
+                          ? "border-gold text-gold"
+                          : "border-line text-text-3"
+                      }`}
+                    >
+                      {u.role === "admin" ? t("role_admin") : t("role_customer")}
+                    </span>
+                    {vipLabel ? (
+                      <span className="rounded-full border-[0.5px] border-gold px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
+                        {vipLabel}
+                      </span>
+                    ) : null}
                   </Link>
-                  <RoleToggle
-                    userId={u.id}
-                    role={u.role}
-                    customerLabel={t("role_customer")}
-                    adminLabel={t("role_admin")}
-                    lastAdminErrorLabel={t("role_last_admin_error")}
-                  />
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         )}
 
