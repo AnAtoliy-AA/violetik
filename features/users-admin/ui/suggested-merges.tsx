@@ -55,7 +55,7 @@ export function SuggestedMerges(props: SuggestedMergesProps) {
               </span>
             </div>
             <Link
-              href={`/admin/users/${row.a.id}/merge/${row.b.id}`}
+              href={`/admin/users/${encodeURIComponent(row.a.id)}/merge/${encodeURIComponent(row.b.id)}`}
               className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent"
             >
               {props.reviewLabel} →

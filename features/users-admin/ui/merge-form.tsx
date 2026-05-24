@@ -67,7 +67,7 @@ export function MergeForm(props: MergeFormProps) {
     startTransition(async () => {
       const r = await mergeUsersAction(payload);
       if (r.ok) {
-        router.push(`/admin/users/${r.survivorId}`);
+        router.push(`/admin/users/${encodeURIComponent(r.survivorId)}`);
         router.refresh();
       }
     });

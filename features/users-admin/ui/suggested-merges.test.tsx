@@ -48,8 +48,10 @@ describe("SuggestedMerges", () => {
     );
     expect(screen.getByText("Suggested merges")).toBeInTheDocument();
     const link = screen.getByRole("link", { name: /Review merge/i });
+    // The colon in user ids ("google:abc", "tg:1") is URL-encoded so the
+    // path segment travels safely (see the [id] page handler).
     expect(link.getAttribute("href")).toContain(
-      "/admin/users/google:abc/merge/tg:1",
+      "/admin/users/google%3Aabc/merge/tg%3A1",
     );
     expect(screen.getByText("email")).toBeInTheDocument();
     expect(screen.getByText("name")).toBeInTheDocument();

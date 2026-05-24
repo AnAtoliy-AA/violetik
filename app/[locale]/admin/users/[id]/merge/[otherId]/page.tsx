@@ -27,7 +27,12 @@ export default async function AdminUsersMergeRoute({
 }: {
   params: Promise<Params>;
 }) {
-  const { locale, id, otherId } = await params;
+  const { locale, id: rawId, otherId: rawOther } = await params;
+  // User ids carry a literal colon — see the [id] page for the rationale.
+  const id = rawId.includes("%") ? decodeURIComponent(rawId) : rawId;
+  const otherId = rawOther.includes("%")
+    ? decodeURIComponent(rawOther)
+    : rawOther;
   setRequestLocale(locale);
 
   const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
@@ -47,7 +52,11 @@ export default async function AdminUsersMergeRoute({
 
   return (
     <div className="pb-16">
-      <AppHeader back={`/admin/users/${id}`} title={tMerge("plate_title")} admin />
+      <AppHeader
+        back={`/admin/users/${encodeURIComponent(id)}`}
+        title={tMerge("plate_title")}
+        admin
+      />
 
       <section className="px-[22px] py-6">
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>
@@ -85,7 +94,7 @@ export default async function AdminUsersMergeRoute({
           conflictPendingTestimonialLabel={tMerge("conflict_pending_testimonial")}
           mergeLabel={tMerge("cta_merge")}
           cancelLabel={tMerge("cta_cancel")}
-          cancelHref={`/admin/users/${id}`}
+          cancelHref={`/admin/users/${encodeURIComponent(id)}`}
         />
       </section>
     </div>

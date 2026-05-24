@@ -192,7 +192,7 @@ export default async function AdminUsersRoute({
               <li key={u.id} className="gilded rounded-[12px] px-4 py-3">
                 <div className="flex flex-wrap items-center gap-3">
                   <Link
-                    href={`/admin/users/${u.id}`}
+                    href={`/admin/users/${encodeURIComponent(u.id)}`}
                     className="min-w-[200px] flex-1"
                   >
                     <div className="font-display text-[18px] italic">

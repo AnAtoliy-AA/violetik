@@ -49,7 +49,12 @@ export default async function AdminUserDetailRoute({
 }: {
   params: Promise<Params>;
 }) {
-  const { locale, id } = await params;
+  const { locale, id: rawId } = await params;
+  // User ids contain a literal colon ("tg:12345", "google:<sub>") which is
+  // a reserved URL char. We encode on emit (see /admin/users list) so the
+  // segment travels safely; Next decodes it once before handing it to us,
+  // but defensively decode again in case the param arrives still encoded.
+  const id = rawId.includes("%") ? decodeURIComponent(rawId) : rawId;
   setRequestLocale(locale);
 
   const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
