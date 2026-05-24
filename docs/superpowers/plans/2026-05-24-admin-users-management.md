@@ -24,6 +24,17 @@
   - `features/users-admin/index.ts` — public API.
 - **Pages** are server components in `app/[locale]/admin/users/...`, calling `requireAdmin()` and reading via `db/users-admin.ts`. Match the structure of [app/[locale]/admin/vip-requests/page.tsx](../../../app/[locale]/admin/vip-requests/page.tsx).
 - **Imports.** Use `@/i18n/navigation` (not `next/link` / `next/navigation`). Import features through the slice root (`@/features/users-admin`), never `@/features/users-admin/ui/...` from outside the slice.
+- **Admin auth pattern.** The three new pages use the same conditional gate `/admin` itself uses ([app/[locale]/admin/page.tsx:40-47](../../../app/[locale]/admin/page.tsx)):
+
+  ```tsx
+  const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
+  if (AUTH_REQUIRED) {
+    const gate = await requireAdmin();
+    if (!gate.ok) redirect({ href: "/sign-in", locale });
+  }
+  ```
+
+  This keeps the pages reachable in CI/local-dev (where the token is unset) so route-level e2e and unit smoke tests can run without secrets. The gate activates as soon as `TELEGRAM_BOT_TOKEN` is set in any environment. Note that `/admin/vip-requests` currently uses unconditional `requireAdmin()` — don't copy that. Server actions still always call `requireAdmin()` (they have no test-only escape hatch and are token-gated by their own check).
 - **Translations.** Every new key MUST be added to all three of `messages/en.json`, `messages/ru.json`, `messages/by.json`. Tests that mount client components in jsdom wrap with `NextIntlClientProvider` if they read translations directly; otherwise pass translated strings as props (see `RequestActions` in `features/vip-requests-admin/ui/request-actions.tsx` — labels come in as props).
 - **Pre-commit / pre-push.** Pre-commit hook runs `lint` + `test`. Pre-push hook runs `build`. Don't `--no-verify`; if a hook fails, fix the root cause.
 - **Commit per task.** Each task ends with a commit so progress is reviewable; small, focused commits are preferred over one big one.
@@ -229,6 +240,8 @@ In `app/[locale]/admin/vip-requests/page.tsx`, replace the active VIP row's `exp
 ```
 
 Add `"expires_lifetime": "lifetime"` (en) / `"навсегда"` (ru) / `"назаўсёды"` (by) to the `AdminVipRequests` namespace.
+
+Leave the **expired** list code in the same file unchanged — it still uses `r.expiresAt!` non-null assertions, and that's safe because `listExpiredVipRequests` filters by `lte(expires_at, now)`; Postgres returns `false` for any comparison against NULL, so lifetime rows are excluded from the expired list and never reach those assertions.
 
 - [ ] **Step 7: Run all tests + lint**
 
@@ -1779,7 +1792,7 @@ export function AdminNoteForm(props: AdminNoteFormProps) {
           <button
             type="submit"
             disabled={pending}
-            className={buttonClassName({ variant: "primary", size: "sm" })}
+            className={buttonClassName({ variant: "gold", size: "sm" })}
           >
             {props.saveLabel}
           </button>
@@ -1943,7 +1956,7 @@ export function VipGrantForm(props: VipGrantFormProps) {
       <button
         type="submit"
         disabled={pending}
-        className={buttonClassName({ variant: "primary", size: "sm" })}
+        className={buttonClassName({ variant: "gold", size: "sm" })}
       >
         {props.grantLabel}
       </button>
@@ -2524,7 +2537,7 @@ export function MergeForm(props: MergeFormProps) {
         <button
           type="submit"
           disabled={pending || hasConflict}
-          className={buttonClassName({ variant: "primary", size: "md" })}
+          className={buttonClassName({ variant: "gold", size: "md" })}
         >
           {props.mergeLabel}
         </button>
@@ -2852,8 +2865,11 @@ export default async function AdminUsersRoute({
   const [{ locale }, search] = await Promise.all([params, searchParams]);
   setRequestLocale(locale);
 
-  const gate = await requireAdmin();
-  if (!gate.ok) redirect({ href: "/sign-in", locale });
+  const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
+  if (AUTH_REQUIRED) {
+    const gate = await requireAdmin();
+    if (!gate.ok) redirect({ href: "/sign-in", locale });
+  }
 
   const q = (search.q ?? "").trim();
   const role = parseRole(search.role);
@@ -3105,8 +3121,11 @@ export default async function AdminUserDetailRoute({
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  const gate = await requireAdmin();
-  if (!gate.ok) redirect({ href: "/sign-in", locale });
+  const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
+  if (AUTH_REQUIRED) {
+    const gate = await requireAdmin();
+    if (!gate.ok) redirect({ href: "/sign-in", locale });
+  }
 
   const user = await getUserDetail(id);
   if (!user) notFound();
@@ -3307,8 +3326,11 @@ export default async function AdminUsersMergeRoute({
   const { locale, id, otherId } = await params;
   setRequestLocale(locale);
 
-  const gate = await requireAdmin();
-  if (!gate.ok) redirect({ href: "/sign-in", locale });
+  const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
+  if (AUTH_REQUIRED) {
+    const gate = await requireAdmin();
+    if (!gate.ok) redirect({ href: "/sign-in", locale });
+  }
 
   if (id === otherId) notFound();
 
