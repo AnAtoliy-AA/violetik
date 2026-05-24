@@ -37,6 +37,7 @@ import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 const QUICK_LINKS: ReadonlyArray<{ key: string; href: string }> = [
   { key: "bookings", href: "/booking/service" },
   { key: "membership", href: "/membership" },
+  { key: "notifications", href: "/profile/notifications" },
   { key: "aftercare", href: "/services" },
   { key: "studio", href: "/master" },
 ];
