@@ -39,6 +39,7 @@ export const users = pgTable(
     lastName: text("last_name"),
     photoUrl: text("photo_url"),
     adminNote: text("admin_note"),
+    preferredLocale: text("preferred_locale").notNull().default("en"),
     role: userRole("role").notNull().default("customer"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -524,3 +525,87 @@ export type MasterStatus = (typeof masterStatus.enumValues)[number];
 export type Testimonial = typeof testimonials.$inferSelect;
 export type NewTestimonial = typeof testimonials.$inferInsert;
 export type TestimonialStatus = (typeof testimonialStatus.enumValues)[number];
+
+/**
+ * Per-user opt-in map for browser-push categories. Missing keys mean
+ * "off" — this is the contract that makes default-off hold without a
+ * backfill on the existing user base.
+ */
+export const notificationPreferences = pgTable("notification_preferences", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  categories: jsonb("categories")
+    .$type<Partial<Record<string, boolean>>>()
+    .notNull()
+    .default({}),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+});
+
+export type NotificationPreferencesRow =
+  typeof notificationPreferences.$inferSelect;
+
+/**
+ * One row per browser-installed PushSubscription. `endpoint` is unique
+ * globally (per browser + service worker); the unique constraint also
+ * dedupes re-subscriptions from the same device. The dispatcher prunes
+ * rows on 410/404 from web-push.
+ */
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull().unique(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => ({
+    userIdx: index("push_subscriptions_user_idx").on(table.userId),
+  }),
+);
+
+export type PushSubscriptionRow = typeof pushSubscriptions.$inferSelect;
+
+/**
+ * Audit + dedup log for the notification dispatcher. Carries one row
+ * per dispatch call (whether or not anything was actually sent). The
+ * `category, payload->>bookingId` index pattern feeds the booking
+ * reminder cron's dedup query.
+ */
+export const notificationLog = pgTable(
+  "notification_log",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    category: text("category").notNull(),
+    payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
+    status: text("status").notNull(),
+    error: text("error"),
+    sentAt: timestamp("sent_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => ({
+    userIdx: index("notification_log_user_idx").on(table.userId, table.sentAt),
+    categoryIdx: index("notification_log_category_idx").on(
+      table.category,
+      table.sentAt,
+    ),
+  }),
+);
+
+export type NotificationLogRow = typeof notificationLog.$inferSelect;

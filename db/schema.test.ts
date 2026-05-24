@@ -168,3 +168,9 @@ describe("db/schema — services", () => {
     expect(_selCat.status).toBe("published");
   });
 });
+
+describe("users.preferredLocale", () => {
+  it("is declared on the schema", () => {
+    expect(users.preferredLocale).toBeDefined();
+  });
+});
