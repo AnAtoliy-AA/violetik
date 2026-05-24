@@ -91,7 +91,11 @@ The notification dispatcher needs to know which locale to translate the payload 
 ALTER TABLE users ADD COLUMN preferred_locale text NOT NULL DEFAULT 'en';
 ```
 
-Set whenever the user signs in or changes their locale via the existing locale switcher. The user-facing payload uses this value; we fall back to `'en'` if it's somehow missing.
+Set in two places:
+1. **Sign-in:** `auth.ts` — extend the existing `signIn` callback (Google) and the Telegram `authorize()` to write `preferred_locale` to the row alongside the existing upsert. Pull the locale from the request URL (`/[locale]/...`) inside the action that initiated sign-in. If unavailable, leave default `'en'`.
+2. **Locale switcher:** see §8.3.
+
+The user-facing payload uses this value; we fall back to `'en'` if it's somehow missing.
 
 ### 6.2 `notification_preferences`
 ```sql
@@ -173,18 +177,18 @@ Steps, in order:
 The function is **fire-and-forget** from the caller's perspective: server actions `await` it (so errors surface in logs) but never throw on its failure — wrap the body in a try/catch and console.error. Notifications must never break a booking flow.
 
 ### 7.3 Trigger sites
-A short audit per category. Each is a one-line `await dispatchNotification(...)` added after the existing DB write inside the matching server action — no new endpoints.
+A short audit per category. Each is a one-line `await dispatchNotification(...)` added after the existing DB write inside the matching server action — no new endpoints. The plan will confirm exact line numbers before editing.
 
-| Category                  | File                                                                                              | Insert point                                       |
-|---------------------------|---------------------------------------------------------------------------------------------------|----------------------------------------------------|
-| `booking_created`         | wherever new bookings land — check [features/booking](../../../features) and [app/api/booking](../../../app/api/booking) | after booking insert; recipient = each admin user  |
-| `booking_confirmed`       | booking status mutator (same module)                                                              | after status update; recipient = booking.userId    |
-| `booking_cancelled`       | [features/booking-cancel](../../../features/booking-cancel)                                       | after status update; recipient = booking.userId    |
-| `booking_reminder_24h`    | new cron at `app/api/cron/booking-reminders/route.ts`                                              | iterate; recipient = booking.userId                |
-| `vip_decision`            | [features/vip-requests-admin](../../../features/vip-requests-admin)                               | after status update; recipient = vipRequest.userId |
-| `vip_request_submitted`   | [features/vip-request-submit](../../../features/vip-request-submit)                               | after insert; recipient = each admin user          |
-| `testimonial_decision`    | [features/testimonials-admin](../../../features/testimonials-admin)                               | after status update; recipient = testimonial.userId|
-| `testimonial_submitted`   | [features/testimonial-submit](../../../features/testimonial-submit)                               | after insert; recipient = each admin user          |
+| Category                  | File                                                                                                  | Insert point                                       |
+|---------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------------------|
+| `booking_created`         | [views/booking/api/submit.ts](../../../views/booking/api/submit.ts) (booking widget submit action)    | after booking insert; recipient = each admin user  |
+| `booking_confirmed`       | [features/bookings-admin/api/actions.ts](../../../features/bookings-admin/api/actions.ts) (status mutator) | after `confirm` status update; recipient = booking.userId |
+| `booking_cancelled`       | [features/booking-cancel/api/cancel-booking-action.ts](../../../features/booking-cancel/api/cancel-booking-action.ts) **and** [features/bookings-admin/api/actions.ts](../../../features/bookings-admin/api/actions.ts) (both paths reach the same status transition) | after status update; recipient = booking.userId    |
+| `booking_reminder_24h`    | new cron at `app/api/cron/booking-reminders/route.ts`                                                  | iterate; recipient = booking.userId                |
+| `vip_decision`            | [features/vip-requests-admin](../../../features/vip-requests-admin) (approve/decline action)           | after status update; recipient = vipRequest.userId |
+| `vip_request_submitted`   | [features/vip-request-submit](../../../features/vip-request-submit) (submit action)                    | after insert; recipient = each admin user          |
+| `testimonial_decision`    | [features/testimonials-admin](../../../features/testimonials-admin) (moderation action)                | after status update; recipient = testimonial.userId|
+| `testimonial_submitted`   | [features/testimonial-submit](../../../features/testimonial-submit) (submit + edit-request actions)    | after insert / change-request set; recipient = each admin user |
 
 "Each admin user" = `SELECT id FROM users WHERE role='admin'`. Fan-out is sequential (admin count is small).
 
@@ -214,7 +218,7 @@ Tag = category id so a second "booking_confirmed" replaces the first instead of 
 ### 7.5 Cron endpoint
 - File: `app/api/cron/booking-reminders/route.ts`.
 - Trigger: `vercel.json` cron `0 * * * *` (hourly).
-- Auth: `Authorization: Bearer ${process.env.CRON_SECRET}` (Vercel sets this automatically; we verify it).
+- Auth: `Authorization: Bearer ${process.env.CRON_SECRET}` in production; bypassed in `NODE_ENV !== 'production'` so the cron can be tested with `curl localhost:3000/api/cron/booking-reminders`. Production with `CRON_SECRET` unset → returns 401 (fail closed).
 - Query: `bookings WHERE status='confirmed' AND scheduled_for BETWEEN now()+'23 hours' AND now()+'25 hours' AND id NOT IN (SELECT (payload->>'bookingId') FROM notification_log WHERE category='booking_reminder_24h' AND sent_at > now()-'48 hours')`. (The dedup is what keeps an hourly cron from sending two reminders.)
 - Calls `dispatchNotification` per match.
 
@@ -253,13 +257,16 @@ New `messages/{en,ru,by}.json` namespace:
   "page_title": "...",
   "intro": "...",
   "enable_browser": "...",
-  "category_booking_confirmed_label": "...",
-  "category_booking_confirmed_body": "Your appointment on {date} is confirmed",
-  ... (16 keys total — label + body for each of the 8 categories) ...
+  "profile_tile_title": "...",
+  "profile_tile_description": "...",
+  "category_booking_confirmed_label": "...",            // shown in the settings UI toggle row
+  "category_booking_confirmed_push_title": "...",        // shown as the OS push title
+  "category_booking_confirmed_push_body": "Your appointment on {date} is confirmed",
+  ...
 }
 ```
 
-`Notifications.profile_tile_title` + `_description` for the entry tile on `/profile`.
+**24 category keys total** — for each of the 8 categories: a `_label` (settings UI), a `_push_title` (OS notification title), and a `_push_body` (OS notification body, with interpolation params). Plus the five global keys (`page_title`, `intro`, `enable_browser`, `profile_tile_title`, `profile_tile_description`). Translated across `en`, `ru`, `by`.
 
 ## 10. Environment variables
 
@@ -277,7 +284,10 @@ VAPID_SUBJECT="mailto:hello@violetta.example.com"
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=""
 
 # --- Cron ---
-# Vercel sets this automatically; required for self-host.
+# Vercel sets this automatically on deploy; required for self-host.
+# The booking-reminders route fails closed (returns 401) when this is
+# unset in production. In `NODE_ENV !== 'production'` the route allows
+# unauthenticated calls so the cron can be exercised locally with curl.
 CRON_SECRET=""
 ```
 
