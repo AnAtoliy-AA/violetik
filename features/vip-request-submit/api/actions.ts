@@ -16,7 +16,7 @@ export type SubmitVipRequestResult =
   | { ok: true; id: string }
   | { ok: false; reason: "unauthorized" }
   | { ok: false; reason: "pending-exists"; id: string }
-  | { ok: false; reason: "already-vip"; expiresAt: Date }
+  | { ok: false; reason: "already-vip"; expiresAt: Date | null }
   | { ok: false; reason: "db-unavailable" };
 
 export async function submitVipRequest(

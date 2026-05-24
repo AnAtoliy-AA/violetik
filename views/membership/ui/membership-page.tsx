@@ -35,10 +35,12 @@ export async function MembershipPage() {
     youreVip:
       tier?.state === "vip"
         ? t("cta_youre_vip", {
-            date: formatLongDate(
-              tier.expiresAt.toISOString().slice(0, 10),
-              locale,
-            ),
+            date: tier.expiresAt
+              ? formatLongDate(
+                  tier.expiresAt.toISOString().slice(0, 10),
+                  locale,
+                )
+              : "",
           })
         : t("cta_youre_vip", { date: "" }),
   };
