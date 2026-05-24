@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "./index";
+import { withQueryTimeout } from "./with-query-timeout";
 import {
   DEFAULT_SITE_SETTINGS,
   siteSettingsPatchSchema,
@@ -10,6 +11,10 @@ import type { PaletteId } from "@/shared/config/palettes";
 import type { Locale } from "@/i18n/routing";
 
 const SINGLETON_ID = "singleton";
+// Hot-path read budget. Anything longer almost certainly means the
+// Supabase pooler is sick — better to degrade to defaults than block
+// the page render. See db/with-query-timeout.ts for the rationale.
+const READ_TIMEOUT_MS = 5_000;
 
 function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
   return {
@@ -44,25 +49,37 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   if (!db) return DEFAULT_SITE_SETTINGS;
 
   try {
-    const existing = await db
-      .select()
-      .from(schema.siteSettings)
-      .where(eq(schema.siteSettings.id, SINGLETON_ID))
-      .limit(1);
+    const existing = await withQueryTimeout(
+      db
+        .select()
+        .from(schema.siteSettings)
+        .where(eq(schema.siteSettings.id, SINGLETON_ID))
+        .limit(1),
+      READ_TIMEOUT_MS,
+      "site_settings.select",
+    );
     if (existing.length > 0) return rowToSettings(existing[0]);
 
-    const inserted = await db
-      .insert(schema.siteSettings)
-      .values({ id: SINGLETON_ID })
-      .onConflictDoNothing({ target: schema.siteSettings.id })
-      .returning();
+    const inserted = await withQueryTimeout(
+      db
+        .insert(schema.siteSettings)
+        .values({ id: SINGLETON_ID })
+        .onConflictDoNothing({ target: schema.siteSettings.id })
+        .returning(),
+      READ_TIMEOUT_MS,
+      "site_settings.insert",
+    );
     if (inserted.length > 0) return rowToSettings(inserted[0]);
 
-    const refetch = await db
-      .select()
-      .from(schema.siteSettings)
-      .where(eq(schema.siteSettings.id, SINGLETON_ID))
-      .limit(1);
+    const refetch = await withQueryTimeout(
+      db
+        .select()
+        .from(schema.siteSettings)
+        .where(eq(schema.siteSettings.id, SINGLETON_ID))
+        .limit(1),
+      READ_TIMEOUT_MS,
+      "site_settings.refetch",
+    );
     return refetch.length > 0
       ? rowToSettings(refetch[0])
       : DEFAULT_SITE_SETTINGS;

@@ -1,6 +1,10 @@
 import { randomBytes } from "node:crypto";
 import { and, desc, eq, gt, isNull, lte, or, sql } from "drizzle-orm";
 import { db, schema } from "./index";
+import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
+
+// Admin SSR budget — same rationale as db/site-settings.ts.
+const ADMIN_READ_TIMEOUT_MS = 5_000;
 
 export function generateVipRequestId(): string {
   return `vipreq_${randomBytes(8).toString("hex")}`;
@@ -182,13 +186,28 @@ function withUserShape(
 
 export async function listPendingVipRequests(): Promise<VipRequestWithUser[]> {
   if (!db) return [];
-  const rows = await db
-    .select({ request: schema.vipRequests, ...userJoinColumns })
-    .from(schema.vipRequests)
-    .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
-    .where(eq(schema.vipRequests.status, "pending"))
-    .orderBy(desc(schema.vipRequests.createdAt));
-  return rows.map(withUserShape);
+  try {
+    const rows = await withQueryTimeout(
+      db
+        .select({ request: schema.vipRequests, ...userJoinColumns })
+        .from(schema.vipRequests)
+        .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
+        .where(eq(schema.vipRequests.status, "pending"))
+        .orderBy(desc(schema.vipRequests.createdAt)),
+      ADMIN_READ_TIMEOUT_MS,
+      "vip_requests.listPending",
+    );
+    return rows.map(withUserShape);
+  } catch (error) {
+    if (error instanceof QueryTimeoutError) {
+      console.warn(
+        "[db/vip-requests] listPendingVipRequests timed out:",
+        error.message,
+      );
+      return [];
+    }
+    throw error;
+  }
 }
 
 export async function listActiveVips(): Promise<VipRequestWithUser[]> {
