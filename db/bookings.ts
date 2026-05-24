@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { and, asc, desc, eq, gte, ne, sql } from "drizzle-orm";
 import { db, schema } from "./index";
+import { activeVipSubquery } from "./vip-requests";
 import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
 
 // Admin SSR budget — same rationale as db/site-settings.ts. The Supabase
@@ -23,6 +24,7 @@ export interface BookingWithUser extends schema.Booking {
   userFirstName: string | null;
   userLastName: string | null;
   username: string | null;
+  userIsVip: boolean;
   masterNameEn: string | null;
   masterNameRu: string | null;
   masterNameBy: string | null;
@@ -97,6 +99,7 @@ export async function listActiveBookingsFrom(
 export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
   if (!db) return [];
   try {
+    const activeVip = activeVipSubquery();
     const rows = await withQueryTimeout(
       db
         .select({
@@ -105,12 +108,14 @@ export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
           userFirstName: schema.users.firstName,
           userLastName: schema.users.lastName,
           username: schema.users.username,
+          vipUserId: activeVip.userId,
           masterNameEn: schema.masters.nameEn,
           masterNameRu: schema.masters.nameRu,
           masterNameBy: schema.masters.nameBy,
         })
         .from(schema.bookings)
         .leftJoin(schema.users, eq(schema.bookings.userId, schema.users.id))
+        .leftJoin(activeVip, eq(activeVip.userId, schema.bookings.userId))
         .leftJoin(schema.masters, eq(schema.bookings.masterId, schema.masters.id))
         .orderBy(desc(schema.bookings.scheduledFor)),
       ADMIN_READ_TIMEOUT_MS,
@@ -122,6 +127,7 @@ export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
       userFirstName: r.userFirstName,
       userLastName: r.userLastName,
       username: r.username,
+      userIsVip: r.vipUserId !== null,
       masterNameEn: r.masterNameEn,
       masterNameRu: r.masterNameRu,
       masterNameBy: r.masterNameBy,

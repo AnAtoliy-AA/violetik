@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "./index";
+import { activeVipSubquery } from "./vip-requests";
 import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
 
 // Admin SSR budget — same rationale as db/site-settings.ts.
@@ -105,6 +106,7 @@ export interface AdminTestimonialRow {
   authorUsername: string | null;
   authorEmail: string | null;
   authorPhotoUrl: string | null;
+  authorIsVip: boolean;
   masterId: string;
   masterNameEn: string;
   masterNameRu: string;
@@ -120,6 +122,7 @@ export async function listTestimonialsByStatus(
       status === "approved"
         ? desc(schema.testimonials.decidedAt)
         : desc(schema.testimonials.createdAt);
+    const activeVip = activeVipSubquery();
     const rows = await db
       .select({
         id: schema.testimonials.id,
@@ -133,6 +136,7 @@ export async function listTestimonialsByStatus(
         authorUsername: schema.users.username,
         authorEmail: schema.users.email,
         authorPhotoUrl: schema.users.photoUrl,
+        vipUserId: activeVip.userId,
         masterId: schema.testimonials.masterId,
         masterNameEn: schema.masters.nameEn,
         masterNameRu: schema.masters.nameRu,
@@ -140,6 +144,7 @@ export async function listTestimonialsByStatus(
       })
       .from(schema.testimonials)
       .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
+      .leftJoin(activeVip, eq(activeVip.userId, schema.testimonials.userId))
       .leftJoin(
         schema.masters,
         eq(schema.testimonials.masterId, schema.masters.id),
@@ -160,6 +165,7 @@ export async function listTestimonialsByStatus(
       authorUsername: r.authorUsername,
       authorEmail: r.authorEmail,
       authorPhotoUrl: r.authorPhotoUrl,
+      authorIsVip: r.vipUserId !== null,
       masterId: r.masterId,
       masterNameEn: r.masterNameEn ?? "",
       masterNameRu: r.masterNameRu ?? "",
@@ -351,6 +357,7 @@ export async function cancelTestimonialChangeRequest(
 export async function listTestimonialsWithChangeRequests(): Promise<AdminTestimonialRow[]> {
   if (!db) return [];
   try {
+    const activeVip = activeVipSubquery();
     const rows = await db
       .select({
         id: schema.testimonials.id,
@@ -367,6 +374,7 @@ export async function listTestimonialsWithChangeRequests(): Promise<AdminTestimo
         authorUsername: schema.users.username,
         authorEmail: schema.users.email,
         authorPhotoUrl: schema.users.photoUrl,
+        vipUserId: activeVip.userId,
         masterId: schema.testimonials.masterId,
         masterNameEn: schema.masters.nameEn,
         masterNameRu: schema.masters.nameRu,
@@ -374,6 +382,7 @@ export async function listTestimonialsWithChangeRequests(): Promise<AdminTestimo
       })
       .from(schema.testimonials)
       .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
+      .leftJoin(activeVip, eq(activeVip.userId, schema.testimonials.userId))
       .leftJoin(schema.masters, eq(schema.testimonials.masterId, schema.masters.id))
       .where(
         sql`${schema.testimonials.status} = 'approved'
@@ -396,6 +405,7 @@ export async function listTestimonialsWithChangeRequests(): Promise<AdminTestimo
       authorUsername: r.authorUsername,
       authorEmail: r.authorEmail,
       authorPhotoUrl: r.authorPhotoUrl,
+      authorIsVip: r.vipUserId !== null,
       masterId: r.masterId,
       masterNameEn: r.masterNameEn ?? "",
       masterNameRu: r.masterNameRu ?? "",

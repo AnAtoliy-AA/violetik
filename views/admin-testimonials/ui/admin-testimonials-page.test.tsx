@@ -65,6 +65,7 @@ function makeRow(overrides: Partial<AdminTestimonialRow> = {}): AdminTestimonial
     authorUsername: null,
     authorEmail: null,
     authorPhotoUrl: null,
+    authorIsVip: false,
     masterId: "violetta",
     masterNameEn: "Violetta",
     masterNameRu: "Виолетта",

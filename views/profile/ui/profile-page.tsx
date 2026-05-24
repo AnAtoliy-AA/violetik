@@ -29,6 +29,7 @@ import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { SpotlightCard } from "@/shared/ui/spotlight-card";
+import { VipBadge } from "@/shared/ui/vip-badge";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
 import { getCurrentTier } from "@/db/vip-requests";
@@ -179,11 +180,7 @@ export async function ProfilePage({ locale }: { locale: string }) {
             </div>
           )}
           <div>
-            {tier.state === "vip" && (
-              <span className="gilded inline-flex items-center rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
-                {t("badge_vip")}
-              </span>
-            )}
+            {tier.state === "vip" && <VipBadge label={t("badge_vip")} />}
             {tier.state === "member-pending" && (
               <span className="rounded-full border-[0.5px] border-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-text-2">
                 {t("badge_pending_vip")}

@@ -28,6 +28,7 @@ const baseRow: TestimonialRowProps["row"] = {
   authorUsername: "lara_k",
   authorEmail: null,
   authorPhotoUrl: null,
+  authorIsVip: false,
   masterId: "violetta",
   masterNameEn: "Violetta",
   masterNameRu: "Виолетта",
@@ -68,6 +69,14 @@ export const Approved: StoryObj<typeof TestimonialRow> = {
 export const Rejected: StoryObj<typeof TestimonialRow> = {
   args: {
     row: { ...baseRow, status: "rejected", decidedAt: new Date("2026-05-21T10:00:00Z") },
+    locale: "en",
+    labels,
+  },
+};
+
+export const VipAuthor: StoryObj<typeof TestimonialRow> = {
+  args: {
+    row: { ...baseRow, authorIsVip: true },
     locale: "en",
     labels,
   },
