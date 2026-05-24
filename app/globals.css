@@ -24,6 +24,11 @@
   --font-body: var(--next-font-dm-sans), system-ui, sans-serif;
   --font-mono: var(--next-font-jetbrains), ui-monospace, monospace;
 
+  /* Type scale — clamped headings auto-generate text-h1/h2/h3 utilities */
+  --text-h1: clamp(56px, 16vw, 84px);
+  --text-h2: clamp(34px, 8vw, 48px);
+  --text-h3: clamp(24px, 5.5vw, 32px);
+
   /* Radii */
   --radius-sm: 12px;
   --radius-DEFAULT: 18px;
@@ -42,17 +47,275 @@
   --animate-float-in: floatIn var(--duration-DEFAULT) var(--ease-out) both;
   --animate-mask-up: maskUp 900ms var(--ease-out) both;
   --animate-letter-in: letterIn 1.1s var(--ease-out) both;
-}
+  --animate-soft-pulse: softPulse 2.2s ease-in-out infinite;
+  --animate-aurora: aurora 24s ease-in-out infinite;
+  --animate-seal-rotate: sealRotate 60s linear infinite;
+  --animate-ink-bloom: inkBloom 1.6s var(--ease-out) both;
+  --animate-rule-draw: ruleDraw 1.2s var(--ease-out) both;
 
-/* Non-utility token: gold gradient (used in helper classes + ad-hoc styles) */
-:root {
-  --gold-grad: linear-gradient(
+  /* New shadow scale — depth without darkness */
+  --shadow-soft: 0 24px 50px -22px rgba(0, 0, 0, 0.7);
+  --shadow-card: 0 12px 28px -16px rgba(0, 0, 0, 0.55);
+  --shadow-lifted:
+    0 36px 80px -28px rgba(0, 0, 0, 0.8),
+    0 8px 20px -10px rgba(0, 0, 0, 0.4);
+  --shadow-gold-glow:
+    0 0 0 1px rgba(201, 169, 110, 0.15),
+    0 24px 60px -20px rgba(201, 169, 110, 0.25);
+
+  /* Spotlight tint for pointer-reactive cards */
+  --color-spotlight: rgba(244, 234, 216, 0.06);
+
+  /* Stacked-glass blur tokens */
+  --backdrop-blur-sm: blur(8px);
+  --backdrop-blur-md: blur(16px) saturate(160%);
+  --backdrop-blur-lg: blur(28px) saturate(180%);
+
+  /* Gold gradient as a bg-image utility token (generates `bg-gold`) */
+  --background-image-gold: linear-gradient(
     135deg,
     #b8956a 0%,
     #e8cf99 25%,
     #fff5d6 45%,
     #d4b27a 65%,
     #a07b48 100%
+  );
+}
+
+/* Alias so existing :root-style references to --gold-grad keep working */
+:root {
+  --gold-grad: var(--background-image-gold);
+}
+
+/*
+ * Palette overrides.
+ *
+ * Each block flips the runtime CSS variables that the @theme defaults
+ * declare for Aubergine. Tailwind utilities (bg-bg, text-accent, …) all
+ * read these via var(), so switching <html data-palette="…"> instantly
+ * re-themes the entire app — no rebuild, no re-render needed.
+ *
+ * Text + line colors are constant alphas of #f4ead8 across every palette
+ * so we don't repeat them; the gold gradient is palette-tinted per scheme.
+ */
+
+:root[data-palette="rose"] {
+  --color-bg: #1e0d18;
+  --color-bg-2: #260f1c;
+  --color-surface: #2a1226;
+  --color-surface-2: #371732;
+  --color-accent: #e8b08c;
+  --color-accent-2: #f3cdae;
+  --color-plum: #a8456d;
+  --color-violet: #c97aa3;
+  --color-rose: #f0c0c8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #b56e57 0%,
+    #f3cdae 30%,
+    #fff0e0 50%,
+    #d99478 70%,
+    #9a4f3a 100%
+  );
+}
+
+:root[data-palette="lilac"] {
+  --color-bg: #1a1226;
+  --color-bg-2: #221530;
+  --color-surface: #2a1838;
+  --color-surface-2: #371e48;
+  --color-accent: #e0c4f3;
+  --color-accent-2: #f0dffb;
+  --color-plum: #8a6cc4;
+  --color-violet: #b598dc;
+  --color-rose: #d9c2e8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #8a6cc4 0%,
+    #e0c4f3 30%,
+    #fbeafe 50%,
+    #c2a3e8 70%,
+    #6b4ba0 100%
+  );
+}
+
+:root[data-palette="mono"] {
+  --color-bg: #0d0a0f;
+  --color-bg-2: #13101a;
+  --color-surface: #1a1620;
+  --color-surface-2: #221d2a;
+  --color-accent: #d4c9b8;
+  --color-accent-2: #e8e0d0;
+  --color-plum: #3a2a3a;
+  --color-violet: #6a5d6e;
+  --color-rose: #a89c9c;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #8a8276 0%,
+    #d4c9b8 30%,
+    #f3ecdc 50%,
+    #b7ad9c 70%,
+    #6a614f 100%
+  );
+}
+
+:root[data-palette="ink"] {
+  --color-bg: #0a0f1f;
+  --color-bg-2: #0f1729;
+  --color-surface: #152033;
+  --color-surface-2: #1f2c44;
+  --color-accent: #9fb4d8;
+  --color-accent-2: #c1d2ec;
+  --color-plum: #2e3e5a;
+  --color-violet: #6a82ad;
+  --color-rose: #b3c7e4;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #5a6e94 0%,
+    #9fb4d8 30%,
+    #e0e9f5 50%,
+    #8094bd 70%,
+    #3d4f70 100%
+  );
+}
+
+:root[data-palette="moss"] {
+  --color-bg: #0d130f;
+  --color-bg-2: #131c16;
+  --color-surface: #172218;
+  --color-surface-2: #1f2e22;
+  --color-accent: #a8c098;
+  --color-accent-2: #c5d8b6;
+  --color-plum: #3a4632;
+  --color-violet: #6d8060;
+  --color-rose: #c2d3b8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #6a7d54 0%,
+    #a8c098 30%,
+    #e6f0d8 50%,
+    #8aa478 70%,
+    #4f6038 100%
+  );
+}
+
+:root[data-palette="bronze"] {
+  --color-bg: #150e08;
+  --color-bg-2: #1c1410;
+  --color-surface: #241a10;
+  --color-surface-2: #2f2418;
+  --color-accent: #d4a574;
+  --color-accent-2: #e8c498;
+  --color-plum: #6b4424;
+  --color-violet: #b08660;
+  --color-rose: #d9b390;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #8a5a30 0%,
+    #d4a574 30%,
+    #f5dcbc 50%,
+    #b88450 70%,
+    #5a3a1a 100%
+  );
+}
+
+:root[data-palette="pearl"] {
+  --color-bg: #1a1612;
+  --color-bg-2: #221d18;
+  --color-surface: #28221c;
+  --color-surface-2: #342d25;
+  --color-accent: #f0e3cf;
+  --color-accent-2: #f8efe0;
+  --color-plum: #6a5848;
+  --color-violet: #b4a08a;
+  --color-rose: #d8c8b0;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #b09878 0%,
+    #f0e3cf 30%,
+    #fffaf0 50%,
+    #d0bca0 70%,
+    #786650 100%
+  );
+}
+
+:root[data-palette="emerald"] {
+  --color-bg: #06120c;
+  --color-bg-2: #0a1a12;
+  --color-surface: #0f2018;
+  --color-surface-2: #142c20;
+  --color-accent: #7ec699;
+  --color-accent-2: #a5dcba;
+  --color-plum: #1f4030;
+  --color-violet: #5a9072;
+  --color-rose: #bce0c8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #3a8055 0%,
+    #7ec699 30%,
+    #d6f0e0 50%,
+    #54a075 70%,
+    #1f4530 100%
+  );
+}
+
+:root[data-palette="sapphire"] {
+  --color-bg: #06101c;
+  --color-bg-2: #0a1828;
+  --color-surface: #0f1c30;
+  --color-surface-2: #142840;
+  --color-accent: #7da3d0;
+  --color-accent-2: #a8c5e4;
+  --color-plum: #1f3a5c;
+  --color-violet: #5870a0;
+  --color-rose: #b8d0e4;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #3a6094 0%,
+    #7da3d0 30%,
+    #d8e8f5 50%,
+    #5880b8 70%,
+    #1c3a5c 100%
+  );
+}
+
+:root[data-palette="ruby"] {
+  --color-bg: #1a070b;
+  --color-bg-2: #220a10;
+  --color-surface: #2b0f15;
+  --color-surface-2: #3a1620;
+  --color-accent: #d97b8a;
+  --color-accent-2: #ec9fac;
+  --color-plum: #6e2030;
+  --color-violet: #a0526b;
+  --color-rose: #ecb5c0;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #8a3040 0%,
+    #d97b8a 30%,
+    #fad4dc 50%,
+    #b85868 70%,
+    #5a1c28 100%
+  );
+}
+
+:root[data-palette="obsidian"] {
+  --color-bg: #050505;
+  --color-bg-2: #0c0c0c;
+  --color-surface: #121212;
+  --color-surface-2: #1c1c1c;
+  --color-accent: #c2c2c2;
+  --color-accent-2: #e0e0e0;
+  --color-plum: #2a2a2a;
+  --color-violet: #6a6a6a;
+  --color-rose: #c8c8c8;
+  --background-image-gold: linear-gradient(
+    135deg,
+    #707070 0%,
+    #c2c2c2 30%,
+    #f0f0f0 50%,
+    #909090 70%,
+    #404040 100%
   );
 }
 
@@ -96,11 +359,106 @@
   }
 }
 
+@keyframes softPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate3d(-10%, -8%, 0) rotate(0deg);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(8%, 6%, 0) rotate(8deg);
+    opacity: 0.75;
+  }
+}
+
+@keyframes sealRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes inkBloom {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+
+@keyframes ruleDraw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Metaball flame: a single ember rises from the base and fades near the top.
+ * Combined with siblings on randomized delays inside a `blur + contrast`
+ * container, the embers coalesce into a wavering flame silhouette. */
+@keyframes flameRise {
+  0%,
+  15% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  85%,
+  100% {
+    transform: translate(0, -200px);
+    opacity: 0;
+  }
+}
+
+/* Free sparks fly off the flame body — they rise faster than the metaball
+ * embers and drift horizontally by a per-spark amount supplied via the
+ * `--sparkDriftX` CSS variable. They fade in briefly then fade out near the
+ * apex so they read as individual points of light, not particles snapping
+ * in and out. */
+@keyframes sparkRise {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(var(--sparkDriftX, 0px), -230px);
+    opacity: 0;
+  }
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Enable Cormorant ligatures + alternates on every display-set heading. */
+.font-display {
+  font-feature-settings: "liga", "dlig", "ss01";
 }
 
 /* Hide scrollbars on horizontal scroll regions */
@@ -147,11 +505,144 @@ body {
   .text-gold-shimmer {
     animation: none;
   }
+  .spotlight::after,
+  .stroke-draw::after {
+    transition: none !important;
+  }
   *,
   *::before,
   *::after {
     animation-duration: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0ms !important;
+  }
+}
+
+/* Atelier utilities — gilded borders, top-edge glass highlight, drop cap */
+
+.gilded {
+  border: 0.5px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  background-image:
+    linear-gradient(var(--color-surface), var(--color-surface)),
+    var(--gold-grad);
+}
+
+.glass-top {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.dropcap::first-letter {
+  font-family: var(--font-display);
+  float: left;
+  font-size: 56px;
+  line-height: 0.85;
+  margin-right: 8px;
+  margin-top: 6px;
+  background: var(--gold-grad);
+  background-size: 200% 100%;
+  background-position: 25% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Pointer-reactive spotlight surface. Consumers write --mx/--my via JS. */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    220px circle at var(--mx, 50%) var(--my, 50%),
+    var(--color-spotlight),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 260ms var(--ease-out);
+  pointer-events: none;
+  z-index: 0;
+}
+.spotlight:hover::after,
+.spotlight:focus-within::after {
+  opacity: 1;
+}
+
+/* Stroke-drawn underline for italic display text. Toggle with [data-revealed="true"].
+ * Uses ::after so the element's own background stays free for siblings like .text-gold-shimmer. */
+.stroke-draw {
+  position: relative;
+  display: inline-block;
+}
+.stroke-draw::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 700ms var(--ease-out);
+}
+.stroke-draw:hover::after,
+.stroke-draw[data-revealed="true"]::after {
+  transform: scaleX(1);
+}
+
+/* Edge-lit gilded card — gilded with a soft gold glow + 2px lift on hover. */
+.gilded-lift {
+  border: 0.5px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  background-image:
+    linear-gradient(var(--color-surface), var(--color-surface)),
+    var(--gold-grad);
+  transition:
+    box-shadow 360ms var(--ease-out),
+    transform 360ms var(--ease-out);
+}
+.gilded-lift:hover {
+  box-shadow: var(--shadow-gold-glow);
+  transform: translateY(-2px);
+}
+
+/* View Transitions API — service-hero morph between catalog and detail.
+ *
+ * Without this, the browser uses default 250ms ease. We slow it down so the
+ * morph reads as a deliberate camera move (not a UI flicker), and pass it
+ * through a brief blur to hide pixel-level interpolation artifacts when
+ * the source thumbnail and destination hero render different NailTile
+ * variants. Honors prefers-reduced-motion below.
+ */
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 480ms;
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-image-pair(*) {
+  animation: vt-blur 480ms var(--ease-out);
+}
+@keyframes vt-blur {
+  30%,
+  60% {
+    filter: blur(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-image-pair(*) {
+    animation: none !important;
   }
 }

@@ -1,0 +1,179 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+# Cancel an in-flight run when a new commit is pushed to the same branch.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# Force JavaScript actions onto Node 24. actions/{checkout,setup-node,cache,
+# upload-artifact}@v4 still ship Node 20, which GitHub deprecates on
+# 2026-06-02 and removes on 2026-09-16. Until v5s land we opt in early.
+# https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  verify:
+    name: Lint · Vitest · Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Vitest has two projects: jsdom (default) and a storybook browser
+      # project that drives Playwright Chromium against every story. Both
+      # run under `npm test`, so the browser binary has to be present.
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium for Vitest storybook project
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Chromium system deps only
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test (Vitest, unit + Storybook story tests)
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  e2e:
+    name: Playwright e2e
+    runs-on: ubuntu-latest
+    needs: verify
+    timeout-minutes: 20
+    # The booking + catalog + service-detail + sitemap + profile specs all
+    # assert on canonical service names that used to come from STUDIO_DATA
+    # but now live in the DB. Spin up a Postgres service container, point
+    # both DATABASE_URL (postgres-js / next dev) and DIRECT_URL
+    # (drizzle-kit migrate) at it, and apply migrations before the dev
+    # server boots. The migration seeds the six legacy services + four
+    # categories idempotently via ON CONFLICT DO NOTHING, so retries
+    # don't double-insert.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: violetik_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/violetik_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/violetik_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply DB migrations
+        run: npm run db:migrate
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: Install system deps only
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps
+
+      - name: Run e2e
+        run: npm run e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    needs: verify
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # Lighthouse picks up Google Chrome stable, which is pre-installed
+      # on the github-hosted ubuntu-latest runner. lhci autorun starts
+      # `next start`, waits for the "Ready in" pattern, collects each URL
+      # `numberOfRuns` times, runs asserts, and uploads to Google's
+      # temporary public storage so the report links are crawlable from
+      # the PR.
+      - name: Lighthouse CI
+        run: npx --no-install @lhci/cli autorun
+
+      - name: Upload Lighthouse report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci
+          retention-days: 7

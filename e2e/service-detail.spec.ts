@@ -1,0 +1,66 @@
+import { test, expect } from "@playwright/test";
+
+test("renders the Signature Manicure detail at /en/services/signature", async ({
+  page,
+}) => {
+  await page.goto("/en/services/signature");
+  await expect(
+    page.getByRole("heading", { level: 1, name: /Signature Manicure/i }),
+  ).toBeVisible();
+  await expect(page.getByText(/What it includes/i)).toBeVisible();
+  await expect(page.getByText(/Recent in this style/i)).toBeVisible();
+});
+
+test("Reserve a chair link routes to /booking/service with the selected id", async ({
+  page,
+}) => {
+  await page.goto("/en/services/gel");
+  const cta = page.getByRole("link", { name: /Reserve a chair/i });
+  await expect(cta).toBeVisible();
+  await expect(cta).toHaveAttribute(
+    "href",
+    /\/booking\/service\?selected=gel/,
+  );
+});
+
+test("back arrow returns to the catalog", async ({ page }) => {
+  await page.goto("/en/services/editorial");
+  const back = page.getByRole("link", { name: /Go back/i });
+  await expect(back).toHaveAttribute("href", /\/services$/);
+});
+
+test("renders the Belarusian copy at /be/services/signature", async ({ page }) => {
+  await page.goto("/be/services/signature");
+  await expect(page.getByText(/Што ўваходзіць/i)).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Забраніраваць крэсла/i }),
+  ).toBeVisible();
+});
+
+test("unknown service id returns 404", async ({ page }) => {
+  const response = await page.goto("/en/services/does-not-exist");
+  expect(response?.status()).toBe(404);
+});
+
+test("source thumbnail carries a view-transition-name", async ({ page }) => {
+  await page.goto("/en/services");
+  // The first menu row's thumbnail is the source for the shared-element morph.
+  const row = page.locator("article.group\\/menu").first();
+  const thumb = row.locator("div[style*='view-transition-name']").first();
+  await expect(thumb).toHaveAttribute(
+    "style",
+    /view-transition-name:\s*service-hero-/,
+  );
+});
+
+test("destination detail hero carries the matching view-transition-name", async ({
+  page,
+}) => {
+  await page.goto("/en/services/signature");
+  const heroes = page.locator("[style*='view-transition-name']");
+  // The hero is one of (potentially) several flagged elements; at least one
+  // must name the active service.
+  await expect(heroes.first()).toBeVisible();
+  const html = await page.content();
+  expect(html).toMatch(/view-transition-name:\s*service-hero-signature/);
+});
