@@ -2,6 +2,8 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
+type DrizzleClient = ReturnType<typeof drizzle<typeof schema>>;
+
 /**
  * Drizzle client. Returns null when `DATABASE_URL` is unset so the
  * codebase can gracefully degrade in CI / local dev where the DB
@@ -12,8 +14,17 @@ import * as schema from "./schema";
  *
  * `prepare: false` is required for the Supabase Transaction pooler
  * (port 6543) which doesn't support prepared statements.
+ *
+ * Cached on `globalThis` so Next.js dev-mode HMR reloads of this
+ * module reuse the same postgres-js pool instead of orphaning the
+ * old one. Without this, every file save would create a fresh pool;
+ * the old pool's sockets stayed alive (held by the postgres-js
+ * runtime + drizzle metadata), so after a few hours of dev work the
+ * Supabase pooler's per-IP connection cap is exhausted and every
+ * new query stalls until our 5s timeout. In prod each function
+ * instance is a fresh process, so this cache is a no-op there.
  */
-function createClient() {
+function createClient(): DrizzleClient | null {
   const url = process.env.DATABASE_URL;
   if (!url) return null;
   try {
@@ -66,5 +77,13 @@ function createClient() {
   }
 }
 
-export const db = createClient();
+const globalForDb = globalThis as unknown as {
+  __violetikDb?: DrizzleClient | null;
+};
+
+if (globalForDb.__violetikDb === undefined) {
+  globalForDb.__violetikDb = createClient();
+}
+
+export const db: DrizzleClient | null = globalForDb.__violetikDb;
 export { schema };
