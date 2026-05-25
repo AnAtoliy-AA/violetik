@@ -54,12 +54,16 @@ export function Sheet({
   const reduced = useReducedMotion();
 
   useEffect(() => {
+    // SSR/hydration gate — must flip after mount so the portal target exists.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
   useEffect(() => {
     if (!open) return;
     lastFocused.current = document.activeElement as HTMLElement | null;
+    // Reset to default snap whenever the sheet opens (consumer-driven).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSnap(defaultSnap);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
