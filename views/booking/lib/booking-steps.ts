@@ -52,10 +52,14 @@ export interface DateCell {
  * first cell of the booking date strip — never UTC, because the
  * studio's "today" can differ from UTC by ±3h.
  */
-export function bookingStartISO(now: Date, timeZone: string): string {
+export function bookingStartISO(now: Date, tz: string): string {
+  // Param is `tz` (not `timeZone`) so SWC's inliner doesn't lose the
+  // value through a `{ timeZone }` shorthand when inlining this fn into
+  // a scope that shadows the param's renamed identifier. See the same
+  // workaround in `dayOfWeekInTZ` below.
   // en-CA always formats as YYYY-MM-DD.
   return new Intl.DateTimeFormat("en-CA", {
-    timeZone,
+    timeZone: tz,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -72,12 +76,18 @@ const DOW_FROM_EN = {
   Sat: 6,
 } as const;
 
-function dayOfWeekInTZ(iso: string, timeZone: string): number {
+function dayOfWeekInTZ(iso: string, tz: string): number {
+  // Param is `tz` (not `timeZone`) on purpose: when SWC inlines this
+  // fn into the Array.from callback below, the callback's index param
+  // shadows the outer `timeZone`. A `{ timeZone }` shorthand here gets
+  // left as a free reference after inlining → ReferenceError at
+  // runtime. Using a different name forces the inliner to emit an
+  // explicit `timeZone: tz` it can rewrite correctly.
   // 12:00 UTC sits ~11h from either DST transition edge in any
   // real-world studio tz, so the studio-local civil date is invariant.
   const anchor = new Date(`${iso}T12:00:00Z`);
   const wd = new Intl.DateTimeFormat("en-US", {
-    timeZone,
+    timeZone: tz,
     weekday: "short",
   }).format(anchor);
   return DOW_FROM_EN[wd as keyof typeof DOW_FROM_EN];
