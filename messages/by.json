@@ -6,7 +6,21 @@
     "hero_title_lead": "гэта",
     "hero_title_word": "партрэт.",
     "hero_paragraph": "Аўтарскі нэйл-дызайн з атэлье Віалеты на адно крэсла. У нядзелю а 20:00 адкрываецца каляндар — раім не спазняцца.",
-    "cta_book": "Забраніраваць",
+    "cta_book": "Запісацца",
+    "next_opening_eyebrow": "БЛІЖЭЙШАЕ АКНО",
+    "next_opening_tonight": "СЁННЯ {time} · {service}",
+    "next_opening_day": "{day} {time} · {service}",
+    "next_opening_fully_booked": "СЁННЯ ЎСЁ ЗАНЯТА",
+    "trust_strip_eyebrow": "Чаму мы",
+    "trust_strip_years": "{n, plural, one {# год працы} few {# гады працы} many {# гадоў працы} other {# гадоў працы}}",
+    "trust_strip_sets": "{n}+ выкананых сэтаў",
+    "trust_strip_chair": "Па запісу · адно крэсла",
+    "trust_strip_rating": "{score} ★ з {n} візітаў",
+    "trust_strip_telegram_eyebrow": "ЗАПІС У TELEGRAM",
+    "address_copy_label": "Скапіяваць адрас",
+    "address_maps_label": "Адкрыць на мапе",
+    "address_copied_toast": "Адрас скапіяваны",
+    "address_maps_toast": "Адкрываем мапу…",
     "cta_gallery": "Галерэя",
     "capsule_eyebrow": "На тыдні · Лімітаваная капсула",
     "capsule_title": "Моў і Гранат — толькі шэсць рук.",
@@ -72,7 +86,7 @@
     "progress_aria": "Прагрэс браніравання",
     "back_aria": "Назад",
     "cta_continue": "Далей",
-    "cta_confirm": "Пацвердзіць запіс",
+    "cta_confirm": "Пацвердзіць",
     "cta_pick_service": "Абярыце рытуал",
     "cta_pick_date": "Абярыце дзень",
     "cta_pick_time": "Абярыце час",
@@ -111,6 +125,28 @@
       "reserved": "Занята",
       "available": "Вольна"
     },
+    "step_label_of": "{current} з {total} · {label}",
+    "step_label_service": "Паслуга",
+    "step_label_when": "Калі",
+    "step_label_confirm": "Пацверджанне",
+    "when": {
+      "eyebrow": "Крок 02 / Калі",
+      "title": "Выберыце <em>дзень і гадзіну</em>.",
+      "paragraph": "Гартайце дні. Тапніце плітку, каб запісацца.",
+      "no_slots": "— НЯМА АКОН — ПАСПРАБУЙЦЕ НАСТУПНЫ ДЗЕНЬ"
+    },
+    "service_tile_duration": "· {n} ХВ ·",
+    "service_tile_more": "{n} яшчэ",
+    "save_sheet": {
+      "title": "Мы трымаем ваша месца",
+      "body": "Месца за вамі на 5 хвілін. Працягвайце — ці адпраўце спасылку сабе.",
+      "cta_continue": "Працягнуць",
+      "cta_telegram": "Адправіць у Telegram",
+      "cta_discard": "Адмяніць"
+    },
+    "policy_strip": "ПЕРАНОС БЯСПЛАТНА · ЗА 12Г · НЯ-З'ЯЎЛЕННЕ ЎТРЫМЛІВАЕ 50%",
+    "arrival_eyebrow": "УВАХОД",
+    "arrival_body": "3 паверх, званок адзін раз.",
     "errors": {
       "slot_taken": "Гэты слот толькі што заняты. Выберыце іншы.",
       "db_unavailable": "Запіс часова недаступны. Паспрабуйце праз хвіліну.",
@@ -149,7 +185,15 @@
     "missing_date": "—",
     "missing_time": "—",
     "cta_calendar": "Дадаць у каляндар",
-    "cta_return": "Вярнуцца ў атэлье"
+    "cta_return": "Вярнуцца ў атэлье",
+    "headline": "Пацверджана.",
+    "calendar_apple": "Apple",
+    "calendar_google": "Google",
+    "calendar_ics": "Спампаваць",
+    "telegram_remind_eyebrow": "· НАГАДАЦЬ · ЗА 24Г · У TELEGRAM ·",
+    "share_eyebrow": "ПРЫВЯДЗІ СЯБРОЎКУ",
+    "share_cta": "Скапіяваць рэферальную спасылку",
+    "share_copied": "Спасылка скапіявана"
   },
   "ServiceDetail": {
     "meta_subtitle": "Рытуал",
@@ -157,7 +201,12 @@
     "includes_eyebrow": "—— Што ўваходзіць",
     "recent_eyebrow": "—— Свежыя працы ў гэтым стылі",
     "from": "Ад",
-    "cta_reserve": "Забраніраваць крэсла"
+    "cta_reserve": "Забраніраваць крэсла",
+    "cta_ask_first": "Спачатку спытаць",
+    "ask_first_template": "Прывітанне — цікавіць {service}, калі бліжэйшае акно?",
+    "aftercare_eyebrow": "ДАГЛЯД ПАСЛЯ",
+    "aftercare_body": "Што спатрэбіцца пасля — гадзіна без гарачай вады і дзень без прамога сонца. Поўную памятку прышлем паведамленнем.",
+    "pairs_eyebrow": "ДОБРА СПАЛУЧАЕЦЦА"
   },
   "Services": {
     "meta_title": "Меню",
@@ -177,9 +226,12 @@
   },
   "Onboarding": {
     "meta_title": "Знаёмства",
-    "skip": "Прапусціць",
+    "skip": "На галоўную",
     "cta_continue": "Далей",
-    "cta_begin": "Пачаць",
+    "cta_begin": "Увайсці",
+    "voice_attribution": "— В.",
+    "voice_what_we_do": "Адно крэсла, адна гадзіна, адна пара рук — вашы. Без чэргаў і падслуханых размоў. Толькі пакой і тое, што мы ствараем.",
+    "voice_how_a_sitting_feels": "Візіт — гэта маленькая цырымонія. Гарбата, гутарка пра настрой, потым дзевяноста ціхіх хвілін працы.",
     "aria_carousel": "Карусель знаёмства",
     "aria_dots": "Індыкатар слайдаў",
     "aria_dot": "Слайд {n} з {total}",
@@ -195,9 +247,17 @@
   },
   "Welcome": {
     "tagline": "Прыватнае атэлье манікюру — адно крэсла, адна гадзіна, адзін ціхі рытуал за раз.",
-    "cta_enter": "Я тут упершыню",
-    "cta_returning": "Запісацца",
-    "home_link": "На галоўную"
+    "cta_enter": "Увайсці",
+    "cta_returning": "Я ўжо тут",
+    "cta_tonight": "Вокны на сёння",
+    "home_link": "На галоўную",
+    "proof_est": "З · MMXIV",
+    "proof_chair": "ПА ЗАПІСУ · АДНО КРЭСЛА",
+    "proof_open_until": "АДКРЫТА · ДА {time}",
+    "proof_opens_on": "АДКРЫЕМСЯ {day} {time}",
+    "ribbon_fully_booked": "· СЁННЯ ПОЎНА · БЛІЖЭЙШАЕ АКНО {day} ·",
+    "ribbon_join_at": "{time} · {service}",
+    "ribbon_label": "Сёння ў студыі"
   },
   "LocaleSwitcher": {
     "label": "Мова",
@@ -243,8 +303,14 @@
     "countdown": {
       "today": "Сёння",
       "tomorrow": "Заўтра",
-      "in_days": "Праз {n} дн."
+      "in_days": "Праз {n} дн.",
+      "in_hours": "Праз {n} г.",
+      "now": "Зараз"
     },
+    "signout": "Зачыніць дзверы",
+    "rebook_cta": "Паўтарыць",
+    "palettes_eyebrow": "Захаваныя палітры",
+    "palettes_empty": "Прымерце палітру — яна захаваецца тут.",
     "quick_links_aria": "Спасылкі акаўнта",
     "quick_links": {
       "bookings": "Мае запісы",
@@ -437,6 +503,11 @@
   },
   "SiteFooter": {
     "credit_prefix": "Створана з любоўю"
+  },
+  "Tonight": {
+    "label": "Сёння ў студыі",
+    "fully_booked": "· СЁННЯ ЎСЁ ЗАНЯТА · БЛІЖЭЙШАЕ {day} · {time} {service} ·",
+    "dismiss": "Схаваць вокны на сёння"
   },
   "Error": {
     "meta_title": "Нешта зрушылася",

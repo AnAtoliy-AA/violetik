@@ -6,7 +6,21 @@
     "hero_title_lead": "это",
     "hero_title_word": "портрет.",
     "hero_paragraph": "Авторский нейл-дизайн из ателье Виолетты на одно кресло. По воскресеньям в 20:00 открывается календарь — рекомендуем не опаздывать.",
-    "cta_book": "Забронировать",
+    "cta_book": "Записаться",
+    "next_opening_eyebrow": "БЛИЖАЙШЕЕ ОКНО",
+    "next_opening_tonight": "СЕГОДНЯ {time} · {service}",
+    "next_opening_day": "{day} {time} · {service}",
+    "next_opening_fully_booked": "СЕГОДНЯ ВСЁ ЗАНЯТО",
+    "trust_strip_eyebrow": "Почему мы",
+    "trust_strip_years": "{n, plural, one {# год работы} few {# года работы} other {# лет работы}}",
+    "trust_strip_sets": "{n}+ выполненных сетов",
+    "trust_strip_chair": "По записи · одно кресло",
+    "trust_strip_rating": "{score} ★ из {n} визитов",
+    "trust_strip_telegram_eyebrow": "ЗАПИСЬ В TELEGRAM",
+    "address_copy_label": "Скопировать адрес",
+    "address_maps_label": "Открыть на карте",
+    "address_copied_toast": "Адрес скопирован",
+    "address_maps_toast": "Открываем карту…",
     "cta_gallery": "Галерея",
     "capsule_eyebrow": "На неделе · Лимитированная капсула",
     "capsule_title": "Мов и Гранат — только шесть рук.",
@@ -72,7 +86,7 @@
     "progress_aria": "Прогресс бронирования",
     "back_aria": "Назад",
     "cta_continue": "Дальше",
-    "cta_confirm": "Подтвердить запись",
+    "cta_confirm": "Подтвердить",
     "cta_pick_service": "Выберите ритуал",
     "cta_pick_date": "Выберите день",
     "cta_pick_time": "Выберите время",
@@ -111,6 +125,28 @@
       "reserved": "Занято",
       "available": "Свободно"
     },
+    "step_label_of": "{current} из {total} · {label}",
+    "step_label_service": "Услуга",
+    "step_label_when": "Когда",
+    "step_label_confirm": "Подтверждение",
+    "when": {
+      "eyebrow": "Шаг 02 / Когда",
+      "title": "Выберите <em>день и час</em>.",
+      "paragraph": "Листайте дни. Тапните плитку, чтобы записаться.",
+      "no_slots": "— НЕТ ОКОН — ПОПРОБУЙТЕ СЛЕДУЮЩИЙ ДЕНЬ"
+    },
+    "service_tile_duration": "· {n} МИН ·",
+    "service_tile_more": "{n} ещё",
+    "save_sheet": {
+      "title": "Мы держим ваше место",
+      "body": "Место за вами на 5 минут. Продолжите — или отправьте ссылку себе.",
+      "cta_continue": "Продолжить",
+      "cta_telegram": "Отправить в Telegram",
+      "cta_discard": "Отменить"
+    },
+    "policy_strip": "ПЕРЕНОС БЕСПЛАТНО · ЗА 12Ч · НЕЯВКА УДЕРЖИВАЕТ 50%",
+    "arrival_eyebrow": "ВХОД",
+    "arrival_body": "3 этаж, звонок один раз.",
     "errors": {
       "slot_taken": "Этот слот только что заняли. Выберите другой.",
       "db_unavailable": "Запись временно недоступна. Повторите попытку через минуту.",
@@ -149,7 +185,15 @@
     "missing_date": "—",
     "missing_time": "—",
     "cta_calendar": "Добавить в календарь",
-    "cta_return": "Вернуться в ателье"
+    "cta_return": "Вернуться в ателье",
+    "headline": "Подтверждено.",
+    "calendar_apple": "Apple",
+    "calendar_google": "Google",
+    "calendar_ics": "Скачать",
+    "telegram_remind_eyebrow": "· НАПОМНИТЬ · ЗА 24Ч · В TELEGRAM ·",
+    "share_eyebrow": "ПРИВЕДИ ПОДРУГУ",
+    "share_cta": "Скопировать реферальную ссылку",
+    "share_copied": "Ссылка скопирована"
   },
   "ServiceDetail": {
     "meta_subtitle": "Ритуал",
@@ -157,7 +201,12 @@
     "includes_eyebrow": "—— Что входит",
     "recent_eyebrow": "—— Свежие работы в этом стиле",
     "from": "От",
-    "cta_reserve": "Забронировать кресло"
+    "cta_reserve": "Забронировать кресло",
+    "cta_ask_first": "Сначала спросить",
+    "ask_first_template": "Здравствуйте — интересует {service}, когда ближайшее окно?",
+    "aftercare_eyebrow": "УХОД ПОСЛЕ",
+    "aftercare_body": "Что потребуется после — час без горячей воды и день без прямого солнца. Полную памятку пришлём сообщением.",
+    "pairs_eyebrow": "ХОРОШО СОЧЕТАЕТСЯ"
   },
   "Services": {
     "meta_title": "Меню",
@@ -177,9 +226,12 @@
   },
   "Onboarding": {
     "meta_title": "Знакомство",
-    "skip": "Пропустить",
+    "skip": "На главную",
     "cta_continue": "Дальше",
-    "cta_begin": "Начать",
+    "cta_begin": "Войти",
+    "voice_attribution": "— В.",
+    "voice_what_we_do": "Одно кресло, один час, одна пара рук — ваши. Без очередей и подслушанных разговоров. Только комната и то, что мы создаём.",
+    "voice_how_a_sitting_feels": "Визит — это маленькая церемония. Чай, разговор о настроении, потом девяносто тихих минут работы.",
     "aria_carousel": "Карусель знакомства",
     "aria_dots": "Индикатор слайдов",
     "aria_dot": "Слайд {n} из {total}",
@@ -195,9 +247,17 @@
   },
   "Welcome": {
     "tagline": "Частное ателье маникюра — одно кресло, один час, один тихий ритуал за раз.",
-    "cta_enter": "Я здесь впервые",
-    "cta_returning": "Записаться",
-    "home_link": "На главную"
+    "cta_enter": "Войти",
+    "cta_returning": "Я уже здесь",
+    "cta_tonight": "Окна на сегодня",
+    "home_link": "На главную",
+    "proof_est": "С · MMXIV",
+    "proof_chair": "ПО ЗАПИСИ · ОДНО КРЕСЛО",
+    "proof_open_until": "ОТКРЫТО · ДО {time}",
+    "proof_opens_on": "ОТКРОЕМСЯ {day} {time}",
+    "ribbon_fully_booked": "· СЕГОДНЯ ПОЛНО · БЛИЖАЙШЕЕ ОКНО {day} ·",
+    "ribbon_join_at": "{time} · {service}",
+    "ribbon_label": "Сегодня в студии"
   },
   "LocaleSwitcher": {
     "label": "Язык",
@@ -243,8 +303,14 @@
     "countdown": {
       "today": "Сегодня",
       "tomorrow": "Завтра",
-      "in_days": "Через {n} дн."
+      "in_days": "Через {n} дн.",
+      "in_hours": "Через {n} ч.",
+      "now": "Сейчас"
     },
+    "signout": "Закрыть дверь",
+    "rebook_cta": "Повторить",
+    "palettes_eyebrow": "Сохранённые палитры",
+    "palettes_empty": "Примерьте палитру — она сохранится здесь.",
     "quick_links_aria": "Ссылки аккаунта",
     "quick_links": {
       "bookings": "Мои записи",
@@ -437,6 +503,11 @@
   },
   "SiteFooter": {
     "credit_prefix": "Создано с любовью"
+  },
+  "Tonight": {
+    "label": "Сегодня в студии",
+    "fully_booked": "· СЕГОДНЯ ВСЁ ЗАНЯТО · БЛИЖАЙШЕЕ {day} · {time} {service} ·",
+    "dismiss": "Скрыть окна на сегодня"
   },
   "Error": {
     "meta_title": "Что-то сорвалось",

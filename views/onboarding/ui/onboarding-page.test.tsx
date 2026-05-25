@@ -31,23 +31,25 @@ function renderWithIntl() {
 }
 
 describe("OnboardingPage", () => {
-  it("starts on the first slide and shows a Continue button", () => {
+  it("starts on the first slide and shows the Forward button", () => {
     renderWithIntl();
     expect(screen.getByText("A studio of one")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /^Continue$/i }),
+      screen.getByRole("button", { name: /^Forward$/i }),
     ).toBeInTheDocument();
   });
 
-  it("advances slides and swaps the CTA to Begin on the last one", async () => {
+  it("advances slides and swaps the CTA to Step inside on the last one", async () => {
     const user = userEvent.setup();
     renderWithIntl();
-    await user.click(screen.getByRole("button", { name: /^Continue$/i }));
+    await user.click(screen.getByRole("button", { name: /^Forward$/i }));
     expect(screen.getByText("Designed like couture")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: /^Continue$/i }));
+    await user.click(screen.getByRole("button", { name: /^Forward$/i }));
     expect(screen.getByText("Yours, by appointment")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /^Continue$/i })).toBeNull();
-    expect(screen.getByRole("link", { name: /^Begin$/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Forward$/i })).toBeNull();
+    expect(
+      screen.getByRole("link", { name: /^Step inside$/i }),
+    ).toBeInTheDocument();
   });
 
   it("allows jumping to a specific slide via the dot indicator", async () => {
@@ -61,11 +63,10 @@ describe("OnboardingPage", () => {
     expect(screen.getByText("Yours, by appointment")).toBeInTheDocument();
   });
 
-  it("Skip and Begin links both point at /home", () => {
+  it("Skip-equivalent link points at /home", () => {
     renderWithIntl();
-    expect(screen.getByRole("link", { name: /^Skip$/i })).toHaveAttribute(
-      "href",
-      "/home",
-    );
+    expect(
+      screen.getByRole("link", { name: /^Take me home$/i }),
+    ).toHaveAttribute("href", "/home");
   });
 });

@@ -6,8 +6,22 @@
     "hero_title_lead": "are a",
     "hero_title_word": "portrait.",
     "hero_paragraph": "Editorial nail design from Violetta's one-chair studio. Sundays at 20:00, the calendar opens — we recommend punctuality.",
-    "cta_book": "Book a chair",
+    "cta_book": "Reserve",
     "cta_gallery": "Gallery",
+    "next_opening_eyebrow": "NEXT OPENING",
+    "next_opening_tonight": "TONIGHT {time} · {service}",
+    "next_opening_day": "{day} {time} · {service}",
+    "next_opening_fully_booked": "FULLY BOOKED TODAY",
+    "trust_strip_eyebrow": "Why this studio",
+    "trust_strip_years": "{n, plural, one {# year open} other {# years open}}",
+    "trust_strip_sets": "{n}+ complete sets logged",
+    "trust_strip_chair": "By appointment · single chair",
+    "trust_strip_rating": "{score} ★ from {n} sittings",
+    "trust_strip_telegram_eyebrow": "BOOK BY MESSAGE",
+    "address_copy_label": "Copy address",
+    "address_maps_label": "Open in maps",
+    "address_copied_toast": "Address copied",
+    "address_maps_toast": "Opening maps…",
     "capsule_eyebrow": "This week · Limited capsule",
     "capsule_title": "Mauve & Garnet — six hands only.",
     "plate_menu": "The menu",
@@ -71,8 +85,8 @@
     "step_counter": "Step {current} of {total}",
     "progress_aria": "Booking progress",
     "back_aria": "Go back",
-    "cta_continue": "Continue",
-    "cta_confirm": "Confirm appointment",
+    "cta_continue": "Forward",
+    "cta_confirm": "Confirm",
     "cta_pick_service": "Pick a ritual",
     "cta_pick_date": "Pick a day",
     "cta_pick_time": "Pick a time",
@@ -132,7 +146,29 @@
       "invalid_input": "Pick a service, date and time before confirming.",
       "too_soon": "This time is too close to now. Bookings need at least 3 hours' notice — please pick another time.",
       "unknown": "Something slipped. Please try again."
-    }
+    },
+    "step_label_of": "{current} of {total} · {label}",
+    "step_label_service": "Service",
+    "step_label_when": "When",
+    "step_label_confirm": "Confirm",
+    "when": {
+      "eyebrow": "Step 02 / When",
+      "title": "Pick a <em>day & hour</em>.",
+      "paragraph": "Drag the day strip. Tap a tile to reserve.",
+      "no_slots": "— NO OPENINGS — TRY NEXT DAY"
+    },
+    "service_tile_duration": "· {n} MIN ·",
+    "service_tile_more": "{n} more details",
+    "save_sheet": {
+      "title": "We held your seat",
+      "body": "Saved your seat for 5 minutes. Pick up where you left off — or send the link to yourself.",
+      "cta_continue": "Keep going",
+      "cta_telegram": "Send to Telegram",
+      "cta_discard": "Discard"
+    },
+    "policy_strip": "RESCHEDULE FREE · UP TO 12H BEFORE · NO-SHOW HOLDS 50%",
+    "arrival_eyebrow": "ARRIVAL",
+    "arrival_body": "3rd floor, ring once."
   },
   "Confirmation": {
     "meta_title": "Reserved",
@@ -149,7 +185,15 @@
     "missing_date": "—",
     "missing_time": "—",
     "cta_calendar": "Add to calendar",
-    "cta_return": "Return to the atelier"
+    "cta_return": "Return to the atelier",
+    "headline": "Confirmed.",
+    "calendar_apple": "Apple",
+    "calendar_google": "Google",
+    "calendar_ics": "Download",
+    "telegram_remind_eyebrow": "· REMIND ME · 24H BEFORE · BY TELEGRAM ·",
+    "share_eyebrow": "BRING A FRIEND",
+    "share_cta": "Copy referral link",
+    "share_copied": "Referral link copied"
   },
   "ServiceDetail": {
     "meta_subtitle": "Ritual",
@@ -157,7 +201,12 @@
     "includes_eyebrow": "—— What it includes",
     "recent_eyebrow": "—— Recent in this style",
     "from": "From",
-    "cta_reserve": "Reserve a chair"
+    "cta_reserve": "Reserve a chair",
+    "cta_ask_first": "Ask first",
+    "ask_first_template": "Hello — interested in {service}, what's the soonest opening?",
+    "aftercare_eyebrow": "AFTERCARE",
+    "aftercare_body": "What it costs in time after — keep your hands out of hot water for an hour and out of the sun for a day. We send the full sheet by message.",
+    "pairs_eyebrow": "PAIRS WELL WITH"
   },
   "Services": {
     "meta_title": "The menu",
@@ -177,9 +226,12 @@
   },
   "Onboarding": {
     "meta_title": "Onboarding",
-    "skip": "Skip",
-    "cta_continue": "Continue",
-    "cta_begin": "Begin",
+    "skip": "Take me home",
+    "cta_continue": "Forward",
+    "cta_begin": "Step inside",
+    "voice_attribution": "— V.",
+    "voice_what_we_do": "One chair, one hour, one set of hands — yours. No queues, no overhearing. Just the room and what we're making.",
+    "voice_how_a_sitting_feels": "A sitting is a small ceremony. Tea, a mood conversation, then ninety quiet minutes of hands.",
     "aria_carousel": "Welcome carousel",
     "aria_dots": "Slide indicator",
     "aria_dot": "Slide {n} of {total}",
@@ -195,9 +247,17 @@
   },
   "Welcome": {
     "tagline": "A private nail atelier — one chair, one hour, one quiet ritual at a time.",
-    "cta_enter": "I'm new here",
-    "cta_returning": "Start booking",
-    "home_link": "Go to home"
+    "cta_enter": "Step inside",
+    "cta_returning": "Returning",
+    "cta_tonight": "Tonight's openings",
+    "home_link": "Go to home",
+    "proof_est": "EST · MMXIV",
+    "proof_chair": "BY APPOINTMENT · SINGLE CHAIR",
+    "proof_open_until": "OPEN NOW · UNTIL {time}",
+    "proof_opens_on": "OPENS {day} {time}",
+    "ribbon_fully_booked": "· FULLY BOOKED TONIGHT · NEXT OPENING {day} ·",
+    "ribbon_join_at": "{time} · {service}",
+    "ribbon_label": "Tonight in the studio"
   },
   "LocaleSwitcher": {
     "label": "Language",
@@ -243,8 +303,14 @@
     "countdown": {
       "today": "Today",
       "tomorrow": "Tomorrow",
-      "in_days": "In {n} days"
+      "in_days": "In {n} days",
+      "in_hours": "In {n} hours",
+      "now": "Now"
     },
+    "signout": "Close the door",
+    "rebook_cta": "Book this again",
+    "palettes_eyebrow": "Saved palettes",
+    "palettes_empty": "Try a palette to keep it here.",
     "quick_links_aria": "Account links",
     "quick_links": {
       "bookings": "My bookings",
@@ -437,6 +503,11 @@
   },
   "SiteFooter": {
     "credit_prefix": "Created with Love by"
+  },
+  "Tonight": {
+    "label": "Tonight in the studio",
+    "fully_booked": "· FULLY BOOKED TONIGHT · NEXT {day} · {time} {service} ·",
+    "dismiss": "Hide tonight's openings"
   },
   "Error": {
     "meta_title": "Something slipped",
