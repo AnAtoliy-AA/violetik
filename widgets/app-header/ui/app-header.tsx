@@ -85,7 +85,7 @@ export function AppHeader({
       href="/home"
       className="-m-2 rounded-sm p-2 transition-opacity duration-fast ease-out hover:opacity-80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
     >
-      <Wordmark size="xs" />
+      <Wordmark size="sm" animated />
     </Link>
   );
 

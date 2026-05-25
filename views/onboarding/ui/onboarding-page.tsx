@@ -76,7 +76,7 @@ export function OnboardingPage() {
   return (
     <div className="relative px-[22px]">
       <header className="flex items-center justify-between py-[6px] pb-6">
-        <Wordmark size="xs" />
+        <Wordmark size="sm" animated />
         <Link
           href="/home"
           className="font-mono text-xs uppercase tracking-[0.16em] text-text-3 hover:text-text-2"
