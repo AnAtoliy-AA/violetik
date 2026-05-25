@@ -119,7 +119,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             // Sign-in only — the calendar.events scope used by
             // /admin/integrations/google is a separate OAuth flow.
-            authorization: { params: { scope: "openid email profile" } },
+            authorization: {
+              params: {
+                scope: "openid email profile",
+                // Force account chooser every time so signing out of
+                // the app and back in doesn't silently reuse Google's
+                // cached session.
+                prompt: "select_account",
+              },
+            },
             // Don't override profile() — Auth.js v5 deliberately
             // overwrites the returned `id` with crypto.randomUUID()
             // for OAuth providers (see @auth/core/lib/actions/

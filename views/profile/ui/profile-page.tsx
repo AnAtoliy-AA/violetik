@@ -6,6 +6,7 @@ import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { AppHeader } from "@/widgets/app-header";
 import { TabBar } from "@/widgets/tab-bar";
+import { SignOutButton } from "@/features/telegram-login";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 import { ProfileHero } from "./profile-hero";
 import { UpcomingBookings } from "./upcoming-bookings";
@@ -32,9 +33,10 @@ export async function ProfilePage({ locale }: { locale: string }) {
     redirect(`/${locale}/sign-in?callbackUrl=/${locale}/profile`);
   }
 
-  const [t, tLinks] = await Promise.all([
+  const [t, tLinks, tSignIn] = await Promise.all([
     getTranslations("Profile"),
     getTranslations("Profile.quick_links"),
+    getTranslations("SignIn"),
   ]);
 
   return (
@@ -87,6 +89,13 @@ export async function ProfilePage({ locale }: { locale: string }) {
           <TestimonialsSection userId={user.id} locale={locale} />
         </Suspense>
       </section>
+
+      <div className="mt-10 flex justify-center px-[22px]">
+        <SignOutButton
+          label={tSignIn("cta_sign_out")}
+          redirectTo={`/${locale}/welcome`}
+        />
+      </div>
 
       <TabBar showAdmin={user.role === "admin"} />
     </div>
