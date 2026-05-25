@@ -1,2 +1,6 @@
 npm run lint
-npm test
+# Exclude the storybook (chromium) project locally — Playwright Chromium
+# under parallel jsdom load causes timeout flakes on dev machines. The
+# CI verify job (.github/workflows/ci.yml) runs `npm test` with both
+# projects, so storybook stories are still gated before merge.
+npx vitest run --project=\!storybook
