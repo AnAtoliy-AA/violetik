@@ -24,4 +24,17 @@ describe("Wordmark", () => {
     expect(container.firstChild).toHaveClass("opacity-50");
     expect(container.firstChild).toHaveClass("font-display");
   });
+
+  it("applies the continuous shimmer to both name and subline when animated", () => {
+    render(<Wordmark animated />);
+    expect(screen.getByText("Violetta")).toHaveClass("text-gold-shimmer");
+    expect(screen.getByText("B·E·A·U·T·Y")).toHaveClass("text-gold-shimmer");
+  });
+
+  it("keeps the static gold subline when not animated", () => {
+    render(<Wordmark />);
+    expect(screen.getByText("Violetta")).not.toHaveClass("text-gold-shimmer");
+    expect(screen.getByText("B·E·A·U·T·Y")).toHaveClass("text-gold");
+    expect(screen.getByText("B·E·A·U·T·Y")).not.toHaveClass("text-gold-shimmer");
+  });
 });

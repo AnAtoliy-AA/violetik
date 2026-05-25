@@ -37,9 +37,30 @@ export function WelcomePage() {
       <PaperGrain />
 
       <motion.div
-        className="absolute top-4 right-[22px] z-20"
+        className="absolute top-4 right-[22px] z-20 flex items-center gap-2"
         {...fade(0.4)}
       >
+        <Link
+          href="/home"
+          aria-label={t("home_link")}
+          className="inline-flex size-7 items-center justify-center rounded-full border-[0.5px] border-line text-text-2 transition-colors duration-fast ease-out hover:text-text hover:bg-surface/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+        >
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            width={13}
+            height={13}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.4}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 11.5 12 4l9 7.5" />
+            <path d="M5 10.5V20h14v-9.5" />
+            <path d="M10 20v-5h4v5" />
+          </svg>
+        </Link>
         <LocaleSwitcher variant="welcome" />
       </motion.div>
 
@@ -51,7 +72,7 @@ export function WelcomePage() {
           >
             <MonogramSeal letter="V" className="size-12 text-[22px]" />
           </motion.div>
-          <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)]">
+          <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)] text-brand-cycle">
             <LetterReveal text="Violetta" />
           </div>
 

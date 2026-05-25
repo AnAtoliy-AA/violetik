@@ -497,12 +497,40 @@ body {
   animation: var(--animate-shimmer);
 }
 
+/* Continuous brand-palette colour cycle for hero wordmarks.
+ * Used on the welcome screen's "Violetta" — gently drifts the letter color
+ * through the cream / gold / rose / violet palette without ever leaving the
+ * brand. Reduced-motion users see a static cream color. */
+@keyframes brandHueCycle {
+  0%,
+  100% {
+    color: var(--color-text);
+  }
+  20% {
+    color: var(--color-accent-2);
+  }
+  40% {
+    color: var(--color-rose);
+  }
+  60% {
+    color: var(--color-violet);
+  }
+  80% {
+    color: var(--color-accent);
+  }
+}
+
+.text-brand-cycle {
+  animation: brandHueCycle 14s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --duration-DEFAULT: 0ms;
     --duration-fast: 0ms;
   }
-  .text-gold-shimmer {
+  .text-gold-shimmer,
+  .text-brand-cycle {
     animation: none;
   }
   .spotlight::after,
