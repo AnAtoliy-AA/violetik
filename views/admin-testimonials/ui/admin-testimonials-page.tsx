@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
+import { RefreshButton } from "@/shared/ui/refresh-button";
 import {
   AdminDeleteButton,
   ChangeRequestActions,
@@ -44,7 +45,12 @@ export function AdminTestimonialsPage({
 
   return (
     <div className="pb-16">
-      <AppHeader back="/admin" title={t("meta_title")} admin />
+      <AppHeader
+        back="/admin"
+        title={t("meta_title")}
+        admin
+        actions={<RefreshButton ariaLabel={t("cta_refresh")} />}
+      />
 
       <section className="px-[22px] py-6">
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>
