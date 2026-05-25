@@ -51,16 +51,20 @@ export async function listAllServices(): Promise<schema.Service[]> {
 export async function listPublishedServices(): Promise<schema.Service[]> {
   if (!db) return [];
   try {
-    const eligibleIds = await getServiceIdsHavingAnyPublishedMaster();
-    const rows = await withQueryTimeout(
-      db
-        .select()
-        .from(schema.services)
-        .where(eq(schema.services.status, "published"))
-        .orderBy(schema.services.sortOrder),
-      SSR_READ_TIMEOUT_MS,
-      "services.listPublished",
-    );
+    // Two independent reads — parallelize so their 5s SSR budgets
+    // overlap. Sequential would stack to 10s when the pool is sick.
+    const [eligibleIds, rows] = await Promise.all([
+      getServiceIdsHavingAnyPublishedMaster(),
+      withQueryTimeout(
+        db
+          .select()
+          .from(schema.services)
+          .where(eq(schema.services.status, "published"))
+          .orderBy(schema.services.sortOrder),
+        SSR_READ_TIMEOUT_MS,
+        "services.listPublished",
+      ),
+    ]);
     // Fall through to the unfiltered list when the masters table has
     // no published rows (first-run installs would otherwise show an
     // empty menu). Admin sees orphan badges in /admin/services.
