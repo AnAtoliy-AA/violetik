@@ -12,10 +12,10 @@ import {
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { SpotlightCard } from "@/shared/ui/spotlight-card";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import {
   getCachedUserBookings,
   getCachedAllServices,
-  getCachedSiteSettings,
   getCachedProfileWithPhoto,
 } from "../api/loaders";
 
@@ -40,7 +40,7 @@ export async function UpcomingBookings({
     getTranslations("Profile"),
     getCachedUserBookings(userId),
     getCachedAllServices(),
-    getCachedSiteSettings(),
+    getSiteSettingsServer(),
     getCachedProfileWithPhoto(),
   ]);
 
