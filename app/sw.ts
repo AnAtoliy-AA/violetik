@@ -1,21 +1,50 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/turbopack/worker";
-import { NetworkFirst, Serwist } from "serwist";
+import { NetworkFirst, NetworkOnly, Serwist } from "serwist";
 
 declare const self: ServiceWorkerGlobalScope & {
   __SW_MANIFEST: (string | { url: string; revision: string | null })[];
 };
 
-// Bounded navigation handler — must come before defaultCache so it
-// matches first. defaultCache's own NetworkFirst for navigations has no
-// timeout, so a slow SSR (DB stall, cold lambda) leaves the user
+// Routes whose HTML varies per signed-in user. Caching navigation
+// responses for these would let the SW serve another user's profile
+// (or a stale empty state from when SSR fell back during the old 5s
+// withQueryTimeout era) to a returning visitor. NetworkOnly keeps the
+// SW out of the loop entirely for these — slower offline UX (no cached
+// fallback) is the right trade for correctness on personalized data.
+const PERSONALIZED_PATHNAME = /^\/(?:en|ru|by)\/(?:profile|admin|booking|onboarding|sign-in)(?:\/|$)/;
+
+const personalizedNavigationHandler = {
+  matcher: ({
+    request,
+    sameOrigin,
+    url,
+  }: {
+    request: Request;
+    sameOrigin: boolean;
+    url: URL;
+  }) =>
+    sameOrigin &&
+    request.mode === "navigate" &&
+    PERSONALIZED_PATHNAME.test(url.pathname),
+  handler: new NetworkOnly(),
+};
+
+// Bounded navigation handler for *public* pages (home, master, gallery,
+// services, etc.) — defaultCache's own NetworkFirst for navigations has
+// no timeout, so a slow SSR (DB stall, cold lambda) leaves the user
 // staring at a blank chrome until the response eventually comes in or
 // the fetch errors. With networkTimeoutSeconds, the SW gives up on the
 // network after 4s and serves the cached version (or falls through to
 // the offline fallback below) — perceived latency stays bounded.
-const navigationHandler = {
-  matcher: ({ request, sameOrigin }: { request: Request; sameOrigin: boolean }) =>
-    sameOrigin && request.mode === "navigate",
+const publicNavigationHandler = {
+  matcher: ({
+    request,
+    sameOrigin,
+  }: {
+    request: Request;
+    sameOrigin: boolean;
+  }) => sameOrigin && request.mode === "navigate",
   handler: new NetworkFirst({
     cacheName: "pages",
     networkTimeoutSeconds: 4,
@@ -27,7 +56,11 @@ const serwist = new Serwist({
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: [navigationHandler, ...defaultCache],
+  runtimeCaching: [
+    personalizedNavigationHandler,
+    publicNavigationHandler,
+    ...defaultCache,
+  ],
   fallbacks: {
     entries: [
       {
@@ -39,6 +72,15 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+// One-shot wipe of the "pages" cache so users upgrading from a prior SW
+// version don't keep being served the stale personalized HTML it cached
+// (the previous SW's NetworkFirst applied to /profile, /admin, etc.).
+// Safe to leave indefinitely — `caches.delete` is a no-op when the cache
+// is already absent.
+self.addEventListener("activate", (event) => {
+  event.waitUntil(caches.delete("pages"));
+});
 
 self.addEventListener("push", (event) => {
   if (!event.data) return;
