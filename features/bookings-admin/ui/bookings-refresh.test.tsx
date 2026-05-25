@@ -118,7 +118,7 @@ describe("BookingsRefreshControls", () => {
     await act(async () => {
       pill.click();
     });
-    expect(refreshSpy).toHaveBeenCalled();
+    expect(refreshSpy).toHaveBeenCalledOnce();
     expect(screen.queryByTestId("new-items-pill")).not.toBeInTheDocument();
   });
 

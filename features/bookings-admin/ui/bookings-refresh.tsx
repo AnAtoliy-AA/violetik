@@ -43,11 +43,11 @@ export function BookingsRefreshControls({
     }
   }, []);
 
-  // Polling: subscribe to a server-side count and mirror it into local state.
-  // The setLatest call lives in fetchCount's async path (callback firing on
-  // external change), which is the supported "subscribe to external system"
-  // shape. eslint's react-hooks/set-state-in-effect can't see across the
-  // useCallback boundary.
+  // Polling: subscribe to the pending-count endpoint and mirror it into
+  // local state. fetchCount reads document.visibilityState and hits the
+  // network — it's a genuine "subscribe to external system" effect, and
+  // the setLatest inside it is the subscription callback, not a render-
+  // derived setter. That's the documented exception to the eslint rule.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchCount();
