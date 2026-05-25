@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { RefreshButton } from "@/shared/ui/refresh-button";
 import { NewItemsPill } from "@/shared/ui/new-items-pill";
@@ -10,15 +11,12 @@ const ENDPOINT = "/api/admin/bookings/pending-count";
 
 export interface BookingsRefreshControlsProps {
   initialPendingCount: number;
-  ariaRefreshLabel: string;
-  newPendingLabel: (n: number) => string;
 }
 
 export function BookingsRefreshControls({
   initialPendingCount,
-  ariaRefreshLabel,
-  newPendingLabel,
 }: BookingsRefreshControlsProps) {
+  const t = useTranslations("AdminBookings");
   const router = useRouter();
   const [baseline, setBaseline] = useState(initialPendingCount);
   const [latest, setLatest] = useState(initialPendingCount);
@@ -87,12 +85,12 @@ export function BookingsRefreshControls({
       {delta > 0 ? (
         <NewItemsPill
           count={delta}
-          label={newPendingLabel(delta)}
+          label={t("n_new_pending", { n: delta })}
           onClick={handlePillClick}
         />
       ) : null}
       <RefreshButton
-        ariaLabel={ariaRefreshLabel}
+        ariaLabel={t("cta_refresh")}
         onRefresh={resetBaseline}
         disableVisibilityRefresh
       />

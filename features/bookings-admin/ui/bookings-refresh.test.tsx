@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
+import { NextIntlClientProvider } from "next-intl";
 
 const refreshSpy = vi.fn();
 vi.mock("@/i18n/navigation", () => ({
@@ -7,6 +8,21 @@ vi.mock("@/i18n/navigation", () => ({
 }));
 
 import { BookingsRefreshControls } from "./bookings-refresh";
+
+const messages = {
+  AdminBookings: {
+    cta_refresh: "Refresh",
+    n_new_pending: "{n} new — refresh",
+  },
+};
+
+function renderWithIntl(ui: React.ReactElement) {
+  return render(
+    <NextIntlClientProvider locale="en" messages={messages}>
+      {ui}
+    </NextIntlClientProvider>,
+  );
+}
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -29,8 +45,6 @@ function defaultProps(
 ) {
   return {
     initialPendingCount: 2,
-    ariaRefreshLabel: "Refresh",
-    newPendingLabel: (n: number) => `${n} new — refresh`,
     ...overrides,
   };
 }
@@ -57,7 +71,7 @@ describe("BookingsRefreshControls", () => {
 
   it("fires an immediate fetch on mount", async () => {
     fetchSpy.mockResolvedValue(jsonResponse({ count: 2 }));
-    render(<BookingsRefreshControls {...defaultProps()} />);
+    renderWithIntl(<BookingsRefreshControls {...defaultProps()} />);
     await flushPromises();
     expect(fetchSpy).toHaveBeenCalledWith(
       "/api/admin/bookings/pending-count",
@@ -67,14 +81,14 @@ describe("BookingsRefreshControls", () => {
 
   it("does not show the pill when count equals baseline", async () => {
     fetchSpy.mockResolvedValue(jsonResponse({ count: 2 }));
-    render(<BookingsRefreshControls {...defaultProps()} />);
+    renderWithIntl(<BookingsRefreshControls {...defaultProps()} />);
     await flushPromises();
     expect(screen.queryByTestId("new-items-pill")).not.toBeInTheDocument();
   });
 
   it("shows the pill with the delta when count exceeds baseline", async () => {
     fetchSpy.mockResolvedValue(jsonResponse({ count: 5 }));
-    render(
+    renderWithIntl(
       <BookingsRefreshControls {...defaultProps({ initialPendingCount: 2 })} />,
     );
     await flushPromises();
@@ -85,7 +99,7 @@ describe("BookingsRefreshControls", () => {
 
   it("polls again after 30 seconds", async () => {
     fetchSpy.mockResolvedValue(jsonResponse({ count: 2 }));
-    render(<BookingsRefreshControls {...defaultProps()} />);
+    renderWithIntl(<BookingsRefreshControls {...defaultProps()} />);
     await flushPromises();
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     await act(async () => {
@@ -96,7 +110,7 @@ describe("BookingsRefreshControls", () => {
 
   it("skips fetching when the tab is hidden", async () => {
     fetchSpy.mockResolvedValue(jsonResponse({ count: 2 }));
-    render(<BookingsRefreshControls {...defaultProps()} />);
+    renderWithIntl(<BookingsRefreshControls {...defaultProps()} />);
     await flushPromises();
     expect(fetchSpy).toHaveBeenCalledTimes(1);
 
@@ -109,7 +123,7 @@ describe("BookingsRefreshControls", () => {
 
   it("clicking the pill triggers router.refresh and resets the baseline", async () => {
     fetchSpy.mockResolvedValue(jsonResponse({ count: 5 }));
-    render(
+    renderWithIntl(
       <BookingsRefreshControls {...defaultProps({ initialPendingCount: 2 })} />,
     );
     await flushPromises();
@@ -124,7 +138,7 @@ describe("BookingsRefreshControls", () => {
 
   it("on visibilitychange to visible, triggers router.refresh", async () => {
     fetchSpy.mockResolvedValue(jsonResponse({ count: 2 }));
-    render(<BookingsRefreshControls {...defaultProps()} />);
+    renderWithIntl(<BookingsRefreshControls {...defaultProps()} />);
     await flushPromises();
     refreshSpy.mockClear();
 
@@ -140,7 +154,7 @@ describe("BookingsRefreshControls", () => {
     fetchSpy.mockRejectedValueOnce(new Error("network down"));
     fetchSpy.mockResolvedValue(jsonResponse({ count: 4 }));
 
-    render(
+    renderWithIntl(
       <BookingsRefreshControls {...defaultProps({ initialPendingCount: 2 })} />,
     );
     await flushPromises();
