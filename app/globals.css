@@ -80,6 +80,40 @@
     #d4b27a 65%,
     #a07b48 100%
   );
+
+  /* === Next Wave (Phase 2) tokens === */
+
+  /* Semantic surfaces (used by sticky bars, sheets, toasts) */
+  --color-surface-elevated: color-mix(in oklab, var(--color-surface) 90%, white 10%);
+  --color-surface-translucent: color-mix(in oklab, var(--color-bg) 70%, transparent);
+
+  /* Status colours — palette-agnostic, hand-tuned for AA on bg */
+  --color-status-open: #7fc7a1;
+  --color-status-closed: #c9a96e;
+  --color-status-warn: #e8b07a;
+  --color-status-error: #d97781;
+
+  /* Skeleton shimmer (used for slot loading, gallery defer) */
+  --color-skeleton-1: rgba(243, 234, 216, 0.04);
+  --color-skeleton-2: rgba(243, 234, 216, 0.1);
+
+  /* Sheet / modal scrim */
+  --color-scrim: rgba(8, 4, 10, 0.62);
+
+  /* Confetti palette (uses palette tokens) */
+  --confetti-1: var(--color-accent);
+  --confetti-2: var(--color-accent-2);
+  --confetti-3: var(--color-rose);
+  --confetti-4: var(--color-violet);
+
+  /* Spring physics defaults for motion (consumed via JS) */
+  --spring-soft: "stiffness:140, damping:18, mass:0.6";
+  --spring-snappy: "stiffness:380, damping:30, mass:0.5";
+
+  /* New keyframes */
+  --animate-skeleton: skeleton 1600ms linear infinite;
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-ripple: ripple 700ms var(--ease-out) both;
 }
 
 /* Alias so existing :root-style references to --gold-grad keep working */
@@ -449,6 +483,35 @@
   }
 }
 
+@keyframes skeleton {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes ripple {
+  from {
+    transform: scale(0);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);
@@ -673,4 +736,41 @@ body {
   ::view-transition-image-pair(*) {
     animation: none !important;
   }
+}
+
+/* === Next Wave (Phase 2) utilities === */
+
+/* Skeleton shimmer utility */
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    var(--color-skeleton-1) 0%,
+    var(--color-skeleton-2) 50%,
+    var(--color-skeleton-1) 100%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-skeleton);
+}
+
+/* Ripple — material-style touch feedback inside .ripple-host */
+.ripple-host {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.ripple {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  pointer-events: none;
+  animation: var(--animate-ripple);
+}
+
+/* Tap-target visualiser (dev only — toggle via html[data-debug-hit="true"]) */
+:where(html[data-debug-hit="true"]) button,
+:where(html[data-debug-hit="true"]) a,
+:where(html[data-debug-hit="true"]) [role="button"] {
+  outline: 1px dashed rgba(232, 207, 153, 0.4);
 }
