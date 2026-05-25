@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { HomePage } from "@/views/home";
-import { loadMastersForLocale } from "@/entities/master/api/load";
-import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
-import { listApprovedTestimonials } from "@/entities/testimonial";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 import type { Locale } from "@/i18n/routing";
 
@@ -26,19 +23,10 @@ export default async function HomeRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [masters, settings, latestTestimonials, sessionUser] = await Promise.all([
-    loadMastersForLocale(locale as Locale, { publishedOnly: true }),
-    getSiteSettingsServer(),
-    listApprovedTestimonials({ limit: 1 }),
-    getCurrentSessionUser(),
-  ]);
-  const testimonial = latestTestimonials[0] ?? null;
+  const sessionUser = await getCurrentSessionUser();
   return (
     <HomePage
-      master={masters[0]}
-      settings={settings}
       locale={locale as Locale}
-      testimonial={testimonial}
       showAdmin={sessionUser?.role === "admin"}
     />
   );
