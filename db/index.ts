@@ -48,9 +48,15 @@ function createClientPair(): ClientPair | null {
     // only one connection, a single half-broken TCP socket (NAT
     // timeout, pooler-side idle close, HMR-orphaned cancel) hangs every
     // subsequent query for the 2-minute server-side statement_timeout,
-    // since there's no second conn to retry on.
+    // since there's no second conn to retry on. Dev was previously
+    // `max: 5` and that proved too tight: a few HMR-orphaned conns
+    // (Next aborts the response mid-stream during SPA back-nav, and
+    // postgres-js never reclaims the conn) would exhaust the pool and
+    // make the next admin page wait 30s for the dev-timeout to fire.
+    // `max: 20` gives enough headroom that a handful of leaked conns
+    // don't starve real traffic; well below Supabase PgBouncer's cap.
     const isBuild = process.env.NEXT_PHASE === "phase-production-build";
-    const maxPool = isBuild ? 1 : 5;
+    const maxPool = isBuild ? 1 : 20;
 
     // Per-query statement_timeout cannot be enforced here: the Supabase
     // Transaction pooler (port 6543) silently ignores both
