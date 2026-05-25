@@ -1,8 +1,5 @@
 import { desc, eq } from "drizzle-orm";
 import { db, schema } from "./index";
-import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
-
-const SSR_READ_TIMEOUT_MS = 5_000;
 
 export interface GoogleTokenUpsert {
   userId: string;
@@ -57,27 +54,12 @@ export async function upsertGoogleToken(
  */
 export async function getActiveGoogleToken(): Promise<schema.GoogleOauthToken | null> {
   if (!db) return null;
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select()
-        .from(schema.googleOauthTokens)
-        .orderBy(desc(schema.googleOauthTokens.connectedAt))
-        .limit(1),
-      SSR_READ_TIMEOUT_MS,
-      "google_tokens.getActive",
-    );
-    return rows[0] ?? null;
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/google-tokens] getActiveGoogleToken timed out:",
-        error.message,
-      );
-      return null;
-    }
-    throw error;
-  }
+  const rows = await db
+    .select()
+    .from(schema.googleOauthTokens)
+    .orderBy(desc(schema.googleOauthTokens.connectedAt))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function deleteGoogleToken(userId: string): Promise<void> {

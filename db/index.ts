@@ -43,9 +43,8 @@ function createClient(): DrizzleClient | null {
     // Transaction pooler (port 6543) silently ignores both
     // `connection.statement_timeout` and `?options=-c statement_timeout=...`;
     // the only knob that holds is the server-side `ALTER ROLE ... SET
-    // statement_timeout` (currently 2min). Hot-path callers wrap their
-    // queries in `withQueryTimeout` (see ./with-query-timeout.ts) to
-    // avoid blocking SSR that long.
+    // statement_timeout` (currently 2min). A slow query will block the
+    // page until Vercel's function timeout fires (~60s on hobby tier).
     const client = postgres(url, {
       prepare: false,
       max: maxPool,

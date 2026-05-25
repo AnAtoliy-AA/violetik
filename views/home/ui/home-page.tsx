@@ -1,37 +1,31 @@
+import { Suspense } from "react";
 import { AppHeader } from "@/widgets/app-header";
 import { AtelierHours } from "@/widgets/atelier-hours";
 import { TabBar } from "@/widgets/tab-bar";
-import type { Master } from "@/entities/master";
-import type { SiteSettings } from "@/entities/site-settings";
-import type { ApprovedTestimonial } from "@/entities/testimonial";
 import type { Locale } from "@/i18n/routing";
 import { Aurora } from "@/shared/ui/aurora";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { AnnouncementCapsule } from "./sections/announcement-capsule";
 import { AtelierMotion } from "./sections/atelier-motion";
 import { GalleryStrip } from "./sections/gallery-strip";
-import { HomeFooter } from "./sections/home-footer";
 import { HomeHero } from "./sections/home-hero";
-import { MasterStrip } from "./sections/master-strip";
 import { MembershipCard } from "./sections/membership-card";
 import { SignaturesList } from "./sections/signatures-list";
-import { TestimonialCard } from "./sections/testimonial-card";
+import { HomeFooterAsync } from "./sections/home-footer-async";
+import { MasterStripAsync } from "./sections/master-strip-async";
+import { TestimonialCardAsync } from "./sections/testimonial-card-async";
+import {
+  HomeFooterSkeleton,
+  MasterStripSkeleton,
+  TestimonialCardSkeleton,
+} from "./sections/home-skeletons";
 
 export interface HomePageProps {
-  master?: Master;
-  settings: SiteSettings;
   locale: Locale;
-  testimonial: ApprovedTestimonial | null;
   showAdmin?: boolean;
 }
 
-export function HomePage({
-  master,
-  settings,
-  locale,
-  testimonial,
-  showAdmin = false,
-}: HomePageProps) {
+export function HomePage({ locale, showAdmin = false }: HomePageProps) {
   return (
     <div className="pb-28">
       <AppHeader />
@@ -43,12 +37,18 @@ export function HomePage({
       </section>
       <AnnouncementCapsule />
       <SignaturesList />
-      <MasterStrip master={master} />
+      <Suspense fallback={<MasterStripSkeleton />}>
+        <MasterStripAsync locale={locale} />
+      </Suspense>
       <GalleryStrip />
       <AtelierMotion />
-      <TestimonialCard testimonial={testimonial} />
+      <Suspense fallback={<TestimonialCardSkeleton />}>
+        <TestimonialCardAsync />
+      </Suspense>
       <MembershipCard />
-      <HomeFooter settings={settings} locale={locale} />
+      <Suspense fallback={<HomeFooterSkeleton />}>
+        <HomeFooterAsync locale={locale} />
+      </Suspense>
       <TabBar showAdmin={showAdmin} />
     </div>
   );

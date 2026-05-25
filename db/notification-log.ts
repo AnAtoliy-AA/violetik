@@ -1,9 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "./index";
-import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
-
-const SSR_READ_TIMEOUT_MS = 5_000;
 
 export type NotificationLogStatus =
   | "sent"
@@ -43,31 +40,16 @@ export async function hasRecentBookingReminder(
   bookingId: string,
 ): Promise<boolean> {
   if (!db) return false;
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select({ id: schema.notificationLog.id })
-        .from(schema.notificationLog)
-        .where(
-          and(
-            eq(schema.notificationLog.category, "booking_reminder_24h"),
-            sql`${schema.notificationLog.payload}->>'bookingId' = ${bookingId}`,
-            sql`${schema.notificationLog.sentAt} > now() - interval '48 hours'`,
-          ),
-        )
-        .limit(1),
-      SSR_READ_TIMEOUT_MS,
-      "notification_log.hasRecentBookingReminder",
-    );
-    return rows.length > 0;
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/notification-log] hasRecentBookingReminder timed out:",
-        error.message,
-      );
-      return false;
-    }
-    throw error;
-  }
+  const rows = await db
+    .select({ id: schema.notificationLog.id })
+    .from(schema.notificationLog)
+    .where(
+      and(
+        eq(schema.notificationLog.category, "booking_reminder_24h"),
+        sql`${schema.notificationLog.payload}->>'bookingId' = ${bookingId}`,
+        sql`${schema.notificationLog.sentAt} > now() - interval '48 hours'`,
+      ),
+    )
+    .limit(1);
+  return rows.length > 0;
 }

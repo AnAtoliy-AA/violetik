@@ -1,11 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { and, desc, eq, gt, isNull, lte, or, sql } from "drizzle-orm";
 import { db, schema } from "./index";
-import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
-
-// SSR read budget — same rationale as db/site-settings.ts.
-const SSR_READ_TIMEOUT_MS = 5_000;
-const ADMIN_READ_TIMEOUT_MS = SSR_READ_TIMEOUT_MS;
 
 /**
  * Subquery that yields one row per user with an active (approved &
@@ -150,53 +145,38 @@ export type CurrentTier =
 
 export async function getCurrentTier(userId: string): Promise<CurrentTier> {
   if (!db) return { state: "member" };
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select()
-        .from(schema.vipRequests)
-        .where(
-          and(
-            eq(schema.vipRequests.userId, userId),
-            or(
-              eq(schema.vipRequests.status, "pending"),
-              eq(schema.vipRequests.status, "approved"),
-            ),
-          ),
-        )
-        .orderBy(desc(schema.vipRequests.createdAt)),
-      SSR_READ_TIMEOUT_MS,
-      "vip_requests.getCurrentTier",
-    );
+  const rows = await db
+    .select()
+    .from(schema.vipRequests)
+    .where(
+      and(
+        eq(schema.vipRequests.userId, userId),
+        or(
+          eq(schema.vipRequests.status, "pending"),
+          eq(schema.vipRequests.status, "approved"),
+        ),
+      ),
+    )
+    .orderBy(desc(schema.vipRequests.createdAt));
 
-    const now = new Date();
-    const activeVip = rows.find(
-      (r) =>
-        r.status === "approved" &&
-        (r.expiresAt === null || r.expiresAt > now),
-    );
-    if (activeVip) {
-      return {
-        state: "vip",
-        activeRequestId: activeVip.id,
-        expiresAt: activeVip.expiresAt,
-      };
-    }
-    const pending = rows.find((r) => r.status === "pending");
-    if (pending) {
-      return { state: "member-pending", pendingRequestId: pending.id };
-    }
-    return { state: "member" };
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/vip-requests] getCurrentTier timed out:",
-        error.message,
-      );
-      return { state: "member" };
-    }
-    throw error;
+  const now = new Date();
+  const activeVip = rows.find(
+    (r) =>
+      r.status === "approved" &&
+      (r.expiresAt === null || r.expiresAt > now),
+  );
+  if (activeVip) {
+    return {
+      state: "vip",
+      activeRequestId: activeVip.id,
+      expiresAt: activeVip.expiresAt,
+    };
   }
+  const pending = rows.find((r) => r.status === "pending");
+  if (pending) {
+    return { state: "member-pending", pendingRequestId: pending.id };
+  }
+  return { state: "member" };
 }
 
 export interface VipRequestWithUser extends schema.VipRequest {
@@ -233,63 +213,33 @@ function withUserShape(
 
 export async function listPendingVipRequests(): Promise<VipRequestWithUser[]> {
   if (!db) return [];
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select({ request: schema.vipRequests, ...userJoinColumns })
-        .from(schema.vipRequests)
-        .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
-        .where(eq(schema.vipRequests.status, "pending"))
-        .orderBy(desc(schema.vipRequests.createdAt)),
-      ADMIN_READ_TIMEOUT_MS,
-      "vip_requests.listPending",
-    );
-    return rows.map(withUserShape);
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/vip-requests] listPendingVipRequests timed out:",
-        error.message,
-      );
-      return [];
-    }
-    throw error;
-  }
+  const rows = await db
+    .select({ request: schema.vipRequests, ...userJoinColumns })
+    .from(schema.vipRequests)
+    .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
+    .where(eq(schema.vipRequests.status, "pending"))
+    .orderBy(desc(schema.vipRequests.createdAt));
+  return rows.map(withUserShape);
 }
 
 export async function listActiveVips(): Promise<VipRequestWithUser[]> {
   if (!db) return [];
   const now = new Date();
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select({ request: schema.vipRequests, ...userJoinColumns })
-        .from(schema.vipRequests)
-        .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
-        .where(
-          and(
-            eq(schema.vipRequests.status, "approved"),
-            or(
-              isNull(schema.vipRequests.expiresAt),
-              gt(schema.vipRequests.expiresAt, now),
-            ),
-          ),
-        )
-        .orderBy(sql`${schema.vipRequests.expiresAt} ASC NULLS LAST`),
-      ADMIN_READ_TIMEOUT_MS,
-      "vip_requests.listActive",
-    );
-    return rows.map(withUserShape);
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/vip-requests] listActiveVips timed out:",
-        error.message,
-      );
-      return [];
-    }
-    throw error;
-  }
+  const rows = await db
+    .select({ request: schema.vipRequests, ...userJoinColumns })
+    .from(schema.vipRequests)
+    .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
+    .where(
+      and(
+        eq(schema.vipRequests.status, "approved"),
+        or(
+          isNull(schema.vipRequests.expiresAt),
+          gt(schema.vipRequests.expiresAt, now),
+        ),
+      ),
+    )
+    .orderBy(sql`${schema.vipRequests.expiresAt} ASC NULLS LAST`);
+  return rows.map(withUserShape);
 }
 
 export async function listExpiredVipRequests(opts: {
@@ -298,63 +248,33 @@ export async function listExpiredVipRequests(opts: {
 }): Promise<VipRequestWithUser[]> {
   if (!db) return [];
   const now = new Date();
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select({ request: schema.vipRequests, ...userJoinColumns })
-        .from(schema.vipRequests)
-        .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
-        .where(
-          and(
-            eq(schema.vipRequests.status, "approved"),
-            lte(schema.vipRequests.expiresAt, now),
-          ),
-        )
-        .orderBy(desc(schema.vipRequests.expiresAt))
-        .limit(opts.limit)
-        .offset(opts.offset),
-      ADMIN_READ_TIMEOUT_MS,
-      "vip_requests.listExpired",
-    );
-    return rows.map(withUserShape);
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/vip-requests] listExpiredVipRequests timed out:",
-        error.message,
-      );
-      return [];
-    }
-    throw error;
-  }
+  const rows = await db
+    .select({ request: schema.vipRequests, ...userJoinColumns })
+    .from(schema.vipRequests)
+    .leftJoin(schema.users, eq(schema.vipRequests.userId, schema.users.id))
+    .where(
+      and(
+        eq(schema.vipRequests.status, "approved"),
+        lte(schema.vipRequests.expiresAt, now),
+      ),
+    )
+    .orderBy(desc(schema.vipRequests.expiresAt))
+    .limit(opts.limit)
+    .offset(opts.offset);
+  return rows.map(withUserShape);
 }
 
 export async function countExpiredVipRequests(): Promise<number> {
   if (!db) return 0;
   const now = new Date();
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select({ n: sql<number>`count(*)::int` })
-        .from(schema.vipRequests)
-        .where(
-          and(
-            eq(schema.vipRequests.status, "approved"),
-            lte(schema.vipRequests.expiresAt, now),
-          ),
-        ),
-      ADMIN_READ_TIMEOUT_MS,
-      "vip_requests.countExpired",
+  const rows = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(schema.vipRequests)
+    .where(
+      and(
+        eq(schema.vipRequests.status, "approved"),
+        lte(schema.vipRequests.expiresAt, now),
+      ),
     );
-    return rows[0]?.n ?? 0;
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/vip-requests] countExpiredVipRequests timed out:",
-        error.message,
-      );
-      return 0;
-    }
-    throw error;
-  }
+  return rows[0]?.n ?? 0;
 }
