@@ -6,14 +6,23 @@ declare const self: ServiceWorkerGlobalScope & {
   __SW_MANIFEST: (string | { url: string; revision: string | null })[];
 };
 
-// Routes whose HTML varies per signed-in user. Caching navigation
-// responses for these would let the SW serve another user's profile
-// (or a stale empty state from when SSR fell back during the old 5s
-// withQueryTimeout era) to a returning visitor. NetworkOnly keeps the
-// SW out of the loop entirely for these — slower offline UX (no cached
-// fallback) is the right trade for correctness on personalized data.
+// Routes whose response varies per signed-in user. Without this guard,
+// `defaultCache` from @serwist/turbopack caches *both* full-document
+// navigations under "pages" AND App Router RSC fetches under
+// "pages-rsc" / "pages-rsc-prefetch" — all via NetworkFirst with no
+// network timeout. The cache key is just the URL, so the SW will
+// happily replay another session's RSC payload (or an empty profile
+// baked when the old 5s withQueryTimeout fired) to a returning
+// visitor. We have to intercept BOTH request shapes before defaultCache
+// sees them.
 const PERSONALIZED_PATHNAME = /^\/(?:en|ru|by)\/(?:profile|admin|booking|onboarding|sign-in)(?:\/|$)/;
 
+const isPersonalizedSameOrigin = (
+  sameOrigin: boolean,
+  url: URL,
+): boolean => sameOrigin && PERSONALIZED_PATHNAME.test(url.pathname);
+
+// Full-document navigation to /profile, /admin, etc.
 const personalizedNavigationHandler = {
   matcher: ({
     request,
@@ -24,9 +33,28 @@ const personalizedNavigationHandler = {
     sameOrigin: boolean;
     url: URL;
   }) =>
-    sameOrigin &&
-    request.mode === "navigate" &&
-    PERSONALIZED_PATHNAME.test(url.pathname),
+    request.mode === "navigate" && isPersonalizedSameOrigin(sameOrigin, url),
+  handler: new NetworkOnly(),
+};
+
+// App Router RSC fetches for the same paths. These are issued during
+// client-side navigation (Next-Router-Prefetch === "1" for prefetch on
+// hover, RSC === "1" for the actual navigation). defaultCache's RSC
+// matchers are NetworkFirst against "pages-rsc[-prefetch]" with no
+// timeout — so without this earlier match a stale RSC stream gets
+// replayed on every SPA hop back to the personalized route.
+const personalizedRscHandler = {
+  matcher: ({
+    request,
+    sameOrigin,
+    url,
+  }: {
+    request: Request;
+    sameOrigin: boolean;
+    url: URL;
+  }) =>
+    request.headers.get("RSC") === "1" &&
+    isPersonalizedSameOrigin(sameOrigin, url),
   handler: new NetworkOnly(),
 };
 
@@ -58,6 +86,7 @@ const serwist = new Serwist({
   navigationPreload: true,
   runtimeCaching: [
     personalizedNavigationHandler,
+    personalizedRscHandler,
     publicNavigationHandler,
     ...defaultCache,
   ],
@@ -73,13 +102,23 @@ const serwist = new Serwist({
 
 serwist.addEventListeners();
 
-// One-shot wipe of the "pages" cache so users upgrading from a prior SW
-// version don't keep being served the stale personalized HTML it cached
-// (the previous SW's NetworkFirst applied to /profile, /admin, etc.).
-// Safe to leave indefinitely — `caches.delete` is a no-op when the cache
-// is already absent.
+// One-shot wipe of every cache defaultCache could have populated with
+// personalized responses under a prior SW version: full-document HTML
+// ("pages") and both App Router RSC streams ("pages-rsc",
+// "pages-rsc-prefetch"). Otherwise upgrading users would keep being
+// served the stale rows already on disk until their natural eviction
+// (32 entries / 24h). Safe to leave indefinitely — `caches.delete` is
+// a no-op when the cache is already absent.
+const LEGACY_PERSONALIZED_CACHES = [
+  "pages",
+  "pages-rsc",
+  "pages-rsc-prefetch",
+];
+
 self.addEventListener("activate", (event) => {
-  event.waitUntil(caches.delete("pages"));
+  event.waitUntil(
+    Promise.all(LEGACY_PERSONALIZED_CACHES.map((name) => caches.delete(name))),
+  );
 });
 
 self.addEventListener("push", (event) => {
