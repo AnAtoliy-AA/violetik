@@ -39,28 +39,26 @@ describe("OnboardingPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("advances slides and swaps the CTA to Step inside on the last one", async () => {
+  it("advances to the second slide and swaps the CTA to Step inside", async () => {
     const user = userEvent.setup();
     renderWithIntl();
     await user.click(screen.getByRole("button", { name: /^Forward$/i }));
     expect(screen.getByText("Designed like couture")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: /^Forward$/i }));
-    expect(screen.getByText("Yours, by appointment")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /^Forward$/i })).toBeNull();
     expect(
       screen.getByRole("link", { name: /^Step inside$/i }),
     ).toBeInTheDocument();
   });
 
-  it("allows jumping to a specific slide via the dot indicator", async () => {
+  it("renders exactly two dots after the 2-card recut", async () => {
     const user = userEvent.setup();
     renderWithIntl();
     const dots = screen.getAllByRole("tab");
-    expect(dots).toHaveLength(3);
+    expect(dots).toHaveLength(2);
     expect(dots[0]).toHaveAttribute("aria-selected", "true");
-    await user.click(dots[2]);
-    expect(dots[2]).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("Yours, by appointment")).toBeInTheDocument();
+    await user.click(dots[1]);
+    expect(dots[1]).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("Designed like couture")).toBeInTheDocument();
   });
 
   it("Skip-equivalent link points at /home", () => {

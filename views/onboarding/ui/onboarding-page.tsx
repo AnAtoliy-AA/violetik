@@ -18,15 +18,29 @@ import type { NailTilePalette, NailTileVariant } from "@/shared/ui/nail-tile";
 import { OnboardingSlide } from "./onboarding-slide";
 
 interface SlideMeta {
-  id: "atelier" | "ritual" | "membership";
+  id: "atelier" | "ritual";
   palette: NailTilePalette;
   variant: NailTileVariant;
+  /** Onboarding namespace key for the voice quote rendered as the body. */
+  voiceKey: "voice_what_we_do" | "voice_how_a_sitting_feels";
 }
 
+// §4 — two cards only. The third (membership) recruited later via
+// /membership; here we keep onboarding short and let Violetta's voice
+// carry the warmth instead of stock copy.
 const SLIDES: readonly SlideMeta[] = [
-  { id: "atelier", palette: ["#c9a96e", "#7d3a6f"], variant: 1 },
-  { id: "ritual", palette: ["#d9a3b6", "#3a2050"], variant: 2 },
-  { id: "membership", palette: ["#9d7bc7", "#c9a96e"], variant: 3 },
+  {
+    id: "atelier",
+    palette: ["#c9a96e", "#7d3a6f"],
+    variant: 1,
+    voiceKey: "voice_what_we_do",
+  },
+  {
+    id: "ritual",
+    palette: ["#d9a3b6", "#3a2050"],
+    variant: 2,
+    voiceKey: "voice_how_a_sitting_feels",
+  },
 ];
 
 const EASE_IN_OUT: [number, number, number, number] = [0.65, 0, 0.35, 1];
@@ -75,14 +89,8 @@ export function OnboardingPage() {
 
   return (
     <div className="relative px-[22px]">
-      <header className="flex items-center justify-between py-[6px] pb-6">
+      <header className="flex items-center justify-center py-[6px] pb-6">
         <Wordmark size="sm" animated />
-        <Link
-          href="/home"
-          className="font-mono text-xs uppercase tracking-[0.16em] text-text-3 hover:text-text-2"
-        >
-          {t("skip")}
-        </Link>
       </header>
 
       <div
@@ -112,7 +120,8 @@ export function OnboardingPage() {
               parallaxY={reduceMotion ? undefined : parallaxY}
               eyebrow={t(`${slide.id}_eyebrow`)}
               title={t(`${slide.id}_title`)}
-              body={t(`${slide.id}_body`)}
+              body={t(slide.voiceKey)}
+              attribution={t("voice_attribution")}
             />
           ))}
         </motion.div>
@@ -174,6 +183,16 @@ export function OnboardingPage() {
             {t("cta_continue")}
           </button>
         )}
+      </div>
+
+      {/* §4 — Skip moves bottom-centre, larger mono eyebrow style. */}
+      <div className="mt-6 flex items-center justify-center pb-8">
+        <Link
+          href="/home"
+          className="font-mono text-[11px] uppercase tracking-[0.32em] text-text-3 hover:text-text-2 transition-colors px-3 py-2"
+        >
+          {t("skip")}
+        </Link>
       </div>
     </div>
   );
