@@ -10,6 +10,67 @@ interface ClientPair {
   drizzle: DrizzleClient;
 }
 
+// In dev, cancel any query that hasn't settled within this window. The
+// underlying cause is Next aborting the response mid-stream during HMR
+// or SPA back-nav while a query is in flight; postgres-js never sees an
+// abort signal, so the conn stays "checked out" until the server-side
+// statement_timeout fires (Supabase default: 2 min). Pool exhaustion
+// follows after a handful of those.
+//
+// 15s sits above legitimately-slow queries (typical SSR reads <5s,
+// occasional cold-pool ones <15s) and well below the 30s threshold
+// `withDevTimeout` uses to recycle the whole pool — so the per-query
+// cancel almost always handles a stuck conn before the pool-recycle
+// path is needed.
+const QUERY_WATCHDOG_MS = 15_000;
+
+/**
+ * Dev-only fix for the postgres-js connection leak.
+ *
+ * Every drizzle query bottoms out in `pg.unsafe(query, params)`, which
+ * returns a `PendingQuery`. That object is a Promise *and* exposes
+ * `.cancel()` (see node_modules/postgres/types/index.d.ts), which sends
+ * a PG cancel request on a side channel: the server aborts the
+ * statement (SQLSTATE 57014), and the connection is released back to
+ * the pool — even if the original consumer (the React Server Component
+ * render) was aborted long ago.
+ *
+ * We monkey-patch `pg.unsafe` once at pool creation: each returned
+ * PendingQuery gets a 15s watchdog. If the query hasn't settled by
+ * then, we call `.cancel()`. The promise will reject with the cancel
+ * error, but the conn is back. This is the only place we can install
+ * the watchdog cheaply — drizzle does not expose AbortSignal threading
+ * for its query builder, and Next.js Server Components don't expose
+ * the request's AbortSignal at all.
+ *
+ * No-op in production: Vercel's function timeout already bounds
+ * request duration, so a stuck query cannot accumulate.
+ */
+export function installQueryWatchdog(pg: PgClient): PgClient {
+  if (process.env.NODE_ENV === "production") return pg;
+  const originalUnsafe = pg.unsafe.bind(pg);
+  // Cast: pg.unsafe is overloaded and rest-args don't capture all
+  // overloads cleanly, but the runtime contract is unchanged — we pass
+  // the same args through and return the same PendingQuery.
+  pg.unsafe = function patchedUnsafe(...args: Parameters<typeof pg.unsafe>) {
+    const pending = originalUnsafe(...(args as Parameters<typeof originalUnsafe>));
+    const timer = setTimeout(() => {
+      if (typeof pending.cancel === "function") {
+        // Best-effort: cancel() may be a no-op if the query already
+        // finished. The conn (if still held) is released after PG
+        // acks the cancel request.
+        pending.cancel();
+      }
+    }, QUERY_WATCHDOG_MS);
+    pending.then(
+      () => clearTimeout(timer),
+      () => clearTimeout(timer),
+    );
+    return pending;
+  } as typeof pg.unsafe;
+  return pg;
+}
+
 /**
  * Drizzle client. Exported as a Proxy so the underlying postgres-js +
  * drizzle pair can be swapped without invalidating module-level
@@ -76,6 +137,7 @@ function createClientPair(): ClientPair | null {
       // query.
       keep_alive: 30,
     });
+    installQueryWatchdog(pg);
     return { pg, drizzle: drizzle(pg, { schema }) };
   } catch (error) {
     // Malformed DATABASE_URL (e.g. a quoted value with a trailing comma
