@@ -138,6 +138,15 @@ export const db: DrizzleClient | null = globalForDb.__violetikDbPair
   ? dbProxy
   : null;
 
+// Seconds the old pool gets to drain after a reset. Healthy in-flight
+// queries (sibling Suspense boundaries that happened to be running on
+// the same pool when one query timed out) typically complete in under
+// 1s; the timeout-triggered stuck queries that motivated the reset
+// will of course not complete and get force-closed at the end of the
+// window. Was previously `0` (immediate destroy), which collateral-
+// damaged the healthy queries with "Failed query" errors.
+const POOL_DRAIN_SECONDS = 5;
+
 /**
  * Tear down the current postgres-js pool and create a fresh one on the
  * next access. Used by `withDevTimeout` when a query stalls long enough
@@ -147,9 +156,13 @@ export const db: DrizzleClient | null = globalForDb.__violetikDbPair
  * request on the same dev-server session would just hit the same stuck
  * conns and time out again on a different query.
  *
- * Fires `.end({ timeout: 0 })` to force-close all sockets immediately;
- * any queries still racing on the old pool reject with a connection
- * error, which is the desired behavior — they were already lost.
+ * The swap (`__violetikDbPair = createClientPair()`) is immediate — any
+ * new query placed against `db` lands on the fresh pool. The old pool
+ * is then drained: `.end({ timeout: POOL_DRAIN_SECONDS })` waits up to
+ * 5s for in-flight queries to settle before force-closing. This avoids
+ * "Failed query" errors in sibling Suspense boundaries whose healthy
+ * queries happened to be running on the old pool when the timeout
+ * fired — they get a chance to complete and resolve before the close.
  * Failures from `.end()` itself are swallowed: best-effort cleanup,
  * the new pool is what matters.
  */
@@ -157,7 +170,7 @@ export function resetDbClient(): void {
   const old = globalForDb.__violetikDbPair;
   globalForDb.__violetikDbPair = createClientPair();
   if (old) {
-    void old.pg.end({ timeout: 0 }).catch(() => {});
+    void old.pg.end({ timeout: POOL_DRAIN_SECONDS }).catch(() => {});
   }
 }
 

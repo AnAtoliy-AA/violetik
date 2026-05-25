@@ -15,7 +15,10 @@ export async function TestimonialsSection({
   locale: string;
 }) {
   const [testimonials, publishedMasters] = await Promise.all([
-    withDevTimeout(listUserTestimonials(userId), "profile.userTestimonials"),
+    withDevTimeout(
+      () => listUserTestimonials(userId),
+      "profile.userTestimonials",
+    ),
     getCachedPublishedMasters(),
   ]);
 

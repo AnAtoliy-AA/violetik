@@ -5,7 +5,7 @@ import { HomeFooter } from "./home-footer";
 
 export async function HomeFooterAsync({ locale }: { locale: Locale }) {
   const settings = await withDevTimeout(
-    getSiteSettingsServer(),
+    () => getSiteSettingsServer(),
     "home.siteSettings",
   );
   return <HomeFooter settings={settings} locale={locale} />;

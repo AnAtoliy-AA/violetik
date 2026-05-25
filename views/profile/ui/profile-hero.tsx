@@ -20,7 +20,7 @@ export async function ProfileHero({ user }: { user: User }) {
   const [t, profile, tier] = await Promise.all([
     getTranslations("Profile"),
     getCachedProfileWithPhoto(),
-    withDevTimeout(getCurrentTier(user.id), "profile.currentTier"),
+    withDevTimeout(() => getCurrentTier(user.id), "profile.currentTier"),
   ]);
 
   const displayName =

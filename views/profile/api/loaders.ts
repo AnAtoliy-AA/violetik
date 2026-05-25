@@ -14,17 +14,17 @@ import { loadProfileWithPhoto } from "@/entities/studio/api/load-with-photos";
 // every awaiter sees the same race outcome instead of each starting a
 // fresh timer on top of the same underlying query.
 export const getCachedUserBookings = cache((userId: string) =>
-  withDevTimeout(listUserBookings(userId), "profile.userBookings"),
+  withDevTimeout(() => listUserBookings(userId), "profile.userBookings"),
 );
 export const getCachedAllServices = cache(() =>
-  withDevTimeout(listAllServices(), "profile.allServices"),
+  withDevTimeout(() => listAllServices(), "profile.allServices"),
 );
 export const getCachedPublishedMasters = cache(() =>
-  withDevTimeout(listPublishedMasters(), "profile.publishedMasters"),
+  withDevTimeout(() => listPublishedMasters(), "profile.publishedMasters"),
 );
 export const getCachedSiteSettings = cache(() =>
-  withDevTimeout(getSiteSettings(), "profile.siteSettings"),
+  withDevTimeout(() => getSiteSettings(), "profile.siteSettings"),
 );
 export const getCachedProfileWithPhoto = cache(() =>
-  withDevTimeout(loadProfileWithPhoto(), "profile.profileWithPhoto"),
+  withDevTimeout(() => loadProfileWithPhoto(), "profile.profileWithPhoto"),
 );

@@ -8,7 +8,7 @@ export async function MasterTestimonialsAsync({
   masterId: string;
 }) {
   const testimonials = await withDevTimeout(
-    listApprovedTestimonials({ masterId, limit: 10 }),
+    () => listApprovedTestimonials({ masterId, limit: 10 }),
     "master.approvedTestimonials",
   );
   return <MasterTestimonialsList testimonials={testimonials} />;
