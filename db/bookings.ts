@@ -86,6 +86,19 @@ export async function listActiveBookingsFrom(
 }
 
 /**
+ * Count of bookings with status = 'pending'. Used by the admin
+ * polling endpoint to drive the "N new" badge cheaply.
+ */
+export async function countPendingBookings(): Promise<number> {
+  if (!db) return 0;
+  const rows = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(schema.bookings)
+    .where(eq(schema.bookings.status, "pending"));
+  return rows[0]?.count ?? 0;
+}
+
+/**
  * Admin-facing list: every booking, newest first, with a small profile
  * snapshot of the booker joined in.
  */

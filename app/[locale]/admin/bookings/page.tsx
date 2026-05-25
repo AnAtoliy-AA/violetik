@@ -8,7 +8,10 @@ import { listBookingsForAdmin } from "@/db/bookings";
 import { listAllServices } from "@/db/services";
 import { bookingTimeZoneFromSettings } from "@/shared/lib/google-calendar";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
-import { BookingActions } from "@/features/bookings-admin";
+import {
+  BookingActions,
+  BookingsRefreshControls,
+} from "@/features/bookings-admin";
 import { VipBadge } from "@/shared/ui/vip-badge";
 import type { Booking } from "@/db/schema";
 import { cn } from "@/shared/lib/cn";
@@ -93,10 +96,24 @@ export default async function AdminBookingsRoute({
   ]);
   const tz = bookingTimeZoneFromSettings(settings);
   const serviceById = new Map(allServices.map((s) => [s.id, s]));
+  const initialPendingCount = bookings.filter(
+    (b) => b.status === "pending",
+  ).length;
 
   return (
     <div className="pb-16">
-      <AppHeader back="/admin" title={t("meta_title")} admin />
+      <AppHeader
+        back="/admin"
+        title={t("meta_title")}
+        admin
+        actions={
+          <BookingsRefreshControls
+            initialPendingCount={initialPendingCount}
+            ariaRefreshLabel={t("cta_refresh")}
+            newPendingLabel={(n) => t("n_new_pending", { n })}
+          />
+        }
+      />
 
       <section className="px-[22px] py-6">
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>

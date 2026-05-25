@@ -21,6 +21,8 @@ export interface AppHeaderProps extends HTMLAttributes<HTMLElement> {
    * wordmark / back arrow. Used on every `/admin/*` route.
    */
   admin?: boolean;
+  /** Extra controls rendered in the right zone, before LocaleSwitcher. */
+  actions?: ReactNode;
 }
 
 function HamburgerIcon() {
@@ -70,6 +72,7 @@ export function AppHeader({
   menuButton,
   ariaMenuLabel = "Open menu",
   admin = false,
+  actions,
   className,
   ...rest
 }: AppHeaderProps) {
@@ -126,6 +129,7 @@ export function AppHeader({
           </span>
         ) : null}
         <div className="flex items-center gap-2">
+          {actions}
           <PwaInstallButton />
           <LocaleSwitcher />
           {menu}

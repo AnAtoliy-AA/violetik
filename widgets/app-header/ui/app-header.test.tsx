@@ -84,4 +84,30 @@ describe("AppHeader", () => {
     renderHeader();
     expect(screen.getByRole("radiogroup", { name: /language/i })).toBeInTheDocument();
   });
+
+  it("renders nodes passed via the actions slot", () => {
+    renderHeader({
+      actions: (
+        <button type="button" aria-label="Refresh">
+          Refresh
+        </button>
+      ),
+    });
+    expect(screen.getByRole("button", { name: /refresh/i })).toBeInTheDocument();
+  });
+
+  it("places actions before the locale switcher", () => {
+    renderHeader({
+      actions: (
+        <button type="button" aria-label="Refresh">
+          Refresh
+        </button>
+      ),
+    });
+    const refresh = screen.getByRole("button", { name: /refresh/i });
+    const lang = screen.getByRole("radiogroup", { name: /language/i });
+    expect(
+      refresh.compareDocumentPosition(lang) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
 });

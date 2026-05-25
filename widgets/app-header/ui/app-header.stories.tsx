@@ -53,3 +53,28 @@ export const DetailScreen: Story = {
     },
   },
 };
+
+export const WithActions: Story = {
+  args: {
+    back: "/admin",
+    title: "BOOKINGS",
+    admin: true,
+    actions: (
+      <button
+        type="button"
+        aria-label="Refresh"
+        className="inline-flex size-[38px] items-center justify-center rounded-full border-[0.5px] border-line-strong"
+      >
+        ↻
+      </button>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Admin variant with an `actions` slot — used by admin list pages to mount a refresh button (and, on the bookings page, a polling-driven \"N new\" pill) in the right zone before the LocaleSwitcher.",
+      },
+    },
+  },
+};
