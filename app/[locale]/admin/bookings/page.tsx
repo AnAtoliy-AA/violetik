@@ -6,6 +6,7 @@ import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { listBookingsForAdmin } from "@/db/bookings";
 import { listAllServices } from "@/db/services";
+import { withDevTimeout } from "@/db/dev-timeout";
 import { bookingTimeZoneFromSettings } from "@/shared/lib/google-calendar";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import {
@@ -89,10 +90,13 @@ export default async function AdminBookingsRoute({
   setRequestLocale(locale);
   const t = await getTranslations("AdminBookings");
   const tStatus = await getTranslations("AdminBookings.status");
+  // Wrap in withDevTimeout so a stalled sibling (typically
+  // site.settings) recycling the pool doesn't kill these queries
+  // with CONNECTION_DESTROYED — they retry on the fresh pool.
   const [settings, bookings, allServices] = await Promise.all([
     getSiteSettingsServer(),
-    listBookingsForAdmin(),
-    listAllServices(),
+    withDevTimeout(() => listBookingsForAdmin(), "admin.bookings"),
+    withDevTimeout(() => listAllServices(), "admin.services"),
   ]);
   const tz = bookingTimeZoneFromSettings(settings);
   const serviceById = new Map(allServices.map((s) => [s.id, s]));
