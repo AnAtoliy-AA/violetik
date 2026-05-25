@@ -14,6 +14,7 @@ import {
   ActiveVipDowngradeButton,
   ExpiredRowMeta,
 } from "@/features/vip-requests-admin";
+import { RefreshButton } from "@/shared/ui/refresh-button";
 import { requireAdmin } from "@/shared/lib/auth-server";
 
 export const dynamic = "force-dynamic";
@@ -72,7 +73,12 @@ export default async function AdminVipRequestsRoute({
 
   return (
     <div className="pb-16">
-      <AppHeader back="/admin" title={t("meta_title")} admin />
+      <AppHeader
+        back="/admin"
+        title={t("meta_title")}
+        admin
+        actions={<RefreshButton ariaLabel={t("cta_refresh")} />}
+      />
 
       <section className="px-[22px] py-6">
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>
