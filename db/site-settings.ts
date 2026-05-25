@@ -1,6 +1,5 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "./index";
-import { withQueryTimeout } from "./with-query-timeout";
 import {
   DEFAULT_SITE_SETTINGS,
   siteSettingsPatchSchema,
@@ -11,10 +10,6 @@ import type { PaletteId } from "@/shared/config/palettes";
 import type { Locale } from "@/i18n/routing";
 
 const SINGLETON_ID = "singleton";
-// Hot-path read budget. Anything longer almost certainly means the
-// Supabase pooler is sick — better to degrade to defaults than block
-// the page render. See db/with-query-timeout.ts for the rationale.
-const READ_TIMEOUT_MS = 5_000;
 
 function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
   return {
@@ -43,43 +38,32 @@ function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
 /**
  * Reads the singleton site_settings row, lazily inserting a defaults
  * row on first call. Returns frozen defaults when DATABASE_URL is
- * unset so the app degrades gracefully in local dev / CI.
+ * unset so the app degrades gracefully in local dev / CI, or when the
+ * read fails (pre-migration build-time SSG, missing table, etc.).
  */
 export async function getSiteSettings(): Promise<SiteSettings> {
   if (!db) return DEFAULT_SITE_SETTINGS;
 
   try {
-    const existing = await withQueryTimeout(
-      db
-        .select()
-        .from(schema.siteSettings)
-        .where(eq(schema.siteSettings.id, SINGLETON_ID))
-        .limit(1),
-      READ_TIMEOUT_MS,
-      "site_settings.select",
-    );
+    const existing = await db
+      .select()
+      .from(schema.siteSettings)
+      .where(eq(schema.siteSettings.id, SINGLETON_ID))
+      .limit(1);
     if (existing.length > 0) return rowToSettings(existing[0]);
 
-    const inserted = await withQueryTimeout(
-      db
-        .insert(schema.siteSettings)
-        .values({ id: SINGLETON_ID })
-        .onConflictDoNothing({ target: schema.siteSettings.id })
-        .returning(),
-      READ_TIMEOUT_MS,
-      "site_settings.insert",
-    );
+    const inserted = await db
+      .insert(schema.siteSettings)
+      .values({ id: SINGLETON_ID })
+      .onConflictDoNothing({ target: schema.siteSettings.id })
+      .returning();
     if (inserted.length > 0) return rowToSettings(inserted[0]);
 
-    const refetch = await withQueryTimeout(
-      db
-        .select()
-        .from(schema.siteSettings)
-        .where(eq(schema.siteSettings.id, SINGLETON_ID))
-        .limit(1),
-      READ_TIMEOUT_MS,
-      "site_settings.refetch",
-    );
+    const refetch = await db
+      .select()
+      .from(schema.siteSettings)
+      .where(eq(schema.siteSettings.id, SINGLETON_ID))
+      .limit(1);
     return refetch.length > 0
       ? rowToSettings(refetch[0])
       : DEFAULT_SITE_SETTINGS;

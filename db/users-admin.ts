@@ -12,10 +12,6 @@ import {
   sql,
 } from "drizzle-orm";
 import { db, schema } from "./index";
-import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
-
-// Admin SSR budget — same rationale as db/site-settings.ts.
-const ADMIN_READ_TIMEOUT_MS = 5_000;
 
 export const USERS_PAGE_SIZE = 20;
 
@@ -97,51 +93,39 @@ export async function listUsers(input: ListUsersInput): Promise<UserListRow[]> {
     baseFilters.push(isNull(activeVip.userId));
   }
 
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select({
-          user: schema.users,
-          vipUserId: activeVip.userId,
-          vipExpiresAt: activeVip.expiresAt,
-        })
-        .from(schema.users)
-        .leftJoin(activeVip, eq(activeVip.userId, schema.users.id))
-        .where(baseFilters.length ? and(...baseFilters) : undefined)
-        .orderBy(desc(schema.users.lastSignInAt), desc(schema.users.createdAt))
-        .limit(USERS_PAGE_SIZE)
-        .offset(offset),
-      ADMIN_READ_TIMEOUT_MS,
-      "users.list",
-    );
+  const rows = await db
+    .select({
+      user: schema.users,
+      vipUserId: activeVip.userId,
+      vipExpiresAt: activeVip.expiresAt,
+    })
+    .from(schema.users)
+    .leftJoin(activeVip, eq(activeVip.userId, schema.users.id))
+    .where(baseFilters.length ? and(...baseFilters) : undefined)
+    .orderBy(desc(schema.users.lastSignInAt), desc(schema.users.createdAt))
+    .limit(USERS_PAGE_SIZE)
+    .offset(offset);
 
-    return rows.map((r) => ({
-      id: r.user.id,
-      telegramId: r.user.telegramId,
-      googleSub: r.user.googleSub,
-      email: r.user.email,
-      username: r.user.username,
-      firstName: r.user.firstName,
-      lastName: r.user.lastName,
-      photoUrl: r.user.photoUrl,
-      role: r.user.role,
-      createdAt: r.user.createdAt,
-      lastSignInAt: r.user.lastSignInAt,
-      adminNote: r.user.adminNote,
-      vipState: !r.vipUserId
-        ? "none"
-        : r.vipExpiresAt === null
-          ? "lifetime"
-          : "active",
-      vipExpiresAt: r.vipExpiresAt,
-    }));
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn("[db/users-admin] listUsers timed out:", error.message);
-      return [];
-    }
-    throw error;
-  }
+  return rows.map((r) => ({
+    id: r.user.id,
+    telegramId: r.user.telegramId,
+    googleSub: r.user.googleSub,
+    email: r.user.email,
+    username: r.user.username,
+    firstName: r.user.firstName,
+    lastName: r.user.lastName,
+    photoUrl: r.user.photoUrl,
+    role: r.user.role,
+    createdAt: r.user.createdAt,
+    lastSignInAt: r.user.lastSignInAt,
+    adminNote: r.user.adminNote,
+    vipState: !r.vipUserId
+      ? "none"
+      : r.vipExpiresAt === null
+        ? "lifetime"
+        : "active",
+    vipExpiresAt: r.vipExpiresAt,
+  }));
 }
 
 export async function countUsers(
@@ -168,24 +152,12 @@ export async function countUsers(
   if (input.vip === "active") baseFilters.push(isNotNull(activeVip.userId));
   if (input.vip === "none") baseFilters.push(isNull(activeVip.userId));
 
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select({ n: sql<number>`count(*)::int` })
-        .from(schema.users)
-        .leftJoin(activeVip, eq(activeVip.userId, schema.users.id))
-        .where(baseFilters.length ? and(...baseFilters) : undefined),
-      ADMIN_READ_TIMEOUT_MS,
-      "users.count",
-    );
-    return rows[0]?.n ?? 0;
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn("[db/users-admin] countUsers timed out:", error.message);
-      return 0;
-    }
-    throw error;
-  }
+  const rows = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(schema.users)
+    .leftJoin(activeVip, eq(activeVip.userId, schema.users.id))
+    .where(baseFilters.length ? and(...baseFilters) : undefined);
+  return rows[0]?.n ?? 0;
 }
 
 export interface UserDetail extends UserListRow {
@@ -198,111 +170,95 @@ export interface UserDetail extends UserListRow {
 export async function getUserDetail(id: string): Promise<UserDetail | null> {
   if (!db) return null;
 
-  try {
-    const userRow = await withQueryTimeout(
+  const userRow = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, id))
+    .limit(1);
+  const user = userRow[0];
+  if (!user) return null;
+
+  const now = new Date();
+
+  const [bookingRows, pendingRow, approvedRow, activeRow, pendingVipRow] =
+    await Promise.all([
       db
-        .select()
-        .from(schema.users)
-        .where(eq(schema.users.id, id))
+        .select({ n: sql<number>`count(*)::int` })
+        .from(schema.bookings)
+        .where(eq(schema.bookings.userId, id)),
+      db
+        .select({ n: sql<number>`count(*)::int` })
+        .from(schema.testimonials)
+        .where(
+          and(
+            eq(schema.testimonials.userId, id),
+            eq(schema.testimonials.status, "pending"),
+          ),
+        ),
+      db
+        .select({ n: sql<number>`count(*)::int` })
+        .from(schema.testimonials)
+        .where(
+          and(
+            eq(schema.testimonials.userId, id),
+            eq(schema.testimonials.status, "approved"),
+          ),
+        ),
+      db
+        .select({
+          id: schema.vipRequests.id,
+          expiresAt: schema.vipRequests.expiresAt,
+        })
+        .from(schema.vipRequests)
+        .where(
+          and(
+            eq(schema.vipRequests.userId, id),
+            eq(schema.vipRequests.status, "approved"),
+            or(
+              isNull(schema.vipRequests.expiresAt),
+              gt(schema.vipRequests.expiresAt, now),
+            ),
+          ),
+        )
         .limit(1),
-      ADMIN_READ_TIMEOUT_MS,
-      "users.getDetail.user",
-    );
-    const user = userRow[0];
-    if (!user) return null;
+      db
+        .select({ id: schema.vipRequests.id })
+        .from(schema.vipRequests)
+        .where(
+          and(
+            eq(schema.vipRequests.userId, id),
+            eq(schema.vipRequests.status, "pending"),
+          ),
+        )
+        .limit(1),
+    ]);
 
-    const now = new Date();
+  const active = activeRow[0];
 
-    const [bookingRows, pendingRow, approvedRow, activeRow, pendingVipRow] =
-      await withQueryTimeout(
-        Promise.all([
-          db
-            .select({ n: sql<number>`count(*)::int` })
-            .from(schema.bookings)
-            .where(eq(schema.bookings.userId, id)),
-          db
-            .select({ n: sql<number>`count(*)::int` })
-            .from(schema.testimonials)
-            .where(
-              and(
-                eq(schema.testimonials.userId, id),
-                eq(schema.testimonials.status, "pending"),
-              ),
-            ),
-          db
-            .select({ n: sql<number>`count(*)::int` })
-            .from(schema.testimonials)
-            .where(
-              and(
-                eq(schema.testimonials.userId, id),
-                eq(schema.testimonials.status, "approved"),
-              ),
-            ),
-          db
-            .select({
-              id: schema.vipRequests.id,
-              expiresAt: schema.vipRequests.expiresAt,
-            })
-            .from(schema.vipRequests)
-            .where(
-              and(
-                eq(schema.vipRequests.userId, id),
-                eq(schema.vipRequests.status, "approved"),
-                or(
-                  isNull(schema.vipRequests.expiresAt),
-                  gt(schema.vipRequests.expiresAt, now),
-                ),
-              ),
-            )
-            .limit(1),
-          db
-            .select({ id: schema.vipRequests.id })
-            .from(schema.vipRequests)
-            .where(
-              and(
-                eq(schema.vipRequests.userId, id),
-                eq(schema.vipRequests.status, "pending"),
-              ),
-            )
-            .limit(1),
-        ]),
-        ADMIN_READ_TIMEOUT_MS,
-        "users.getDetail.aggregates",
-      );
-
-    const active = activeRow[0];
-
-    return {
-      id: user.id,
-      telegramId: user.telegramId,
-      googleSub: user.googleSub,
-      email: user.email,
-      username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      photoUrl: user.photoUrl,
-      role: user.role,
-      createdAt: user.createdAt,
-      lastSignInAt: user.lastSignInAt,
-      adminNote: user.adminNote,
-      vipState: !active
-        ? "none"
-        : active.expiresAt === null
-          ? "lifetime"
-          : "active",
-      vipExpiresAt: active?.expiresAt ?? null,
-      bookingCount: bookingRows[0]?.n ?? 0,
-      testimonialPendingCount: pendingRow[0]?.n ?? 0,
-      testimonialApprovedCount: approvedRow[0]?.n ?? 0,
-      pendingVipRequestId: pendingVipRow[0]?.id ?? null,
-    };
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn("[db/users-admin] getUserDetail timed out:", error.message);
-      return null;
-    }
-    throw error;
-  }
+  return {
+    id: user.id,
+    telegramId: user.telegramId,
+    googleSub: user.googleSub,
+    email: user.email,
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    photoUrl: user.photoUrl,
+    role: user.role,
+    createdAt: user.createdAt,
+    lastSignInAt: user.lastSignInAt,
+    adminNote: user.adminNote,
+    vipState: !active
+      ? "none"
+      : active.expiresAt === null
+        ? "lifetime"
+        : "active",
+    vipExpiresAt: active?.expiresAt ?? null,
+    bookingCount: bookingRows[0]?.n ?? 0,
+    testimonialPendingCount: pendingRow[0]?.n ?? 0,
+    testimonialApprovedCount: approvedRow[0]?.n ?? 0,
+    pendingVipRequestId: pendingVipRow[0]?.id ?? null,
+  };
 }
 
 export type SetUserRoleResult =
@@ -444,23 +400,7 @@ export async function suggestMergeCandidates(
 ): Promise<MergeCandidate[]> {
   if (!db) return [];
 
-  let users: schema.User[];
-  try {
-    users = await withQueryTimeout(
-      db.select().from(schema.users),
-      ADMIN_READ_TIMEOUT_MS,
-      "users.suggestMergeCandidates",
-    );
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/users-admin] suggestMergeCandidates timed out:",
-        error.message,
-      );
-      return [];
-    }
-    throw error;
-  }
+  const users = await db.select().from(schema.users);
 
   const tg = users.filter((u) => u.id.startsWith("tg:"));
   const google = users.filter((u) => u.id.startsWith("google:"));
@@ -535,46 +475,29 @@ export async function getMergeConflicts(
     return { bothPendingVip: false, pendingTestimonialCollisions: [] };
   }
 
-  let vipRows: Array<{ userId: string }>;
-  let testimonialRows: Array<{ userId: string; masterId: string }>;
-  try {
-    [vipRows, testimonialRows] = await withQueryTimeout(
-      Promise.all([
-        db
-          .select({ userId: schema.vipRequests.userId })
-          .from(schema.vipRequests)
-          .where(
-            and(
-              eq(schema.vipRequests.status, "pending"),
-              inArray(schema.vipRequests.userId, [idA, idB]),
-            ),
-          ),
-        db
-          .select({
-            userId: schema.testimonials.userId,
-            masterId: schema.testimonials.masterId,
-          })
-          .from(schema.testimonials)
-          .where(
-            and(
-              eq(schema.testimonials.status, "pending"),
-              inArray(schema.testimonials.userId, [idA, idB]),
-            ),
-          ),
-      ]),
-      ADMIN_READ_TIMEOUT_MS,
-      "users.getMergeConflicts",
-    );
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/users-admin] getMergeConflicts timed out:",
-        error.message,
-      );
-      return { bothPendingVip: false, pendingTestimonialCollisions: [] };
-    }
-    throw error;
-  }
+  const [vipRows, testimonialRows] = await Promise.all([
+    db
+      .select({ userId: schema.vipRequests.userId })
+      .from(schema.vipRequests)
+      .where(
+        and(
+          eq(schema.vipRequests.status, "pending"),
+          inArray(schema.vipRequests.userId, [idA, idB]),
+        ),
+      ),
+    db
+      .select({
+        userId: schema.testimonials.userId,
+        masterId: schema.testimonials.masterId,
+      })
+      .from(schema.testimonials)
+      .where(
+        and(
+          eq(schema.testimonials.status, "pending"),
+          inArray(schema.testimonials.userId, [idA, idB]),
+        ),
+      ),
+  ]);
 
   const pendingUsers = new Set(vipRows.map((r) => r.userId));
   const bothPendingVip = pendingUsers.has(idA) && pendingUsers.has(idB);
@@ -776,24 +699,9 @@ export async function mergeUsers(
  */
 export async function listAdminUserIds(): Promise<string[]> {
   if (!db) return [];
-  try {
-    const rows = await withQueryTimeout(
-      db
-        .select({ id: schema.users.id })
-        .from(schema.users)
-        .where(eq(schema.users.role, "admin")),
-      ADMIN_READ_TIMEOUT_MS,
-      "users.listAdminIds",
-    );
-    return rows.map((r) => r.id);
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/users-admin] listAdminUserIds timed out:",
-        error.message,
-      );
-      return [];
-    }
-    throw error;
-  }
+  const rows = await db
+    .select({ id: schema.users.id })
+    .from(schema.users)
+    .where(eq(schema.users.role, "admin"));
+  return rows.map((r) => r.id);
 }

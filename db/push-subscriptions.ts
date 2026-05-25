@@ -1,9 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import { db, schema } from "./index";
-import { QueryTimeoutError, withQueryTimeout } from "./with-query-timeout";
-
-const SSR_READ_TIMEOUT_MS = 5_000;
 
 export interface NewPushSubscription {
   userId: string;
@@ -47,25 +44,10 @@ export async function listSubscriptionsByUser(
   userId: string,
 ): Promise<schema.PushSubscriptionRow[]> {
   if (!db) return [];
-  try {
-    return await withQueryTimeout(
-      db
-        .select()
-        .from(schema.pushSubscriptions)
-        .where(eq(schema.pushSubscriptions.userId, userId)),
-      SSR_READ_TIMEOUT_MS,
-      "push_subscriptions.listByUser",
-    );
-  } catch (error) {
-    if (error instanceof QueryTimeoutError) {
-      console.warn(
-        "[db/push-subscriptions] listSubscriptionsByUser timed out:",
-        error.message,
-      );
-      return [];
-    }
-    throw error;
-  }
+  return db
+    .select()
+    .from(schema.pushSubscriptions)
+    .where(eq(schema.pushSubscriptions.userId, userId));
 }
 
 export async function deleteSubscriptionByEndpoint(
