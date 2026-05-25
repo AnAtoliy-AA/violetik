@@ -4,6 +4,7 @@ import { Aurora } from "@/shared/ui/aurora";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { VipBadge } from "@/shared/ui/vip-badge";
 import { getCurrentTier } from "@/db/vip-requests";
+import { withDevTimeout } from "@/db/dev-timeout";
 import type { User } from "@/db/schema";
 import { getCachedProfileWithPhoto } from "../api/loaders";
 
@@ -19,7 +20,7 @@ export async function ProfileHero({ user }: { user: User }) {
   const [t, profile, tier] = await Promise.all([
     getTranslations("Profile"),
     getCachedProfileWithPhoto(),
-    getCurrentTier(user.id),
+    withDevTimeout(getCurrentTier(user.id), "profile.currentTier"),
   ]);
 
   const displayName =
