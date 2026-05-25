@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/features/locale-switcher";
+import { PwaInstallButton } from "@/features/pwa-install";
 import { cn } from "@/shared/lib/cn";
 import { Wordmark } from "@/shared/ui/wordmark";
 
@@ -125,6 +126,7 @@ export function AppHeader({
           </span>
         ) : null}
         <div className="flex items-center gap-2">
+          <PwaInstallButton />
           <LocaleSwitcher />
           {menu}
         </div>
