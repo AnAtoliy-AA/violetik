@@ -156,6 +156,9 @@ export const vipRequests = pgTable(
     pendingUniq: uniqueIndex("vip_requests_one_pending_per_user")
       .on(table.userId)
       .where(sql`status = 'pending'`),
+    decidedByIdx: index("vip_requests_decided_by_idx")
+      .on(table.decidedBy)
+      .where(sql`decided_by IS NOT NULL`),
     activeExpiryIdx: index("vip_requests_active_expiry_idx")
       .on(table.expiresAt)
       .where(sql`status = 'approved'`),
@@ -272,6 +275,9 @@ export const siteSettings = pgTable(
       "site_settings_lng_range",
       sql`${table.longitude} IS NULL OR ${table.longitude} BETWEEN -180 AND 180`,
     ),
+    updatedByIdx: index("site_settings_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
   }),
 );
 
@@ -295,6 +301,9 @@ export const serviceCategories = pgTable(
   (table) => ({
     sortIdx: index("service_categories_sort_idx").on(table.sortOrder),
     statusIdx: index("service_categories_status_idx").on(table.status),
+    updatedByIdx: index("service_categories_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
   }),
 );
 
@@ -331,6 +340,9 @@ export const services = pgTable(
     categoryIdx: index("services_category_idx").on(table.categoryId),
     sortIdx: index("services_sort_idx").on(table.sortOrder),
     statusIdx: index("services_status_idx").on(table.status),
+    updatedByIdx: index("services_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
     includesMax8: check(
       "services_includes_max_8",
       sql`jsonb_array_length(${table.includes}) <= 8`,
@@ -451,6 +463,9 @@ export const studioPhotos = pgTable(
       table.slotKind,
       table.slotId,
     ),
+    uploadedByIdx: index("studio_photos_uploaded_by_idx")
+      .on(table.uploadedBy)
+      .where(sql`uploaded_by IS NOT NULL`),
   }),
 );
 
@@ -493,6 +508,9 @@ export const testimonials = pgTable(
     userIdx: index("testimonials_user_idx").on(table.userId),
     masterIdx: index("testimonials_master_idx").on(table.masterId),
     statusIdx: index("testimonials_status_idx").on(table.status),
+    decidedByIdx: index("testimonials_decided_by_idx")
+      .on(table.decidedBy)
+      .where(sql`decided_by IS NOT NULL`),
     onePendingPerPair: uniqueIndex("testimonials_one_pending_per_pair")
       .on(table.userId, table.masterId)
       .where(sql`status = 'pending'`),
