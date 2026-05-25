@@ -205,6 +205,11 @@
     "ru": "Russian",
     "by": "Belarusian"
   },
+  "PwaInstall": {
+    "aria_label": "Install app",
+    "ios_instructions": "On iPhone or iPad, tap the Share button in Safari and choose 'Add to Home Screen' to install the atelier as an app.",
+    "ios_close": "Close"
+  },
   "Gallery": {
     "meta_title": "Portfolio",
     "plate_title": "Gallery",
