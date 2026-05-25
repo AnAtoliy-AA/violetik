@@ -107,11 +107,7 @@ export default async function AdminBookingsRoute({
         title={t("meta_title")}
         admin
         actions={
-          <BookingsRefreshControls
-            initialPendingCount={initialPendingCount}
-            ariaRefreshLabel={t("cta_refresh")}
-            newPendingLabel={(n) => t("n_new_pending", { n })}
-          />
+          <BookingsRefreshControls initialPendingCount={initialPendingCount} />
         }
       />
 
