@@ -18,6 +18,12 @@ export interface PressableSurfaceProps
   as?: ElementType;
   /** Disable ripple emission (still scales on press). */
   noRipple?: boolean;
+  /** Anchor href — only meaningful when `as` resolves to a link element. */
+  href?: string;
+  /** Anchor target — only meaningful when `as` resolves to a link element. */
+  target?: string;
+  /** Anchor rel — only meaningful when `as` resolves to a link element. */
+  rel?: string;
   children?: ReactNode;
   ref?: Ref<HTMLElement>;
 }
