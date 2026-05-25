@@ -72,7 +72,7 @@ export function WelcomePage() {
           >
             <MonogramSeal letter="V" className="size-12 text-[22px]" />
           </motion.div>
-          <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)]">
+          <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)] text-brand-cycle">
             <LetterReveal text="Violetta" />
           </div>
 
