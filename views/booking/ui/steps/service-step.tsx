@@ -63,7 +63,7 @@ export function ServiceStep({
               aria-checked={active}
               onClick={() => setService(s.id)}
               className={cn(
-                "gilded flex items-center gap-3.5 rounded-[18px] p-3.5 text-left text-text",
+                "group gilded flex items-start gap-3.5 rounded-[18px] p-3.5 text-left text-text",
                 "transition-colors duration-fast ease-out",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                 active ? "glass-top" : "hover:bg-surface-2",

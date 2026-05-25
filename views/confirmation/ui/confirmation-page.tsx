@@ -14,6 +14,7 @@ import { PaperGrain } from "@/shared/ui/paper-grain";
 import { formatLongDate } from "@/views/booking/lib/booking-steps";
 import { useBookingStore } from "@/views/booking/model/booking-store";
 import { ConfettiBurst } from "./confetti-burst";
+import { ConfirmationExtras } from "./confirmation-extras";
 import { GoldenSeal } from "./golden-seal";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -194,6 +195,22 @@ export function ConfirmationPage(props: ConfirmationPageProps) {
               <span className="text-right text-[13px]">{v}</span>
             </div>
           ))}
+          <ConfirmationExtras
+            calendar={
+              props.bookingId
+                ? {
+                    apple: `webcal://violetta.example.com/api/booking/${props.bookingId}.ics`,
+                    google: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(service?.name ?? "Violetta")}`,
+                    ics: `/api/booking/${props.bookingId}.ics`,
+                  }
+                : null
+            }
+            referralUrl={
+              typeof window !== "undefined"
+                ? `${window.location.origin}/welcome?ref=${code}`
+                : null
+            }
+          />
         </motion.div>
 
         <motion.div
