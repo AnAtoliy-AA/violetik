@@ -4,6 +4,7 @@ import {
   MyTestimonialsList,
 } from "@/features/testimonial-submit";
 import { listUserTestimonials } from "@/db/testimonials";
+import { withDevTimeout } from "@/db/dev-timeout";
 import { getCachedPublishedMasters } from "../api/loaders";
 
 export async function TestimonialsSection({
@@ -14,7 +15,7 @@ export async function TestimonialsSection({
   locale: string;
 }) {
   const [testimonials, publishedMasters] = await Promise.all([
-    listUserTestimonials(userId),
+    withDevTimeout(listUserTestimonials(userId), "profile.userTestimonials"),
     getCachedPublishedMasters(),
   ]);
 

@@ -1,4 +1,5 @@
 import { listApprovedTestimonials } from "@/entities/testimonial";
+import { withDevTimeout } from "@/db/dev-timeout";
 import { MasterTestimonialsList } from "./master-testimonials-list";
 
 export async function MasterTestimonialsAsync({
@@ -6,10 +7,10 @@ export async function MasterTestimonialsAsync({
 }: {
   masterId: string;
 }) {
-  const testimonials = await listApprovedTestimonials({
-    masterId,
-    limit: 10,
-  });
+  const testimonials = await withDevTimeout(
+    listApprovedTestimonials({ masterId, limit: 10 }),
+    "master.approvedTestimonials",
+  );
   return <MasterTestimonialsList testimonials={testimonials} />;
 }
 

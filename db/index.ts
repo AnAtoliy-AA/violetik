@@ -3,11 +3,24 @@ import postgres from "postgres";
 import * as schema from "./schema";
 
 type DrizzleClient = ReturnType<typeof drizzle<typeof schema>>;
+type PgClient = ReturnType<typeof postgres>;
+
+interface ClientPair {
+  pg: PgClient;
+  drizzle: DrizzleClient;
+}
 
 /**
- * Drizzle client. Returns null when `DATABASE_URL` is unset so the
- * codebase can gracefully degrade in CI / local dev where the DB
- * isn't provisioned. Callers should null-check before use:
+ * Drizzle client. Exported as a Proxy so the underlying postgres-js +
+ * drizzle pair can be swapped without invalidating module-level
+ * references in the ~16 db/*.ts callers. Property access (`db.select`,
+ * `db.insert`, …) always dispatches to whatever the *current* pair is —
+ * `resetDbClient()` swaps that pair in place when dev-mode detects a
+ * poisoned pool. See `db/dev-timeout.ts`.
+ *
+ * Returns null when `DATABASE_URL` is unset so the codebase can
+ * gracefully degrade in CI / local dev where the DB isn't provisioned.
+ * Callers should null-check before use:
  *
  *   if (!db) return; // DB not configured, skip persistence
  *   await db.insert(schema.users)...
@@ -21,10 +34,10 @@ type DrizzleClient = ReturnType<typeof drizzle<typeof schema>>;
  * the old pool's sockets stayed alive (held by the postgres-js
  * runtime + drizzle metadata), so after a few hours of dev work the
  * Supabase pooler's per-IP connection cap is exhausted and every
- * new query stalls until our 5s timeout. In prod each function
- * instance is a fresh process, so this cache is a no-op there.
+ * new query stalls. In prod each function instance is a fresh
+ * process, so this cache is a no-op there.
  */
-function createClient(): DrizzleClient | null {
+function createClientPair(): ClientPair | null {
   const url = process.env.DATABASE_URL;
   if (!url) return null;
   try {
@@ -45,7 +58,7 @@ function createClient(): DrizzleClient | null {
     // the only knob that holds is the server-side `ALTER ROLE ... SET
     // statement_timeout` (currently 2min). A slow query will block the
     // page until Vercel's function timeout fires (~60s on hobby tier).
-    const client = postgres(url, {
+    const pg = postgres(url, {
       prepare: false,
       max: maxPool,
       // Fail fast on connect rather than holding a request open.
@@ -63,7 +76,7 @@ function createClient(): DrizzleClient | null {
       // query.
       keep_alive: 30,
     });
-    return drizzle(client, { schema });
+    return { pg, drizzle: drizzle(pg, { schema }) };
   } catch (error) {
     // Malformed DATABASE_URL (e.g. a quoted value with a trailing comma
     // copied from a code snippet) shouldn't crash the build — fall back
@@ -77,12 +90,75 @@ function createClient(): DrizzleClient | null {
 }
 
 const globalForDb = globalThis as unknown as {
-  __violetikDb?: DrizzleClient | null;
+  __violetikDbPair?: ClientPair | null;
 };
 
-if (globalForDb.__violetikDb === undefined) {
-  globalForDb.__violetikDb = createClient();
+if (globalForDb.__violetikDbPair === undefined) {
+  globalForDb.__violetikDbPair = createClientPair();
 }
 
-export const db: DrizzleClient | null = globalForDb.__violetikDb;
+function currentDrizzle(): DrizzleClient | null {
+  return globalForDb.__violetikDbPair?.drizzle ?? null;
+}
+
+const proxyTarget = {} as DrizzleClient;
+
+const dbProxy = new Proxy(proxyTarget, {
+  get(_, prop, receiver) {
+    const real = currentDrizzle();
+    if (!real) return undefined;
+    const value = Reflect.get(real, prop, receiver);
+    // Bind methods so `this` inside drizzle's internals is the real
+    // PostgresJsDatabase, not the Proxy. Non-function values (the few
+    // public properties on the class) pass through unchanged.
+    return typeof value === "function" ? value.bind(real) : value;
+  },
+  has(_, prop) {
+    const real = currentDrizzle();
+    return real ? Reflect.has(real, prop) : false;
+  },
+  // Without this, a destructuring assignment like `const { select } = db`
+  // would silently no-op when DATABASE_URL is unset instead of throwing.
+  ownKeys() {
+    const real = currentDrizzle();
+    return real ? Reflect.ownKeys(real) : [];
+  },
+  getOwnPropertyDescriptor(_, prop) {
+    const real = currentDrizzle();
+    return real ? Reflect.getOwnPropertyDescriptor(real, prop) : undefined;
+  },
+});
+
+// Preserve the original `null when unconfigured` semantic for the ~78
+// `if (!db) return` checks scattered across db/*.ts: when the initial
+// createClientPair returned null, the export itself is null (truthy
+// check fails), so callers short-circuit exactly as before. When the
+// pool exists, the export is the Proxy whose target swaps on reset.
+export const db: DrizzleClient | null = globalForDb.__violetikDbPair
+  ? dbProxy
+  : null;
+
+/**
+ * Tear down the current postgres-js pool and create a fresh one on the
+ * next access. Used by `withDevTimeout` when a query stalls long enough
+ * to indicate the pool is poisoned (commonly: Next's mid-stream
+ * response abort during HMR left in-flight queries holding connections
+ * that postgres-js never reclaims). Without this reset, the *next*
+ * request on the same dev-server session would just hit the same stuck
+ * conns and time out again on a different query.
+ *
+ * Fires `.end({ timeout: 0 })` to force-close all sockets immediately;
+ * any queries still racing on the old pool reject with a connection
+ * error, which is the desired behavior — they were already lost.
+ * Failures from `.end()` itself are swallowed: best-effort cleanup,
+ * the new pool is what matters.
+ */
+export function resetDbClient(): void {
+  const old = globalForDb.__violetikDbPair;
+  globalForDb.__violetikDbPair = createClientPair();
+  if (old) {
+    void old.pg.end({ timeout: 0 }).catch(() => {});
+  }
+}
+
 export { schema };
