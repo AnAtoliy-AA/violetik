@@ -138,10 +138,13 @@ export default async function LocaleLayout({
           siteUrl={SITE_URL}
           name={tSite("name")}
         />
+        <a href="#main-content" className="skip-to-content sr-only focus:not-sr-only">
+          Skip to content
+        </a>
         <NextIntlClientProvider>
           <ToastProvider>
             <ServiceWorkerRegistrar />
-            {children}
+            <main id="main-content">{children}</main>
             <SiteFooter />
           </ToastProvider>
         </NextIntlClientProvider>
