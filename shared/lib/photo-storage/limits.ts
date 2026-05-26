@@ -10,7 +10,11 @@ export const ALLOWED_PHOTO_MIME_TYPES = [
   "image/avif",
 ] as const;
 
-export const MAX_PHOTO_BYTES = 8 * 1024 * 1024; // 8 MB
+// Generous cap — phone photos can be 8–20 MB. The actual upload bypasses
+// the Vercel 4.5 MB function body cap via client-direct upload to Blob
+// (see /api/admin/photos/upload-token), so the limit here is a UX/cost
+// guard, not a technical constraint.
+export const MAX_PHOTO_BYTES = 25 * 1024 * 1024; // 25 MB
 
 export const MAX_PHOTO_MB = MAX_PHOTO_BYTES / (1024 * 1024);
 
