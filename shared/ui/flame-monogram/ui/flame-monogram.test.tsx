@@ -74,4 +74,11 @@ describe("FlameMonogram", () => {
     );
     expect(freeCircles).toHaveLength(36);
   });
+
+  it("renders a smoke wisp with three drifting paths above the V", () => {
+    const { container } = render(<FlameMonogram />);
+    const smoke = container.querySelector("[data-testid='fm-smoke']");
+    expect(smoke).not.toBeNull();
+    expect(smoke!.querySelectorAll("path")).toHaveLength(3);
+  });
 });

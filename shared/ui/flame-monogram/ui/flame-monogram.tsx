@@ -223,6 +223,50 @@ export function FlameMonogram({
           style={{ filter: "blur(4px)" }}
         />
 
+        {/* Smoke wisp — three vertical smudges drifting upward from the V's tips.
+          * SMIL animateTransform (not animate) is required for transform attribute
+          * animation. Static under reduced motion. */}
+        <g data-testid="fm-smoke">
+          {[
+            { d: "M 92 70 Q 88 50 96 30 Q 102 14 98 -2", delay: "0s",   dur: "6s" },
+            { d: "M 100 64 Q 104 44 100 26 Q 96 10 104 -4", delay: "-2s", dur: "7s" },
+            { d: "M 110 72 Q 116 52 108 32 Q 104 16 112 0",  delay: "-4s", dur: "8s" },
+          ].map((s, i) => (
+            <path
+              key={i}
+              d={s.d}
+              fill="none"
+              stroke="rgba(40,30,40,0.32)"
+              strokeWidth="14"
+              strokeLinecap="round"
+              style={{ filter: "blur(6px)" }}
+              opacity="0"
+            >
+              {reduceMotion ? null : (
+                <>
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    from="0 0"
+                    to="0 -120"
+                    dur={s.dur}
+                    begin={s.delay}
+                    repeatCount="indefinite"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0;0.5;0.5;0"
+                    keyTimes="0;0.2;0.7;1"
+                    dur={s.dur}
+                    begin={s.delay}
+                    repeatCount="indefinite"
+                  />
+                </>
+              )}
+            </path>
+          ))}
+        </g>
+
         {/* Free sparks — small particles that escape the metaball body and
          * drift upward independently. Rendered outside the mask so they read
          * as individual points of light rising from the fire. */}
@@ -254,7 +298,7 @@ export function FlameMonogram({
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 60% 75% at 50% 55%, rgba(255, 180, 90, 0.35), rgba(201, 87, 42, 0.18) 45%, transparent 80%)",
+            "radial-gradient(ellipse 40% 55% at 50% 60%, rgba(255, 220, 140, 0.45), rgba(220, 90, 40, 0.22) 40%, transparent 75%)",
         }}
       />
 
