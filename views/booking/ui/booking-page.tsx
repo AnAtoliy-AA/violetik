@@ -12,6 +12,7 @@ import type { ResolvedPrice } from "@/entities/site-settings";
 import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { buttonClassName } from "@/shared/ui/button";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
+import { Sheet } from "@/shared/ui/sheet";
 import { AppHeader } from "@/widgets/app-header";
 import { BookingStepper } from "@/widgets/booking-stepper";
 import {
@@ -82,6 +83,7 @@ export function BookingPage({
 
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [saveSheetOpen, setSaveSheetOpen] = useState(false);
 
   useEffect(() => {
     const selected = searchParams.get("selected");
@@ -94,6 +96,70 @@ export function BookingPage({
   useEffect(() => {
     emitAnalytics("booking_step_entered", { step });
   }, [step]);
+
+  // §6.6 — exit-intent save sheet. Triggers once per session when the
+  // user is mid-flow (date/time/confirm) and presses Back. We push a
+  // sentinel history entry on mount so popstate fires before the URL
+  // actually moves off the booking page; if they click "Discard" in
+  // the sheet, we explicitly navigate them out.
+  const GUARDED_STEPS: ReadonlySet<BookingStep> = new Set([
+    "date",
+    "time",
+    "confirm",
+  ]);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!GUARDED_STEPS.has(step)) return;
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem("violetta.booking-save-sheet-seen") === "1";
+    } catch {
+      /* private browsing — treat as seen, no sheet */
+      seen = true;
+    }
+    if (seen) return;
+
+    // Push the sentinel so the next Back press lands here, not the prior URL.
+    window.history.pushState({ __violettaSaveGuard: true }, "");
+
+    const onPop = () => {
+      if (sessionStorage.getItem("violetta.booking-save-sheet-seen") === "1") {
+        return;
+      }
+      try {
+        sessionStorage.setItem("violetta.booking-save-sheet-seen", "1");
+      } catch {
+        /* swallow */
+      }
+      // Re-push the sentinel so a second Back press still lands on us
+      // until the user explicitly discards.
+      window.history.pushState({ __violettaSaveGuard: true }, "");
+      setSaveSheetOpen(true);
+      emitAnalytics("booking_save_sheet_shown", { step });
+    };
+    window.addEventListener("popstate", onPop);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+    };
+    // GUARDED_STEPS is a stable constant; including it would lint-noise.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  const resumeFromSheet = () => {
+    setSaveSheetOpen(false);
+    emitAnalytics("booking_save_sheet_resumed", { step });
+  };
+
+  const discardFromSheet = () => {
+    setSaveSheetOpen(false);
+    router.push("/services");
+  };
+
+  const telegramSelfLink = (() => {
+    if (typeof window === "undefined") return null;
+    const url = window.location.href;
+    return `https://t.me/share/url?url=${encodeURIComponent(url)}`;
+  })();
 
   const stepIndex = indexOfStep(step);
   const back = prevStep(step);
@@ -236,6 +302,55 @@ export function BookingPage({
           </Link>
         )}
       </div>
+
+      <Sheet
+        open={saveSheetOpen}
+        onOpenChange={(o) => (o ? setSaveSheetOpen(true) : resumeFromSheet())}
+        snapPoints={[0.42]}
+        title={t("save_sheet.title")}
+        description={t("save_sheet.body")}
+      >
+        <div className="mt-4 flex flex-col gap-2 pb-2">
+          <button
+            type="button"
+            onClick={resumeFromSheet}
+            className={buttonClassName({
+              variant: "gold",
+              size: "lg",
+              block: true,
+            })}
+          >
+            {t("save_sheet.cta_continue")}
+          </button>
+          {telegramSelfLink ? (
+            <a
+              href={telegramSelfLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={resumeFromSheet}
+              className={buttonClassName({
+                variant: "ghost",
+                size: "lg",
+                block: true,
+              })}
+            >
+              {t("save_sheet.cta_telegram")}
+            </a>
+          ) : null}
+          <button
+            type="button"
+            onClick={discardFromSheet}
+            className={buttonClassName({
+              variant: "ghost",
+              size: "md",
+              block: true,
+              className: "text-text-3",
+            })}
+          >
+            {t("save_sheet.cta_discard")}
+          </button>
+        </div>
+      </Sheet>
     </div>
   );
 }
