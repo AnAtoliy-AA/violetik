@@ -268,7 +268,11 @@
   "PwaInstall": {
     "aria_label": "Усталяваць праграму",
     "ios_instructions": "На iPhone ці iPad націсніце кнопку «Падзяліцца» ў Safari і абярыце «На экран «Дадому»», каб усталяваць атэлье як праграму.",
-    "ios_close": "Закрыць"
+    "ios_close": "Закрыць",
+    "sheet_title": "Дадайце Віалету на галоўны экран",
+    "sheet_body": "Хутчэй, чым закладка.",
+    "sheet_cta_install": "Дадаць",
+    "sheet_cta_dismiss": "Не зараз"
   },
   "Gallery": {
     "meta_title": "Партфоліа",
@@ -285,6 +289,15 @@
     "lightbox_title": "Этуд: {tag}.",
     "lightbox_caption": "Зроблена Віалетай — фініш {tag}.",
     "lightbox_close": "Закрыць",
+    "lightbox_share_label": "Падзяліцца",
+    "lightbox_share_sheet_title": "Падзяліцца гэтым сэтам",
+    "lightbox_share_copy_link": "Скапіяваць спасылку",
+    "lightbox_share_telegram": "Адправіць у Telegram",
+    "lightbox_share_download": "Спампаваць выяву",
+    "lightbox_share_copied_toast": "Спасылка скапіявана",
+    "lightbox_share_native_text": "Этуд: {tag} — атэлье Віалеты",
+    "lightbox_next": "Наступнае",
+    "lightbox_prev": "Папярэдняе",
     "category": {
       "Editorial": "Эдыторыял",
       "Gel": "Гель",
@@ -803,6 +816,7 @@
     "vapid_missing": "Ключы апавяшчэнняў не наладжаныя. Папрасіце адміна задаць пераменныя VAPID_*.",
     "offline_title": "Няма злучэння",
     "offline_body": "Падключыцеся да сеткі, каб працягваць.",
+    "offline_brand_line": "Не ў сетцы · але мы будзем тут, калі вернецеся",
     "profile_tile_title": "Апавяшчэнні",
     "profile_tile_description": "Абярыце, якія абнаўленні вы хочаце атрымліваць.",
     "category_booking_created_label": "Новы запіс (адмін)",

@@ -268,7 +268,11 @@
   "PwaInstall": {
     "aria_label": "Установить приложение",
     "ios_instructions": "На iPhone или iPad нажмите кнопку «Поделиться» в Safari и выберите «На экран «Домой»», чтобы установить ателье как приложение.",
-    "ios_close": "Закрыть"
+    "ios_close": "Закрыть",
+    "sheet_title": "Добавьте Виолетту на главный экран",
+    "sheet_body": "Быстрее, чем закладка.",
+    "sheet_cta_install": "Добавить",
+    "sheet_cta_dismiss": "Не сейчас"
   },
   "Gallery": {
     "meta_title": "Портфолио",
@@ -285,6 +289,15 @@
     "lightbox_title": "Этюд: {tag}.",
     "lightbox_caption": "Сделано Виалетой — финиш {tag}.",
     "lightbox_close": "Закрыть",
+    "lightbox_share_label": "Поделиться",
+    "lightbox_share_sheet_title": "Поделиться этим сетом",
+    "lightbox_share_copy_link": "Скопировать ссылку",
+    "lightbox_share_telegram": "Отправить в Telegram",
+    "lightbox_share_download": "Скачать изображение",
+    "lightbox_share_copied_toast": "Ссылка скопирована",
+    "lightbox_share_native_text": "Этюд: {tag} — ателье Виолетты",
+    "lightbox_next": "Следующее",
+    "lightbox_prev": "Предыдущее",
     "category": {
       "Editorial": "Эдиториал",
       "Gel": "Гель",
@@ -803,6 +816,7 @@
     "vapid_missing": "Ключи уведомлений не настроены. Попросите администратора задать переменные VAPID_*.",
     "offline_title": "Нет соединения",
     "offline_body": "Подключитесь к сети, чтобы продолжить.",
+    "offline_brand_line": "Не в сети · но мы будем здесь, когда вернётесь",
     "profile_tile_title": "Уведомления",
     "profile_tile_description": "Выберите, какие новости вы хотите получать.",
     "category_booking_created_label": "Новая запись (админ)",

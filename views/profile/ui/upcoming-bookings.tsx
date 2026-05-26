@@ -18,6 +18,7 @@ import {
   getCachedAllServices,
   getCachedProfileWithPhoto,
 } from "../api/loaders";
+import { NextVisitCountdown } from "./next-visit-countdown";
 
 function formatDateTime(date: Date, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
@@ -103,6 +104,12 @@ export async function UpcomingBookings({
         <p className="mt-1.5 text-[13px] text-text-2">
           {formatDateTime(next.scheduledFor, locale)}
         </p>
+        {/* §10.1 — live countdown (Counter, updates every minute). */}
+        <div className="mt-2">
+          <NextVisitCountdown
+            scheduledForIso={next.scheduledFor.toISOString()}
+          />
+        </div>
         {masterNameInLocale(next) ? (
           <p className="mt-1 text-[12px] text-text-3">
             {t("with_master", { name: masterNameInLocale(next) ?? "" })}

@@ -70,9 +70,19 @@ export function GalleryPage({
   const openItem = openId
     ? (STUDIO_DATA.gallery.find((g) => g.id === openId) ?? null)
     : null;
-  const setNumber = openItem
-    ? STUDIO_DATA.gallery.findIndex((g) => g.id === openItem.id) + 1
-    : 0;
+  const openIndex = openItem
+    ? STUDIO_DATA.gallery.findIndex((g) => g.id === openItem.id)
+    : -1;
+  const setNumber = openItem ? openIndex + 1 : 0;
+
+  const navigateLightbox = (direction: 1 | -1) => {
+    if (openIndex < 0) return;
+    const next = STUDIO_DATA.gallery[
+      (openIndex + direction + STUDIO_DATA.gallery.length) %
+        STUDIO_DATA.gallery.length
+    ];
+    if (next) setOpenId(next.id);
+  };
 
   return (
     <div className="pb-28">
@@ -133,18 +143,32 @@ export function GalleryPage({
             key={openItem.id}
             item={openItem}
             setNumber={setNumber}
-            eyebrow={t("lightbox_eyebrow", {
-              number: setNumber.toString().padStart(2, "0"),
-              tag: labels[openItem.tag] ?? openItem.tag,
-            })}
-            title={t("lightbox_title", {
-              tag: labels[openItem.tag] ?? openItem.tag,
-            })}
-            caption={t("lightbox_caption", {
-              tag: labels[openItem.tag] ?? openItem.tag,
-            })}
-            closeLabel={t("lightbox_close")}
+            labels={{
+              eyebrow: t("lightbox_eyebrow", {
+                number: setNumber.toString().padStart(2, "0"),
+                tag: labels[openItem.tag] ?? openItem.tag,
+              }),
+              title: t("lightbox_title", {
+                tag: labels[openItem.tag] ?? openItem.tag,
+              }),
+              caption: t("lightbox_caption", {
+                tag: labels[openItem.tag] ?? openItem.tag,
+              }),
+              closeLabel: t("lightbox_close"),
+              shareLabel: t("lightbox_share_label"),
+              shareSheetTitle: t("lightbox_share_sheet_title"),
+              shareCopyLink: t("lightbox_share_copy_link"),
+              shareTelegram: t("lightbox_share_telegram"),
+              shareDownload: t("lightbox_share_download"),
+              shareCopiedToast: t("lightbox_share_copied_toast"),
+              shareNativeText: t("lightbox_share_native_text", {
+                tag: labels[openItem.tag] ?? openItem.tag,
+              }),
+              nextLabel: t("lightbox_next"),
+              prevLabel: t("lightbox_prev"),
+            }}
             onClose={() => setOpenId(null)}
+            onNavigate={navigateLightbox}
           />
         ) : null}
       </AnimatePresence>

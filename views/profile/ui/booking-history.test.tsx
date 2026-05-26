@@ -1,10 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { AnchorHTMLAttributes } from "react";
 import { render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import en from "@/messages/en.json";
 
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(),
+}));
+
+// next-intl's createNavigation pulls in next/navigation, which Vitest's
+// jsdom project can't resolve under ESM. Stub the locale-aware Link
+// with a plain anchor — routing isn't what these tests exercise.
+vi.mock("@/i18n/navigation", () => ({
+  Link: ({
+    href,
+    children,
+    ...rest
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
 }));
 
 vi.mock("@/db/bookings", () => ({

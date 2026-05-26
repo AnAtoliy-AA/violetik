@@ -111,24 +111,29 @@ export function AppHeader({
       )}
       {...rest}
     >
-      <div className="relative flex items-center justify-between px-[22px] pb-2 pt-[10px]">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 px-[22px] pb-2 pt-[10px]">
+        <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
           {left}
           {admin ? (
             <span
               data-testid="app-header-admin"
               className="font-mono text-[9px] uppercase tracking-[0.32em] text-text-2"
             >
-              · ADMIN ·
+              {/* Compact glyph on mobile — full label returns at sm. */}
+              <span aria-hidden className="sm:hidden">·</span>
+              <span aria-hidden className="hidden sm:inline">· ADMIN ·</span>
+              <span className="sr-only sm:hidden">Admin</span>
             </span>
           ) : null}
         </div>
         {title ? (
-          <span className="pointer-events-none absolute inset-x-0 text-center font-mono text-[9px] uppercase tracking-[0.32em] text-text-2">
+          <span className="min-w-0 flex-1 truncate text-center font-mono text-[9px] uppercase tracking-[0.32em] text-text-2">
             {title}
           </span>
-        ) : null}
-        <div className="flex items-center gap-2">
+        ) : (
+          <span aria-hidden className="flex-1" />
+        )}
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           {actions}
           <PwaInstallButton />
           <LocaleSwitcher />

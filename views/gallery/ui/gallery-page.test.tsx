@@ -26,13 +26,16 @@ vi.mock("motion/react", async (importOriginal) => {
 });
 
 import { GalleryPage } from "./gallery-page";
+import { ToastProvider } from "@/shared/ui/toast";
 
 const GALLERY_TAGS = ["Editorial", "Gel", "Chrome", "Lace", "Bridal"] as const;
 
 function renderPage() {
   return render(
     <NextIntlClientProvider locale="en" messages={en}>
-      <GalleryPage />
+      <ToastProvider>
+        <GalleryPage />
+      </ToastProvider>
     </NextIntlClientProvider>,
   );
 }
