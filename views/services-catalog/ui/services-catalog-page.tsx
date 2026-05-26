@@ -63,7 +63,7 @@ export function ServicesCatalogPage({
     <div className="pb-28">
       <AppHeader />
 
-      <section className="relative overflow-hidden px-[22px] pb-[18px] pt-3">
+      <section className="perf-isolate relative overflow-hidden px-[22px] pb-[18px] pt-3">
         <Aurora intensity="subtle" />
         <PaperGrain />
         <div className="relative z-10">
