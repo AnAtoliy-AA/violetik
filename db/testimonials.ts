@@ -11,6 +11,8 @@ export interface NewTestimonialInput {
   userId: string;
   masterId: string;
   body: string;
+  /** §11.3 — optional service the testimonial is about. */
+  serviceId?: string | null;
 }
 
 export type CreateTestimonialResult =
@@ -59,6 +61,7 @@ export async function createTestimonial(
         userId: input.userId,
         masterId: input.masterId,
         body: input.body,
+        serviceId: input.serviceId ?? null,
       })
       .returning();
     if (!rows[0]) return null;

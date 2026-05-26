@@ -81,6 +81,7 @@ describe("submitTestimonialAction", () => {
       userId: "tg:1",
       masterId: "m1",
       body: "hi",
+      serviceId: null,
     });
   });
 });

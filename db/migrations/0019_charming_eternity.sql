@@ -1,0 +1,1 @@
+ALTER TABLE "studio_photos" ADD COLUMN "palette" jsonb;

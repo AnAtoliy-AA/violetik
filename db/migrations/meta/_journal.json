@@ -127,6 +127,20 @@
       "when": 1780400000000,
       "tag": "0017_faithful_mister_sinister",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1779820502933,
+      "tag": "0018_mute_manta",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1779820703577,
+      "tag": "0019_charming_eternity",
+      "breakpoints": true
     }
   ]
 }

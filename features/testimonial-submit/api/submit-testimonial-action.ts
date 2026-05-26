@@ -11,6 +11,10 @@ import { dispatchNotification } from "@/shared/lib/notifications";
 const inputSchema = z.object({
   masterId: z.string().min(1),
   body: z.string(),
+  // §11.3 — optional. Lets a customer tag a review to the specific
+  // service they sat for. Service detail page filters by this when
+  // present; legacy rows stay master-level.
+  serviceId: z.string().min(1).optional(),
 });
 
 export type SubmitTestimonialResult =
@@ -27,7 +31,7 @@ export type SubmitTestimonialResult =
     };
 
 export async function submitTestimonialAction(
-  rawInput: { masterId: string; body: string },
+  rawInput: { masterId: string; body: string; serviceId?: string | null },
 ): Promise<SubmitTestimonialResult> {
   try {
     const user = await getCurrentSessionUser();
@@ -49,6 +53,7 @@ export async function submitTestimonialAction(
       userId: user.id,
       masterId: parsed.data.masterId,
       body,
+      serviceId: parsed.data.serviceId ?? null,
     });
     if (!result) {
       return { ok: false, reason: "unknown" };

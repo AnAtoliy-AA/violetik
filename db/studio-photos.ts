@@ -8,6 +8,8 @@ export interface StudioPhotoRecord {
   slotKind: StudioPhotoSlotKind;
   slotId: string;
   image: ImageAsset;
+  /** §9.3 — sharp-extracted dominant colors at upload time. */
+  palette: string[] | null;
   uploadedAt: string;
   uploadedBy: string | null;
 }
@@ -23,6 +25,7 @@ function rowToRecord(row: schema.StudioPhotoRow): StudioPhotoRecord {
       height: row.height ?? undefined,
       blurDataURL: row.blurDataUrl ?? undefined,
     },
+    palette: row.palette ?? null,
     uploadedAt: row.uploadedAt.toISOString(),
     uploadedBy: row.uploadedBy,
   };
@@ -103,6 +106,8 @@ export interface UpsertStudioPhotoInput {
   width?: number | null;
   height?: number | null;
   blurDataUrl?: string | null;
+  /** §9.3 — optional 4-color palette extracted at upload time. */
+  palette?: string[] | null;
   uploadedBy?: string | null;
 }
 
@@ -128,6 +133,7 @@ export async function upsertStudioPhoto(
       width: input.width ?? null,
       height: input.height ?? null,
       blurDataUrl: input.blurDataUrl ?? null,
+      palette: input.palette ?? null,
       uploadedBy: input.uploadedBy ?? null,
     })
     .onConflictDoUpdate({
@@ -138,6 +144,7 @@ export async function upsertStudioPhoto(
         width: input.width ?? null,
         height: input.height ?? null,
         blurDataUrl: input.blurDataUrl ?? null,
+        palette: input.palette ?? null,
         uploadedBy: input.uploadedBy ?? null,
         uploadedAt: new Date(),
       },

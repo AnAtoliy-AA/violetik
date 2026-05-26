@@ -1,0 +1,1 @@
+ALTER TABLE "testimonials" ADD COLUMN "service_id" text;

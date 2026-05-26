@@ -79,12 +79,24 @@ export default async function ServiceDetailRoute({
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .slice(0, 3);
 
-  // §8.2 — service-specific reviews. Testimonials carry masterId, not
-  // serviceId, so we filter to the attributed master's testimonials.
-  // Empty list collapses the section.
-  const reviews = master
-    ? await listApprovedTestimonials({ masterId: master.id, limit: 6 })
+  // §8.2 + §11.3 — service-specific reviews. Testimonials now carry
+  // an optional serviceId; prefer those, fall back to the master's
+  // general reviews until per-service ones accumulate. Empty list
+  // collapses the section entirely (the brief explicitly forbids
+  // filler).
+  let reviews = master
+    ? await listApprovedTestimonials({
+        masterId: master.id,
+        serviceId: service.id,
+        limit: 6,
+      })
     : [];
+  if (reviews.length === 0 && master) {
+    reviews = await listApprovedTestimonials({
+      masterId: master.id,
+      limit: 6,
+    });
+  }
 
   return (
     <ServiceDetailPage
