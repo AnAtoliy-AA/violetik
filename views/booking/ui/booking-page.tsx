@@ -86,10 +86,22 @@ export function BookingPage({
   const [pending, startTransition] = useTransition();
   const [saveSheetOpen, setSaveSheetOpen] = useState(false);
 
+  const setDate = useBookingStore((s) => s.setDate);
+  const setTime = useBookingStore((s) => s.setTime);
+
+  // §3.3 / §5.1 — Tonight CTA + home next-opening line hand off via
+  // `?selected=`, `?date=`, `?time=`. Pre-fill the store so the When
+  // step lands with the picker already populated instead of asking
+  // the visitor to re-pick what they just tapped on the previous
+  // screen.
   useEffect(() => {
     const selected = searchParams.get("selected");
     if (selected && !serviceId) setService(selected);
-  }, [searchParams, serviceId, setService]);
+    const qsDate = searchParams.get("date");
+    if (qsDate && /^\d{4}-\d{2}-\d{2}$/.test(qsDate) && !date) setDate(qsDate);
+    const qsTime = searchParams.get("time");
+    if (qsTime && /^\d{2}:\d{2}$/.test(qsTime) && !time) setTime(qsTime);
+  }, [searchParams, serviceId, setService, date, setDate, time, setTime]);
 
   // §16 — booking funnel telemetry. One enter event per step mount;
   // matches `BOOKING_STEPS` from the brief's funnel (`step` is the

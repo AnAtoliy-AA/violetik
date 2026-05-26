@@ -28,6 +28,12 @@ export interface WelcomeNextOpening {
   time: string;
   isToday: boolean;
   service: string | null;
+  /**
+   * Headline service id, used to pre-select the ritual in the booking
+   * store via `?selected=` so the visitor doesn't bounce off Confirm
+   * for missing-service after picking a time.
+   */
+  serviceId?: string | null;
   dayName: string | null;
 }
 
@@ -69,12 +75,20 @@ export function WelcomePage({
         : null;
   const statusIsOpen = status.state === "open";
 
-  const tonightHref =
-    nextOpening?.isToday && nextOpening?.time
-      ? `/booking/when?prefilter=tonight&time=${encodeURIComponent(
-          nextOpening.time,
-        )}`
-      : "/booking/when?prefilter=tonight";
+  // §3.3 — Tonight CTA hands the visitor straight to the When step
+  // with the headline service pre-selected. Without `?selected=` they
+  // land on When with no serviceId in the store and bounce off Confirm
+  // (canAdvance requires service+date+time).
+  const tonightHref = (() => {
+    const params = new URLSearchParams({ prefilter: "tonight" });
+    if (nextOpening?.isToday && nextOpening?.time) {
+      params.set("time", nextOpening.time);
+    }
+    if (nextOpening?.serviceId) {
+      params.set("selected", nextOpening.serviceId);
+    }
+    return `/booking/when?${params.toString()}`;
+  })();
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
