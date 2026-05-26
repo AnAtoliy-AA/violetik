@@ -284,7 +284,7 @@ export function FlameMonogram({
             const z = i - (LETTER_DEPTH - 1);
             const isFront = i === LETTER_DEPTH - 1;
             // Lerp from dark bronze at the back to mid-gold near the front;
-            // the actual front face is overridden with the shimmer gradient.
+            // the actual front face is overridden with the fire gradient.
             const t = i / (LETTER_DEPTH - 1);
             const lerp = (a: number, b: number) => Math.round(a + (b - a) * t);
             const shade = `rgb(${lerp(58, 160)}, ${lerp(42, 130)}, ${lerp(18, 78)})`;
