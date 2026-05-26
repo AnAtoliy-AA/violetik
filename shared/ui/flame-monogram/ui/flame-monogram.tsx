@@ -261,8 +261,9 @@ export function FlameMonogram({
       {/* Extruded 3D letter — `LETTER_DEPTH` copies stacked along the Z axis
        * give the glyph actual thickness so rotating around Y reveals the
        * letter's sides rather than collapsing it to an invisible plane.
-       * The front face uses the gold-shimmer gradient; the recessed layers
-       * fade to dark bronze, simulating shading down the extrusion. */}
+       * The front face uses the fire gradient (see Task 2); the recessed layers
+       * fade from black-cherry to bright orange, simulating a glowing ember
+       * log down the extrusion. */}
       <m.div
         className="absolute inset-0 flex items-center justify-center"
         style={{
