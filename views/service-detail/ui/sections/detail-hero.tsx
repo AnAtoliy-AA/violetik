@@ -66,6 +66,21 @@ export function DetailHero({
 
       <PaperGrain className="opacity-[0.05]" />
 
+      {/* §8.1 — gilded 1px inset frame that doesn't clip the parallax image */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-2 rounded-[18px]"
+        style={{
+          border: "0.5px solid transparent",
+          backgroundImage: "var(--gold-grad)",
+          WebkitMaskImage:
+            "linear-gradient(#000, #000) padding-box, linear-gradient(#000, #000)",
+          WebkitMaskComposite: "xor",
+          maskComposite: "exclude",
+          opacity: 0.55,
+        }}
+      />
+
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
