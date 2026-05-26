@@ -2,6 +2,7 @@ import type { HTMLAttributes, ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/features/locale-switcher";
 import { PwaInstallButton } from "@/features/pwa-install";
+import { NavSheet } from "@/widgets/nav-sheet";
 import { cn } from "@/shared/lib/cn";
 import { Wordmark } from "@/shared/ui/wordmark";
 
@@ -14,8 +15,6 @@ export interface AppHeaderProps extends HTMLAttributes<HTMLElement> {
   ariaBackLabel?: string;
   /** Slot to override the right-hand menu button entirely. */
   menuButton?: ReactNode;
-  /** A11y label for the default hamburger button. */
-  ariaMenuLabel?: string;
   /**
    * When true, an inline mono eyebrow `· ADMIN ·` is rendered next to the
    * wordmark / back arrow. Used on every `/admin/*` route.
@@ -23,23 +22,6 @@ export interface AppHeaderProps extends HTMLAttributes<HTMLElement> {
   admin?: boolean;
   /** Extra controls rendered in the right zone, before LocaleSwitcher. */
   actions?: ReactNode;
-}
-
-function HamburgerIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 24 24"
-      width={14}
-      height={14}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.4}
-      strokeLinecap="round"
-    >
-      <path d="M6 8h12M6 12h12M6 16h8" />
-    </svg>
-  );
 }
 
 function BackIcon() {
@@ -70,7 +52,6 @@ export function AppHeader({
   back,
   ariaBackLabel = "Go back",
   menuButton,
-  ariaMenuLabel = "Open menu",
   admin = false,
   actions,
   className,
@@ -93,15 +74,7 @@ export function AppHeader({
     </Link>
   );
 
-  const menu = menuButton ?? (
-    <button
-      type="button"
-      aria-label={ariaMenuLabel}
-      className={circleButtonClass}
-    >
-      <HamburgerIcon />
-    </button>
-  );
+  const menu = menuButton ?? <NavSheet />;
 
   return (
     <header

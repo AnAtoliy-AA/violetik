@@ -265,6 +265,20 @@
     "ribbon_join_at": "{time} · {service}",
     "ribbon_label": "Сёння ў студыі"
   },
+  "Nav": {
+    "trigger_label": "Адкрыць навігацыю",
+    "aria_label": "Навігацыя па атэлье",
+    "title": "Атэлье",
+    "description": "Знайдзіце залу, рытуал або свой профіль.",
+    "home": { "label": "Галоўная" },
+    "services": { "label": "Меню" },
+    "gallery": { "label": "Галерэя" },
+    "masters": { "label": "Майстры" },
+    "membership": { "label": "Сяброўства" },
+    "book": { "label": "Запісацца" },
+    "profile": { "label": "Профіль" },
+    "notifications": { "label": "Апавяшчэнні" }
+  },
   "LocaleSwitcher": {
     "label": "Мова",
     "en": "Англійская",

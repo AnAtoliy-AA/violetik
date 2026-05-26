@@ -265,6 +265,20 @@
     "ribbon_join_at": "{time} · {service}",
     "ribbon_label": "Tonight in the studio"
   },
+  "Nav": {
+    "trigger_label": "Open navigation",
+    "aria_label": "Atelier navigation",
+    "title": "Atelier",
+    "description": "Find a room, a ritual, or your own thread.",
+    "home": { "label": "Home" },
+    "services": { "label": "Menu" },
+    "gallery": { "label": "Gallery" },
+    "masters": { "label": "Masters" },
+    "membership": { "label": "Membership" },
+    "book": { "label": "Book a sitting" },
+    "profile": { "label": "You" },
+    "notifications": { "label": "Notifications" }
+  },
   "LocaleSwitcher": {
     "label": "Language",
     "en": "English",

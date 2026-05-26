@@ -21,6 +21,20 @@ import { AppHeader } from "./app-header";
 
 const messages = {
   LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", by: "Belarusian" },
+  Nav: {
+    trigger_label: "Open menu",
+    aria_label: "Atelier navigation",
+    title: "Atelier",
+    description: "Navigate the studio.",
+    home: { label: "Home" },
+    services: { label: "Menu" },
+    gallery: { label: "Gallery" },
+    masters: { label: "Masters" },
+    membership: { label: "Membership" },
+    book: { label: "Book" },
+    profile: { label: "You" },
+    notifications: { label: "Notifications" },
+  },
 };
 
 function renderHeader(props?: React.ComponentProps<typeof AppHeader>) {
@@ -36,13 +50,6 @@ describe("AppHeader", () => {
     renderHeader();
     expect(screen.getByText("Violetta")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /open menu/i })).toBeInTheDocument();
-  });
-
-  it("uses a custom ariaMenuLabel when provided", () => {
-    renderHeader({ ariaMenuLabel: "Show navigation" });
-    expect(
-      screen.getByRole("button", { name: /show navigation/i }),
-    ).toBeInTheDocument();
   });
 
   it("renders a back link instead of the wordmark when back is set", () => {

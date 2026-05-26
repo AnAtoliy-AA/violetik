@@ -265,6 +265,20 @@
     "ribbon_join_at": "{time} · {service}",
     "ribbon_label": "Сегодня в студии"
   },
+  "Nav": {
+    "trigger_label": "Открыть навигацию",
+    "aria_label": "Навигация по ателье",
+    "title": "Ателье",
+    "description": "Найдите зал, ритуал или вернитесь в свой профиль.",
+    "home": { "label": "Главная" },
+    "services": { "label": "Меню" },
+    "gallery": { "label": "Галерея" },
+    "masters": { "label": "Мастера" },
+    "membership": { "label": "Членство" },
+    "book": { "label": "Записаться" },
+    "profile": { "label": "Профиль" },
+    "notifications": { "label": "Уведомления" }
+  },
   "LocaleSwitcher": {
     "label": "Язык",
     "en": "Английский",
