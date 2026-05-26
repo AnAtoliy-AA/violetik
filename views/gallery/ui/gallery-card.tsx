@@ -89,18 +89,34 @@ export function GalleryCard({
         * bottom-right. Tapping a dot bubbles up `onPaletteSelect` so
         * the grid can filter to other cards sharing that color. Falls
         * back to the two `palette` colors when no extended
-        * `paletteDots` is provided. */}
+        * `paletteDots` is provided.
+        *
+        * Note: the parent card is itself a <button>, so the dots can't
+        * be real <button> elements (HTML forbids nested buttons → React
+        * hydration error). Use `role="button"` on <span> so the
+        * affordance is keyboard- and screen-reader-accessible without
+        * the illegal nesting.
+        */}
       <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-[rgba(20,9,26,0.55)] px-1.5 py-1 backdrop-blur-md">
         {(item.paletteDots ?? item.palette).slice(0, 4).map((color, i) => {
           const isActive = activePalette === color;
+          const activate = () => onPaletteSelect?.(color);
           return (
-            <button
+            <span
               key={`${color}-${i}`}
-              type="button"
+              role="button"
+              tabIndex={0}
               aria-label={color}
               onClick={(e) => {
                 e.stopPropagation();
-                onPaletteSelect?.(color);
+                activate();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  activate();
+                }
               }}
               className={cn(
                 "size-2 rounded-full ring-[0.5px] ring-white/30 transition-transform",
