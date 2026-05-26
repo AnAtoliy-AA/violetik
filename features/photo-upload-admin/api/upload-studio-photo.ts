@@ -4,10 +4,10 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/shared/lib/auth-server";
 import {
-  uploadPhotoToStorage,
   deletePhotoFromStorage,
   type PhotoUploadError,
 } from "@/shared/lib/photo-storage";
+import { isValidBlobKey } from "@/shared/lib/photo-storage/keys";
 import {
   upsertStudioPhoto,
   deleteStudioPhoto,
@@ -26,37 +26,46 @@ const slotKindSchema = z.enum([
 const intInRange = (min: number, max: number) =>
   z.coerce.number().int().min(min).max(max).optional().nullable();
 
-const uploadSchema = z.object({
+const finalizeSchema = z.object({
   slotKind: slotKindSchema,
   slotId: z.string().min(1).max(64),
   alt: z.string().trim().min(1, "alt_required").max(280),
-  width: intInRange(0, 12_000),
-  height: intInRange(0, 12_000),
+  src: z
+    .string()
+    .url()
+    .refine(
+      (url) => /\.public\.blob\.vercel-storage\.com\//.test(url),
+      "not a Vercel Blob URL",
+    ),
+  // Pathname is what we issued the upload token for — refuse to record any
+  // other key under this slot.
+  pathname: z.string().refine(isValidBlobKey, "invalid blob key"),
+  width: intInRange(0, 30_000),
+  height: intInRange(0, 30_000),
 });
 
-export type UploadStudioPhotoResult =
+export type FinalizeStudioPhotoUploadInput = z.input<typeof finalizeSchema>;
+
+export type FinalizeStudioPhotoUploadResult =
   | { ok: true; src: string }
   | {
       ok: false;
       error: PhotoUploadError | "auth" | "validation";
-      /** Underlying provider message — shown alongside the translated error. */
       detail?: string;
     };
 
 /**
- * Server action that powers `/admin/photos`. Auth-gates, validates the
- * form, uploads to Vercel Blob, upserts the DB row, deletes any stale
- * blob the upsert displaced, and revalidates the customer routes that
- * render that slot.
+ * Records a client-direct upload — file went straight from browser to
+ * Vercel Blob via /api/admin/photos/upload-token; this action validates
+ * the resulting URL, writes the DB row, displaces any prior blob, and
+ * revalidates the affected customer routes.
  *
- * Auth is enforced only when TELEGRAM_BOT_TOKEN is configured — mirrors
- * the existing pattern in update-site-settings.ts so CI / local dev
- * without auth secrets keeps working.
+ * Replaces the prior File-based server action which was capped by the
+ * Vercel 4.5 MB function body limit (see commit history).
  */
-export async function uploadStudioPhotoAction(
-  _prev: UploadStudioPhotoResult | null,
-  formData: FormData,
-): Promise<UploadStudioPhotoResult> {
+export async function finalizeStudioPhotoUploadAction(
+  input: FinalizeStudioPhotoUploadInput,
+): Promise<FinalizeStudioPhotoUploadResult> {
   const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
 
   let uploadedBy: string | null = null;
@@ -66,53 +75,41 @@ export async function uploadStudioPhotoAction(
     uploadedBy = gate.user.id;
   }
 
-  const file = formData.get("file");
-  if (!(file instanceof File)) {
+  const parsed = finalizeSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "validation" };
+
+  // The pathname must address the same slot the client claims — otherwise
+  // an admin could trick this into pointing slot A at a blob uploaded for
+  // slot B. The token-issuing route already constrains it, but defense in
+  // depth costs nothing here.
+  const expectedPrefix = `studio/${parsed.data.slotKind}/${parsed.data.slotId}-`;
+  if (!parsed.data.pathname.startsWith(expectedPrefix)) {
     return { ok: false, error: "validation" };
   }
 
-  const parsed = uploadSchema.safeParse({
-    slotKind: formData.get("slotKind"),
-    slotId: formData.get("slotId"),
-    alt: formData.get("alt"),
-    width: formData.get("width") || null,
-    height: formData.get("height") || null,
-  });
-  if (!parsed.success) {
-    return { ok: false, error: "validation" };
+  try {
+    const upsert = await upsertStudioPhoto({
+      slotKind: parsed.data.slotKind,
+      slotId: parsed.data.slotId,
+      src: parsed.data.src,
+      alt: parsed.data.alt,
+      width: parsed.data.width ?? null,
+      height: parsed.data.height ?? null,
+      uploadedBy,
+    });
+
+    if (upsert?.previousSrc && upsert.previousSrc !== parsed.data.src) {
+      await deletePhotoFromStorage(upsert.previousSrc);
+    }
+
+    revalidateForSlot(parsed.data.slotKind);
+    return { ok: true, src: parsed.data.src };
+  } catch (error) {
+    console.error("[photo-upload-admin] finalize failed", error);
+    const message =
+      error instanceof Error ? error.message : String(error ?? "unknown");
+    return { ok: false, error: "upload_failed", detail: message };
   }
-
-  const uploaded = await uploadPhotoToStorage({
-    slotKind: parsed.data.slotKind,
-    slotId: parsed.data.slotId,
-    file,
-  });
-  if (!uploaded.ok) {
-    return {
-      ok: false,
-      error: uploaded.error,
-      detail: uploaded.detail?.message,
-    };
-  }
-
-  const upsert = await upsertStudioPhoto({
-    slotKind: parsed.data.slotKind,
-    slotId: parsed.data.slotId,
-    src: uploaded.value.src,
-    alt: parsed.data.alt,
-    width: parsed.data.width ?? null,
-    height: parsed.data.height ?? null,
-    uploadedBy,
-  });
-
-  // Clean up the replaced blob, if any. Best-effort — a stale orphan blob
-  // doesn't break the new render.
-  if (upsert?.previousSrc && upsert.previousSrc !== uploaded.value.src) {
-    await deletePhotoFromStorage(upsert.previousSrc);
-  }
-
-  revalidateForSlot(parsed.data.slotKind);
-  return { ok: true, src: uploaded.value.src };
 }
 
 const deleteSchema = z.object({

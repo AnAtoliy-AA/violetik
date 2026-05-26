@@ -355,7 +355,7 @@
       "plate_title": "Photography",
       "eyebrow": "Studio imagery",
       "title": "Atelier photographs.",
-      "paragraph": "Drop a JPEG, PNG, WebP or AVIF (up to 8 MB) for each slot — services, gallery items, master portrait, testimonial avatars, atelier clips, and the demo profile avatar. Each upload replaces what was there. Storage is Vercel Blob.",
+      "paragraph": "Drop a JPEG, PNG, WebP or AVIF (up to 25 MB) for each slot — services, gallery items, master portrait, testimonial avatars, atelier clips, and the demo profile avatar. Each upload replaces what was there. Storage is Vercel Blob.",
       "storage_not_configured_banner": "BLOB_READ_WRITE_TOKEN is missing · uploads are disabled on this build",
       "storage_not_configured": "Storage not configured · uploads disabled",
       "group_service": "Service rituals",
