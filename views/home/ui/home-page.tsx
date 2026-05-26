@@ -34,7 +34,7 @@ export function HomePage({ locale, showAdmin = false }: HomePageProps) {
       <AppHeader />
       <AtelierHours />
       <TonightStrip />
-      <section className="perf-isolate relative px-[22px] pb-9 pt-2.5 md:px-12 md:pb-14 md:pt-6">
+      <section className="relative px-[22px] pb-9 pt-2.5 md:px-12 md:pb-14 md:pt-6">
         <Aurora intensity="subtle" />
         <PaperGrain />
         <HomeHero />

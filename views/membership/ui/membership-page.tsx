@@ -49,7 +49,7 @@ export async function MembershipPage() {
     <div className="pb-10">
       <AppHeader back="/home" title={t("plate_title")} />
 
-      <section className="perf-isolate relative overflow-hidden px-[22px] pb-4 pt-3">
+      <section className="relative overflow-hidden px-[22px] pb-4 pt-3">
         <Aurora intensity="subtle" />
         <PaperGrain />
         <div className="relative z-10">
