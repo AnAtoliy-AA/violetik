@@ -375,7 +375,7 @@
       "upload_error_not_configured": "Vercel Blob not configured",
       "upload_error_empty_file": "File is empty",
       "upload_error_unsupported_type": "Unsupported file type",
-      "upload_error_too_large": "File is too large (max 8 MB)",
+      "upload_error_too_large": "Photo is {size} MB · max {max} MB. Compress or resize the image and try again.",
       "upload_error_upload_failed": "Upload failed · try again",
       "upload_error_auth": "Sign in as admin to upload",
       "upload_error_validation": "Some fields are missing",

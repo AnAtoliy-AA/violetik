@@ -14,6 +14,14 @@ import type { ImageAsset } from "@/entities/studio";
 import { buttonClassName } from "@/shared/ui/button";
 import { FloatingInput } from "@/shared/ui/floating-input";
 import { cn } from "@/shared/lib/cn";
+import {
+  MAX_PHOTO_BYTES,
+  MAX_PHOTO_MB,
+} from "@/shared/lib/photo-storage/limits";
+
+function formatMb(bytes: number): string {
+  return (bytes / (1024 * 1024)).toFixed(1);
+}
 
 export interface PhotoUploadRowProps {
   slot: PhotoSlot;
@@ -37,6 +45,7 @@ export function PhotoUploadRow({
   const t = useTranslations("Admin.photos");
   const formRef = useRef<HTMLFormElement>(null);
   const [pending, setPending] = useState<PendingFile | null>(null);
+  const [oversizeBytes, setOversizeBytes] = useState<number | null>(null);
   const [alt, setAlt] = useState<string>(current?.alt ?? "");
 
   const [uploadState, uploadAction, uploadPending] = useActionState<
@@ -50,9 +59,18 @@ export function PhotoUploadRow({
   >(deleteStudioPhotoAction, null);
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setOversizeBytes(null);
     const file = event.target.files?.[0];
     if (!file) {
       setPending(null);
+      return;
+    }
+    // Stop oversized picks at the client edge — otherwise they hit the
+    // server action's body limit, the framework throws, and the user lands
+    // on the locale error boundary with no actionable hint.
+    if (file.size > MAX_PHOTO_BYTES) {
+      setPending(null);
+      setOversizeBytes(file.size);
       return;
     }
     const preview = URL.createObjectURL(file);
@@ -69,12 +87,26 @@ export function PhotoUploadRow({
   }
 
   const previewSrc = pending?.preview ?? current?.src ?? null;
-  const errorMessage =
-    uploadState && !uploadState.ok
+  const serverTooLargeBytes =
+    uploadState &&
+    !uploadState.ok &&
+    uploadState.error === "too_large" &&
+    pending
+      ? pending.file.size
+      : null;
+  const tooLargeBytes = oversizeBytes ?? serverTooLargeBytes;
+  const errorMessage = tooLargeBytes
+    ? t("upload_error_too_large", {
+        size: formatMb(tooLargeBytes),
+        max: MAX_PHOTO_MB,
+      })
+    : uploadState && !uploadState.ok
       ? t(`upload_error_${uploadState.error}` as const)
       : null;
   const errorDetail =
-    uploadState && !uploadState.ok ? uploadState.detail : null;
+    uploadState && !uploadState.ok && !tooLargeBytes
+      ? uploadState.detail
+      : null;
 
   return (
     <article

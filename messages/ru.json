@@ -375,7 +375,7 @@
       "upload_error_not_configured": "Vercel Blob не настроен",
       "upload_error_empty_file": "Файл пуст",
       "upload_error_unsupported_type": "Неподдерживаемый тип файла",
-      "upload_error_too_large": "Файл слишком большой (макс. 8 МБ)",
+      "upload_error_too_large": "Фото {size} МБ · максимум {max} МБ. Сожмите или уменьшите размер изображения и попробуйте снова.",
       "upload_error_upload_failed": "Сбой загрузки · попробуйте ещё раз",
       "upload_error_auth": "Войдите как админ для загрузки",
       "upload_error_validation": "Заполните все поля",
