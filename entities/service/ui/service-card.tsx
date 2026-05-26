@@ -71,7 +71,13 @@ export function ServiceCard({
             aria-hidden
             className="mb-1 h-0 flex-1 border-b-[0.5px] border-dotted border-line-strong"
           />
-          <span className="gilded inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 font-mono text-[13px] text-gold">
+          {/* Gold-hairline ring chip. \`text-accent\` is the *flat* gold
+            * color — \`text-gold\` would set background:linear-gradient +
+            * background-clip:text + color:transparent, which renders as
+            * invisible text inside a transparent-bg chip because the
+            * gradient layer can't paint through. Right margin so the
+            * SpotlightCard's overflow:hidden never crops the ring. */}
+          <span className="mr-1 inline-flex shrink-0 items-center rounded-full border-[0.5px] border-accent/70 px-2.5 py-0.5 font-mono text-[13px] text-accent">
             {resolvedPrice ? (
               <Price
                 resolved={resolvedPrice}

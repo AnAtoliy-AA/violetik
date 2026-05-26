@@ -59,7 +59,7 @@ export async function SignaturesList() {
           <SpotlightCard key={service.id} className="rounded-none">
             <Link
               href={`/services/${service.id}`}
-              className="block transition-transform duration-fast ease-out hover:scale-[1.005] motion-reduce:hover:scale-100"
+              className="block"
             >
               <ServiceCard
                 service={service}
