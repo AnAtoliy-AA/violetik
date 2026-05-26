@@ -33,4 +33,12 @@ describe("FlameMonogram", () => {
     // Embers live inside the goo mask; free sparks are siblings of the rect.
     expect(container.querySelectorAll("mask circle")).toHaveLength(12);
   });
+
+  it("defines a separate displacement filter for the front-face glyph", () => {
+    const { container } = render(<FlameMonogram />);
+    const displace = container.querySelector("filter#fm-displace");
+    expect(displace).not.toBeNull();
+    expect(displace?.querySelector("feTurbulence")).not.toBeNull();
+    expect(displace?.querySelector("feDisplacementMap")).not.toBeNull();
+  });
 });

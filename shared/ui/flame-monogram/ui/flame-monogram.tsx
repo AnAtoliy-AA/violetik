@@ -156,6 +156,30 @@ export function FlameMonogram({
             )}
           </filter>
 
+          <filter id="fm-displace" x="-10%" y="-10%" width="120%" height="120%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.025 0.06"
+              numOctaves="2"
+              seed="7"
+              result="dispNoise"
+            >
+              {reduceMotion ? null : (
+                <animate
+                  attributeName="baseFrequency"
+                  dur="5s"
+                  values="0.025 0.06;0.04 0.08;0.02 0.07;0.035 0.065;0.025 0.06"
+                  repeatCount="indefinite"
+                />
+              )}
+            </feTurbulence>
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="dispNoise"
+              scale={reduceMotion ? "1.5" : "4"}
+            />
+          </filter>
+
           <mask id="fm-mask">
             <g filter="url(#fm-goo)">
               {embers.map((ember, i) => (
