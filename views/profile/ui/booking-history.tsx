@@ -1,5 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { bucketBookings } from "@/entities/booking";
+import { Link } from "@/i18n/navigation";
+import { buttonClassName } from "@/shared/ui/button";
 import { getCachedUserBookings, getCachedAllServices } from "../api/loaders";
 
 function formatDateTime(date: Date, locale: string): string {
@@ -43,9 +45,9 @@ export async function BookingHistory({
       {completedHistory.map((row) => (
         <li
           key={row.id}
-          className="flex items-baseline justify-between py-3.5"
+          className="flex items-baseline justify-between gap-3 py-3.5"
         >
-          <div>
+          <div className="min-w-0">
             <p className="font-display text-[19px] font-normal italic leading-tight">
               {serviceName(row.serviceId)}
             </p>
@@ -53,6 +55,17 @@ export async function BookingHistory({
               {formatDateTime(row.scheduledFor, locale)}
             </p>
           </div>
+          {/* §10.2 — "Book this again" ghost; pre-selects the service. */}
+          <Link
+            href={`/booking/service?selected=${encodeURIComponent(row.serviceId)}`}
+            className={buttonClassName({
+              variant: "ghost",
+              size: "sm",
+              className: "shrink-0",
+            })}
+          >
+            {t("rebook_cta")}
+          </Link>
         </li>
       ))}
     </ul>
