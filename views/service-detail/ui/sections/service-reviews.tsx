@@ -1,5 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { ApprovedTestimonial } from "@/entities/testimonial";
+import { toRomanNumeral } from "@/shared/lib/format/roman-numeral";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Marquee } from "@/shared/ui/marquee";
@@ -15,13 +16,19 @@ function initialOf(name: string): string {
 
 export function ServiceReviews({ reviews }: ServiceReviewsProps) {
   const t = useTranslations("ServiceDetail");
+  const locale = useLocale();
   if (reviews.length === 0) return null;
   return (
     <section className="px-[22px] py-7">
       <Eyebrow>{t("reviews_eyebrow")}</Eyebrow>
       <LetterpressRule className="mt-3" />
       <Marquee className="mt-4" gap="1rem" duration="55s">
-        {reviews.map((r) => (
+        {reviews.map((r) => {
+          const month = new Intl.DateTimeFormat(locale, { month: "short" })
+            .format(r.createdAt)
+            .toUpperCase();
+          const year = toRomanNumeral(r.createdAt.getFullYear());
+          return (
           <article
             key={r.id}
             className="gilded glass-top flex w-[280px] shrink-0 flex-col gap-2 rounded-[14px] p-4"
@@ -32,6 +39,9 @@ export function ServiceReviews({ reviews }: ServiceReviewsProps) {
             >
               &ldquo;{r.body}&rdquo;
             </p>
+            <div className="font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
+              · {month} {year} ·
+            </div>
             <div className="mt-1 flex items-center gap-2">
               <span
                 aria-hidden
@@ -49,7 +59,8 @@ export function ServiceReviews({ reviews }: ServiceReviewsProps) {
               ) : null}
             </div>
           </article>
-        ))}
+          );
+        })}
       </Marquee>
     </section>
   );

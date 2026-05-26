@@ -33,6 +33,7 @@ export function HomeFooter({ settings, locale }: HomeFooterProps) {
           mapAria: tFooter("map_aria"),
           mapTitle: tFooter("map_title"),
           getDirections: tFooter("get_directions"),
+          stampOverlay: addressLine ? addressLine.toUpperCase() : undefined,
         }}
       />
       <TappableAddress
