@@ -283,11 +283,14 @@ export function FlameMonogram({
           {Array.from({ length: LETTER_DEPTH }).map((_, i) => {
             const z = i - (LETTER_DEPTH - 1);
             const isFront = i === LETTER_DEPTH - 1;
-            // Lerp from dark bronze at the back to mid-gold near the front;
-            // the actual front face is overridden with the fire gradient.
+            // Ember ramp — black-cherry at the back fades to bright orange near the front;
+            // the front face is overridden with the fire gradient (Task 2). The non-linear
+            // tt = t * t keeps the back layers dark longer so the V reads as a glowing
+            // ember log when it rotates.
             const t = i / (LETTER_DEPTH - 1);
-            const lerp = (a: number, b: number) => Math.round(a + (b - a) * t);
-            const shade = `rgb(${lerp(58, 160)}, ${lerp(42, 130)}, ${lerp(18, 78)})`;
+            const tt = t * t; // hotter front, darker tail — most depth fades quickly to black-cherry.
+            const lerp = (a: number, b: number) => Math.round(a + (b - a) * tt);
+            const shade = `rgb(${lerp(40, 255)}, ${lerp(8, 140)}, ${lerp(0, 40)})`;
             return (
               <span
                 key={i}

@@ -54,4 +54,13 @@ describe("FlameMonogram", () => {
     expect(front.style.filter).toContain("url(#fm-displace)");
     expect(front.className).not.toMatch(/text-gold-shimmer/);
   });
+
+  it("shades extrusion back layers with ember tones, not bronze", () => {
+    const { container } = render(<FlameMonogram />);
+    const spans = container.querySelectorAll<HTMLElement>("div.grid > span");
+    // Back layer (i=0): color should be near-black-cherry, not bronze.
+    // Bronze was rgb(58, 42, 18); ember target is rgb(40, 8, 0).
+    const back = spans[0];
+    expect(back.style.color).toBe("rgb(40, 8, 0)");
+  });
 });
