@@ -10,6 +10,7 @@ import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { LocalBusinessJsonLd } from "@/shared/ui/local-business-jsonld";
 import { ServiceWorkerRegistrar } from "@/shared/lib/pwa/service-worker-registrar";
 import { SiteFooter } from "@/widgets/site-footer";
+import { ToastProvider } from "@/shared/ui/toast";
 import "../globals.css";
 
 const SITE_URL =
@@ -137,10 +138,15 @@ export default async function LocaleLayout({
           siteUrl={SITE_URL}
           name={tSite("name")}
         />
+        <a href="#main-content" className="skip-to-content sr-only focus:not-sr-only">
+          Skip to content
+        </a>
         <NextIntlClientProvider>
-          <ServiceWorkerRegistrar />
-          {children}
-          <SiteFooter />
+          <ToastProvider>
+            <ServiceWorkerRegistrar />
+            <main id="main-content">{children}</main>
+            <SiteFooter />
+          </ToastProvider>
         </NextIntlClientProvider>
       </body>
     </html>

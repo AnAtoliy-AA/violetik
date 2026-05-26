@@ -61,6 +61,7 @@ export default async function ServiceDetailRoute({
       resolvedPrice={resolvedPrice}
       currency={currency}
       locale={locale}
+      telegramUsername={settings.telegramUsername}
     />
   );
 }

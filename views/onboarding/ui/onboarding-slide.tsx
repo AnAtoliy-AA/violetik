@@ -17,6 +17,8 @@ export interface OnboardingSlideProps {
   eyebrow: string;
   title: string;
   body: string;
+  /** Optional attribution (e.g. "— V.") rendered after the body. */
+  attribution?: string;
 }
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -29,6 +31,7 @@ export function OnboardingSlide({
   eyebrow,
   title,
   body,
+  attribution,
 }: OnboardingSlideProps) {
   const reduceMotion = useReducedMotion();
   const fanPalette: NailTilePalette = [palette[0], "#14091a"];
@@ -39,17 +42,22 @@ export function OnboardingSlide({
         <motion.div
           className="absolute inset-0"
           style={parallaxY ? { y: parallaxY } : undefined}
-          // Passing-the-lens: incoming hero settles 1.08 → 1, outgoing one
-          // expands 1 → 1.08 as it slides away.
+          // §4 Ken-Burns slow zoom on the active hero (paused for reduced
+          // motion). Inactive slides settle at 1.08 so the cross-fade reads
+          // as one continuous lens move.
           animate={
             reduceMotion
               ? { scale: 1 }
-              : { scale: active ? 1 : 1.08 }
+              : active
+                ? { scale: [1, 1.06, 1.06] }
+                : { scale: 1.08 }
           }
           transition={
             reduceMotion
               ? { duration: 0 }
-              : { duration: 0.7, ease: EASE_OUT }
+              : active
+                ? { duration: 12, ease: "linear", times: [0, 0.5, 1] }
+                : { duration: 0.7, ease: EASE_OUT }
           }
         >
           <NailTile palette={palette} variant={variant} className="size-full" />
@@ -83,7 +91,16 @@ export function OnboardingSlide({
           {title}
         </h2>
         <LetterpressRule className="mb-3 max-w-[160px]" />
-        <p className="m-0 text-[15px] leading-[1.55] text-text-2">{body}</p>
+        {attribution ? (
+          <blockquote className="m-0 font-display italic text-[17px] leading-[1.5] text-text-2">
+            {body}
+            <footer className="mt-2 font-mono not-italic text-[10px] uppercase tracking-[0.28em] text-text-3">
+              {attribution}
+            </footer>
+          </blockquote>
+        ) : (
+          <p className="m-0 text-[15px] leading-[1.55] text-text-2">{body}</p>
+        )}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
 import type { NailTileVariant } from "@/shared/ui/nail-tile";
 import { AppHeader } from "@/widgets/app-header";
+import { AftercareSection } from "./sections/aftercare-section";
 import { DetailDescription } from "./sections/detail-description";
 import { DetailHero } from "./sections/detail-hero";
 import { IncludesList } from "./sections/includes-list";
@@ -17,6 +18,8 @@ export interface ServiceDetailPageProps {
   resolvedPrice: ResolvedPrice;
   currency?: CurrencyCode;
   locale?: Locale;
+  /** Studio Telegram handle (no @) used by the sticky CTA "Ask first" button. */
+  telegramUsername?: string | null;
 }
 
 const HERO_PALETTE: readonly [string, string] = ["#c9a96e", "#7d3a6f"];
@@ -26,6 +29,7 @@ export function ServiceDetailPage({
   resolvedPrice,
   currency = "EUR",
   locale = "en",
+  telegramUsername = null,
 }: ServiceDetailPageProps) {
   const t = useTranslations("ServiceDetail");
   const plateNumber = service.sortOrder;
@@ -55,8 +59,14 @@ export function ServiceDetailPage({
       </div>
       <DetailDescription service={service} />
       <IncludesList items={service.includes} />
+      <AftercareSection />
       <RecentMiniGallery items={recent} />
-      <StickyCta serviceId={service.id} resolvedPrice={resolvedPrice} />
+      <StickyCta
+        serviceId={service.id}
+        resolvedPrice={resolvedPrice}
+        serviceName={service.name}
+        telegramUsername={telegramUsername}
+      />
     </div>
   );
 }

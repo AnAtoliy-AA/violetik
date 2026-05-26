@@ -11,11 +11,33 @@ import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { FlameMonogram } from "@/shared/ui/flame-monogram";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
+import { Stamp } from "@/shared/ui/stamp";
 import { LetterReveal } from "./letter-reveal";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-export function WelcomePage() {
+export type WelcomeStatus =
+  | { state: "open"; closesAt: string }
+  | { state: "closed"; day: string; time: string }
+  | { state: "no-hours" };
+
+export interface WelcomeNextOpening {
+  date: string;
+  time: string;
+  isToday: boolean;
+  service: string | null;
+  dayName: string | null;
+}
+
+export interface WelcomePageProps {
+  status?: WelcomeStatus;
+  nextOpening?: WelcomeNextOpening | null;
+}
+
+export function WelcomePage({
+  status = { state: "no-hours" },
+  nextOpening = null,
+}: WelcomePageProps = {}) {
   const t = useTranslations("Welcome");
   const reduceMotion = useReducedMotion();
 
@@ -30,6 +52,21 @@ export function WelcomePage() {
     animate: { opacity: 1, y: 0 },
     transition: { duration: reduceMotion ? 0 : 1.1, ease: EASE_OUT, delay },
   });
+
+  const statusLabel =
+    status.state === "open"
+      ? t("proof_open_until", { time: status.closesAt })
+      : status.state === "closed"
+        ? t("proof_opens_on", { day: status.day, time: status.time })
+        : null;
+  const statusIsOpen = status.state === "open";
+
+  const tonightHref =
+    nextOpening?.isToday && nextOpening?.time
+      ? `/booking/time?prefilter=tonight&time=${encodeURIComponent(
+          nextOpening.time,
+        )}`
+      : "/booking/time?prefilter=tonight";
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
@@ -66,10 +103,7 @@ export function WelcomePage() {
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
-          <motion.div
-            className="mb-6 flex justify-center"
-            {...fade(0.3)}
-          >
+          <motion.div className="mb-6 flex justify-center" {...fade(0.3)}>
             <MonogramSeal letter="V" className="size-12 text-[22px]" />
           </motion.div>
           <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)] text-brand-cycle">
@@ -87,7 +121,11 @@ export function WelcomePage() {
             className="mx-auto mt-[34px] overflow-hidden"
             initial={reduceMotion ? false : { width: 0 }}
             animate={{ width: 180 }}
-            transition={{ duration: reduceMotion ? 0 : 1.5, ease: EASE_OUT, delay: 0.6 }}
+            transition={{
+              duration: reduceMotion ? 0 : 1.5,
+              ease: EASE_OUT,
+              delay: 0.6,
+            }}
           >
             <Ornament />
           </motion.div>
@@ -96,7 +134,11 @@ export function WelcomePage() {
             className="mx-auto mt-[30px] h-[250px] w-[190px]"
             initial={reduceMotion ? false : { opacity: 0, y: 30 }}
             animate={{ opacity: 0.92, y: 0 }}
-            transition={{ duration: reduceMotion ? 0 : 1.2, ease: EASE_OUT, delay: 1.9 }}
+            transition={{
+              duration: reduceMotion ? 0 : 1.2,
+              ease: EASE_OUT,
+              delay: 1.9,
+            }}
           >
             <FlameMonogram letter="V" className="size-full" />
           </motion.div>
@@ -107,26 +149,96 @@ export function WelcomePage() {
           >
             {t("tagline")}
           </motion.p>
+
+          {/* §3.1 — three proof points, staggered after the tagline */}
+          <div className="mt-6 flex flex-col items-center gap-3">
+            <motion.div {...fade(2.6)}>
+              <Stamp size="sm">{t("proof_est")}</Stamp>
+            </motion.div>
+            <motion.div
+              className="font-mono text-[10px] uppercase tracking-[0.32em] text-text-3"
+              {...fade(2.72)}
+            >
+              {t("proof_chair")}
+            </motion.div>
+            {statusLabel && (
+              <motion.div
+                className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.32em] text-text-2"
+                {...fade(2.84)}
+              >
+                <span
+                  aria-hidden
+                  className={`inline-block size-1.5 rounded-full ${
+                    statusIsOpen ? "bg-status-open" : "bg-accent"
+                  } motion-safe:animate-soft-pulse`}
+                />
+                <span>{statusLabel}</span>
+              </motion.div>
+            )}
+          </div>
         </div>
 
-        <motion.div
-          className="flex flex-col gap-3 pb-9"
-          {...rise(2.4)}
-        >
+        <motion.div className="flex flex-col gap-3 pb-9" {...rise(2.4)}>
           <MagneticButton className="block w-full">
             <Link
               href="/onboarding"
-              className={buttonClassName({ variant: "gold", size: "lg", block: true })}
+              className={buttonClassName({
+                variant: "gold",
+                size: "lg",
+                block: true,
+              })}
             >
               {t("cta_enter")}
             </Link>
           </MagneticButton>
           <Link
             href="/booking/service"
-            className={buttonClassName({ variant: "ghost", size: "lg", block: true })}
+            className={buttonClassName({
+              variant: "ghost",
+              size: "lg",
+              block: true,
+            })}
           >
             {t("cta_returning")}
           </Link>
+          {/* §3.2 — third CTA, ghost, jumps to tonight's openings */}
+          <Link
+            href={tonightHref}
+            className={buttonClassName({
+              variant: "ghost",
+              size: "md",
+              block: true,
+              className: "text-text-3 hover:text-text",
+            })}
+          >
+            {t("cta_tonight")}
+          </Link>
+
+          {/* §3.3 — tonight ribbon */}
+          {nextOpening && (
+            <motion.div
+              className="mt-3 mx-auto text-center font-mono text-[10px] uppercase tracking-[0.32em] text-text-3 max-w-[320px]"
+              aria-label={t("ribbon_label")}
+              {...fade(3.0)}
+            >
+              {nextOpening.isToday ? (
+                <span>
+                  ·{" "}
+                  {t("ribbon_join_at", {
+                    time: nextOpening.time,
+                    service: nextOpening.service ?? "—",
+                  })}{" "}
+                  ·
+                </span>
+              ) : (
+                <span>
+                  {t("ribbon_fully_booked", {
+                    day: nextOpening.dayName ?? "—",
+                  })}
+                </span>
+              )}
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </div>
