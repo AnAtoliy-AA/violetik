@@ -291,16 +291,18 @@ export function FlameMonogram({
             return (
               <span
                 key={i}
-                className={cn(
-                  "font-display text-[180px] font-light italic leading-none",
-                  isFront && "text-gold-shimmer",
-                )}
+                className="font-display text-[180px] font-light italic leading-none"
                 style={{
                   gridArea: "1 / 1",
                   transform: `translateZ(${z}px)`,
-                  color: isFront ? undefined : shade,
+                  color: isFront ? "transparent" : shade,
+                  backgroundImage: isFront
+                    ? "linear-gradient(180deg, #fff5d6 0%, #ffd28a 30%, #e8a04a 60%, #c9572a 100%)"
+                    : undefined,
+                  WebkitBackgroundClip: isFront ? "text" : undefined,
+                  backgroundClip: isFront ? "text" : undefined,
                   filter: isFront
-                    ? "drop-shadow(0 2px 4px rgba(0,0,0,0.9)) drop-shadow(0 0 18px rgba(232, 207, 153, 0.55))"
+                    ? "url(#fm-displace) drop-shadow(0 2px 6px rgba(120,30,10,0.7)) drop-shadow(0 0 22px rgba(255,180,90,0.6))"
                     : undefined,
                 }}
               >

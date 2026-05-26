@@ -41,4 +41,17 @@ describe("FlameMonogram", () => {
     expect(displace?.querySelector("feTurbulence")).not.toBeNull();
     expect(displace?.querySelector("feDisplacementMap")).not.toBeNull();
   });
+
+  it("renders the front-face glyph with a fire-gradient text and the displace filter", () => {
+    const { container } = render(<FlameMonogram />);
+    // Front face is the last span (highest z) inside the .grid wrapper.
+    const spans = container.querySelectorAll<HTMLElement>("div.grid > span");
+    const front = spans[spans.length - 1];
+    expect(front).toBeDefined();
+    // Inline style replaces the text-gold-shimmer class.
+    expect(front.style.color).toBe("transparent");
+    expect(front.style.backgroundImage).toContain("linear-gradient");
+    expect(front.style.filter).toContain("url(#fm-displace)");
+    expect(front.className).not.toMatch(/text-gold-shimmer/);
+  });
 });
