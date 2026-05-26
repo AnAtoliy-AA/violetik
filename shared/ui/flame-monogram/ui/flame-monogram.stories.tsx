@@ -9,7 +9,7 @@ const meta: Meta<typeof FlameMonogram> = {
     docs: {
       description: {
         component:
-          "Rotating premium-quality monogram letter wrapped in a flicker of gold-and-amber flames. The glyph uses the Cormorant display face with the brand gold-shimmer animation; the flames live in SVG so they composite beneath the letter without bleeding into siblings. Honors prefers-reduced-motion.",
+          "Rotating monogram letter rendered as fire: the glyph is filled with a vertical fire gradient (white-hot at the base, ember-orange at the tips) displaced by SVG turbulence, while extruded back layers fade from bright orange to black-cherry. A flame body wraps the V via a metaball mask, with 36 free sparks and a three-strand smoke wisp drifting upward. Honors prefers-reduced-motion.",
       },
     },
   },
