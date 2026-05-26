@@ -129,7 +129,7 @@ export function TonightStripClient({
         type="button"
         aria-label={t("dismiss")}
         onClick={dismiss}
-        className="absolute right-2 top-1/2 -translate-y-1/2 text-text-3 hover:text-text-2 px-2 leading-none"
+        className="absolute right-0 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center text-text-3 hover:text-text-2 leading-none"
       >
         ×
       </button>

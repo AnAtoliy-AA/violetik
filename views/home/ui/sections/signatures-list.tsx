@@ -4,6 +4,7 @@ import { ServiceMenuItem } from "@/entities/service";
 import { loadServicesForLocale } from "@/entities/service/api/load";
 import { resolvePrice, type ResolvedPrice } from "@/entities/site-settings";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import { countBookingsByServiceId } from "@/db/bookings";
 import type { CurrencyCode } from "@/db/schema";
 import type { Locale } from "@/i18n/routing";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
@@ -35,8 +36,20 @@ export async function SignaturesList() {
     getSiteSettingsServer(),
   ]);
   const locale = localeStr as Locale;
-  const all = await loadServicesForLocale(locale);
-  const services = all.slice(0, 4);
+  const [all, bookingCounts] = await Promise.all([
+    loadServicesForLocale(locale),
+    countBookingsByServiceId(),
+  ]);
+  // §5.2 — pin the most-booked first. Ties (and zero-booking services)
+  // fall back to the catalog's editorial `sortOrder` so the list is
+  // never random.
+  const ranked = [...all].sort((a, b) => {
+    const ca = bookingCounts.get(a.id) ?? 0;
+    const cb = bookingCounts.get(b.id) ?? 0;
+    if (ca !== cb) return cb - ca;
+    return a.sortOrder - b.sortOrder;
+  });
+  const services = ranked.slice(0, 4);
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
   const pricedServices: Record<string, ResolvedPrice> = {};
@@ -76,6 +89,14 @@ export async function SignaturesList() {
                 resolvedPrice={pricedServices[service.id]}
                 currency={currency}
                 locale={locale}
+                sittingsCount={bookingCounts.get(service.id) ?? 0}
+                sittingsLabel={
+                  (bookingCounts.get(service.id) ?? 0) > 0
+                    ? t("sittings_label", {
+                        n: bookingCounts.get(service.id) ?? 0,
+                      })
+                    : undefined
+                }
               />
             </Link>
           </SpotlightCard>

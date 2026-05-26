@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { and, asc, desc, eq, gte, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, ne, sql } from "drizzle-orm";
 import { db, schema } from "./index";
 import { activeVipSubquery } from "./vip-requests";
 
@@ -83,6 +83,32 @@ export async function listActiveBookingsFrom(
         ne(schema.bookings.status, "cancelled"),
       ),
     );
+}
+
+/**
+ * Per-service count of confirmed + completed bookings. Backs §5.2's
+ * "pin the most-booked" signatures rerank and §11.3's "N sittings"
+ * line on each service tile. Cancelled + pending bookings excluded so
+ * the count reflects realised demand, not interest.
+ */
+export type CountedBookingStatus = "confirmed" | "completed";
+
+export async function countBookingsByServiceId(
+  statuses: ReadonlyArray<CountedBookingStatus> = ["confirmed", "completed"],
+): Promise<ReadonlyMap<string, number>> {
+  if (!db) return new Map();
+  if (statuses.length === 0) return new Map();
+  const rows = await db
+    .select({
+      serviceId: schema.bookings.serviceId,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(schema.bookings)
+    .where(inArray(schema.bookings.status, [...statuses]))
+    .groupBy(schema.bookings.serviceId);
+  const out = new Map<string, number>();
+  for (const r of rows) out.set(r.serviceId, r.count);
+  return out;
 }
 
 /**

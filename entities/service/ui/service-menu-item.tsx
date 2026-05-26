@@ -19,6 +19,15 @@ export interface ServiceMenuItemProps extends HTMLAttributes<HTMLElement> {
   currency?: CurrencyCode;
   /** Active locale. Defaults to en for legacy stories/tests. */
   locale?: Locale;
+  /**
+   * §11.3 — count of confirmed/completed sittings for this service. When
+   * present, renders inline as a small mono caps signal next to the
+   * duration. Skip the line when zero so brand-new services don't
+   * advertise "0 sittings".
+   */
+  sittingsCount?: number;
+  /** Label rendered as "{n} SITTINGS" (locale-aware). */
+  sittingsLabel?: string;
 }
 
 const DEFAULT_PALETTE: readonly [string, string] = ["#c9a96e", "#7d3a6f"];
@@ -32,6 +41,8 @@ export function ServiceMenuItem({
   resolvedPrice,
   currency = "EUR",
   locale = "en",
+  sittingsCount,
+  sittingsLabel,
   className,
   ...rest
 }: ServiceMenuItemProps) {
@@ -85,6 +96,9 @@ export function ServiceMenuItem({
           </div>
           <div className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
             {service.duration} · {service.category.name}
+            {sittingsCount && sittingsCount > 0 && sittingsLabel ? (
+              <> · <span className="text-accent">{sittingsLabel}</span></>
+            ) : null}
           </div>
           <p className="mt-2.5 text-[13px] leading-[1.5] text-text-2">
             {service.blurb}

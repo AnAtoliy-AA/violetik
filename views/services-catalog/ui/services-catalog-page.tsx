@@ -28,6 +28,8 @@ export interface ServicesCatalogPageProps {
   currency?: CurrencyCode;
   locale?: Locale;
   showAdmin?: boolean;
+  /** §11.3 — confirmed+completed booking counts per service id. */
+  bookingCounts?: Readonly<Record<string, number>>;
 }
 
 export function ServicesCatalogPage({
@@ -37,8 +39,10 @@ export function ServicesCatalogPage({
   currency = "EUR",
   locale = "en",
   showAdmin = false,
+  bookingCounts,
 }: ServicesCatalogPageProps) {
   const t = useTranslations("Services");
+  const tHome = useTranslations("Home");
   const [active, setActive] = useState<ChipValue>(ALL);
 
   const chips: readonly ChipValue[] = useMemo(
@@ -114,6 +118,14 @@ export function ServicesCatalogPage({
                   resolvedPrice={pricedServices?.[service.id]}
                   currency={currency}
                   locale={locale}
+                  sittingsCount={bookingCounts?.[service.id] ?? 0}
+                  sittingsLabel={
+                    (bookingCounts?.[service.id] ?? 0) > 0
+                      ? tHome("sittings_label", {
+                          n: bookingCounts?.[service.id] ?? 0,
+                        })
+                      : undefined
+                  }
                 />
               </Link>
             </SpotlightCard>

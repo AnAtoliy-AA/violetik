@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { activeVipSubquery } from "@/db/vip-requests";
 import { buildAuthorDisplay } from "../lib/build-author-display";
@@ -33,6 +33,17 @@ export async function listApprovedTestimonials(
     : eq(schema.testimonials.status, "approved");
   try {
     const activeVip = activeVipSubquery();
+    // §11.4 — correlated EXISTS subquery: did this user ever have a
+    // confirmed or completed booking with the master they reviewed?
+    // EXISTS keeps the outer row count stable (no Cartesian blow-up
+    // from joining bookings directly).
+    const verifiedExpr = sql<boolean>`EXISTS (
+      SELECT 1
+      FROM ${schema.bookings} b
+      WHERE b.user_id = ${schema.testimonials.userId}
+        AND b.master_id = ${schema.testimonials.masterId}
+        AND b.status IN ('confirmed', 'completed')
+    )`;
     const rows = await db
       .select({
         id: schema.testimonials.id,
@@ -45,6 +56,7 @@ export async function listApprovedTestimonials(
         email: schema.users.email,
         photoUrl: schema.users.photoUrl,
         vipUserId: activeVip.userId,
+        verified: verifiedExpr,
       })
       .from(schema.testimonials)
       .leftJoin(schema.users, eq(schema.testimonials.userId, schema.users.id))
@@ -65,6 +77,7 @@ export async function listApprovedTestimonials(
       }),
       authorPhotoUrl: r.photoUrl,
       authorIsVip: r.vipUserId !== null,
+      hasMatchedBooking: Boolean(r.verified),
     }));
   } catch (error) {
     if (isMissingTable(error)) return [];

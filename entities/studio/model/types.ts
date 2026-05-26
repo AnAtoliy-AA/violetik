@@ -27,7 +27,18 @@ export interface VideoAsset {
 export interface GalleryItem {
   id: string;
   tag: GalleryTag;
+  /**
+   * Two-color palette used by the gradient placeholder + view-transition.
+   */
   palette: readonly [string, string];
+  /**
+   * §9.3 — extended palette swatches rendered as 4 tiny dots beside the
+   * card. The brief asks for sharp-extracted dominant colors at build
+   * time; until that pipeline lands we use a hand-tuned 4-stop palette
+   * that subsumes `palette`. Optional — when absent, the gallery
+   * falls back to the 2-color `palette` for dot rendering.
+   */
+  paletteDots?: ReadonlyArray<string>;
   h: number;
   /** Optional real photograph; falls back to the palette gradient when absent. */
   image?: ImageAsset;
