@@ -19,6 +19,13 @@ const nextConfig: NextConfig = {
   // without support fall back to instant nav — progressive enhancement.
   experimental: {
     viewTransition: true,
+    // Phone photos routinely exceed the 1 MB default — anything above goes
+    // through validate() in shared/lib/photo-storage and surfaces the
+    // translated `too_large` error inline. Keep this in sync with
+    // MAX_PHOTO_BYTES.
+    serverActions: {
+      bodySizeLimit: "8mb",
+    },
   },
   // Allow next/image to optimize photographs served from Vercel Blob.
   // The wildcard matches both `<store>.public.blob.vercel-storage.com` and

@@ -2,22 +2,14 @@
 // actions or RSCs. Vitest exercises it directly (with @vercel/blob mocked
 // in storage.test.ts) so we don't add the `server-only` import barrier.
 import { del, put } from "@vercel/blob";
+import {
+  ALLOWED_PHOTO_MIME_TYPES,
+  MAX_PHOTO_BYTES,
+  type PhotoUploadError,
+} from "./limits";
 
-export const ALLOWED_PHOTO_MIME_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/avif",
-] as const;
-
-export const MAX_PHOTO_BYTES = 8 * 1024 * 1024; // 8 MB
-
-export type PhotoUploadError =
-  | "not_configured"
-  | "empty_file"
-  | "unsupported_type"
-  | "too_large"
-  | "upload_failed";
+export type { PhotoUploadError } from "./limits";
+export { ALLOWED_PHOTO_MIME_TYPES, MAX_PHOTO_BYTES } from "./limits";
 
 export interface UploadPhotoInput {
   /** Logical bucket — used to build the blob key. */
