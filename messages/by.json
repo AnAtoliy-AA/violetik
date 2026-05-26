@@ -268,7 +268,11 @@
   "PwaInstall": {
     "aria_label": "Усталяваць праграму",
     "ios_instructions": "На iPhone ці iPad націсніце кнопку «Падзяліцца» ў Safari і абярыце «На экран «Дадому»», каб усталяваць атэлье як праграму.",
-    "ios_close": "Закрыць"
+    "ios_close": "Закрыць",
+    "sheet_title": "Дадайце Віалету на галоўны экран",
+    "sheet_body": "Хутчэй, чым закладка.",
+    "sheet_cta_install": "Дадаць",
+    "sheet_cta_dismiss": "Не зараз"
   },
   "Gallery": {
     "meta_title": "Партфоліа",
@@ -803,6 +807,7 @@
     "vapid_missing": "Ключы апавяшчэнняў не наладжаныя. Папрасіце адміна задаць пераменныя VAPID_*.",
     "offline_title": "Няма злучэння",
     "offline_body": "Падключыцеся да сеткі, каб працягваць.",
+    "offline_brand_line": "Не ў сетцы · але мы будзем тут, калі вернецеся",
     "profile_tile_title": "Апавяшчэнні",
     "profile_tile_description": "Абярыце, якія абнаўленні вы хочаце атрымліваць.",
     "category_booking_created_label": "Новы запіс (адмін)",

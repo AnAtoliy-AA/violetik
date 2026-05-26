@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/shared/lib/cn";
+import { Sheet } from "@/shared/ui/sheet";
+import { buttonClassName } from "@/shared/ui/button";
 
 // Chrome/Edge/Android fire `beforeinstallprompt` when the site is
 // installable; we capture the event and trigger `prompt()` from a user
@@ -15,6 +17,10 @@ interface BeforeInstallPromptEvent extends Event {
     platform: string;
   }>;
 }
+
+// §12.3 — one-shot session gate so the proactive install sheet doesn't
+// pop every time the user navigates after dismissing it.
+const SHEET_SESSION_KEY = "violetta.pwa-install-sheet-seen";
 
 function detectIos(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -65,6 +71,7 @@ export function PwaInstallButton() {
   const [isIos, setIsIos] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showIosHelp, setShowIosHelp] = useState(false);
+  const [showSheet, setShowSheet] = useState(false);
 
   // Browser-only detection (window.matchMedia, navigator.userAgent) has
   // to run after mount or SSR/CSR diverge. Same hydration-safe pattern
@@ -81,11 +88,21 @@ export function PwaInstallButton() {
       event.preventDefault();
       promptEventRef.current = event as BeforeInstallPromptEvent;
       setCanInstall(true);
+      // §12.3 — surface the install sheet proactively the first time
+      // the browser tells us we're installable, once per session.
+      try {
+        if (sessionStorage.getItem(SHEET_SESSION_KEY) !== "1") {
+          setShowSheet(true);
+        }
+      } catch {
+        /* private mode — silently skip */
+      }
     };
     const onInstalled = () => {
       promptEventRef.current = null;
       setCanInstall(false);
       setIsInstalled(true);
+      setShowSheet(false);
     };
 
     window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
@@ -96,18 +113,42 @@ export function PwaInstallButton() {
     };
   }, []);
 
-  const onClick = useCallback(async () => {
+  const markSheetSeen = useCallback(() => {
+    try {
+      sessionStorage.setItem(SHEET_SESSION_KEY, "1");
+    } catch {
+      /* noop */
+    }
+  }, []);
+
+  const firePrompt = useCallback(async () => {
     const event = promptEventRef.current;
-    if (event) {
-      await event.prompt();
-      const choice = await event.userChoice;
-      promptEventRef.current = null;
-      setCanInstall(false);
-      if (choice.outcome === "accepted") setIsInstalled(true);
+    if (!event) return;
+    await event.prompt();
+    const choice = await event.userChoice;
+    promptEventRef.current = null;
+    setCanInstall(false);
+    if (choice.outcome === "accepted") setIsInstalled(true);
+  }, []);
+
+  const onClick = useCallback(async () => {
+    if (promptEventRef.current) {
+      await firePrompt();
       return;
     }
     if (isIos) setShowIosHelp(true);
-  }, [isIos]);
+  }, [firePrompt, isIos]);
+
+  const onSheetInstall = useCallback(async () => {
+    markSheetSeen();
+    setShowSheet(false);
+    await firePrompt();
+  }, [firePrompt, markSheetSeen]);
+
+  const onSheetDismiss = useCallback(() => {
+    markSheetSeen();
+    setShowSheet(false);
+  }, [markSheetSeen]);
 
   if (isInstalled) return null;
   if (!canInstall && !isIos) return null;
@@ -150,6 +191,38 @@ export function PwaInstallButton() {
           </div>
         </div>
       ) : null}
+      <Sheet
+        open={showSheet}
+        onOpenChange={(next) => (next ? setShowSheet(true) : onSheetDismiss())}
+        snapPoints={[0.34]}
+        title={t("sheet_title")}
+        description={t("sheet_body")}
+      >
+        <div className="mt-4 flex flex-col gap-3 pb-3">
+          <button
+            type="button"
+            onClick={onSheetInstall}
+            className={buttonClassName({
+              variant: "gold",
+              size: "lg",
+              block: true,
+            })}
+          >
+            {t("sheet_cta_install")}
+          </button>
+          <button
+            type="button"
+            onClick={onSheetDismiss}
+            className={buttonClassName({
+              variant: "ghost",
+              size: "lg",
+              block: true,
+            })}
+          >
+            {t("sheet_cta_dismiss")}
+          </button>
+        </div>
+      </Sheet>
     </>
   );
 }

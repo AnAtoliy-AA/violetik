@@ -268,7 +268,11 @@
   "PwaInstall": {
     "aria_label": "Install app",
     "ios_instructions": "On iPhone or iPad, tap the Share button in Safari and choose 'Add to Home Screen' to install the atelier as an app.",
-    "ios_close": "Close"
+    "ios_close": "Close",
+    "sheet_title": "Add Violetta to your home",
+    "sheet_body": "Quicker than a bookmark.",
+    "sheet_cta_install": "Add",
+    "sheet_cta_dismiss": "Not yet"
   },
   "Gallery": {
     "meta_title": "Portfolio",
@@ -803,6 +807,7 @@
     "vapid_missing": "Notification keys are not configured. Ask the admin to set the VAPID_* environment variables.",
     "offline_title": "You're offline",
     "offline_body": "Reconnect to keep browsing the atelier.",
+    "offline_brand_line": "Offline · but we'll be here when you're back",
     "profile_tile_title": "Notifications",
     "profile_tile_description": "Choose which updates you'd like to receive.",
     "category_booking_created_label": "New booking submitted (admin)",
