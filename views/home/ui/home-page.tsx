@@ -4,6 +4,7 @@ import { AtelierHours } from "@/widgets/atelier-hours";
 import { TabBar } from "@/widgets/tab-bar";
 import type { Locale } from "@/i18n/routing";
 import { Aurora } from "@/shared/ui/aurora";
+import { DeferUntilVisible } from "@/shared/ui/defer-until-visible";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { TonightStrip } from "@/widgets/tonight-strip";
 import { AnnouncementCapsule } from "./sections/announcement-capsule";
@@ -47,11 +48,26 @@ export function HomePage({ locale, showAdmin = false }: HomePageProps) {
       </Suspense>
       <TrustStrip />
       <GalleryStrip />
-      <AtelierMotion />
+      {/* §14.4 — AtelierMotion ships three <video> elements; defer until
+        * the visitor scrolls within 400px so the LCP-critical hero never
+        * competes with motion media network requests. */}
+      <DeferUntilVisible
+        placeholder={
+          <div aria-hidden className="h-[280px] px-[22px] pb-7 pt-6" />
+        }
+      >
+        <AtelierMotion />
+      </DeferUntilVisible>
       <Suspense fallback={<TestimonialCardSkeleton />}>
         <TestimonialCardAsync />
       </Suspense>
-      <MembershipCard />
+      <DeferUntilVisible
+        placeholder={
+          <div aria-hidden className="h-[240px] px-[22px] pb-7 pt-6" />
+        }
+      >
+        <MembershipCard />
+      </DeferUntilVisible>
       <Suspense fallback={<HomeFooterSkeleton />}>
         <HomeFooterAsync locale={locale} />
       </Suspense>
