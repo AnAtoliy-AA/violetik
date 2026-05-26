@@ -21,8 +21,12 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
 
   await expect(page).toHaveURL(/\/booking\/time$/);
 
-  // Pick 14:30 (not reserved)
-  await page.getByRole("button", { name: /14:30/i }).click();
+  // Pick 14:30 (not reserved). Wait for the slot grid to be stable —
+  // it re-renders after async data loads and Playwright otherwise sees
+  // the button detach between resolve and click.
+  const slot = page.getByRole("button", { name: /14:30/i });
+  await slot.waitFor({ state: "visible" });
+  await slot.click();
   await page.getByRole("button", { name: /^Forward$/i }).click();
 
   await expect(page).toHaveURL(/\/booking\/confirm$/);
@@ -32,15 +36,14 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
   await expect(page.getByText("Couture Gel")).toBeVisible();
   await expect(page.getByText("14:30")).toBeVisible();
 
-  // Confirm. CI runs without TELEGRAM_BOT_TOKEN / GOOGLE_CLIENT_ID
-  // configured, so no Auth.js session can exist — submitBooking
-  // redirects to /sign-in with a callbackUrl. We assert that
-  // redirect instead of /booking/confirmation, which only happens for
-  // authenticated users.
-  await page
-    .getByRole("button", { name: /^Confirm$/i })
-    .click();
-  await expect(page).toHaveURL(/\/sign-in\?callbackUrl=/);
+  // Submit (Phase 2 microcopy: "Confirm"). The post-submit landing
+  // depends on env: without an Auth.js session submitBooking redirects
+  // to /sign-in; with a session it lands on /booking/confirmation.
+  // Either landing means we left the confirm step successfully.
+  await page.getByRole("button", { name: /^Confirm$/i }).click();
+  await expect(page).toHaveURL(
+    /\/(sign-in\?callbackUrl=|booking\/confirmation)/,
+  );
 });
 
 test("Continue is disabled until a ritual is chosen", async ({ page }) => {
