@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import type { FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { PALETTES } from "@/shared/config/palettes";
+import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { cn } from "@/shared/lib/cn";
 import { routing } from "@/i18n/routing";
 import type {
@@ -117,7 +118,10 @@ export function SiteSettingsForm({
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                onClick={() => setDefaultPalette(p.id)}
+                onClick={() => {
+                  setDefaultPalette(p.id);
+                  emitAnalytics("palette_switched", { palette: p.id });
+                }}
                 className={cn(
                   "group flex items-center gap-3 rounded-full border-[0.5px] px-3 py-2",
                   "transition-colors duration-fast ease-out",

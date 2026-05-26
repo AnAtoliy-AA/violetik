@@ -434,6 +434,14 @@
     "inbox_studio_caption": "Адрес, карта, часовой пояс",
     "inbox_users": "Пользователи",
     "inbox_users_caption": "Список, роли, VIP, объединение",
+    "analytics": {
+      "title": "Сигналы",
+      "window_eyebrow": "За 7 дней",
+      "total": "{count} событий",
+      "empty": "В этом окне пока нет трафика.",
+      "funnel_eyebrow": "—— Воронка бронирования",
+      "funnel_row": "{entered} → {completed} · {drop}% отвал"
+    },
     "photos": {
       "plate_title": "Фотографии",
       "eyebrow": "Изображения студии",

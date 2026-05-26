@@ -15,6 +15,7 @@ import { buttonClassName } from "@/shared/ui/button";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { Wordmark } from "@/shared/ui/wordmark";
 import type { NailTilePalette, NailTileVariant } from "@/shared/ui/nail-tile";
+import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { OnboardingSlide } from "./onboarding-slide";
 
 interface SlideMeta {
@@ -169,6 +170,7 @@ export function OnboardingPage() {
           <MagneticButton>
             <Link
               href="/home"
+              onClick={() => emitAnalytics("onboarding_completed")}
               className={buttonClassName({ variant: "gold", size: "md" })}
             >
               {t("cta_begin")}
@@ -189,6 +191,7 @@ export function OnboardingPage() {
       <div className="mt-6 flex items-center justify-center pb-8">
         <Link
           href="/home"
+          onClick={() => emitAnalytics("onboarding_skipped")}
           className="font-mono text-[11px] uppercase tracking-[0.32em] text-text-3 hover:text-text-2 transition-colors px-3 py-2"
         >
           {t("skip")}

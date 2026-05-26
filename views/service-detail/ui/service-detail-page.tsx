@@ -6,6 +6,7 @@ import type { Service } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { STUDIO_DATA } from "@/entities/studio";
 import type { ApprovedTestimonial } from "@/entities/testimonial";
+import { MountEvent } from "@/shared/lib/analytics/mount-event";
 import type { NailTileVariant } from "@/shared/ui/nail-tile";
 import { AppHeader } from "@/widgets/app-header";
 import { AftercareSection } from "./sections/aftercare-section";
@@ -54,6 +55,10 @@ export function ServiceDetailPage({
 
   return (
     <div className="pb-24">
+      <MountEvent
+        event="service_detail_opened"
+        payload={{ serviceId: service.id }}
+      />
       <div className="relative">
         <DetailHero
           service={service}

@@ -434,6 +434,14 @@
     "inbox_studio_caption": "Адрас, карта, часавы пояс",
     "inbox_users": "Карыстальнікі",
     "inbox_users_caption": "Спіс, ролі, VIP, аб'яднанне",
+    "analytics": {
+      "title": "Сігналы",
+      "window_eyebrow": "За 7 дзён",
+      "total": "{count} падзей",
+      "empty": "У гэтым акне пакуль няма трафіку.",
+      "funnel_eyebrow": "—— Варонка браніравання",
+      "funnel_row": "{entered} → {completed} · {drop}% адсеў"
+    },
     "photos": {
       "plate_title": "Фатаграфіі",
       "eyebrow": "Выявы атэлье",

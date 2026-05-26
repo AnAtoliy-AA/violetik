@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -12,6 +13,7 @@ import { FlameMonogram } from "@/shared/ui/flame-monogram";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { Stamp } from "@/shared/ui/stamp";
+import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { LetterReveal } from "./letter-reveal";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -40,6 +42,12 @@ export function WelcomePage({
 }: WelcomePageProps = {}) {
   const t = useTranslations("Welcome");
   const reduceMotion = useReducedMotion();
+
+  // §16 — Phase 2 analytics. Fires once per mount; the emit helper is
+  // SSR-safe and a no-op until window is available.
+  useEffect(() => {
+    emitAnalytics("welcome_landed");
+  }, []);
 
   const fade = (delay: number) => ({
     initial: reduceMotion ? false : { opacity: 0 },
@@ -182,6 +190,7 @@ export function WelcomePage({
           <MagneticButton className="block w-full">
             <Link
               href="/onboarding"
+              onClick={() => emitAnalytics("welcome_cta_step_inside")}
               className={buttonClassName({
                 variant: "gold",
                 size: "lg",
@@ -204,6 +213,7 @@ export function WelcomePage({
           {/* §3.2 — third CTA, ghost, jumps to tonight's openings */}
           <Link
             href={tonightHref}
+            onClick={() => emitAnalytics("welcome_cta_tonight")}
             className={buttonClassName({
               variant: "ghost",
               size: "md",

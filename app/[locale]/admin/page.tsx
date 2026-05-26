@@ -8,6 +8,7 @@ import { SignOutButton } from "@/features/telegram-login";
 import { listBookingsForAdmin } from "@/db/bookings";
 import { listPendingVipRequests } from "@/db/vip-requests";
 import { countPendingTestimonials } from "@/db/testimonials";
+import { AdminAnalyticsSummary } from "@/views/admin/ui/sections/analytics-summary";
 
 type Params = { locale: string };
 
@@ -183,6 +184,8 @@ export default async function AdminRoute({
           </li>
         </ul>
       </section>
+
+      <AdminAnalyticsSummary />
 
       {AUTH_REQUIRED ? (
         <section className="border-t-[0.5px] border-line px-[22px] pt-6">

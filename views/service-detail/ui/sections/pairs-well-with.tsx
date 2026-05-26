@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import type { Service } from "@/entities/service";
+import { TrackedLink } from "@/shared/lib/analytics/tracked-link";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
@@ -22,8 +22,10 @@ export function PairsWellWith({ pairs }: PairsWellWithProps) {
       <div className="mt-4 grid grid-cols-3 gap-2.5">
         {pairs.map((p, i) => (
           <SpotlightCard key={p.id} className="rounded-[14px]">
-            <Link
+            <TrackedLink
               href={`/services/${encodeURIComponent(p.id)}`}
+              event="service_detail_pairs_with_opened"
+              payload={{ serviceId: p.id }}
               className="block no-underline"
             >
               <div className="gilded h-[120px] overflow-hidden rounded-[14px]">
@@ -43,7 +45,7 @@ export function PairsWellWith({ pairs }: PairsWellWithProps) {
                   {p.name}
                 </div>
               </div>
-            </Link>
+            </TrackedLink>
           </SpotlightCard>
         ))}
       </div>

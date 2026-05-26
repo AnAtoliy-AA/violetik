@@ -434,6 +434,14 @@
     "inbox_studio_caption": "Address, map, timezone",
     "inbox_users": "Users",
     "inbox_users_caption": "List, role, VIP, merge",
+    "analytics": {
+      "title": "Signals",
+      "window_eyebrow": "Last 7 days",
+      "total": "{count} events",
+      "empty": "No traffic yet in this window.",
+      "funnel_eyebrow": "—— Booking funnel",
+      "funnel_row": "{entered} → {completed} · {drop}% drop"
+    },
     "photos": {
       "plate_title": "Photography",
       "eyebrow": "Studio imagery",

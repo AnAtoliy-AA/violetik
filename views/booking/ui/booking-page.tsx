@@ -9,6 +9,7 @@ import type { CurrencyCode } from "@/db/schema";
 import type { Master } from "@/entities/master";
 import type { Service } from "@/entities/service";
 import type { ResolvedPrice } from "@/entities/site-settings";
+import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { buttonClassName } from "@/shared/ui/button";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { AppHeader } from "@/widgets/app-header";
@@ -87,6 +88,13 @@ export function BookingPage({
     if (selected && !serviceId) setService(selected);
   }, [searchParams, serviceId, setService]);
 
+  // §16 — booking funnel telemetry. One enter event per step mount;
+  // matches `BOOKING_STEPS` from the brief's funnel (`step` is the
+  // /booking/<step> segment).
+  useEffect(() => {
+    emitAnalytics("booking_step_entered", { step });
+  }, [step]);
+
   const stepIndex = indexOfStep(step);
   const back = prevStep(step);
   const next = nextStep(step);
@@ -115,11 +123,15 @@ export function BookingPage({
         // On success the server action redirects; we only reach here
         // when it returned an error.
         if (result && !result.ok) {
+          emitAnalytics("booking_submit_error", { error: result.error });
           setSubmitError(result.error);
+          return;
         }
+        emitAnalytics("booking_submit_success");
       });
       return;
     }
+    emitAnalytics("booking_step_completed", { step });
     if (next) router.push(`/booking/${next}`);
   };
 
