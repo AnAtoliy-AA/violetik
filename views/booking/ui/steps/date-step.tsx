@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
@@ -72,7 +72,7 @@ export function DateStep({ timeZone }: DateStepProps) {
               )}
             >
               {isSelected ? (
-                <motion.span
+                <m.span
                   layoutId="date-pill"
                   className="absolute inset-0 rounded-[12px] bg-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]"
                   transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}

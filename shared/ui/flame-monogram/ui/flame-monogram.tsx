@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, type CSSProperties } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { cn } from "@/shared/lib/cn";
 
 export interface FlameMonogramProps {
@@ -239,7 +239,7 @@ export function FlameMonogram({
        * letter's sides rather than collapsing it to an invisible plane.
        * The front face uses the gold-shimmer gradient; the recessed layers
        * fade to dark bronze, simulating shading down the extrusion. */}
-      <motion.div
+      <m.div
         className="absolute inset-0 flex items-center justify-center"
         style={{
           transformPerspective: 900,
@@ -285,7 +285,7 @@ export function FlameMonogram({
             );
           })}
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

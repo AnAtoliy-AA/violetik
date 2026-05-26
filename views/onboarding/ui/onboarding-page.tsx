@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  motion,
+  m,
   useMotionValue,
   useReducedMotion,
   useTransform,
@@ -100,7 +100,7 @@ export function OnboardingPage() {
         aria-label={t("aria_carousel")}
         className="gilded glass-top relative h-[480px] overflow-hidden rounded-[28px]"
       >
-        <motion.div
+        <m.div
           className="flex h-full cursor-grab active:cursor-grabbing"
           drag={reduceMotion ? false : "x"}
           dragConstraints={{ left: 0, right: 0 }}
@@ -125,7 +125,7 @@ export function OnboardingPage() {
               attribution={t("voice_attribution")}
             />
           ))}
-        </motion.div>
+        </m.div>
       </div>
 
       <div className="mt-6 flex items-center justify-between">
@@ -151,7 +151,7 @@ export function OnboardingPage() {
                 )}
               >
                 {isActive ? (
-                  <motion.span
+                  <m.span
                     layoutId="onboard-dot"
                     aria-hidden
                     className="absolute inset-0 rounded-full bg-gold"

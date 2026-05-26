@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -219,7 +219,7 @@ export function BookingPage({
 
       <div className="flex-1 px-[22px] pb-32 pt-5">
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={step}
             initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -245,7 +245,7 @@ export function BookingPage({
                 location={location}
               />
             ) : null}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
 

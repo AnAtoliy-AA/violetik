@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { STUDIO_DATA } from "@/entities/studio";
@@ -75,7 +75,7 @@ export function GalleryStrip() {
       </div>
       <LetterpressRule className="mx-[22px] mb-4" />
       <div ref={viewportRef} className="overflow-hidden">
-        <motion.div
+        <m.div
           ref={trackRef}
           drag={reduceMotion || maxDrag === 0 ? false : "x"}
           dragConstraints={{ left: -maxDrag, right: 0 }}
@@ -84,7 +84,7 @@ export function GalleryStrip() {
           className="flex gap-3 px-[22px] pb-2 cursor-grab active:cursor-grabbing select-none"
         >
           {items.map((g, i) => (
-            <motion.div
+            <m.div
               key={g.id}
               whileHover={reduceMotion ? undefined : CARD_LIFT}
               transition={CARD_TRANSITION}
@@ -108,9 +108,9 @@ export function GalleryStrip() {
                   {g.tag}
                 </span>
               </Link>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

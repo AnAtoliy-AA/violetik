@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, useReducedMotion, type PanInfo } from "motion/react";
+import { m, useReducedMotion, type PanInfo } from "motion/react";
 import type { GalleryItem } from "@/entities/studio";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
@@ -127,7 +127,7 @@ export function GalleryLightbox({
   if (typeof document === "undefined") return null;
 
   return createPortal(
-    <motion.div
+    <m.div
       role="dialog"
       aria-modal
       aria-label={labels.title}
@@ -142,7 +142,7 @@ export function GalleryLightbox({
         className="relative w-full max-w-[420px]"
         onClick={(e) => e.stopPropagation()}
       >
-        <motion.div
+        <m.div
           layoutId={`gallery-image-${item.id}`}
           className="gilded overflow-hidden rounded-[28px]"
           style={{ aspectRatio: "3 / 4", touchAction: "pan-y" }}
@@ -159,7 +159,7 @@ export function GalleryLightbox({
             imageSizes="(max-width: 420px) 100vw, 420px"
             className="size-full"
           />
-        </motion.div>
+        </m.div>
         <div className="mt-4 text-text">
           <Eyebrow gold>{labels.eyebrow}</Eyebrow>
           <div className="my-2 mb-1.5 font-display text-[26px] font-normal italic">
@@ -247,7 +247,7 @@ export function GalleryLightbox({
           </div>
         </Sheet>
       ) : null}
-    </motion.div>,
+    </m.div>,
     document.body,
   );
 }

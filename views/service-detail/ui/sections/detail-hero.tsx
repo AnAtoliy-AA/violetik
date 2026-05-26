@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { m, useReducedMotion, useScroll, useTransform } from "motion/react";
 import type { CurrencyCode } from "@/db/schema";
 import type { Locale } from "@/i18n/routing";
 import type { ResolvedPrice } from "@/entities/site-settings";
@@ -49,7 +49,7 @@ export function DetailHero({
 
   return (
     <div className="relative h-[440px] overflow-hidden">
-      <motion.div
+      <m.div
         className="absolute inset-0"
         style={heroStyle}
         aria-hidden
@@ -62,7 +62,7 @@ export function DetailHero({
           imagePriority
           className="size-full"
         />
-      </motion.div>
+      </m.div>
 
       <PaperGrain className="opacity-[0.05]" />
 

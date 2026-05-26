@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType, SVGProps } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import {
   Home as HomeIcon,
@@ -86,7 +86,7 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
               >
                 {isActive ? (
                   <>
-                    <motion.span
+                    <m.span
                       layoutId="tab-thumb"
                       aria-hidden
                       className="absolute inset-0 -z-10 rounded-full bg-surface-2"
@@ -96,7 +96,7 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
                           : { type: "spring", stiffness: 380, damping: 32 }
                       }
                     />
-                    <motion.span
+                    <m.span
                       aria-hidden
                       className="gilded pointer-events-none absolute inset-0 rounded-full"
                       initial={reduceMotion ? false : { opacity: 0 }}

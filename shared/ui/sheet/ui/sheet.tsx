@@ -12,7 +12,7 @@ import { createPortal } from "react-dom";
 import {
   AnimatePresence,
   type PanInfo,
-  motion,
+  m,
   useReducedMotion,
 } from "motion/react";
 import { cn } from "@/shared/lib/cn";
@@ -164,7 +164,7 @@ export function Sheet({
           aria-hidden={false}
           className="fixed inset-0 z-[110] flex items-end justify-center"
         >
-          <motion.div
+          <m.div
             key="scrim"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -173,7 +173,7 @@ export function Sheet({
             onClick={() => onOpenChange(false)}
             className="absolute inset-0 bg-[color:var(--color-scrim)] backdrop-blur-md"
           />
-          <motion.div
+          <m.div
             key="sheet"
             ref={sheetRef}
             tabIndex={-1}
@@ -232,7 +232,7 @@ export function Sheet({
             >
               {children}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       )}
     </AnimatePresence>,

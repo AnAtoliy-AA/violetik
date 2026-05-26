@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import type { GalleryItem } from "@/entities/studio";
 import { cn } from "@/shared/lib/cn";
 import { useInView } from "@/shared/lib/use-in-view";
@@ -31,7 +31,7 @@ export function GalleryCard({
   });
   const shouldRenderImage = eager || inView;
   return (
-    <motion.button
+    <m.button
       ref={observerRef}
       type="button"
       onClick={() => onOpen(item.id)}
@@ -56,7 +56,7 @@ export function GalleryCard({
       style={{ height: item.h }}
       aria-label={item.tag}
     >
-      <motion.div
+      <m.div
         layoutId={`gallery-image-${item.id}`}
         className="size-full"
         transition={{ duration: reduceMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -72,13 +72,13 @@ export function GalleryCard({
         ) : (
           <Skeleton variant="rect" className="size-full rounded-none" />
         )}
-      </motion.div>
+      </m.div>
       <span className="absolute left-2.5 top-2.5 rounded-full bg-[rgba(20,9,26,0.45)] px-2 py-[3px] font-display text-[12px] italic text-text backdrop-blur-md">
         Nº {String(index + 1).padStart(2, "0")}
       </span>
       <span className="absolute bottom-2.5 left-2.5 rounded-full bg-[rgba(20,9,26,0.55)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-text backdrop-blur-md">
         {item.tag}
       </span>
-    </motion.button>
+    </m.button>
   );
 }

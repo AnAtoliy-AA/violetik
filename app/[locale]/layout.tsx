@@ -11,6 +11,7 @@ import { LocalBusinessJsonLd } from "@/shared/ui/local-business-jsonld";
 import { ServiceWorkerRegistrar } from "@/shared/lib/pwa/service-worker-registrar";
 import { SiteFooter } from "@/widgets/site-footer";
 import { ToastProvider } from "@/shared/ui/toast";
+import { LazyMotionRoot } from "@/shared/lib/motion/lazy-motion-root";
 import "../globals.css";
 
 const SITE_URL =
@@ -34,15 +35,20 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
+// DM Sans + JetBrains Mono ship through next/font's typed subset list
+// which only exposes latin / latin-ext for those families. Cyrillic
+// users still get correct glyphs via the system font fallback chain
+// (see --font-body / --font-mono in globals.css). Display copy lives
+// in Cormorant Garamond, which does carry Cyrillic.
 const dmSans = DM_Sans({
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
   variable: "--next-font-dm-sans",
   display: "swap",
 });
 
 const jetBrains = JetBrains_Mono({
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--next-font-jetbrains",
   display: "swap",
@@ -146,11 +152,13 @@ export default async function LocaleLayout({
           {tSite("skip_to_content")}
         </a>
         <NextIntlClientProvider>
-          <ToastProvider>
-            <ServiceWorkerRegistrar />
-            <main id="main-content">{children}</main>
-            <SiteFooter />
-          </ToastProvider>
+          <LazyMotionRoot>
+            <ToastProvider>
+              <ServiceWorkerRegistrar />
+              <main id="main-content">{children}</main>
+              <SiteFooter />
+            </ToastProvider>
+          </LazyMotionRoot>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -10,7 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { Toast } from "./toast";
 import type { ToastInput, ToastInstance } from "./toast-types";
 
@@ -104,7 +104,7 @@ export function ToastProvider({ children, limit = 3 }: ToastProviderProps) {
       >
         <AnimatePresence initial={false}>
           {toasts.map((toast) => (
-            <motion.div
+            <m.div
               key={toast.id}
               layout={!reduced}
               initial={reduced ? false : { opacity: 0, y: -12, scale: 0.96 }}
@@ -118,7 +118,7 @@ export function ToastProvider({ children, limit = 3 }: ToastProviderProps) {
               className="pointer-events-auto"
             >
               <Toast toast={toast} onDismiss={dismiss} />
-            </motion.div>
+            </m.div>
           ))}
         </AnimatePresence>
       </div>
