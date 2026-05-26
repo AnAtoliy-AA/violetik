@@ -8,7 +8,6 @@ import { LocaleSwitcher } from "@/features/locale-switcher";
 import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
-import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { FlameMonogram } from "@/shared/ui/flame-monogram";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
@@ -110,9 +109,6 @@ export function WelcomePage({
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
-          <m.div className="mb-6 flex justify-center" {...fade(0.3)}>
-            <MonogramSeal letter="V" className="size-12 text-[22px]" />
-          </m.div>
           <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)] text-brand-cycle">
             <LetterReveal text="Violetta" />
           </div>
