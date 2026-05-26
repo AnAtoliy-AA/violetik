@@ -23,6 +23,7 @@ const messages = {
   LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", by: "Belarusian" },
   Nav: {
     trigger_label: "Open menu",
+    close_label: "Close",
     aria_label: "Atelier navigation",
     title: "Atelier",
     description: "Navigate the studio.",

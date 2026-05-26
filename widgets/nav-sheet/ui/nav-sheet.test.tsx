@@ -21,6 +21,7 @@ import { NavSheet } from "./nav-sheet";
 const messages = {
   Nav: {
     trigger_label: "Open navigation",
+    close_label: "Close navigation",
     aria_label: "Atelier navigation",
     title: "Atelier",
     description: "Find a room, a ritual, or your own thread.",
