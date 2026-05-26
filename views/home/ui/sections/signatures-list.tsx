@@ -1,7 +1,8 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { ServiceCard } from "@/entities/service";
+import { ServiceMenuItem } from "@/entities/service";
 import { loadServicesForLocale } from "@/entities/service/api/load";
+import { resolvePrice, type ResolvedPrice } from "@/entities/site-settings";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import type { CurrencyCode } from "@/db/schema";
 import type { Locale } from "@/i18n/routing";
@@ -38,6 +39,10 @@ export async function SignaturesList() {
   const services = all.slice(0, 4);
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
+  const pricedServices: Record<string, ResolvedPrice> = {};
+  for (const s of services) {
+    pricedServices[s.id] = resolvePrice(`service:${s.id}`, s.price, settings);
+  }
   return (
     <section className="px-[22px] pb-6 pt-12">
       <div className="mb-3 flex items-end justify-between">
@@ -54,17 +59,21 @@ export async function SignaturesList() {
       </h2>
       <LetterpressRule className="mb-[22px] mt-3" />
 
+      {/* Same ServiceMenuItem used on /services so the menu reads as one
+        * coherent surface across home + catalog. */}
       <div className="flex flex-col">
         {services.map((service, i) => (
           <SpotlightCard key={service.id} className="rounded-none">
             <Link
               href={`/services/${service.id}`}
-              className="block px-1.5 transition-transform duration-fast ease-out hover:scale-[1.005] motion-reduce:hover:scale-100"
+              className="block transition-transform duration-fast ease-out"
             >
-              <ServiceCard
+              <ServiceMenuItem
                 service={service}
+                plateNumber={i + 1}
                 variant={(i % 6) as NailTileVariant}
                 topRule={i === 0}
+                resolvedPrice={pricedServices[service.id]}
                 currency={currency}
                 locale={locale}
               />
