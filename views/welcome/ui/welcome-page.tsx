@@ -75,21 +75,6 @@ export function WelcomePage({
         : null;
   const statusIsOpen = status.state === "open";
 
-  // §3.3 — Tonight CTA hands the visitor straight to the When step
-  // with the headline service pre-selected. Without `?selected=` they
-  // land on When with no serviceId in the store and bounce off Confirm
-  // (canAdvance requires service+date+time).
-  const tonightHref = (() => {
-    const params = new URLSearchParams({ prefilter: "tonight" });
-    if (nextOpening?.isToday && nextOpening?.time) {
-      params.set("time", nextOpening.time);
-    }
-    if (nextOpening?.serviceId) {
-      params.set("selected", nextOpening.serviceId);
-    }
-    return `/booking/when?${params.toString()}`;
-  })();
-
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
       <Aurora intensity="vivid" />
@@ -224,20 +209,6 @@ export function WelcomePage({
           >
             {t("cta_returning")}
           </Link>
-          {/* §3.2 — third CTA, ghost, jumps to tonight's openings */}
-          <Link
-            href={tonightHref}
-            onClick={() => emitAnalytics("welcome_cta_tonight")}
-            className={buttonClassName({
-              variant: "ghost",
-              size: "md",
-              block: true,
-              className: "text-text-3 hover:text-text",
-            })}
-          >
-            {t("cta_tonight")}
-          </Link>
-
           {/* §3.3 — tonight ribbon */}
           {nextOpening && (
             <m.div
