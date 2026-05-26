@@ -22,8 +22,12 @@ const OG_LOCALE: Record<string, string> = {
   by: "be_BY",
 };
 
+// §14 — Font subsetting. The app ships en/ru/by, so subsets cover Latin
+// + Cyrillic only. Greek/Vietnamese stay out of the bundle (~40kb saved
+// per font face) and Cyrillic users finally get italic display glyphs
+// instead of falling back to the system serif.
 const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   weight: ["300", "400", "500"],
   style: ["normal", "italic"],
   variable: "--next-font-cormorant",
@@ -31,14 +35,14 @@ const cormorant = Cormorant_Garamond({
 });
 
 const dmSans = DM_Sans({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   weight: ["300", "400", "500", "600"],
   variable: "--next-font-dm-sans",
   display: "swap",
 });
 
 const jetBrains = JetBrains_Mono({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   weight: ["400", "500"],
   variable: "--next-font-jetbrains",
   display: "swap",
@@ -139,7 +143,7 @@ export default async function LocaleLayout({
           name={tSite("name")}
         />
         <a href="#main-content" className="skip-to-content sr-only focus:not-sr-only">
-          Skip to content
+          {tSite("skip_to_content")}
         </a>
         <NextIntlClientProvider>
           <ToastProvider>

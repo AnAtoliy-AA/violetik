@@ -775,6 +775,19 @@ body {
   outline: 1px dashed rgba(232, 207, 153, 0.4);
 }
 
+/* §13 — Hand-tuned gilded focus ring on every interactive primitive. We
+ * scope to focus-visible so it never fires on mouse clicks, and we use
+ * a transparent outline + 2px box-shadow so it nests inside rounded
+ * corners without clipping. Components keep their own offset by setting
+ * outline-offset where the ring needs to sit outside the border. */
+:where(button, a, [role="button"], [role="tab"], input, select, textarea,
+       summary, details):focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-accent);
+  border-radius: inherit;
+}
+
 /* §13 — A11y skip-to-content link. Visible only on focus; reveals at the
  * top of every page when a keyboard user tabs onto it. */
 .skip-to-content {
