@@ -1,8 +1,16 @@
+// §6.1 — Phase 2 collapses date + time into a single "when" step, and
+// hides the "master" step when the studio has a single master.
+// `BOOKING_STEPS` keeps the legacy long form so existing /booking/date
+// and /booking/time URLs (deep-links, marketing emails, the Welcome
+// tonight ribbon) still resolve. `effectiveBookingSteps()` is what the
+// UI walks — it returns the three- or four-step list depending on
+// `mastersCount`.
 export const BOOKING_STEPS = [
   "service",
   "master",
   "date",
   "time",
+  "when",
   "confirm",
 ] as const;
 export type BookingStep = (typeof BOOKING_STEPS)[number];
@@ -11,20 +19,50 @@ export function isBookingStep(value: string): value is BookingStep {
   return (BOOKING_STEPS as readonly string[]).includes(value);
 }
 
-export function indexOfStep(step: BookingStep): number {
-  return BOOKING_STEPS.indexOf(step);
+/**
+ * Step list the stepper + advance/back logic walk. With a solo studio
+ * the master step is omitted; with multiple masters it is reintroduced
+ * automatically. /booking/date and /booking/time remain reachable for
+ * backwards compatibility but the in-app flow routes through /when.
+ */
+export function effectiveBookingSteps(
+  mastersCount: number,
+): ReadonlyArray<BookingStep> {
+  const base: BookingStep[] = ["service"];
+  if (mastersCount > 1) base.push("master");
+  base.push("when", "confirm");
+  return base;
 }
 
-export function nextStep(step: BookingStep): BookingStep | null {
-  const i = indexOfStep(step);
-  if (i === -1 || i === BOOKING_STEPS.length - 1) return null;
-  return BOOKING_STEPS[i + 1];
+export function indexOfStep(
+  step: BookingStep,
+  steps: ReadonlyArray<BookingStep> = BOOKING_STEPS,
+): number {
+  // Treat legacy /date or /time as the collapsed /when step so an
+  // emailed link still lights up the stepper correctly.
+  if (step === "date" || step === "time") {
+    const whenIdx = steps.indexOf("when");
+    if (whenIdx !== -1) return whenIdx;
+  }
+  return steps.indexOf(step);
 }
 
-export function prevStep(step: BookingStep): BookingStep | null {
-  const i = indexOfStep(step);
+export function nextStep(
+  step: BookingStep,
+  steps: ReadonlyArray<BookingStep> = BOOKING_STEPS,
+): BookingStep | null {
+  const i = indexOfStep(step, steps);
+  if (i === -1 || i === steps.length - 1) return null;
+  return steps[i + 1];
+}
+
+export function prevStep(
+  step: BookingStep,
+  steps: ReadonlyArray<BookingStep> = BOOKING_STEPS,
+): BookingStep | null {
+  const i = indexOfStep(step, steps);
   if (i <= 0) return null;
-  return BOOKING_STEPS[i - 1];
+  return steps[i - 1];
 }
 
 export const RESERVED_TIMES = ["11:30", "16:00"] as const;

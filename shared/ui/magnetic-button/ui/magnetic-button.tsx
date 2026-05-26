@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import {
-  motion,
+  m,
   useMotionValue,
   useReducedMotion,
   useSpring,
@@ -85,13 +85,13 @@ export function MagneticButton({
   }
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       data-magnetic="true"
       className={cn("inline-flex", className)}
       style={{ x: sx, y: sy, willChange: "transform" }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

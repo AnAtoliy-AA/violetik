@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useMemo } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Service } from "@/entities/service";
@@ -37,7 +37,7 @@ function HeadlineTypeOn({
           {line.split(/\s+/).filter(Boolean).map((word) => {
             const i = wordIndex++;
             return (
-              <motion.span
+              <m.span
                 key={`${lineIdx}-${i}`}
                 className="inline-block whitespace-pre"
                 initial={reduceMotion ? false : { opacity: 0, y: 8 }}
@@ -49,7 +49,7 @@ function HeadlineTypeOn({
                 }}
               >
                 {word}{" "}
-              </motion.span>
+              </m.span>
             );
           })}
           {lineIdx < lines.length - 1 ? <br /> : null}
@@ -126,7 +126,7 @@ export function ConfirmationPage(props: ConfirmationPageProps) {
       <Aurora intensity="subtle" />
       <PaperGrain />
       {/* Curtain — the seal scales into a black overlay that clears in 1.6s. */}
-      <motion.div
+      <m.div
         aria-hidden
         className="pointer-events-none absolute inset-0 z-20 bg-bg"
         initial={reduceMotion ? false : { opacity: 1 }}
@@ -142,7 +142,7 @@ export function ConfirmationPage(props: ConfirmationPageProps) {
       <div className="relative z-10 pt-10 text-center">
         <GoldenSeal />
 
-        <motion.div
+        <m.div
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.7, ease: EASE_OUT, delay: 0.9 }}
@@ -162,9 +162,9 @@ export function ConfirmationPage(props: ConfirmationPageProps) {
           <p className="mx-auto mt-3.5 max-w-[320px] text-[14px] text-text-2">
             {t("subtitle")}
           </p>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.8, ease: EASE_OUT, delay: 1.5 }}
@@ -198,11 +198,35 @@ export function ConfirmationPage(props: ConfirmationPageProps) {
           <ConfirmationExtras
             calendar={
               props.bookingId
-                ? {
-                    apple: `webcal://violetta.example.com/api/booking/${props.bookingId}.ics`,
-                    google: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(service?.name ?? "Violetta")}`,
-                    ics: `/api/booking/${props.bookingId}.ics`,
-                  }
+                ? (() => {
+                    const icsPath = `/api/booking/${props.bookingId}/ics?locale=${locale}`;
+                    const origin =
+                      typeof window !== "undefined"
+                        ? window.location.origin
+                        : "";
+                    // Apple Calendar handoff uses webcal:// against the
+                    // current host so it works in dev (localhost:3000) and
+                    // prod alike — no hardcoded domain.
+                    const absoluteIcs = `${origin}${icsPath}`;
+                    // Google Calendar's "create event" URL takes start/end
+                    // as `dates=YYYYMMDDTHHMMSSZ/...`. Falls back to a
+                    // bare template when start/end aren't yet known.
+                    const params = new URLSearchParams({
+                      action: "TEMPLATE",
+                      text: service?.name ?? "Violetta",
+                      location: props.location ?? "",
+                      details: `Reservation ${code}`,
+                    });
+                    if (date && time) {
+                      const stamp = `${date.replace(/-/g, "")}T${time.replace(":", "")}00`;
+                      params.set("dates", `${stamp}/${stamp}`);
+                    }
+                    return {
+                      apple: absoluteIcs.replace(/^https?:\/\//, "webcal://"),
+                      google: `https://calendar.google.com/calendar/render?${params.toString()}`,
+                      ics: icsPath,
+                    };
+                  })()
                 : null
             }
             referralUrl={
@@ -211,9 +235,9 @@ export function ConfirmationPage(props: ConfirmationPageProps) {
                 : null
             }
           />
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: reduceMotion ? 0 : 0.8, ease: EASE_OUT, delay: 1.7 }}
@@ -237,7 +261,7 @@ export function ConfirmationPage(props: ConfirmationPageProps) {
           >
             {t("cta_return")}
           </Link>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

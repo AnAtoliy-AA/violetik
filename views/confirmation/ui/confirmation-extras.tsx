@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { useToast } from "@/shared/ui/toast";
 import { buttonClassName } from "@/shared/ui/button";
 
@@ -35,7 +36,8 @@ export function ConfirmationExtras({
   const { push } = useToast();
   const [remindMe, setRemindMe] = useState(true);
 
-  const handleCalendarTap = (label: string) => () => {
+  const handleCalendarTap = (kind: "apple" | "google" | "ics", label: string) => () => {
+    emitAnalytics("confirmation_add_to_calendar", { kind });
     push({
       intent: "success",
       eyebrow: t("cta_calendar"),
@@ -47,6 +49,7 @@ export function ConfirmationExtras({
     if (!referralUrl) return;
     try {
       await navigator.clipboard.writeText(referralUrl);
+      emitAnalytics("confirmation_share_link_copied");
       push({
         intent: "success",
         eyebrow: t("share_eyebrow"),
@@ -63,7 +66,7 @@ export function ConfirmationExtras({
         <a
           href={calendar?.apple ?? "#"}
           aria-disabled={!calendar}
-          onClick={handleCalendarTap(t("calendar_apple"))}
+          onClick={handleCalendarTap("apple", t("calendar_apple"))}
           className={buttonClassName({
             variant: "outline",
             size: "sm",
@@ -75,7 +78,7 @@ export function ConfirmationExtras({
           href={calendar?.google ?? "#"}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={handleCalendarTap(t("calendar_google"))}
+          onClick={handleCalendarTap("google", t("calendar_google"))}
           className={buttonClassName({
             variant: "outline",
             size: "sm",
@@ -86,7 +89,7 @@ export function ConfirmationExtras({
         <a
           href={calendar?.ics ?? "#"}
           download
-          onClick={handleCalendarTap(t("calendar_ics"))}
+          onClick={handleCalendarTap("ics", t("calendar_ics"))}
           className={buttonClassName({
             variant: "outline",
             size: "sm",

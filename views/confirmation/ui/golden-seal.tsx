@@ -1,13 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function GoldenSeal() {
   const reduceMotion = useReducedMotion();
   return (
-    <motion.div
+    <m.div
       aria-hidden
       className="relative mx-auto size-[130px]"
       initial={reduceMotion ? false : { scale: 0.5, rotate: -40, opacity: 0 }}
@@ -26,7 +26,7 @@ export function GoldenSeal() {
       <div
         className="absolute inset-3 rounded-full border-[0.5px] border-white/45 motion-safe:[animation:sealRotate_60s_linear_infinite_reverse]"
       />
-      <motion.svg
+      <m.svg
         viewBox="0 0 60 60"
         className="absolute inset-0 m-auto size-10"
         initial={reduceMotion ? false : { opacity: 0 }}
@@ -41,7 +41,7 @@ export function GoldenSeal() {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-      </motion.svg>
-    </motion.div>
+      </m.svg>
+    </m.div>
   );
 }

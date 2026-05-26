@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { useEffect } from "react";
+import { m, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/features/locale-switcher";
@@ -12,6 +13,7 @@ import { FlameMonogram } from "@/shared/ui/flame-monogram";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { Stamp } from "@/shared/ui/stamp";
+import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { LetterReveal } from "./letter-reveal";
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -41,6 +43,12 @@ export function WelcomePage({
   const t = useTranslations("Welcome");
   const reduceMotion = useReducedMotion();
 
+  // §16 — Phase 2 analytics. Fires once per mount; the emit helper is
+  // SSR-safe and a no-op until window is available.
+  useEffect(() => {
+    emitAnalytics("welcome_landed");
+  }, []);
+
   const fade = (delay: number) => ({
     initial: reduceMotion ? false : { opacity: 0 },
     animate: { opacity: 1 },
@@ -63,17 +71,17 @@ export function WelcomePage({
 
   const tonightHref =
     nextOpening?.isToday && nextOpening?.time
-      ? `/booking/time?prefilter=tonight&time=${encodeURIComponent(
+      ? `/booking/when?prefilter=tonight&time=${encodeURIComponent(
           nextOpening.time,
         )}`
-      : "/booking/time?prefilter=tonight";
+      : "/booking/when?prefilter=tonight";
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
       <Aurora intensity="vivid" />
       <PaperGrain />
 
-      <motion.div
+      <m.div
         className="absolute top-4 right-[22px] z-20 flex items-center gap-2"
         {...fade(0.4)}
       >
@@ -99,25 +107,25 @@ export function WelcomePage({
           </svg>
         </Link>
         <LocaleSwitcher variant="welcome" />
-      </motion.div>
+      </m.div>
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
-          <motion.div className="mb-6 flex justify-center" {...fade(0.3)}>
+          <m.div className="mb-6 flex justify-center" {...fade(0.3)}>
             <MonogramSeal letter="V" className="size-12 text-[22px]" />
-          </motion.div>
+          </m.div>
           <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)] text-brand-cycle">
             <LetterReveal text="Violetta" />
           </div>
 
-          <motion.div
+          <m.div
             className="mt-[14px] font-mono text-[11px] uppercase tracking-[0.48em] text-gold-shimmer"
             {...fade(0.9)}
           >
             B · E · A · U · T · Y
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             className="mx-auto mt-[34px] overflow-hidden"
             initial={reduceMotion ? false : { width: 0 }}
             animate={{ width: 180 }}
@@ -128,9 +136,9 @@ export function WelcomePage({
             }}
           >
             <Ornament />
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             className="mx-auto mt-[30px] h-[250px] w-[190px]"
             initial={reduceMotion ? false : { opacity: 0, y: 30 }}
             animate={{ opacity: 0.92, y: 0 }}
@@ -141,28 +149,28 @@ export function WelcomePage({
             }}
           >
             <FlameMonogram letter="V" className="size-full" />
-          </motion.div>
+          </m.div>
 
-          <motion.p
+          <m.p
             className="mx-auto mt-8 max-w-[320px] font-display text-[22px] font-light italic leading-[1.3] text-text-2"
             {...rise(2.2)}
           >
             {t("tagline")}
-          </motion.p>
+          </m.p>
 
           {/* §3.1 — three proof points, staggered after the tagline */}
           <div className="mt-6 flex flex-col items-center gap-3">
-            <motion.div {...fade(2.6)}>
+            <m.div {...fade(2.6)}>
               <Stamp size="sm">{t("proof_est")}</Stamp>
-            </motion.div>
-            <motion.div
+            </m.div>
+            <m.div
               className="font-mono text-[10px] uppercase tracking-[0.32em] text-text-3"
               {...fade(2.72)}
             >
               {t("proof_chair")}
-            </motion.div>
+            </m.div>
             {statusLabel && (
-              <motion.div
+              <m.div
                 className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.32em] text-text-2"
                 {...fade(2.84)}
               >
@@ -173,15 +181,16 @@ export function WelcomePage({
                   } motion-safe:animate-soft-pulse`}
                 />
                 <span>{statusLabel}</span>
-              </motion.div>
+              </m.div>
             )}
           </div>
         </div>
 
-        <motion.div className="flex flex-col gap-3 pb-9" {...rise(2.4)}>
+        <m.div className="flex flex-col gap-3 pb-9" {...rise(2.4)}>
           <MagneticButton className="block w-full">
             <Link
               href="/onboarding"
+              onClick={() => emitAnalytics("welcome_cta_step_inside")}
               className={buttonClassName({
                 variant: "gold",
                 size: "lg",
@@ -204,6 +213,7 @@ export function WelcomePage({
           {/* §3.2 — third CTA, ghost, jumps to tonight's openings */}
           <Link
             href={tonightHref}
+            onClick={() => emitAnalytics("welcome_cta_tonight")}
             className={buttonClassName({
               variant: "ghost",
               size: "md",
@@ -216,7 +226,7 @@ export function WelcomePage({
 
           {/* §3.3 — tonight ribbon */}
           {nextOpening && (
-            <motion.div
+            <m.div
               className="mt-3 mx-auto text-center font-mono text-[10px] uppercase tracking-[0.32em] text-text-3 max-w-[320px]"
               aria-label={t("ribbon_label")}
               {...fade(3.0)}
@@ -237,9 +247,9 @@ export function WelcomePage({
                   })}
                 </span>
               )}
-            </motion.div>
+            </m.div>
           )}
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

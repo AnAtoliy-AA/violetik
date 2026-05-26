@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import {
-  motion,
+  m,
   useInView,
   useReducedMotion,
   useScroll,
@@ -47,7 +47,7 @@ export function HomeHero() {
        * paragraph remain readable on wide viewports. The FlameMonogram below
        * anchors to this full-width relative container so its `-right-10` puts
        * it at the section's right edge (inset by the section's padding). */}
-      <motion.div
+      <m.div
         className="relative z-10 mt-9 max-w-[760px]"
         style={styledHero}
       >
@@ -86,15 +86,15 @@ export function HomeHero() {
             {t("cta_gallery")}
           </Link>
         </div>
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         aria-hidden
         className="pointer-events-none absolute -right-10 top-[60px] z-0 h-[250px] w-[190px]"
         style={styledFan}
       >
         <FlameMonogram />
-      </motion.div>
+      </m.div>
     </div>
   );
 }

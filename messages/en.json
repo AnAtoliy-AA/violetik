@@ -95,6 +95,7 @@
       "master": "Master",
       "date": "Date",
       "time": "Time",
+      "when": "When",
       "confirm": "Confirm"
     },
     "service": {
@@ -206,7 +207,11 @@
     "ask_first_template": "Hello — interested in {service}, what's the soonest opening?",
     "aftercare_eyebrow": "AFTERCARE",
     "aftercare_body": "What it costs in time after — keep your hands out of hot water for an hour and out of the sun for a day. We send the full sheet by message.",
-    "pairs_eyebrow": "PAIRS WELL WITH"
+    "pairs_eyebrow": "—— Pairs well with",
+    "master_eyebrow": "—— Your hands",
+    "master_cta": "Reserve with {initial}.",
+    "reviews_eyebrow": "—— From clients",
+    "reviews_verified": "VERIFIED"
   },
   "Services": {
     "meta_title": "The menu",
@@ -430,6 +435,14 @@
     "inbox_studio_caption": "Address, map, timezone",
     "inbox_users": "Users",
     "inbox_users_caption": "List, role, VIP, merge",
+    "analytics": {
+      "title": "Signals",
+      "window_eyebrow": "Last 7 days",
+      "total": "{count} events",
+      "empty": "No traffic yet in this window.",
+      "funnel_eyebrow": "—— Booking funnel",
+      "funnel_row": "{entered} → {completed} · {drop}% drop"
+    },
     "photos": {
       "plate_title": "Photography",
       "eyebrow": "Studio imagery",
@@ -512,7 +525,8 @@
     "og_title": "Violetta Beauty",
     "meta_title_with_city": "Violetta — nails & beauty in {city}",
     "meta_description_with_city": "Editorial nail design in {city}. Manicure, gel, design — quality work at fair prices.",
-    "meta_keywords_with_city": "{city} nails, {city} manicure, {city} beauty, {city} gel, cheap quality nails {city}"
+    "meta_keywords_with_city": "{city} nails, {city} manicure, {city} beauty, {city} gel, cheap quality nails {city}",
+    "skip_to_content": "Skip to content"
   },
   "SiteFooter": {
     "credit_prefix": "Created with Love by"

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { cn } from "@/shared/lib/cn";
 
 export interface LetterRevealProps {
@@ -32,7 +32,7 @@ export function LetterReveal({
         const driftDelay = entranceDelay + ENTRANCE_DURATION + i * 0.12;
 
         return (
-          <motion.span
+          <m.span
             key={`${char}-${i}`}
             aria-hidden
             className="inline-block"
@@ -44,7 +44,7 @@ export function LetterReveal({
               delay: reduceMotion ? 0 : entranceDelay,
             }}
           >
-            <motion.span
+            <m.span
               className="inline-block"
               animate={reduceMotion ? undefined : { y: [0, -4, 0, 4, 0] }}
               transition={
@@ -59,8 +59,8 @@ export function LetterReveal({
               }
             >
               {char === " " ? " " : char}
-            </motion.span>
-          </motion.span>
+            </m.span>
+          </m.span>
         );
       })}
     </span>

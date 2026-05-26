@@ -95,6 +95,7 @@
       "master": "Мастер",
       "date": "Дата",
       "time": "Время",
+      "when": "Когда",
       "confirm": "Подтверждение"
     },
     "service": {
@@ -206,7 +207,11 @@
     "ask_first_template": "Здравствуйте — интересует {service}, когда ближайшее окно?",
     "aftercare_eyebrow": "УХОД ПОСЛЕ",
     "aftercare_body": "Что потребуется после — час без горячей воды и день без прямого солнца. Полную памятку пришлём сообщением.",
-    "pairs_eyebrow": "ХОРОШО СОЧЕТАЕТСЯ"
+    "pairs_eyebrow": "—— Хорошо сочетается",
+    "master_eyebrow": "—— Ваши руки",
+    "master_cta": "Запись к {initial}.",
+    "reviews_eyebrow": "—— Из отзывов",
+    "reviews_verified": "ВЕРИФИЦИРОВАНО"
   },
   "Services": {
     "meta_title": "Меню",
@@ -430,6 +435,14 @@
     "inbox_studio_caption": "Адрес, карта, часовой пояс",
     "inbox_users": "Пользователи",
     "inbox_users_caption": "Список, роли, VIP, объединение",
+    "analytics": {
+      "title": "Сигналы",
+      "window_eyebrow": "За 7 дней",
+      "total": "{count} событий",
+      "empty": "В этом окне пока нет трафика.",
+      "funnel_eyebrow": "—— Воронка бронирования",
+      "funnel_row": "{entered} → {completed} · {drop}% отвал"
+    },
     "photos": {
       "plate_title": "Фотографии",
       "eyebrow": "Изображения студии",
@@ -512,7 +525,8 @@
     "og_title": "Violetta Beauty",
     "meta_title_with_city": "Violetta — маникюр и красота в {city}",
     "meta_description_with_city": "Студия дизайна ногтей в {city}. Маникюр, гель, дизайн — качественно и доступно.",
-    "meta_keywords_with_city": "маникюр {city}, ногти {city}, красота {city}, гель {city}, дешевый качественный маникюр {city}"
+    "meta_keywords_with_city": "маникюр {city}, ногти {city}, красота {city}, гель {city}, дешевый качественный маникюр {city}",
+    "skip_to_content": "К основному контенту"
   },
   "SiteFooter": {
     "credit_prefix": "Создано с любовью"

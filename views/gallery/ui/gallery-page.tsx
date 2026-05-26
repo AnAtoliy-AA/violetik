@@ -131,6 +131,7 @@ export function GalleryPage({
                 item={item}
                 index={index}
                 onOpen={setOpenId}
+                eager={index < 4}
               />
             ))}
           </div>

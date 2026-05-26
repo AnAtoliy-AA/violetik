@@ -1,7 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { loadServicesForLocale } from "@/entities/service/api/load";
+import { TrackedLink } from "@/shared/lib/analytics/tracked-link";
 import { getNextOpening } from "@/shared/lib/atelier/next-opening";
 import {
   WEEKLY_DEFAULT_HOURS,
@@ -40,8 +40,8 @@ export async function NextOpeningLine() {
   }
 
   const href = next.isToday
-    ? `/booking/time?prefilter=tonight&time=${encodeURIComponent(next.time)}`
-    : `/booking/time?time=${encodeURIComponent(next.time)}&date=${encodeURIComponent(next.date)}`;
+    ? `/booking/when?prefilter=tonight&time=${encodeURIComponent(next.time)}`
+    : `/booking/when?time=${encodeURIComponent(next.time)}&date=${encodeURIComponent(next.date)}`;
 
   const dayLabel = next.isToday
     ? null
@@ -55,8 +55,9 @@ export async function NextOpeningLine() {
         .toUpperCase();
 
   return (
-    <Link
+    <TrackedLink
       href={href}
+      event="home_next_opening_tapped"
       aria-label={t("next_opening_eyebrow")}
       className="group block px-[22px] pb-3 pt-1"
     >
@@ -83,6 +84,6 @@ export async function NextOpeningLine() {
           ─→
         </span>
       </span>
-    </Link>
+    </TrackedLink>
   );
 }

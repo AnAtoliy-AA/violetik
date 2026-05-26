@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { Marquee } from "@/shared/ui/marquee";
 
 export interface TonightStripData {
@@ -63,12 +64,12 @@ export function TonightStripClient({
           {
             time: data.time,
             service: data.service,
-            href: `/booking/time?prefilter=tonight&time=${encodeURIComponent(data.time)}`,
+            href: `/booking/when?prefilter=tonight&time=${encodeURIComponent(data.time)}`,
           },
           ...(data.laterSlots ?? []).map((s) => ({
             time: s.time,
             service: s.service,
-            href: `/booking/time?prefilter=tonight&time=${encodeURIComponent(s.time)}`,
+            href: `/booking/when?prefilter=tonight&time=${encodeURIComponent(s.time)}`,
           })),
         ]
       : data.next
@@ -76,7 +77,7 @@ export function TonightStripClient({
             {
               time: data.next.time,
               service: data.next.service,
-              href: `/booking/time?time=${encodeURIComponent(data.next.time)}`,
+              href: `/booking/when?time=${encodeURIComponent(data.next.time)}`,
             },
           ]
         : [];
@@ -102,6 +103,7 @@ export function TonightStripClient({
             <Link
               key={`slot-${i}`}
               href={s.href}
+              onClick={() => emitAnalytics("tonight_ribbon_tapped")}
               className="font-mono uppercase tracking-[0.2em] text-[10px] text-text-2 hover:text-text whitespace-nowrap"
             >
               {s.time} {s.service ?? ""}
@@ -112,6 +114,7 @@ export function TonightStripClient({
         <div className="px-4 py-2 text-center">
           <Link
             href={slots[0]?.href ?? "/booking"}
+            onClick={() => emitAnalytics("tonight_ribbon_tapped")}
             className="font-mono uppercase tracking-[0.2em] text-[10px] text-text-2 hover:text-text"
           >
             {t("fully_booked", {

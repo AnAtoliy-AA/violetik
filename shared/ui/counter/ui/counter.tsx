@@ -3,7 +3,7 @@
 import { type HTMLAttributes, useEffect } from "react";
 import {
   animate,
-  motion,
+  m,
   useMotionValue,
   useReducedMotion,
   useTransform,
@@ -53,7 +53,7 @@ function DigitColumn({
       <span aria-hidden className="invisible">
         0
       </span>
-      <motion.span
+      <m.span
         aria-hidden
         className="absolute left-0 top-0 flex flex-col"
         style={{ y, lineHeight: DIGIT_HEIGHT_EM }}
@@ -61,7 +61,7 @@ function DigitColumn({
         {Array.from({ length: 10 }).map((_, n) => (
           <span key={n}>{n}</span>
         ))}
-      </motion.span>
+      </m.span>
     </span>
   );
 }

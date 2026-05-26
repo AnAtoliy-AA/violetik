@@ -95,6 +95,7 @@
       "master": "Майстар",
       "date": "Дата",
       "time": "Час",
+      "when": "Калі",
       "confirm": "Пацвярджэнне"
     },
     "service": {
@@ -206,7 +207,11 @@
     "ask_first_template": "Прывітанне — цікавіць {service}, калі бліжэйшае акно?",
     "aftercare_eyebrow": "ДАГЛЯД ПАСЛЯ",
     "aftercare_body": "Што спатрэбіцца пасля — гадзіна без гарачай вады і дзень без прамога сонца. Поўную памятку прышлем паведамленнем.",
-    "pairs_eyebrow": "ДОБРА СПАЛУЧАЕЦЦА"
+    "pairs_eyebrow": "—— Добра спалучаецца",
+    "master_eyebrow": "—— Вашы рукі",
+    "master_cta": "Запіс да {initial}.",
+    "reviews_eyebrow": "—— З водгукаў",
+    "reviews_verified": "ВЕРЫФІКАВАНА"
   },
   "Services": {
     "meta_title": "Меню",
@@ -430,6 +435,14 @@
     "inbox_studio_caption": "Адрас, карта, часавы пояс",
     "inbox_users": "Карыстальнікі",
     "inbox_users_caption": "Спіс, ролі, VIP, аб'яднанне",
+    "analytics": {
+      "title": "Сігналы",
+      "window_eyebrow": "За 7 дзён",
+      "total": "{count} падзей",
+      "empty": "У гэтым акне пакуль няма трафіку.",
+      "funnel_eyebrow": "—— Варонка браніравання",
+      "funnel_row": "{entered} → {completed} · {drop}% адсеў"
+    },
     "photos": {
       "plate_title": "Фатаграфіі",
       "eyebrow": "Выявы атэлье",
@@ -512,7 +525,8 @@
     "og_title": "Violetta Beauty",
     "meta_title_with_city": "Violetta — манікюр і прыгажосць у {city}",
     "meta_description_with_city": "Студыя дызайну пазногцяў у {city}. Манікюр, гель, дызайн — якасна і даступна.",
-    "meta_keywords_with_city": "манікюр {city}, пазногці {city}, прыгажосць {city}, гель {city}, недарагі якасны манікюр {city}"
+    "meta_keywords_with_city": "манікюр {city}, пазногці {city}, прыгажосць {city}, гель {city}, недарагі якасны манікюр {city}",
+    "skip_to_content": "Да асноўнага зместу"
   },
   "SiteFooter": {
     "credit_prefix": "Створана з любоўю"

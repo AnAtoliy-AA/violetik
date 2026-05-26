@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
@@ -14,9 +14,16 @@ import { useBookingStore } from "@/views/booking/model/booking-store";
 
 export interface DateStepProps {
   timeZone: string;
+  /**
+   * §6.2 — when rendered inside the collapsed When step, skip the
+   * eyebrow / heading / paragraph chrome so the parent owns the h2.
+   * Two h2s on one page would fail screen-reader landmarks + Playwright
+   * strict-mode matchers.
+   */
+  headless?: boolean;
 }
 
-export function DateStep({ timeZone }: DateStepProps) {
+export function DateStep({ timeZone, headless = false }: DateStepProps) {
   const t = useTranslations("Booking.date");
   const locale = useLocale();
   const selected = useBookingStore((s) => s.date);
@@ -33,16 +40,20 @@ export function DateStep({ timeZone }: DateStepProps) {
 
   return (
     <div>
-      <Eyebrow gold>{t("eyebrow")}</Eyebrow>
-      <h2 className="my-2.5 mb-1.5 font-display text-h2 font-normal italic leading-tight tracking-[-0.02em]">
-        {t.rich("title", { em: (c) => <em>{c}</em> })}
-      </h2>
-      <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
-      <p className="m-0 mb-5 text-sm text-text-2">
-        {t.rich("paragraph", {
-          gold: (c) => <span className="text-gold">{c}</span>,
-        })}
-      </p>
+      {headless ? null : (
+        <>
+          <Eyebrow gold>{t("eyebrow")}</Eyebrow>
+          <h2 className="my-2.5 mb-1.5 font-display text-h2 font-normal italic leading-tight tracking-[-0.02em]">
+            {t.rich("title", { em: (c) => <em>{c}</em> })}
+          </h2>
+          <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
+          <p className="m-0 mb-5 text-sm text-text-2">
+            {t.rich("paragraph", {
+              gold: (c) => <span className="text-gold">{c}</span>,
+            })}
+          </p>
+        </>
+      )}
 
       <div className="mb-3.5 font-display text-[22px] italic capitalize">
         {monthLabel}
@@ -72,12 +83,24 @@ export function DateStep({ timeZone }: DateStepProps) {
               )}
             >
               {isSelected ? (
-                <motion.span
-                  layoutId="date-pill"
-                  className="absolute inset-0 rounded-[12px] bg-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]"
-                  transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ zIndex: -1 }}
-                />
+                <>
+                  <m.span
+                    layoutId="date-pill"
+                    className="absolute inset-0 rounded-[12px] bg-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]"
+                    transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ zIndex: -1 }}
+                  />
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 rounded-[12px] motion-safe:animate-[shimmer_2.6s_ease-in-out_infinite]"
+                    style={{
+                      background:
+                        "linear-gradient(120deg, transparent 35%, rgba(255,245,214,0.55) 50%, transparent 65%)",
+                      backgroundSize: "200% 100%",
+                      mixBlendMode: "screen",
+                    }}
+                  />
+                </>
               ) : null}
               <span className="relative font-mono text-[9px] uppercase tracking-[0.08em] opacity-70">
                 {d.dow}

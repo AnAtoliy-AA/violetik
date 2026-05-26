@@ -11,6 +11,7 @@ import { LocalBusinessJsonLd } from "@/shared/ui/local-business-jsonld";
 import { ServiceWorkerRegistrar } from "@/shared/lib/pwa/service-worker-registrar";
 import { SiteFooter } from "@/widgets/site-footer";
 import { ToastProvider } from "@/shared/ui/toast";
+import { LazyMotionRoot } from "@/shared/lib/motion/lazy-motion-root";
 import "../globals.css";
 
 const SITE_URL =
@@ -22,14 +23,23 @@ const OG_LOCALE: Record<string, string> = {
   by: "be_BY",
 };
 
+// §14 — Font subsetting. The app ships en/ru/by, so subsets cover Latin
+// + Cyrillic only. Greek/Vietnamese stay out of the bundle (~40kb saved
+// per font face) and Cyrillic users finally get italic display glyphs
+// instead of falling back to the system serif.
 const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   weight: ["300", "400", "500"],
   style: ["normal", "italic"],
   variable: "--next-font-cormorant",
   display: "swap",
 });
 
+// DM Sans + JetBrains Mono ship through next/font's typed subset list
+// which only exposes latin / latin-ext for those families. Cyrillic
+// users still get correct glyphs via the system font fallback chain
+// (see --font-body / --font-mono in globals.css). Display copy lives
+// in Cormorant Garamond, which does carry Cyrillic.
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
@@ -139,14 +149,16 @@ export default async function LocaleLayout({
           name={tSite("name")}
         />
         <a href="#main-content" className="skip-to-content sr-only focus:not-sr-only">
-          Skip to content
+          {tSite("skip_to_content")}
         </a>
         <NextIntlClientProvider>
-          <ToastProvider>
-            <ServiceWorkerRegistrar />
-            <main id="main-content">{children}</main>
-            <SiteFooter />
-          </ToastProvider>
+          <LazyMotionRoot>
+            <ToastProvider>
+              <ServiceWorkerRegistrar />
+              <main id="main-content">{children}</main>
+              <SiteFooter />
+            </ToastProvider>
+          </LazyMotionRoot>
         </NextIntlClientProvider>
       </body>
     </html>
