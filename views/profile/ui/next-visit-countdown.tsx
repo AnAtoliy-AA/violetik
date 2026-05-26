@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Counter } from "@/shared/ui/counter";
 
@@ -37,7 +37,7 @@ function snapshot(target: Date, now: Date = new Date()): Snapshot | null {
 
 export function NextVisitCountdown({ scheduledForIso }: NextVisitCountdownProps) {
   const t = useTranslations("Profile.countdown");
-  const target = new Date(scheduledForIso);
+  const target = useMemo(() => new Date(scheduledForIso), [scheduledForIso]);
   const [snap, setSnap] = useState<Snapshot | null>(() => snapshot(target));
 
   useEffect(() => {
