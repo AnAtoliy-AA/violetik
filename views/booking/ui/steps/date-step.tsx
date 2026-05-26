@@ -72,12 +72,24 @@ export function DateStep({ timeZone }: DateStepProps) {
               )}
             >
               {isSelected ? (
-                <m.span
-                  layoutId="date-pill"
-                  className="absolute inset-0 rounded-[12px] bg-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]"
-                  transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ zIndex: -1 }}
-                />
+                <>
+                  <m.span
+                    layoutId="date-pill"
+                    className="absolute inset-0 rounded-[12px] bg-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]"
+                    transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ zIndex: -1 }}
+                  />
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 rounded-[12px] motion-safe:animate-[shimmer_2.6s_ease-in-out_infinite]"
+                    style={{
+                      background:
+                        "linear-gradient(120deg, transparent 35%, rgba(255,245,214,0.55) 50%, transparent 65%)",
+                      backgroundSize: "200% 100%",
+                      mixBlendMode: "screen",
+                    }}
+                  />
+                </>
               ) : null}
               <span className="relative font-mono text-[9px] uppercase tracking-[0.08em] opacity-70">
                 {d.dow}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { m } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/shared/lib/cn";
 import { Eyebrow } from "@/shared/ui/eyebrow";
@@ -78,18 +79,41 @@ export function TimeStep() {
                 aria-pressed={isSelected}
                 onClick={() => setTime(slot)}
                 className={cn(
-                  "gilded rounded-[18px] px-4 py-5 text-left",
+                  "relative overflow-hidden rounded-[18px] px-4 py-5 text-left",
                   "transition-colors duration-fast ease-out",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                   isSelected
-                    ? "glass-top text-gold-shimmer"
-                    : "text-text hover:bg-surface-2",
+                    ? "text-bg"
+                    : "gilded text-text hover:bg-surface-2",
                 )}
               >
-                <div className="font-display text-[26px] font-normal italic leading-none">
+                {/* Selected pill — gold fill behind the text, layoutId so
+                  * tapping a new slot morphs across the grid. The shimmer
+                  * sweep on top adds the requested 'blick'. */}
+                {isSelected ? (
+                  <>
+                    <m.span
+                      layoutId="time-pill"
+                      aria-hidden
+                      className="absolute inset-0 rounded-[18px] bg-gold shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]"
+                      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 motion-safe:animate-[shimmer_2.6s_ease-in-out_infinite]"
+                      style={{
+                        background:
+                          "linear-gradient(120deg, transparent 30%, rgba(255,245,214,0.55) 50%, transparent 70%)",
+                        backgroundSize: "200% 100%",
+                        mixBlendMode: "screen",
+                      }}
+                    />
+                  </>
+                ) : null}
+                <div className="relative font-display text-[26px] font-normal italic leading-none">
                   {slot}
                 </div>
-                <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] opacity-70">
+                <div className="relative mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] opacity-70">
                   {t("available")}
                 </div>
               </button>
