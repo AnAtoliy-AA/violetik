@@ -16,7 +16,7 @@ import {
   Bell as NotificationsIcon,
   X as CloseIcon,
 } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/features/locale-switcher";
 import { PwaInstallButton } from "@/features/pwa-install";
 import { cn } from "@/shared/lib/cn";
@@ -25,20 +25,56 @@ interface NavEntry {
   key: string;
   href: string;
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  /** Match function for the active state. */
+  isActive: (pathname: string) => boolean;
 }
 
+const exactOrPrefix = (base: string) => (p: string) =>
+  p === base || p.startsWith(`${base}/`);
+const exact = (base: string) => (p: string) => p === base;
+
 const PRIMARY: readonly NavEntry[] = [
-  { key: "home", href: "/home", Icon: HomeIcon },
-  { key: "services", href: "/services", Icon: MenuIcon },
-  { key: "gallery", href: "/gallery", Icon: GalleryIcon },
-  { key: "masters", href: "/master", Icon: MastersIcon },
-  { key: "membership", href: "/membership", Icon: MembershipIcon },
+  { key: "home", href: "/home", Icon: HomeIcon, isActive: exact("/home") },
+  {
+    key: "services",
+    href: "/services",
+    Icon: MenuIcon,
+    isActive: exactOrPrefix("/services"),
+  },
+  { key: "gallery", href: "/gallery", Icon: GalleryIcon, isActive: exact("/gallery") },
+  {
+    key: "masters",
+    href: "/master",
+    Icon: MastersIcon,
+    isActive: exactOrPrefix("/master"),
+  },
+  {
+    key: "membership",
+    href: "/membership",
+    Icon: MembershipIcon,
+    isActive: exact("/membership"),
+  },
 ];
 
 const VISIT: readonly NavEntry[] = [
-  { key: "book", href: "/booking/service", Icon: CalendarIcon },
-  { key: "profile", href: "/profile", Icon: ProfileIcon },
-  { key: "notifications", href: "/profile/notifications", Icon: NotificationsIcon },
+  {
+    key: "book",
+    href: "/booking/service",
+    Icon: CalendarIcon,
+    isActive: exactOrPrefix("/booking"),
+  },
+  {
+    key: "profile",
+    href: "/profile",
+    Icon: ProfileIcon,
+    isActive: exact("/profile"),
+  },
+  {
+    key: "notifications",
+    href: "/profile/notifications",
+    Icon: NotificationsIcon,
+    isActive: exact("/profile/notifications"),
+  },
 ];
 
 const triggerClass = cn(
@@ -69,45 +105,65 @@ function HamburgerIcon() {
 
 function NavList({
   entries,
+  pathname,
   onSelect,
   t,
 }: {
   entries: readonly NavEntry[];
+  pathname: string;
   onSelect: () => void;
   t: (key: string) => string;
 }) {
   return (
     <ul className="flex flex-col">
-      {entries.map(({ key, href, Icon }) => (
-        <li key={key}>
-          <Link
-            href={href}
-            onClick={onSelect}
-            className={cn(
-              "flex items-center gap-4 rounded-xl px-3 py-3",
-              "text-text transition-colors duration-fast ease-out",
-              "hover:bg-surface-2/60",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-            )}
-          >
-            <span
-              aria-hidden
-              className="inline-flex size-9 items-center justify-center rounded-full border-[0.5px] border-line text-text-2"
+      {entries.map(({ key, href, Icon, isActive }) => {
+        const active = isActive(pathname);
+        return (
+          <li key={key}>
+            <Link
+              href={href}
+              onClick={onSelect}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex items-center gap-4 rounded-xl px-3 py-3",
+                "transition-colors duration-fast ease-out",
+                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+                active
+                  ? "bg-surface-2 text-text"
+                  : "text-text hover:bg-surface-2/60",
+              )}
             >
-              <Icon width={16} height={16} strokeWidth={1.5} />
-            </span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.32em]">
-              {t(`${key}.label`)}
-            </span>
-          </Link>
-        </li>
-      ))}
+              <span
+                aria-hidden
+                className={cn(
+                  "inline-flex size-9 items-center justify-center rounded-full border-[0.5px]",
+                  active
+                    ? "border-accent text-text"
+                    : "border-line text-text-2",
+                )}
+              >
+                <Icon width={16} height={16} strokeWidth={1.5} />
+              </span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.32em]">
+                {t(`${key}.label`)}
+              </span>
+              {active ? (
+                <span
+                  aria-hidden
+                  className="ml-auto inline-block size-1.5 rounded-full bg-accent motion-safe:animate-soft-pulse"
+                />
+              ) : null}
+            </Link>
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
 export function NavSheet() {
   const t = useTranslations("Nav");
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const labelId = useId();
@@ -256,9 +312,19 @@ export function NavSheet() {
                     aria-label={t("aria_label")}
                     className="flex flex-1 flex-col gap-4 overflow-y-auto px-3 pt-2"
                   >
-                    <NavList entries={PRIMARY} onSelect={close} t={t} />
+                    <NavList
+                      entries={PRIMARY}
+                      pathname={pathname}
+                      onSelect={close}
+                      t={t}
+                    />
                     <div aria-hidden className="mx-3 h-px bg-line/60" />
-                    <NavList entries={VISIT} onSelect={close} t={t} />
+                    <NavList
+                      entries={VISIT}
+                      pathname={pathname}
+                      onSelect={close}
+                      t={t}
+                    />
                   </nav>
                   <div className="mt-4 flex items-center justify-between gap-3 border-t border-line/60 px-5 pt-4">
                     <LocaleSwitcher />
