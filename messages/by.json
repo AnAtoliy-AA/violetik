@@ -206,7 +206,11 @@
     "ask_first_template": "Прывітанне — цікавіць {service}, калі бліжэйшае акно?",
     "aftercare_eyebrow": "ДАГЛЯД ПАСЛЯ",
     "aftercare_body": "Што спатрэбіцца пасля — гадзіна без гарачай вады і дзень без прамога сонца. Поўную памятку прышлем паведамленнем.",
-    "pairs_eyebrow": "ДОБРА СПАЛУЧАЕЦЦА"
+    "pairs_eyebrow": "—— Добра спалучаецца",
+    "master_eyebrow": "—— Вашы рукі",
+    "master_cta": "Запіс да {initial}.",
+    "reviews_eyebrow": "—— З водгукаў",
+    "reviews_verified": "ВЕРЫФІКАВАНА"
   },
   "Services": {
     "meta_title": "Меню",

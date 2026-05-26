@@ -206,7 +206,11 @@
     "ask_first_template": "Hello — interested in {service}, what's the soonest opening?",
     "aftercare_eyebrow": "AFTERCARE",
     "aftercare_body": "What it costs in time after — keep your hands out of hot water for an hour and out of the sun for a day. We send the full sheet by message.",
-    "pairs_eyebrow": "PAIRS WELL WITH"
+    "pairs_eyebrow": "—— Pairs well with",
+    "master_eyebrow": "—— Your hands",
+    "master_cta": "Reserve with {initial}.",
+    "reviews_eyebrow": "—— From clients",
+    "reviews_verified": "VERIFIED"
   },
   "Services": {
     "meta_title": "The menu",

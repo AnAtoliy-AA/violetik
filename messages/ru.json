@@ -206,7 +206,11 @@
     "ask_first_template": "Здравствуйте — интересует {service}, когда ближайшее окно?",
     "aftercare_eyebrow": "УХОД ПОСЛЕ",
     "aftercare_body": "Что потребуется после — час без горячей воды и день без прямого солнца. Полную памятку пришлём сообщением.",
-    "pairs_eyebrow": "ХОРОШО СОЧЕТАЕТСЯ"
+    "pairs_eyebrow": "—— Хорошо сочетается",
+    "master_eyebrow": "—— Ваши руки",
+    "master_cta": "Запись к {initial}.",
+    "reviews_eyebrow": "—— Из отзывов",
+    "reviews_verified": "ВЕРИФИЦИРОВАНО"
   },
   "Services": {
     "meta_title": "Меню",
