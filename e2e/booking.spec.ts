@@ -8,7 +8,7 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
 
   // Pick a ritual
   await page.getByRole("radio", { name: /Couture Gel/i }).click();
-  await page.getByRole("button", { name: /^Continue$/i }).click();
+  await page.getByRole("button", { name: /^Forward$/i }).click();
 
   await expect(page).toHaveURL(/\/booking\/date$/);
   await expect(
@@ -17,13 +17,13 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
 
   // Pick the second Tuesday in the strip (2026-05-26)
   await page.getByRole("button", { name: /Tue 26/i }).click();
-  await page.getByRole("button", { name: /^Continue$/i }).click();
+  await page.getByRole("button", { name: /^Forward$/i }).click();
 
   await expect(page).toHaveURL(/\/booking\/time$/);
 
   // Pick 14:30 (not reserved)
   await page.getByRole("button", { name: /14:30/i }).click();
-  await page.getByRole("button", { name: /^Continue$/i }).click();
+  await page.getByRole("button", { name: /^Forward$/i }).click();
 
   await expect(page).toHaveURL(/\/booking\/confirm$/);
   await expect(
@@ -38,7 +38,7 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
   // redirect instead of /booking/confirmation, which only happens for
   // authenticated users.
   await page
-    .getByRole("button", { name: /Confirm appointment/i })
+    .getByRole("button", { name: /^Confirm$/i })
     .click();
   await expect(page).toHaveURL(/\/sign-in\?callbackUrl=/);
 });
