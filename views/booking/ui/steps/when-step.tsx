@@ -31,10 +31,10 @@ export function WhenStep({ timeZone }: WhenStepProps) {
       <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
       <p className="m-0 mb-5 text-sm text-text-2">{t("paragraph")}</p>
 
-      <DateStep timeZone={timeZone} />
+      <DateStep timeZone={timeZone} headless />
 
       <div className="mt-8">
-        <TimeStep />
+        <TimeStep headless />
       </div>
     </div>
   );

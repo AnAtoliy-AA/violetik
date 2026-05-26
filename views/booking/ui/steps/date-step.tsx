@@ -14,9 +14,16 @@ import { useBookingStore } from "@/views/booking/model/booking-store";
 
 export interface DateStepProps {
   timeZone: string;
+  /**
+   * §6.2 — when rendered inside the collapsed When step, skip the
+   * eyebrow / heading / paragraph chrome so the parent owns the h2.
+   * Two h2s on one page would fail screen-reader landmarks + Playwright
+   * strict-mode matchers.
+   */
+  headless?: boolean;
 }
 
-export function DateStep({ timeZone }: DateStepProps) {
+export function DateStep({ timeZone, headless = false }: DateStepProps) {
   const t = useTranslations("Booking.date");
   const locale = useLocale();
   const selected = useBookingStore((s) => s.date);
@@ -33,16 +40,20 @@ export function DateStep({ timeZone }: DateStepProps) {
 
   return (
     <div>
-      <Eyebrow gold>{t("eyebrow")}</Eyebrow>
-      <h2 className="my-2.5 mb-1.5 font-display text-h2 font-normal italic leading-tight tracking-[-0.02em]">
-        {t.rich("title", { em: (c) => <em>{c}</em> })}
-      </h2>
-      <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
-      <p className="m-0 mb-5 text-sm text-text-2">
-        {t.rich("paragraph", {
-          gold: (c) => <span className="text-gold">{c}</span>,
-        })}
-      </p>
+      {headless ? null : (
+        <>
+          <Eyebrow gold>{t("eyebrow")}</Eyebrow>
+          <h2 className="my-2.5 mb-1.5 font-display text-h2 font-normal italic leading-tight tracking-[-0.02em]">
+            {t.rich("title", { em: (c) => <em>{c}</em> })}
+          </h2>
+          <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
+          <p className="m-0 mb-5 text-sm text-text-2">
+            {t.rich("paragraph", {
+              gold: (c) => <span className="text-gold">{c}</span>,
+            })}
+          </p>
+        </>
+      )}
 
       <div className="mb-3.5 font-display text-[22px] italic capitalize">
         {monthLabel}

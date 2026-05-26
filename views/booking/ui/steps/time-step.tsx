@@ -14,7 +14,15 @@ import { useBookingStore } from "@/views/booking/model/booking-store";
 
 const STATIC_FALLBACK: readonly string[] = BOOKING_TIMES;
 
-export function TimeStep() {
+export interface TimeStepProps {
+  /**
+   * §6.2 — when nested under WhenStep, skip the eyebrow + heading +
+   * paragraph chrome. The parent owns the page's h2.
+   */
+  headless?: boolean;
+}
+
+export function TimeStep({ headless = false }: TimeStepProps = {}) {
   const t = useTranslations("Booking.time");
   const locale = useLocale();
   const selected = useBookingStore((s) => s.time);
@@ -46,20 +54,24 @@ export function TimeStep() {
 
   return (
     <div>
-      <Eyebrow gold>{t("eyebrow")}</Eyebrow>
-      <h2 className="my-2.5 mb-1.5 font-display text-h2 font-normal italic leading-tight tracking-[-0.02em]">
-        {t.rich("title", { em: (c) => <em>{c}</em> })}
-      </h2>
-      <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
-      <p className="m-0 mb-5 text-sm text-text-2">
-        {dateLabel ? (
-          <>
-            <span className="text-gold">{dateLabel}</span> · {t("zone_suffix")}
-          </>
-        ) : (
-          t("no_date")
-        )}
-      </p>
+      {headless ? null : (
+        <>
+          <Eyebrow gold>{t("eyebrow")}</Eyebrow>
+          <h2 className="my-2.5 mb-1.5 font-display text-h2 font-normal italic leading-tight tracking-[-0.02em]">
+            {t.rich("title", { em: (c) => <em>{c}</em> })}
+          </h2>
+          <LetterpressRule className="mb-4 mt-3 max-w-[180px]" />
+          <p className="m-0 mb-5 text-sm text-text-2">
+            {dateLabel ? (
+              <>
+                <span className="text-gold">{dateLabel}</span> · {t("zone_suffix")}
+              </>
+            ) : (
+              t("no_date")
+            )}
+          </p>
+        </>
+      )}
 
       {hasFetched && slots.length === 0 ? (
         <p
