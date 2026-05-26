@@ -444,7 +444,35 @@
       "total": "{count} падзей",
       "empty": "У гэтым акне пакуль няма трафіку.",
       "funnel_eyebrow": "—— Варонка браніравання",
-      "funnel_row": "{entered} → {completed} · {drop}% адсеў"
+      "funnel_row": "{entered} → {completed} · {drop}% адсеў",
+      "events": {
+        "welcome_landed": "Зайшлі на welcome",
+        "welcome_cta_step_inside": "Націснулі «Увайсці»",
+        "welcome_cta_tonight": "Націснулі «Сёння»",
+        "onboarding_completed": "Прайшлі анбордынг",
+        "onboarding_skipped": "Прапусцілі анбордынг",
+        "home_next_opening_tapped": "Тап на бліжэйшае акно",
+        "service_detail_opened": "Адкрылі паслугу",
+        "service_detail_pairs_with_opened": "Адкрылі сумежную паслугу",
+        "booking_step_entered": "Увайшлі ў крок запісу",
+        "booking_step_completed": "Прайшлі крок запісу",
+        "booking_save_sheet_shown": "Паказалі «Захаваць месца»",
+        "booking_save_sheet_resumed": "Вярнуліся з «Захаваць месца»",
+        "booking_submit_success": "Запіс пацверджаны",
+        "booking_submit_error": "Памылка пры запісе",
+        "confirmation_share_link_copied": "Скапіявалі реф-спасылку",
+        "confirmation_add_to_calendar": "Дадалі ў каляндар",
+        "palette_switched": "Памянялі палітру",
+        "tonight_ribbon_tapped": "Тап на стужку «Сёння»"
+      },
+      "steps": {
+        "service": "Выбар рытуала",
+        "master": "Выбар майстра",
+        "date": "Выбар дня",
+        "time": "Выбар часу",
+        "when": "Выбар часу",
+        "confirm": "Пацверджанне"
+      }
     },
     "photos": {
       "plate_title": "Фатаграфіі",

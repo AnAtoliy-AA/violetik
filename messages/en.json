@@ -444,7 +444,35 @@
       "total": "{count} events",
       "empty": "No traffic yet in this window.",
       "funnel_eyebrow": "—— Booking funnel",
-      "funnel_row": "{entered} → {completed} · {drop}% drop"
+      "funnel_row": "{entered} → {completed} · {drop}% drop",
+      "events": {
+        "welcome_landed": "Landed on welcome",
+        "welcome_cta_step_inside": "Tapped “Step inside”",
+        "welcome_cta_tonight": "Tapped tonight CTA",
+        "onboarding_completed": "Onboarding finished",
+        "onboarding_skipped": "Onboarding skipped",
+        "home_next_opening_tapped": "Tapped next-opening line",
+        "service_detail_opened": "Opened a service",
+        "service_detail_pairs_with_opened": "Opened a paired service",
+        "booking_step_entered": "Entered a booking step",
+        "booking_step_completed": "Completed a booking step",
+        "booking_save_sheet_shown": "Save-seat sheet shown",
+        "booking_save_sheet_resumed": "Resumed from save sheet",
+        "booking_submit_success": "Booking confirmed",
+        "booking_submit_error": "Booking submit failed",
+        "confirmation_share_link_copied": "Copied referral link",
+        "confirmation_add_to_calendar": "Added to calendar",
+        "palette_switched": "Switched palette",
+        "tonight_ribbon_tapped": "Tapped tonight ribbon"
+      },
+      "steps": {
+        "service": "Picking a ritual",
+        "master": "Picking a master",
+        "date": "Picking a day",
+        "time": "Picking a time",
+        "when": "Picking when",
+        "confirm": "Reviewing & confirming"
+      }
     },
     "photos": {
       "plate_title": "Photography",
