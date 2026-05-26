@@ -10,10 +10,25 @@ export interface TonightStripData {
   isToday: boolean;
   time: string;
   service: string | null;
+  /**
+   * §3.3 / §6.2 — service id used to pre-select the ritual in the
+   * booking store via `?selected=` so the visitor doesn't bounce off
+   * Confirm for missing-service after picking a slot.
+   */
+  serviceId?: string | null;
   /** Additional same-day slots (excluding `time`) to make the marquee feel populated. */
-  laterSlots?: ReadonlyArray<{ time: string; service: string | null }>;
+  laterSlots?: ReadonlyArray<{
+    time: string;
+    service: string | null;
+    serviceId?: string | null;
+  }>;
   /** Used when `isToday` is false — the next available day/time. */
-  next?: { dayName: string; time: string; service: string | null };
+  next?: {
+    dayName: string;
+    time: string;
+    service: string | null;
+    serviceId?: string | null;
+  };
 }
 
 const SESSION_KEY = "violetta.tonight-strip-dismissed";
@@ -58,18 +73,36 @@ export function TonightStripClient({
     }
   };
 
+  const buildHref = (
+    opts: { time: string; serviceId?: string | null; tonight: boolean },
+  ): string => {
+    const p = new URLSearchParams();
+    if (opts.tonight) p.set("prefilter", "tonight");
+    p.set("time", opts.time);
+    if (opts.serviceId) p.set("selected", opts.serviceId);
+    return `/booking/when?${p.toString()}`;
+  };
+
   const slots: Array<{ time: string; service: string | null; href: string }> =
     data.isToday
       ? [
           {
             time: data.time,
             service: data.service,
-            href: `/booking/when?prefilter=tonight&time=${encodeURIComponent(data.time)}`,
+            href: buildHref({
+              time: data.time,
+              serviceId: data.serviceId,
+              tonight: true,
+            }),
           },
           ...(data.laterSlots ?? []).map((s) => ({
             time: s.time,
             service: s.service,
-            href: `/booking/when?prefilter=tonight&time=${encodeURIComponent(s.time)}`,
+            href: buildHref({
+              time: s.time,
+              serviceId: s.serviceId ?? data.serviceId,
+              tonight: true,
+            }),
           })),
         ]
       : data.next
@@ -77,7 +110,11 @@ export function TonightStripClient({
             {
               time: data.next.time,
               service: data.next.service,
-              href: `/booking/when?time=${encodeURIComponent(data.next.time)}`,
+              href: buildHref({
+                time: data.next.time,
+                serviceId: data.next.serviceId,
+                tonight: false,
+              }),
             },
           ]
         : [];

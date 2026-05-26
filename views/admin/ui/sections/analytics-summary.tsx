@@ -81,19 +81,30 @@ export function AdminAnalyticsSummary() {
           </p>
         ) : (
           <ul className="m-0 grid grid-cols-1 gap-1.5 p-0 sm:grid-cols-2">
-            {top.map(([name, count]) => (
-              <li
-                key={name}
-                className="flex items-baseline justify-between border-b-[0.5px] border-line py-1.5"
-              >
-                <span className="truncate font-mono text-[10px] uppercase tracking-[0.18em] text-text-2">
-                  {name}
-                </span>
-                <span className="font-display text-[18px] italic text-gold">
-                  {count}
-                </span>
-              </li>
-            ))}
+            {top.map(([name, count]) => {
+              // Each event id maps to a friendly label under
+              // `Admin.analytics.events.<name>`. If the key is absent
+              // (newly added event the translator hasn't covered yet),
+              // fall back to the raw snake_case id so the panel stays
+              // informative.
+              const label = t.has(`events.${name}`)
+                ? t(`events.${name}`)
+                : name;
+              return (
+                <li
+                  key={name}
+                  className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-1.5"
+                  title={name}
+                >
+                  <span className="truncate text-[13px] text-text-2">
+                    {label}
+                  </span>
+                  <span className="font-display text-[18px] italic text-gold">
+                    {count}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
 
@@ -103,23 +114,29 @@ export function AdminAnalyticsSummary() {
               {t("funnel_eyebrow")}
             </div>
             <ul className="m-0 list-none p-0">
-              {funnel.map((row) => (
-                <li
-                  key={row.step}
-                  className="flex items-baseline justify-between border-b-[0.5px] border-line py-1.5"
-                >
-                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-2">
-                    {row.step}
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
-                    {t("funnel_row", {
-                      entered: row.entered,
-                      completed: row.completed,
-                      drop: Math.round(row.dropRate * 100),
-                    })}
-                  </span>
-                </li>
-              ))}
+              {funnel.map((row) => {
+                const stepLabel = t.has(`steps.${row.step}`)
+                  ? t(`steps.${row.step}`)
+                  : row.step;
+                return (
+                  <li
+                    key={row.step}
+                    className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-1.5"
+                    title={row.step}
+                  >
+                    <span className="text-[13px] text-text-2">
+                      {stepLabel}
+                    </span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+                      {t("funnel_row", {
+                        entered: row.entered,
+                        completed: row.completed,
+                        drop: Math.round(row.dropRate * 100),
+                      })}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ) : null}

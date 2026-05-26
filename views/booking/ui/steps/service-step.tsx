@@ -39,6 +39,7 @@ export function ServiceStep({
   currency = "EUR",
 }: ServiceStepProps) {
   const t = useTranslations("Booking.service");
+  const tBooking = useTranslations("Booking");
   const locale = useLocale() as Locale;
   const serviceId = useBookingStore((s) => s.serviceId);
   const setService = useBookingStore((s) => s.setService);
@@ -79,7 +80,7 @@ export function ServiceStep({
               <div className="min-w-0 flex-1">
                 {/* §6.4 — duration eyebrow above the name, mono caps. */}
                 <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-text-3">
-                  {t("service_tile_duration", {
+                  {tBooking("service_tile_duration", {
                     n: s.durationMinutes,
                   })}
                 </div>

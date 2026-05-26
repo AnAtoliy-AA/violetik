@@ -265,6 +265,21 @@
     "ribbon_join_at": "{time} · {service}",
     "ribbon_label": "Сегодня в студии"
   },
+  "Nav": {
+    "trigger_label": "Открыть навигацию",
+    "close_label": "Закрыть навигацию",
+    "aria_label": "Навигация по ателье",
+    "title": "Ателье",
+    "description": "Найдите зал, ритуал или вернитесь в свой профиль.",
+    "home": { "label": "Главная" },
+    "services": { "label": "Меню" },
+    "gallery": { "label": "Галерея" },
+    "masters": { "label": "Мастера" },
+    "membership": { "label": "Членство" },
+    "book": { "label": "Записаться" },
+    "profile": { "label": "Профиль" },
+    "notifications": { "label": "Уведомления" }
+  },
   "LocaleSwitcher": {
     "label": "Язык",
     "en": "Английский",
@@ -444,7 +459,35 @@
       "total": "{count} событий",
       "empty": "В этом окне пока нет трафика.",
       "funnel_eyebrow": "—— Воронка бронирования",
-      "funnel_row": "{entered} → {completed} · {drop}% отвал"
+      "funnel_row": "{entered} → {completed} · {drop}% отвал",
+      "events": {
+        "welcome_landed": "Зашли на welcome",
+        "welcome_cta_step_inside": "Нажали «Войти»",
+        "welcome_cta_tonight": "Нажали «Сегодня»",
+        "onboarding_completed": "Прошли онбординг",
+        "onboarding_skipped": "Пропустили онбординг",
+        "home_next_opening_tapped": "Тап на ближайшее окно",
+        "service_detail_opened": "Открыли услугу",
+        "service_detail_pairs_with_opened": "Открыли смежную услугу",
+        "booking_step_entered": "Вошли в шаг записи",
+        "booking_step_completed": "Прошли шаг записи",
+        "booking_save_sheet_shown": "Показали «Сохранить место»",
+        "booking_save_sheet_resumed": "Вернулись из «Сохранить место»",
+        "booking_submit_success": "Запись подтверждена",
+        "booking_submit_error": "Ошибка при записи",
+        "confirmation_share_link_copied": "Скопировали реф-ссылку",
+        "confirmation_add_to_calendar": "Добавили в календарь",
+        "palette_switched": "Сменили палитру",
+        "tonight_ribbon_tapped": "Тап на ленту «Сегодня»"
+      },
+      "steps": {
+        "service": "Выбор ритуала",
+        "master": "Выбор мастера",
+        "date": "Выбор дня",
+        "time": "Выбор времени",
+        "when": "Выбор времени",
+        "confirm": "Подтверждение"
+      }
     },
     "photos": {
       "plate_title": "Фотографии",

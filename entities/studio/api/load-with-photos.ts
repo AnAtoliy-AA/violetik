@@ -21,12 +21,30 @@ async function imagesByKind(
   return map;
 }
 
-/** Returns the gallery list with `image` populated. */
+async function palettesByKind(
+  kind: PhotoSlotKind,
+): Promise<Map<string, string[]>> {
+  const rows = await getStudioPhotos(kind);
+  const map = new Map<string, string[]>();
+  for (const r of rows) {
+    if (r.palette && r.palette.length > 0) map.set(r.slotId, r.palette);
+  }
+  return map;
+}
+
+/** Returns the gallery list with `image` + `paletteDots` populated. */
 export async function loadGalleryWithPhotos(): Promise<GalleryItem[]> {
-  const photos = await imagesByKind("gallery");
+  const [photos, palettes] = await Promise.all([
+    imagesByKind("gallery"),
+    palettesByKind("gallery"),
+  ]);
   return STUDIO_DATA.gallery.map((g) => ({
     ...g,
     image: photos.get(g.id) ?? g.image,
+    // §9.3 — prefer the sharp-extracted palette from the uploaded photo;
+    // fall back to the hand-tuned `paletteDots` constant which we
+    // shipped earlier so the gallery never renders dot-less.
+    paletteDots: palettes.get(g.id) ?? g.paletteDots,
   }));
 }
 

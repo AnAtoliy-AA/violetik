@@ -23,6 +23,7 @@ export async function NextOpeningLine() {
 
   const services = await loadServicesForLocale(locale);
   const headlineService = services[0]?.name;
+  const headlineServiceId = services[0]?.id;
   const now = new Date();
   const next = getNextOpening({
     workingHours: WEEKLY_DEFAULT_HOURS,
@@ -39,9 +40,15 @@ export async function NextOpeningLine() {
     );
   }
 
-  const href = next.isToday
-    ? `/booking/when?prefilter=tonight&time=${encodeURIComponent(next.time)}`
-    : `/booking/when?time=${encodeURIComponent(next.time)}&date=${encodeURIComponent(next.date)}`;
+  // Pre-select the headline service so the booking page lands on the
+  // When step with a complete store (service + date + time) — no
+  // bounce off Confirm for missing-service.
+  const hrefParams = new URLSearchParams();
+  if (next.isToday) hrefParams.set("prefilter", "tonight");
+  hrefParams.set("time", next.time);
+  if (!next.isToday) hrefParams.set("date", next.date);
+  if (headlineServiceId) hrefParams.set("selected", headlineServiceId);
+  const href = `/booking/when?${hrefParams.toString()}`;
 
   const dayLabel = next.isToday
     ? null

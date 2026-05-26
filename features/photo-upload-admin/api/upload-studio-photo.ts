@@ -88,6 +88,16 @@ export async function finalizeStudioPhotoUploadAction(
   }
 
   try {
+    // §9.3 — extract a 4-color palette from the just-uploaded blob so
+    // the gallery can render dots beside each image. Best-effort: a
+    // failure (network blip, unsupported format) returns null and the
+    // upsert proceeds without palette data — the UI falls back to its
+    // two-color `palette` constant in that case.
+    const { extractPaletteFromUrl } = await import(
+      "@/shared/lib/photo-storage/extract-palette"
+    );
+    const palette = await extractPaletteFromUrl(parsed.data.src, { count: 4 });
+
     const upsert = await upsertStudioPhoto({
       slotKind: parsed.data.slotKind,
       slotId: parsed.data.slotId,
@@ -95,6 +105,7 @@ export async function finalizeStudioPhotoUploadAction(
       alt: parsed.data.alt,
       width: parsed.data.width ?? null,
       height: parsed.data.height ?? null,
+      palette,
       uploadedBy,
     });
 

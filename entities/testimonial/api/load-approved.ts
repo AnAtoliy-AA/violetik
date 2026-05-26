@@ -6,6 +6,14 @@ import type { ApprovedTestimonial } from "../model/types";
 
 export interface ListApprovedTestimonialsOptions {
   masterId?: string;
+  /**
+   * §11.3 — optional service filter. When set, returns only testimonials
+   * explicitly tied to that service (`testimonials.service_id = serviceId`).
+   * Legacy rows where `service_id IS NULL` are excluded, so a service
+   * with no service-specific reviews surfaces an empty list and the
+   * UI can hide the section.
+   */
+  serviceId?: string;
   limit?: number;
 }
 
@@ -25,12 +33,14 @@ export async function listApprovedTestimonials(
 ): Promise<ApprovedTestimonial[]> {
   if (!db) return [];
   const limit = options.limit ?? 20;
-  const where = options.masterId
-    ? and(
-        eq(schema.testimonials.status, "approved"),
-        eq(schema.testimonials.masterId, options.masterId),
-      )
-    : eq(schema.testimonials.status, "approved");
+  const clauses = [eq(schema.testimonials.status, "approved")];
+  if (options.masterId) {
+    clauses.push(eq(schema.testimonials.masterId, options.masterId));
+  }
+  if (options.serviceId) {
+    clauses.push(eq(schema.testimonials.serviceId, options.serviceId));
+  }
+  const where = clauses.length === 1 ? clauses[0] : and(...clauses);
   try {
     const activeVip = activeVipSubquery();
     // §11.4 — correlated EXISTS subquery: did this user ever have a

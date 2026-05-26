@@ -8,7 +8,6 @@ import { LocaleSwitcher } from "@/features/locale-switcher";
 import { Aurora } from "@/shared/ui/aurora";
 import { buttonClassName } from "@/shared/ui/button";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
-import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { FlameMonogram } from "@/shared/ui/flame-monogram";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
@@ -28,6 +27,12 @@ export interface WelcomeNextOpening {
   time: string;
   isToday: boolean;
   service: string | null;
+  /**
+   * Headline service id, used to pre-select the ritual in the booking
+   * store via `?selected=` so the visitor doesn't bounce off Confirm
+   * for missing-service after picking a time.
+   */
+  serviceId?: string | null;
   dayName: string | null;
 }
 
@@ -69,13 +74,6 @@ export function WelcomePage({
         : null;
   const statusIsOpen = status.state === "open";
 
-  const tonightHref =
-    nextOpening?.isToday && nextOpening?.time
-      ? `/booking/when?prefilter=tonight&time=${encodeURIComponent(
-          nextOpening.time,
-        )}`
-      : "/booking/when?prefilter=tonight";
-
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
       <Aurora intensity="vivid" />
@@ -111,9 +109,6 @@ export function WelcomePage({
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
-          <m.div className="mb-6 flex justify-center" {...fade(0.3)}>
-            <MonogramSeal letter="V" className="size-12 text-[22px]" />
-          </m.div>
           <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)] text-brand-cycle">
             <LetterReveal text="Violetta" />
           </div>
@@ -210,20 +205,6 @@ export function WelcomePage({
           >
             {t("cta_returning")}
           </Link>
-          {/* §3.2 — third CTA, ghost, jumps to tonight's openings */}
-          <Link
-            href={tonightHref}
-            onClick={() => emitAnalytics("welcome_cta_tonight")}
-            className={buttonClassName({
-              variant: "ghost",
-              size: "md",
-              block: true,
-              className: "text-text-3 hover:text-text",
-            })}
-          >
-            {t("cta_tonight")}
-          </Link>
-
           {/* §3.3 — tonight ribbon */}
           {nextOpening && (
             <m.div

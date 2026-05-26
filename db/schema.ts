@@ -453,6 +453,11 @@ export const studioPhotos = pgTable(
     width: integer("width"),
     height: integer("height"),
     blurDataUrl: text("blur_data_url"),
+    // §9.3 — dominant-color palette extracted from the photo at upload
+    // time via sharp. Stored as a small JSON array of hex strings (4
+    // colors). NULL = legacy row uploaded before the extractor existed
+    // OR the extractor was unavailable at upload time.
+    palette: jsonb("palette").$type<string[]>(),
     uploadedAt: timestamp("uploaded_at", { withTimezone: true })
       .notNull()
       .default(sql`now()`),
@@ -486,6 +491,12 @@ export const testimonials = pgTable(
     masterId: text("master_id")
       .notNull()
       .references(() => masters.id, { onDelete: "cascade" }),
+    // §11.3 — optional service the testimonial is *about*. Nullable so
+    // legacy rows + master-level testimonials keep working; when set,
+    // the service detail page filters its review section by it.
+    // Intentionally NOT a FK (mirrors `bookings.serviceId`) so services
+    // can be archived/renamed without losing reviews.
+    serviceId: text("service_id"),
     body: text("body").notNull(),
     status: testimonialStatus("status").notNull().default("pending"),
     // User-initiated change requests on an approved row. Set together

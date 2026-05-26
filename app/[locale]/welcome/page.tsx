@@ -32,6 +32,7 @@ export default async function WelcomeRoute({
 
   const services = await loadServicesForLocale(locale as Locale);
   const headlineService = services[0]?.name ?? null;
+  const headlineServiceId = services[0]?.id ?? null;
 
   const now = new Date();
   const status = resolveAtelierStatus(WEEKLY_DEFAULT_HOURS, now);
@@ -85,6 +86,7 @@ export default async function WelcomeRoute({
               time: nextOpening.time,
               isToday: nextOpening.isToday,
               service: nextOpening.serviceLabel ?? null,
+              serviceId: headlineServiceId,
               dayName: nextDayName,
             }
           : null
