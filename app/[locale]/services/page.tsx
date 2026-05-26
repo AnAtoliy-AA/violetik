@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { listPublishedCategories } from "@/db/services";
+import { countBookingsByServiceId } from "@/db/bookings";
 import { loadServicesForLocale } from "@/entities/service/api/load";
 import type { ServiceCategoryRef } from "@/entities/service";
 import type { CurrencyCode } from "@/db/schema";
@@ -34,12 +35,14 @@ export default async function ServicesRoute({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
-  const [settings, services, categoryRows, sessionUser] = await Promise.all([
-    getSiteSettingsServer(),
-    loadServicesForLocale(locale),
-    listPublishedCategories(),
-    getCurrentSessionUser(),
-  ]);
+  const [settings, services, categoryRows, sessionUser, bookingCounts] =
+    await Promise.all([
+      getSiteSettingsServer(),
+      loadServicesForLocale(locale),
+      listPublishedCategories(),
+      getCurrentSessionUser(),
+      countBookingsByServiceId(),
+    ]);
   const categories: ServiceCategoryRef[] = categoryRows.map((c) => {
     const name =
       locale === "ru" ? c.nameRu : locale === "by" ? c.nameBy : c.nameEn;
@@ -54,6 +57,7 @@ export default async function ServicesRoute({
       currency={currency}
       locale={locale}
       showAdmin={sessionUser?.role === "admin"}
+      bookingCounts={Object.fromEntries(bookingCounts)}
     />
   );
 }

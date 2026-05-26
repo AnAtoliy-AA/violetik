@@ -45,7 +45,7 @@ export function TappableAddress({ address, mapsHref }: TappableAddressProps) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={t("address_maps_label")}
-          className="inline-flex size-7 items-center justify-center rounded-full border-[0.5px] border-line text-text-3 hover:text-text"
+          className="relative inline-flex size-7 items-center justify-center rounded-full border-[0.5px] border-line text-text-3 hover:text-text before:absolute before:-inset-2 before:content-['']"
           onClick={() =>
             push({
               intent: "info",

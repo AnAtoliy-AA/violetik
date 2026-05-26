@@ -38,10 +38,15 @@ describe("ServiceReviews", () => {
     expect(screen.getAllByText(/Anna/)[0]).toBeInTheDocument();
   });
 
-  it("shows the VERIFIED stamp on VIP reviews", () => {
+  it("shows the VERIFIED stamp when the testimonial has a matched booking", () => {
     renderWithIntl(
-      <ServiceReviews reviews={[review({ authorIsVip: true })]} />,
+      <ServiceReviews reviews={[review({ hasMatchedBooking: true })]} />,
     );
     expect(screen.getAllByText("VERIFIED")[0]).toBeInTheDocument();
+  });
+
+  it("does NOT show the VERIFIED stamp for unmatched (or undefined) bookings", () => {
+    renderWithIntl(<ServiceReviews reviews={[review()]} />);
+    expect(screen.queryByText("VERIFIED")).toBeNull();
   });
 });

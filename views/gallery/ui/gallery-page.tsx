@@ -43,6 +43,9 @@ export function GalleryPage({
   const tCat = useTranslations("Gallery.category");
   const [active, setActive] = useState<TagFilterValue>("All");
   const [openId, setOpenId] = useState<string | null>(null);
+  // §9.3 — tapping a palette dot filters the grid to other cards that
+  // share that color. Null clears the filter.
+  const [paletteFilter, setPaletteFilter] = useState<string | null>(null);
 
   const tags: readonly TagFilterValue[] = useMemo(() => ["All", ...TAGS], []);
 
@@ -59,13 +62,15 @@ export function GalleryPage({
   );
 
   const source = items ?? STUDIO_DATA.gallery;
-  const filtered = useMemo(
-    () =>
-      active === "All"
-        ? source
-        : source.filter((g) => g.tag === active),
-    [active, source],
-  );
+  const filtered = useMemo(() => {
+    const byTag =
+      active === "All" ? source : source.filter((g) => g.tag === active);
+    if (!paletteFilter) return byTag;
+    return byTag.filter((g) => {
+      const dots = g.paletteDots ?? g.palette;
+      return dots.includes(paletteFilter);
+    });
+  }, [active, source, paletteFilter]);
 
   const openItem = openId
     ? (STUDIO_DATA.gallery.find((g) => g.id === openId) ?? null)
@@ -124,17 +129,38 @@ export function GalleryPage({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2.5">
-            {filtered.map((item, index) => (
-              <GalleryCard
-                key={item.id}
-                item={item}
-                index={index}
-                onOpen={setOpenId}
-                eager={index < 4}
-              />
-            ))}
-          </div>
+          <>
+            {paletteFilter ? (
+              <div className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.28em] text-text-3">
+                <span>{t("palette_filter_eyebrow")}</span>
+                <span
+                  aria-hidden
+                  className="size-3 rounded-full ring-[0.5px] ring-white/30"
+                  style={{ background: paletteFilter }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setPaletteFilter(null)}
+                  className="ml-1 underline-offset-2 hover:text-text"
+                >
+                  {t("palette_filter_clear")}
+                </button>
+              </div>
+            ) : null}
+            <div className="grid grid-cols-2 gap-2.5">
+              {filtered.map((item, index) => (
+                <GalleryCard
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onOpen={setOpenId}
+                  eager={index < 4}
+                  onPaletteSelect={setPaletteFilter}
+                  activePalette={paletteFilter}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
 

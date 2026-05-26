@@ -54,7 +54,7 @@ export function ServiceReviews({ reviews }: ServiceReviewsProps) {
           <span className="truncate font-mono text-[9px] uppercase tracking-[0.28em] text-text-2">
             {r.authorDisplay}
           </span>
-          {r.authorIsVip ? (
+          {r.hasMatchedBooking ? (
             <Stamp size="sm" className="ml-auto">
               {t("reviews_verified")}
             </Stamp>

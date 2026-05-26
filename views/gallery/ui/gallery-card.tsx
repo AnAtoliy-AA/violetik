@@ -17,6 +17,10 @@ export interface GalleryCardProps {
    * intersect the viewport so the initial paint stays cheap.
    */
   eager?: boolean;
+  /** §9.3 — taps on a palette dot bubble up to filter the grid. */
+  onPaletteSelect?: (color: string) => void;
+  /** Currently-active palette filter — used to highlight the matching dot. */
+  activePalette?: string | null;
 }
 
 export function GalleryCard({
@@ -24,6 +28,8 @@ export function GalleryCard({
   index,
   onOpen,
   eager = false,
+  onPaletteSelect,
+  activePalette,
 }: GalleryCardProps) {
   const reduceMotion = useReducedMotion();
   const [observerRef, inView] = useInView<HTMLButtonElement>({
@@ -78,6 +84,33 @@ export function GalleryCard({
       </span>
       <span className="absolute bottom-2.5 left-2.5 rounded-full bg-[rgba(20,9,26,0.55)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-text backdrop-blur-md">
         {item.tag}
+      </span>
+      {/* §9.3 — palette dots, four tiny swatches in a glass capsule at
+        * bottom-right. Tapping a dot bubbles up `onPaletteSelect` so
+        * the grid can filter to other cards sharing that color. Falls
+        * back to the two `palette` colors when no extended
+        * `paletteDots` is provided. */}
+      <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-[rgba(20,9,26,0.55)] px-1.5 py-1 backdrop-blur-md">
+        {(item.paletteDots ?? item.palette).slice(0, 4).map((color, i) => {
+          const isActive = activePalette === color;
+          return (
+            <button
+              key={`${color}-${i}`}
+              type="button"
+              aria-label={color}
+              onClick={(e) => {
+                e.stopPropagation();
+                onPaletteSelect?.(color);
+              }}
+              className={cn(
+                "size-2 rounded-full ring-[0.5px] ring-white/30 transition-transform",
+                "hover:scale-125 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent",
+                isActive && "scale-125 ring-1 ring-accent",
+              )}
+              style={{ background: color }}
+            />
+          );
+        })}
       </span>
     </m.button>
   );
