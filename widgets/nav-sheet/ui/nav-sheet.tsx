@@ -17,6 +17,8 @@ import {
   X as CloseIcon,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { LocaleSwitcher } from "@/features/locale-switcher";
+import { PwaInstallButton } from "@/features/pwa-install";
 import { cn } from "@/shared/lib/cn";
 
 interface NavEntry {
@@ -258,6 +260,10 @@ export function NavSheet() {
                     <div aria-hidden className="mx-3 h-px bg-line/60" />
                     <NavList entries={VISIT} onSelect={close} t={t} />
                   </nav>
+                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-line/60 px-5 pt-4">
+                    <LocaleSwitcher />
+                    <PwaInstallButton />
+                  </div>
                 </m.div>
               </div>
             )}

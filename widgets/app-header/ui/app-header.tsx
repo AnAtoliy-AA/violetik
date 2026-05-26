@@ -1,7 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
-import { LocaleSwitcher } from "@/features/locale-switcher";
-import { PwaInstallButton } from "@/features/pwa-install";
 import { NavSheet } from "@/widgets/nav-sheet";
 import { cn } from "@/shared/lib/cn";
 import { Wordmark } from "@/shared/ui/wordmark";
@@ -20,7 +18,7 @@ export interface AppHeaderProps extends HTMLAttributes<HTMLElement> {
    * wordmark / back arrow. Used on every `/admin/*` route.
    */
   admin?: boolean;
-  /** Extra controls rendered in the right zone, before LocaleSwitcher. */
+  /** Extra controls rendered in the right zone, before the nav menu. */
   actions?: ReactNode;
 }
 
@@ -108,8 +106,6 @@ export function AppHeader({
         )}
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           {actions}
-          <PwaInstallButton />
-          <LocaleSwitcher />
           {menu}
         </div>
       </div>

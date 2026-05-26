@@ -14,6 +14,8 @@ vi.mock("@/i18n/navigation", () => ({
       {children}
     </a>
   ),
+  usePathname: () => "/",
+  useRouter: () => ({ replace: vi.fn() }),
 }));
 
 import { NavSheet } from "./nav-sheet";
@@ -33,6 +35,16 @@ const messages = {
     book: { label: "Book a sitting" },
     profile: { label: "You" },
     notifications: { label: "Notifications" },
+  },
+  LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", by: "Belarusian" },
+  PwaInstall: {
+    aria_label: "Install app",
+    ios_instructions: "",
+    ios_close: "",
+    sheet_title: "",
+    sheet_body: "",
+    sheet_cta_install: "",
+    sheet_cta_dismiss: "",
   },
 };
 
@@ -72,5 +84,15 @@ describe("NavSheet", () => {
     ]) {
       expect(dialog.querySelector(`a[href="${href}"]`)).not.toBeNull();
     }
+  });
+
+  it("hosts the locale switcher inside the drawer", async () => {
+    const user = userEvent.setup();
+    renderSheet();
+    await user.click(screen.getByRole("button", { name: /open navigation/i }));
+    const dialog = await screen.findByRole("dialog");
+    expect(
+      dialog.querySelector('[role="radiogroup"][aria-label="Language"]'),
+    ).not.toBeNull();
   });
 });
