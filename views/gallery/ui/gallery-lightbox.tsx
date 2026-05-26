@@ -230,18 +230,19 @@ export function GalleryLightbox({
                 {labels.shareTelegram ?? "Telegram"}
               </span>
             </PressableSurface>
-            {item.image?.url ? (
-              <PressableSurface
-                as="a"
-                href={item.image.url}
-                download={item.image.url.split("/").pop() ?? "violetta.jpg"}
-                className="gilded rounded-md px-4 py-3 text-left no-underline"
+            {item.image?.src ? (
+              <a
+                href={item.image.src}
+                download={
+                  item.image.src.split("/").pop() ?? "violetta.jpg"
+                }
+                className="gilded ripple-host inline-flex rounded-md px-4 py-3 text-left no-underline transition-transform duration-100 ease-out active:scale-[0.985] motion-reduce:active:scale-100"
                 onClick={() => setShareOpen(false)}
               >
                 <span className="font-mono uppercase tracking-[0.2em] text-xs text-text-2">
                   {labels.shareDownload ?? "Download"}
                 </span>
-              </PressableSurface>
+              </a>
             ) : null}
           </div>
         </Sheet>
