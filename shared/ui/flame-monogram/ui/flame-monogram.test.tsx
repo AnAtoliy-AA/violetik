@@ -63,4 +63,15 @@ describe("FlameMonogram", () => {
     const back = spans[0];
     expect(back.style.color).toBe("rgb(40, 8, 0)");
   });
+
+  it("renders 36 free sparks (siblings of the masked rect)", () => {
+    const { container } = render(<FlameMonogram />);
+    // Free sparks are <circle>s that are direct children of <svg>, not inside <mask>.
+    const svg = container.querySelector("svg");
+    expect(svg).not.toBeNull();
+    const freeCircles = Array.from(svg!.children).filter(
+      (el) => el.tagName.toLowerCase() === "circle",
+    );
+    expect(freeCircles).toHaveLength(36);
+  });
 });

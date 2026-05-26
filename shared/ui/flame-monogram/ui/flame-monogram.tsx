@@ -59,18 +59,18 @@ interface Spark {
   duration: number;
 }
 
-const SPARK_COUNT = 18;
+const SPARK_COUNT = 36;
 
 // Free sparks fly off the flame body and drift upward independently of the
 // metaball, giving the fire visible particles instead of just a continuous
 // shape. They're rendered outside the goo mask so they remain individual.
 function buildSparks(): Spark[] {
   return Array.from({ length: SPARK_COUNT }, (_, i) => ({
-    size: 1.4 + pseudo(i + 1000, 1) * 2.6,
+    size: 1.4 + pseudo(i + 1000, 1) * 3.4,
     x: -42 + pseudo(i + 1000, 2) * 84,
     driftX: -16 + pseudo(i + 1000, 5) * 32,
     delay: -pseudo(i + 1000, 3) * 2.5,
-    duration: 1.6 + pseudo(i + 1000, 4) * 1.2,
+    duration: 2.0 + pseudo(i + 1000, 4) * 1.4,
   }));
 }
 
@@ -232,7 +232,7 @@ export function FlameMonogram({
             cx={100 + spark.x}
             cy={200}
             r={spark.size}
-            fill={i % 3 === 0 ? "#fff5d6" : "#ffd28a"}
+            fill={i % 5 < 3 ? "#fff5d6" : "#ffd28a"}
             style={
               reduceMotion
                 ? { opacity: 0.5 }
