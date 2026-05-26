@@ -95,6 +95,7 @@
       "master": "Master",
       "date": "Date",
       "time": "Time",
+      "when": "When",
       "confirm": "Confirm"
     },
     "service": {

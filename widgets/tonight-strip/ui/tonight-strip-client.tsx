@@ -64,12 +64,12 @@ export function TonightStripClient({
           {
             time: data.time,
             service: data.service,
-            href: `/booking/time?prefilter=tonight&time=${encodeURIComponent(data.time)}`,
+            href: `/booking/when?prefilter=tonight&time=${encodeURIComponent(data.time)}`,
           },
           ...(data.laterSlots ?? []).map((s) => ({
             time: s.time,
             service: s.service,
-            href: `/booking/time?prefilter=tonight&time=${encodeURIComponent(s.time)}`,
+            href: `/booking/when?prefilter=tonight&time=${encodeURIComponent(s.time)}`,
           })),
         ]
       : data.next
@@ -77,7 +77,7 @@ export function TonightStripClient({
             {
               time: data.next.time,
               service: data.next.service,
-              href: `/booking/time?time=${encodeURIComponent(data.next.time)}`,
+              href: `/booking/when?time=${encodeURIComponent(data.next.time)}`,
             },
           ]
         : [];

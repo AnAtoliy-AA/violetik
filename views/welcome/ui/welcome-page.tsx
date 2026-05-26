@@ -71,10 +71,10 @@ export function WelcomePage({
 
   const tonightHref =
     nextOpening?.isToday && nextOpening?.time
-      ? `/booking/time?prefilter=tonight&time=${encodeURIComponent(
+      ? `/booking/when?prefilter=tonight&time=${encodeURIComponent(
           nextOpening.time,
         )}`
-      : "/booking/time?prefilter=tonight";
+      : "/booking/when?prefilter=tonight";
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">

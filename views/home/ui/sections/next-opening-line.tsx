@@ -40,8 +40,8 @@ export async function NextOpeningLine() {
   }
 
   const href = next.isToday
-    ? `/booking/time?prefilter=tonight&time=${encodeURIComponent(next.time)}`
-    : `/booking/time?time=${encodeURIComponent(next.time)}&date=${encodeURIComponent(next.date)}`;
+    ? `/booking/when?prefilter=tonight&time=${encodeURIComponent(next.time)}`
+    : `/booking/when?time=${encodeURIComponent(next.time)}&date=${encodeURIComponent(next.date)}`;
 
   const dayLabel = next.isToday
     ? null

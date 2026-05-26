@@ -3,6 +3,7 @@ import {
   BOOKING_STEPS,
   buildDateStrip,
   bookingStartISO,
+  effectiveBookingSteps,
   formatLongDate,
   indexOfStep,
   isBookingStep,
@@ -14,29 +15,42 @@ import {
 } from "./booking-steps";
 
 describe("booking-steps", () => {
-  it("isBookingStep accepts known steps and rejects others", () => {
+  it("isBookingStep accepts every known step including legacy + collapsed forms", () => {
     for (const s of BOOKING_STEPS) expect(isBookingStep(s)).toBe(true);
+    // §6.1 — legacy /date and /time still resolve so deep-links survive.
+    expect(isBookingStep("date")).toBe(true);
+    expect(isBookingStep("time")).toBe(true);
+    // §6.2 — new collapsed step.
+    expect(isBookingStep("when")).toBe(true);
     expect(isBookingStep("foo")).toBe(false);
     expect(isBookingStep("")).toBe(false);
   });
 
-  it("nextStep / prevStep walk the sequence and bound at ends", () => {
-    expect(nextStep("service")).toBe("master");
-    expect(nextStep("master")).toBe("date");
-    expect(nextStep("date")).toBe("time");
-    expect(nextStep("time")).toBe("confirm");
-    expect(nextStep("confirm")).toBeNull();
-    expect(prevStep("service")).toBeNull();
-    expect(prevStep("master")).toBe("service");
-    expect(prevStep("date")).toBe("master");
-    expect(prevStep("time")).toBe("date");
-    expect(prevStep("confirm")).toBe("time");
+  it("nextStep / prevStep walk the effective flow for a solo studio (3 steps)", () => {
+    const solo = effectiveBookingSteps(1);
+    expect(solo).toEqual(["service", "when", "confirm"]);
+    expect(nextStep("service", solo)).toBe("when");
+    expect(nextStep("when", solo)).toBe("confirm");
+    expect(nextStep("confirm", solo)).toBeNull();
+    expect(prevStep("service", solo)).toBeNull();
+    expect(prevStep("when", solo)).toBe("service");
+    expect(prevStep("confirm", solo)).toBe("when");
   });
 
-  it("indexOfStep is consistent with BOOKING_STEPS ordering", () => {
-    BOOKING_STEPS.forEach((step, i) => {
-      expect(indexOfStep(step)).toBe(i);
-    });
+  it("nextStep / prevStep reintroduce master when multiple masters exist", () => {
+    const multi = effectiveBookingSteps(3);
+    expect(multi).toEqual(["service", "master", "when", "confirm"]);
+    expect(nextStep("service", multi)).toBe("master");
+    expect(nextStep("master", multi)).toBe("when");
+    expect(prevStep("when", multi)).toBe("master");
+  });
+
+  it("indexOfStep maps legacy /date and /time to the collapsed /when slot", () => {
+    const solo = effectiveBookingSteps(1);
+    expect(indexOfStep("date", solo)).toBe(solo.indexOf("when"));
+    expect(indexOfStep("time", solo)).toBe(solo.indexOf("when"));
+    expect(indexOfStep("service", solo)).toBe(0);
+    expect(indexOfStep("confirm", solo)).toBe(solo.length - 1);
   });
 
   it("bookingStartISO returns the civil date in the studio timezone", () => {

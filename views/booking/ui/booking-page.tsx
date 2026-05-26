@@ -16,8 +16,8 @@ import { Sheet } from "@/shared/ui/sheet";
 import { AppHeader } from "@/widgets/app-header";
 import { BookingStepper } from "@/widgets/booking-stepper";
 import {
-  BOOKING_STEPS,
   type BookingStep,
+  effectiveBookingSteps,
   indexOfStep,
   nextStep,
   prevStep,
@@ -29,6 +29,7 @@ import { DateStep } from "./steps/date-step";
 import { MasterStep } from "./steps/master-step";
 import { ServiceStep } from "./steps/service-step";
 import { TimeStep } from "./steps/time-step";
+import { WhenStep } from "./steps/when-step";
 
 function ArrowRight() {
   return (
@@ -98,13 +99,14 @@ export function BookingPage({
   }, [step]);
 
   // §6.6 — exit-intent save sheet. Triggers once per session when the
-  // user is mid-flow (date/time/confirm) and presses Back. We push a
-  // sentinel history entry on mount so popstate fires before the URL
+  // user is mid-flow (date/time/when/confirm) and presses Back. We push
+  // a sentinel history entry on mount so popstate fires before the URL
   // actually moves off the booking page; if they click "Discard" in
   // the sheet, we explicitly navigate them out.
   const GUARDED_STEPS: ReadonlySet<BookingStep> = new Set([
     "date",
     "time",
+    "when",
     "confirm",
   ]);
   useEffect(() => {
@@ -161,17 +163,22 @@ export function BookingPage({
     return `https://t.me/share/url?url=${encodeURIComponent(url)}`;
   })();
 
-  const stepIndex = indexOfStep(step);
-  const back = prevStep(step);
-  const next = nextStep(step);
+  // §6.1 — collapse the visible step list. Solo studios drop the master
+  // step entirely; the /booking/master URL still resolves so the legacy
+  // route doesn't 404 mid-session.
+  const effectiveSteps = effectiveBookingSteps(masters.length);
+  const stepIndex = indexOfStep(step, effectiveSteps);
+  const back = prevStep(step, effectiveSteps);
+  const next = nextStep(step, effectiveSteps);
 
-  const labels = BOOKING_STEPS.map((s) => tSteps(s));
+  const labels = effectiveSteps.map((s) => tSteps(s));
 
   const canAdvance =
     (step === "service" && !!serviceId) ||
     (step === "master" && !!masterId) ||
     (step === "date" && !!date) ||
     (step === "time" && !!time) ||
+    (step === "when" && !!date && !!time) ||
     (step === "confirm" && !!serviceId && !!date && !!time);
 
   const handleAdvance = () => {
@@ -205,7 +212,10 @@ export function BookingPage({
     <div className="flex min-h-dvh flex-col">
       <AppHeader
         back={back ? `/booking/${back}` : "/services"}
-        title={t("step_counter", { current: stepIndex + 1, total: BOOKING_STEPS.length })}
+        title={t("step_counter", {
+          current: stepIndex + 1,
+          total: effectiveSteps.length,
+        })}
         ariaBackLabel={t("back_aria")}
       />
 
@@ -236,6 +246,7 @@ export function BookingPage({
             {step === "master" ? <MasterStep masters={masters} /> : null}
             {step === "date" ? <DateStep timeZone={timeZone} /> : null}
             {step === "time" ? <TimeStep /> : null}
+            {step === "when" ? <WhenStep timeZone={timeZone} /> : null}
             {step === "confirm" ? (
               <ConfirmStep
                 services={services}

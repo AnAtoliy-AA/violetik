@@ -82,7 +82,7 @@ describe("MasterStep", () => {
     setup("only-orphan-service");
     expect(screen.getByText(/No master is currently set up/i)).toBeVisible();
   });
-  it("auto-skips to /booking/date when exactly one master is eligible", () => {
+  it("auto-skips to /booking/when when exactly one master is eligible", () => {
     const onlyVioletta = masters.map((m) =>
       m.id === "iris" ? { ...m, serviceIds: ["editorial"] } : m,
     );
@@ -94,6 +94,6 @@ describe("MasterStep", () => {
       </NextIntlClientProvider>,
     );
     expect(useBookingStore.getState().masterId).toBe("violetta");
-    expect(routerReplace).toHaveBeenCalledWith("/booking/date");
+    expect(routerReplace).toHaveBeenCalledWith("/booking/when");
   });
 });

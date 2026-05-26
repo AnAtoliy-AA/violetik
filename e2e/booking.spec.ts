@@ -10,16 +10,16 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
   await page.getByRole("radio", { name: /Couture Gel/i }).click();
   await page.getByRole("button", { name: /^Forward$/i }).click();
 
-  await expect(page).toHaveURL(/\/booking\/date$/);
+  // §6.1–6.2 — solo studios collapse master + date + time into a single
+  // /booking/when step. The route still accepts /date and /time, but
+  // the in-app Forward navigation lands on /when.
+  await expect(page).toHaveURL(/\/booking\/when$/);
   await expect(
     page.getByRole("heading", { level: 2, name: /Pick a day/i }),
   ).toBeVisible();
 
   // Pick the second Tuesday in the strip (2026-05-26)
   await page.getByRole("button", { name: /Tue 26/i }).click();
-  await page.getByRole("button", { name: /^Forward$/i }).click();
-
-  await expect(page).toHaveURL(/\/booking\/time$/);
 
   // Pick 14:30 (not reserved). Wait for the slot grid to be stable —
   // it re-renders after async data loads and Playwright otherwise sees

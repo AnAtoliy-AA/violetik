@@ -26,7 +26,7 @@ export function MasterStep({ masters }: MasterStepProps) {
   useEffect(() => {
     if (eligible.length === 1 && selectedMasterId !== eligible[0].id) {
       setMaster(eligible[0].id);
-      router.replace("/booking/date");
+      router.replace("/booking/when");
     }
   }, [eligible, selectedMasterId, setMaster, router]);
 
