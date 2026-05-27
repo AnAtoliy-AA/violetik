@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/cn";
+import { GlassSurface } from "@/shared/ui/glass-surface";
 
 type TabKey = "home" | "services" | "gallery" | "profile" | "admin";
 
@@ -58,16 +59,16 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
       aria-label={t("aria_label")}
       className="fixed bottom-[22px] left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 px-4 pb-3 pt-2"
     >
-      <ul
-        className={cn(
-          "glass-top relative flex items-center justify-around",
-          "h-14 rounded-full border-[0.5px] border-line-strong bg-bg-2/70 shadow-card",
-        )}
-        style={{
-          backdropFilter: "var(--backdrop-blur-lg)",
-          WebkitBackdropFilter: "var(--backdrop-blur-lg)",
-        }}
+      <GlassSurface
+        as="div"
+        tint="warm"
+        blur="2xl"
+        rim
+        specular
+        elevation={3}
+        className="glass-top relative h-14 rounded-full"
       >
+        <ul role="list" className="flex h-full items-center justify-around">
         {tabs.map(({ key, href, Icon }) => {
           const isActive = key === active;
           return (
@@ -75,6 +76,7 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
               <Link
                 href={href}
                 aria-current={isActive ? "page" : undefined}
+                data-rim-sweep={isActive ? "true" : undefined}
                 className={cn(
                   "relative flex items-center justify-center rounded-full px-5 py-2",
                   "transition-[color,opacity] duration-fast ease-out",
@@ -124,7 +126,8 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
             </li>
           );
         })}
-      </ul>
+        </ul>
+      </GlassSurface>
     </nav>
   );
 }
