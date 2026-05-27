@@ -57,7 +57,7 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
   return (
     <nav
       aria-label={t("aria_label")}
-      className="fixed bottom-[22px] left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 px-4 pb-3 pt-2"
+      className="pointer-events-none fixed bottom-[22px] left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 px-4 pb-3 pt-2"
     >
       <GlassSurface
         as="div"
@@ -66,7 +66,7 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
         rim
         specular
         elevation={3}
-        className="glass-top relative h-14 rounded-full"
+        className="glass-top pointer-events-auto relative h-14 rounded-full"
       >
         <ul role="list" className="flex h-full items-center justify-around">
         {tabs.map(({ key, href, Icon }) => {

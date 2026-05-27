@@ -67,12 +67,12 @@
   --color-spotlight: rgba(244, 234, 216, 0.06);
 
   /* Stacked-glass blur scale (replaces the prior sm/md/lg tokens) */
-  --backdrop-blur-xs:  blur(6px)  saturate(140%);
-  --backdrop-blur-sm:  blur(10px) saturate(150%);
-  --backdrop-blur-md:  blur(16px) saturate(160%);
-  --backdrop-blur-lg:  blur(24px) saturate(170%);
-  --backdrop-blur-xl:  blur(32px) saturate(180%);
-  --backdrop-blur-2xl: blur(44px) saturate(200%);
+  --backdrop-blur-xs:  blur(10px) saturate(160%);
+  --backdrop-blur-sm:  blur(16px) saturate(170%);
+  --backdrop-blur-md:  blur(24px) saturate(180%);
+  --backdrop-blur-lg:  blur(36px) saturate(190%);
+  --backdrop-blur-xl:  blur(48px) saturate(200%);
+  --backdrop-blur-2xl: blur(64px) saturate(220%);
 
   /* Liquid Glass tints, rim, edge, shadow, specular coords */
   --color-glass-warm:   rgba(232, 207, 153, 0.06);
@@ -83,7 +83,7 @@
   --color-glass-rim:    rgba(255, 245, 214, 0.55);
   --color-glass-edge:   rgba(232, 207, 153, 0.28);
 
-  --shadow-glass:       0 -28px 56px -22px rgba(0, 0, 0, 0.7);
+  --shadow-glass:       0 -32px 64px -22px rgba(0, 0, 0, 0.78);
 
   /* Specular coords — overwritten by useLiquidPress at runtime */
   --lx: 50%;
@@ -823,6 +823,8 @@ body {
   -webkit-backdrop-filter: var(--backdrop-blur-lg);
   border: 0.5px solid var(--color-glass-edge);
   box-shadow: var(--shadow-glass);
+  /* Explicit so an ancestor pointer-events:none cannot accidentally bleed through. */
+  pointer-events: auto;
 }
 
 .glass-warm  { background: var(--color-glass-warm);  }
