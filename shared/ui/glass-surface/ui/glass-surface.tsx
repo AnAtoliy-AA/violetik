@@ -2,6 +2,7 @@ import {
   forwardRef,
   type ComponentPropsWithoutRef,
   type ForwardedRef,
+  type HTMLAttributes,
   type ReactNode,
 } from "react";
 import { cn } from "@/shared/lib/cn";
@@ -20,10 +21,11 @@ export type GlassSurfaceAs =
   | "footer"
   | "button";
 
-type AnyHtmlProps = ComponentPropsWithoutRef<"div"> &
-  ComponentPropsWithoutRef<"button">;
+// Loose base — events use HTMLElement so they unify across div/button/section.
+// Button-specific attrs we use are added explicitly.
+type GlassBaseProps = Omit<HTMLAttributes<HTMLElement>, "children">;
 
-export interface GlassSurfaceProps extends Omit<AnyHtmlProps, "children"> {
+export interface GlassSurfaceProps extends GlassBaseProps {
   as?: GlassSurfaceAs;
   tint?: GlassTint;
   blur?: GlassBlur;
@@ -33,6 +35,13 @@ export interface GlassSurfaceProps extends Omit<AnyHtmlProps, "children"> {
   elevation?: GlassElevation;
   className?: string;
   children: ReactNode;
+  // Button-specific attrs (used when as="button"):
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  form?: string;
+  name?: string;
+  value?: string | readonly string[] | number;
+  autoFocus?: boolean;
 }
 
 const tintClass: Record<GlassTint, string> = {

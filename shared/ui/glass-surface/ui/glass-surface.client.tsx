@@ -5,21 +5,27 @@ import {
   useCallback,
   useRef,
   type ComponentPropsWithoutRef,
+  type HTMLAttributes,
   type ReactNode,
 } from "react";
 import { useLiquidPress } from "../lib/use-liquid-press";
 import type { GlassSurfaceAs } from "./glass-surface";
 
-type AnyHtmlProps = ComponentPropsWithoutRef<"div"> &
-  ComponentPropsWithoutRef<"button">;
+type GlassBaseProps = Omit<HTMLAttributes<HTMLElement>, "children">;
 
-export interface InteractiveGlassSurfaceProps
-  extends Omit<AnyHtmlProps, "children"> {
+export interface InteractiveGlassSurfaceProps extends GlassBaseProps {
   as: GlassSurfaceAs;
   className: string;
   press: boolean;
   specular: boolean;
   children: ReactNode;
+  // Button-specific attrs (used when as="button"):
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  form?: string;
+  name?: string;
+  value?: string | readonly string[] | number;
+  autoFocus?: boolean;
 }
 
 export const InteractiveGlassSurface = forwardRef<
