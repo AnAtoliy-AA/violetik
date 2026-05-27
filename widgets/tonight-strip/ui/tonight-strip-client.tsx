@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { Marquee } from "@/shared/ui/marquee";
+import { GlassSurface } from "@/shared/ui/glass-surface";
 
 export interface TonightStripData {
   isToday: boolean;
@@ -120,11 +121,13 @@ export function TonightStripClient({
         : [];
 
   return (
-    <div
+    <GlassSurface
+      tint="warm"
+      blur="md"
+      elevation={1}
       aria-label={t("label")}
       className={
-        "relative w-full border-y border-line/40 bg-bg/70 backdrop-blur-sm " +
-        (className ?? "")
+        "relative w-full border-y border-line/40 " + (className ?? "")
       }
     >
       {data.isToday ? (
@@ -170,6 +173,6 @@ export function TonightStripClient({
       >
         ×
       </button>
-    </div>
+    </GlassSurface>
   );
 }
