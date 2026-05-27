@@ -66,10 +66,33 @@
   /* Spotlight tint for pointer-reactive cards */
   --color-spotlight: rgba(244, 234, 216, 0.06);
 
-  /* Stacked-glass blur tokens */
-  --backdrop-blur-sm: blur(8px);
-  --backdrop-blur-md: blur(16px) saturate(160%);
-  --backdrop-blur-lg: blur(28px) saturate(180%);
+  /* Stacked-glass blur scale (replaces the prior sm/md/lg tokens) */
+  --backdrop-blur-xs:  blur(6px)  saturate(140%);
+  --backdrop-blur-sm:  blur(10px) saturate(150%);
+  --backdrop-blur-md:  blur(16px) saturate(160%);
+  --backdrop-blur-lg:  blur(24px) saturate(170%);
+  --backdrop-blur-xl:  blur(32px) saturate(180%);
+  --backdrop-blur-2xl: blur(44px) saturate(200%);
+
+  /* Liquid Glass tints, rim, edge, shadow, specular coords */
+  --color-glass-warm:   rgba(232, 207, 153, 0.06);
+  --color-glass-body:   rgba(244, 234, 216, 0.05);
+  --color-glass-cool:   rgba(244, 234, 216, 0.03);
+  --color-glass-clear:  rgba(244, 234, 216, 0.015);
+
+  --color-glass-rim:    rgba(255, 245, 214, 0.55);
+  --color-glass-edge:   rgba(232, 207, 153, 0.28);
+
+  --shadow-glass:       0 -28px 56px -22px rgba(0, 0, 0, 0.7);
+
+  /* Specular coords — overwritten by useLiquidPress at runtime */
+  --lx: 50%;
+  --ly: 0%;
+
+  /* New keyframe-backed animation tokens */
+  --animate-liquid-press:  liquidPress 320ms var(--ease-out);
+  --animate-rim-sweep:     rimSweep 1400ms var(--ease-out);
+  --animate-glass-shimmer: glassShimmer 18s ease-in-out infinite;
 
   /* Gold gradient as a bg-image utility token (generates `bg-gold`) */
   --background-image-gold: linear-gradient(
@@ -512,6 +535,23 @@
   }
 }
 
+@keyframes liquidPress {
+  0%   { transform: scale(1);     }
+  35%  { transform: scale(0.985); }
+  100% { transform: scale(1);     }
+}
+
+@keyframes rimSweep {
+  0%   { background-position: -100% 50%; opacity: 0; }
+  50%  { opacity: 1; }
+  100% { background-position:  200% 50%; opacity: 0; }
+}
+
+@keyframes glassShimmer {
+  0%, 100% { background-position: 0%   50%; }
+  50%      { background-position: 100% 50%; }
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);
@@ -768,6 +808,119 @@ body {
   background: var(--color-accent);
   pointer-events: none;
   animation: var(--animate-ripple);
+}
+
+/* === Liquid Glass utilities === */
+
+.glass {
+  background: var(--color-glass-body);
+  backdrop-filter: var(--backdrop-blur-lg);
+  -webkit-backdrop-filter: var(--backdrop-blur-lg);
+  border: 0.5px solid var(--color-glass-edge);
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-warm  { background: var(--color-glass-warm);  }
+.glass-cool  { background: var(--color-glass-cool);  }
+.glass-clear { background: var(--color-glass-clear); }
+
+.glass-xs  { backdrop-filter: var(--backdrop-blur-xs);  -webkit-backdrop-filter: var(--backdrop-blur-xs);  }
+.glass-sm  { backdrop-filter: var(--backdrop-blur-sm);  -webkit-backdrop-filter: var(--backdrop-blur-sm);  }
+.glass-md  { backdrop-filter: var(--backdrop-blur-md);  -webkit-backdrop-filter: var(--backdrop-blur-md);  }
+.glass-lg  { backdrop-filter: var(--backdrop-blur-lg);  -webkit-backdrop-filter: var(--backdrop-blur-lg);  }
+.glass-xl  { backdrop-filter: var(--backdrop-blur-xl);  -webkit-backdrop-filter: var(--backdrop-blur-xl);  }
+.glass-2xl { backdrop-filter: var(--backdrop-blur-2xl); -webkit-backdrop-filter: var(--backdrop-blur-2xl); }
+
+/* Lens-edge top rim — always-rendered ::before; consumers transition its opacity. */
+.glass-rim {
+  position: relative;
+  isolation: isolate;
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 1px 0 rgba(255, 245, 214, 0.28);
+}
+.glass-rim::before {
+  content: "";
+  position: absolute;
+  left: 8%; right: 8%; top: -1px;
+  height: 22px;
+  background: radial-gradient(50% 100% at 50% 0%, var(--color-glass-rim), transparent 75%);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--rim-opacity, 1);
+  transition: opacity 240ms var(--ease-out);
+}
+
+/* Pointer-tracked specular highlight — reads --lx / --ly. */
+.glass-specular {
+  position: relative;
+  isolation: isolate;
+}
+.glass-specular::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    160px 100px at var(--lx, 50%) var(--ly, 0%),
+    rgba(255, 255, 255, 0.18),
+    transparent 60%);
+  opacity: 0;
+  transition: opacity 320ms var(--ease-out);
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+.glass-specular[data-active="true"]::after {
+  opacity: 1;
+}
+
+/* Continuous low-cost shimmer — opt-in via class. */
+.glass-shimmer {
+  background-size: 200% 100%;
+  animation: var(--animate-glass-shimmer);
+}
+
+/* Liquid press — surface scales briefly on tap. Triggered by data-active
+ * which is set by useLiquidPress on pointerdown. Scoped to .glass-press so
+ * specular-only surfaces don't accidentally scale. */
+.glass-press[data-active="true"] {
+  animation: var(--animate-liquid-press);
+}
+
+/* Rim-sweep — single-pass gold sweep on the active tab in TabBar (Task 10).
+ * Trigger: any element with data-rim-sweep="true". Lives globally so the
+ * widget keeps no widget-local CSS. !important on background-image so a
+ * sibling Tailwind bg-* utility doesn't silently swallow the sweep. */
+[data-rim-sweep="true"] {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(232, 207, 153, 0.55) 30%,
+    rgba(255, 245, 214, 0.95) 50%,
+    rgba(232, 207, 153, 0.55) 70%,
+    transparent 100%) !important;
+  background-size: 200% 100%;
+  animation: var(--animate-rim-sweep);
+}
+
+/* Reduced transparency / reduced motion fallbacks */
+@media (prefers-reduced-transparency: reduce) {
+  .glass, .glass-warm, .glass-cool, .glass-clear {
+    background: var(--color-surface);
+  }
+  .glass-xs, .glass-sm, .glass-md, .glass-lg, .glass-xl, .glass-2xl {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .glass-specular::after,
+  .glass-rim::before {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-shimmer { animation: none; }
 }
 
 /* Tap-target visualiser (dev only — toggle via html[data-debug-hit="true"]) */
