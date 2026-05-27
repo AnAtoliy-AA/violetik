@@ -54,4 +54,18 @@ describe("PressableSurface", () => {
       vi.useRealTimers();
     }
   });
+
+  it("by default attaches liquid press (glass-specular class, data-active on pointerdown)", () => {
+    render(<PressableSurface>Tap</PressableSurface>);
+    const btn = screen.getByRole("button", { name: "Tap" });
+    expect(btn.className).toMatch(/glass-specular/);
+    fireEvent.pointerDown(btn, { clientX: 5, clientY: 5 });
+    expect(btn.getAttribute("data-active")).toBe("true");
+  });
+
+  it("liquid=false omits glass-specular", () => {
+    render(<PressableSurface liquid={false}>Tap</PressableSurface>);
+    const btn = screen.getByRole("button", { name: "Tap" });
+    expect(btn.className).not.toMatch(/glass-specular/);
+  });
 });

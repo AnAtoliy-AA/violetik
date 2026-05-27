@@ -6,11 +6,13 @@ import {
   type PointerEvent,
   type ReactNode,
   type Ref,
+  type RefObject,
   useCallback,
   useRef,
   useState,
 } from "react";
 import { cn } from "@/shared/lib/cn";
+import { useLiquidPress } from "@/shared/ui/glass-surface";
 
 export interface PressableSurfaceProps
   extends Omit<ButtonHTMLAttributes<HTMLElement>, "type"> {
@@ -24,6 +26,8 @@ export interface PressableSurfaceProps
   target?: string;
   /** Anchor rel — only meaningful when `as` resolves to a link element. */
   rel?: string;
+  /** Attach liquid-press radial highlight via useLiquidPress + glass-specular. */
+  liquid?: boolean;
   children?: ReactNode;
   ref?: Ref<HTMLElement>;
 }
@@ -35,6 +39,7 @@ let rippleId = 0;
 export function PressableSurface({
   as,
   noRipple = false,
+  liquid = true,
   className,
   onPointerDown,
   children,
@@ -44,6 +49,11 @@ export function PressableSurface({
   const localRef = useRef<HTMLElement | null>(null);
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const Component: ElementType = as ?? "button";
+
+  const liquidRef = liquid
+    ? (localRef as RefObject<HTMLElement | null>)
+    : ({ current: null } as RefObject<HTMLElement | null>);
+  useLiquidPress(liquidRef, { pressOnly: true });
 
   const handlePointerDown = useCallback(
     (event: PointerEvent<HTMLElement>) => {
@@ -74,6 +84,7 @@ export function PressableSurface({
       "ripple-host inline-flex items-stretch text-left",
       "transition-transform duration-100 ease-out",
       "active:scale-[0.985] motion-reduce:active:scale-100",
+      liquid && "glass-specular",
       className,
     ),
     onPointerDown: handlePointerDown,
