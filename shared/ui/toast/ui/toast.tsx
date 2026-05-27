@@ -25,6 +25,7 @@ export function Toast({ toast, onDismiss, className, ...rest }: ToastProps) {
       drag={reduced ? false : "x"}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.2}
+      className="w-fit"
       onDragEnd={(_, info: PanInfo) => {
         if (Math.abs(info.velocity.x) > 600 || Math.abs(info.offset.x) > 120) {
           onDismiss(toast.id);
