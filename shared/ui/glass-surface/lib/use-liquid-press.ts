@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
 export interface UseLiquidPressOptions {
   /** If true, only updates --lx/--ly on press, not on hover. Default false. */
@@ -19,6 +19,7 @@ export function useLiquidPress(
 ): UseLiquidPressReturn {
   const { pressOnly = false, setDataActive = true } = options;
   const [pressed, setPressed] = useState(false);
+  const pressedRef = useRef(false);
 
   useEffect(() => {
     const node = ref.current;
@@ -37,16 +38,18 @@ export function useLiquidPress(
     };
 
     const onMove = (e: PointerEvent) => {
-      if (pressOnly && !pressed) return;
+      if (pressOnly && !pressedRef.current) return;
       writeCoords(e);
     };
     const onDown = (e: PointerEvent) => {
       writeCoords(e);
       if (setDataActive) node.setAttribute("data-active", "true");
+      pressedRef.current = true;
       setPressed(true);
     };
     const clear = () => {
       if (setDataActive) node.removeAttribute("data-active");
+      pressedRef.current = false;
       setPressed(false);
     };
 
@@ -63,7 +66,7 @@ export function useLiquidPress(
       node.removeEventListener("pointercancel", clear);
       node.removeEventListener("pointerleave", clear);
     };
-  }, [ref, pressOnly, setDataActive, pressed]);
+  }, [ref, pressOnly, setDataActive]);
 
   return { pressed };
 }

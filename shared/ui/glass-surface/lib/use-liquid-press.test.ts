@@ -62,5 +62,7 @@ describe("useLiquidPress", () => {
     const { target } = renderHookWithRef();
     act(() => fireEv(target, "pointermove", { clientX: 75, clientY: 25 }));
     expect(target.style.getPropertyValue("--lx")).toBe("");
+    act(() => fireEv(target, "pointerdown", { clientX: 75, clientY: 25 }));
+    expect(target.getAttribute("data-active")).toBeNull();
   });
 });
