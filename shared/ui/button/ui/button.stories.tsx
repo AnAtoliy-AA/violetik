@@ -8,7 +8,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["solid", "gold", "outline", "ghost"],
+      options: ["solid", "gold", "outline", "ghost", "glass"],
     },
     size: { control: "select", options: ["sm", "md", "lg"] },
     block: { control: "boolean" },
@@ -23,6 +23,18 @@ export const Solid: Story = { args: { variant: "solid" } };
 export const Gold: Story = { args: { variant: "gold" } };
 export const Outline: Story = { args: { variant: "outline" } };
 export const Ghost: Story = { args: { variant: "ghost" } };
+
+export const Glass: Story = {
+  args: { variant: "glass" },
+  decorators: [
+    (StoryFn) => (
+      <div className="flex items-center justify-center rounded-2xl bg-gradient-to-br from-violet-900 via-purple-800 to-indigo-900 p-12">
+        <StoryFn />
+      </div>
+    ),
+  ],
+};
+
 export const Block: Story = { args: { block: true, variant: "gold" } };
 export const WithIcon: Story = {
   args: {
@@ -33,11 +45,12 @@ export const Disabled: Story = { args: { disabled: true, variant: "gold" } };
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-gradient-to-br from-violet-900 via-purple-800 to-indigo-900 p-8">
       <Button variant="solid">Solid</Button>
       <Button variant="gold">Gold</Button>
       <Button variant="outline">Outline</Button>
       <Button variant="ghost">Ghost</Button>
+      <Button variant="glass">Glass</Button>
       <Button variant="gold" size="sm">
         Small
       </Button>
