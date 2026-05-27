@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { NavSheet } from "@/widgets/nav-sheet";
 import { cn } from "@/shared/lib/cn";
 import { Wordmark } from "@/shared/ui/wordmark";
+import { GlassSurface } from "@/shared/ui/glass-surface";
 
 export interface AppHeaderProps extends HTMLAttributes<HTMLElement> {
   /** If set, replaces the default Wordmark with a centred mono caps title. */
@@ -75,9 +76,13 @@ export function AppHeader({
   const menu = menuButton ?? <NavSheet />;
 
   return (
-    <header
+    <GlassSurface
+      as="header"
+      tint="warm"
+      blur="xl"
+      elevation={2}
       className={cn(
-        "sticky top-0 z-40 bg-bg/85 backdrop-blur",
+        "sticky top-0 z-40",
         className,
       )}
       {...rest}
@@ -115,6 +120,6 @@ export function AppHeader({
           className="mx-[22px] mt-1 h-px bg-line-strong"
         />
       ) : null}
-    </header>
+    </GlassSurface>
   );
 }

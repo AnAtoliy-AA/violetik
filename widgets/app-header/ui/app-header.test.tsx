@@ -46,6 +46,16 @@ function renderHeader(props?: React.ComponentProps<typeof AppHeader>) {
   );
 }
 
+describe("AppHeader — glass chrome", () => {
+  it("renders the header root as a GlassSurface", () => {
+    renderHeader();
+    const header = screen.getByRole("banner");
+    expect(header.getAttribute("data-glass")).toBe("true");
+    expect(header.className).toMatch(/glass-warm/);
+    expect(header.className).toMatch(/glass-xl/);
+  });
+});
+
 describe("AppHeader", () => {
   it("renders the wordmark and a labelled menu button", () => {
     renderHeader();
