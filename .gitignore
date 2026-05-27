@@ -60,3 +60,4 @@ storybook-static
 
 # claude worktrees
 /.claude/worktrees/
+.superpowers/
