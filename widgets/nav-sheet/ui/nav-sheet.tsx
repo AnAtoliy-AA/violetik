@@ -20,6 +20,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/features/locale-switcher";
 import { PwaInstallButton } from "@/features/pwa-install";
 import { cn } from "@/shared/lib/cn";
+import { glassSurfaceClassName } from "@/shared/ui/glass-surface";
 
 interface NavEntry {
   key: string;
@@ -274,13 +275,20 @@ export function NavSheet() {
                       ? { duration: 0 }
                       : { type: "spring", stiffness: 360, damping: 34, mass: 0.6 }
                   }
+                  data-glass="true"
                   className={cn(
                     "absolute right-0 top-0 h-full w-[min(360px,86vw)]",
-                    "bg-surface text-text shadow-lifted",
-                    "border-l border-line-strong/60",
+                    "text-text",
                     "outline-none flex flex-col",
                     "pt-[max(20px,env(safe-area-inset-top))]",
                     "pb-[max(20px,env(safe-area-inset-bottom))]",
+                    glassSurfaceClassName({
+                      tint: "warm",
+                      blur: "2xl",
+                      rim: true,
+                      specular: true,
+                      elevation: 3,
+                    }),
                   )}
                 >
                   <div className="flex items-start justify-between px-5 pb-3">
