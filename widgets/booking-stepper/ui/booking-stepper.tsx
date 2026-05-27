@@ -1,4 +1,5 @@
 import { cn } from "@/shared/lib/cn";
+import { GlassSurface } from "@/shared/ui/glass-surface";
 
 export interface BookingStepperProps {
   labels: readonly string[];
@@ -15,7 +16,10 @@ export function BookingStepper({
   ariaLabel = "Booking progress",
 }: BookingStepperProps) {
   return (
-    <div
+    <GlassSurface
+      tint="cool"
+      blur="md"
+      elevation={1}
       role="group"
       aria-label={ariaLabel}
       className={cn("flex flex-col gap-2", className)}
@@ -46,6 +50,6 @@ export function BookingStepper({
           </span>
         ))}
       </div>
-    </div>
+    </GlassSurface>
   );
 }
