@@ -16,6 +16,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { cn } from "@/shared/lib/cn";
+import { glassSurfaceClassName } from "@/shared/ui/glass-surface";
 
 export interface SheetProps {
   open: boolean;
@@ -178,6 +179,7 @@ export function Sheet({
             ref={sheetRef}
             tabIndex={-1}
             role="dialog"
+            data-glass="true"
             aria-modal
             aria-labelledby={title ? labelId : undefined}
             aria-label={title ? undefined : "Bottom sheet"}
@@ -196,10 +198,15 @@ export function Sheet({
             }
             className={cn(
               "relative w-full max-w-[640px] h-[100vh]",
-              "bg-surface text-text",
-              "rounded-t-2xl shadow-lifted",
-              "border-t border-line-strong/60",
+              "text-text rounded-t-2xl",
               "outline-none flex flex-col",
+              glassSurfaceClassName({
+                tint: "warm",
+                blur: "2xl",
+                rim: true,
+                specular: true,
+                elevation: 3,
+              }),
             )}
             style={{ touchAction: "none" }}
           >

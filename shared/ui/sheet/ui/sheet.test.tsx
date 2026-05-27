@@ -120,6 +120,23 @@ describe("Sheet", () => {
   });
 });
 
+describe("Sheet — glass body", () => {
+  it("renders the sheet body as a GlassSurface (data-glass='true' on body)", () => {
+    render(
+      <Sheet open onOpenChange={() => {}}>
+        <div>contents</div>
+      </Sheet>,
+    );
+    const body = screen.getByText("contents").closest("[data-glass]")!;
+    expect(body).not.toBeNull();
+    expect(body.getAttribute("data-glass")).toBe("true");
+    expect(body.className).toMatch(/glass-warm/);
+    expect(body.className).toMatch(/glass-2xl/);
+    expect(body.className).toMatch(/glass-rim/);
+    expect(body.className).toMatch(/glass-specular/);
+  });
+});
+
 vi.mock("react-dom", async () => {
   const actual = await vi.importActual<typeof import("react-dom")>("react-dom");
   return {
