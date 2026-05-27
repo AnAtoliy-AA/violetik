@@ -878,6 +878,11 @@ body {
 
 /* Continuous low-cost shimmer — opt-in via class. */
 .glass-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 245, 214, 0.04) 50%,
+    transparent 100%);
   background-size: 200% 100%;
   animation: var(--animate-glass-shimmer);
 }
@@ -892,7 +897,12 @@ body {
 /* Rim-sweep — single-pass gold sweep on the active tab in TabBar (Task 10).
  * Trigger: any element with data-rim-sweep="true". Lives globally so the
  * widget keeps no widget-local CSS. !important on background-image so a
- * sibling Tailwind bg-* utility doesn't silently swallow the sweep. */
+ * sibling Tailwind bg-* utility doesn't silently swallow the sweep.
+ *
+ * NOTE: The selector is intentionally unqualified. Only set
+ * data-rim-sweep on elements you genuinely want the sweep on — there is
+ * no scope-fence. If consumers outside the TabBar need this, prefer
+ * scoping at the consumer site or migrate to a class-based opt-in. */
 [data-rim-sweep="true"] {
   background-image: linear-gradient(
     90deg,
@@ -918,9 +928,14 @@ body {
   .glass-rim::before {
     display: none;
   }
+  .glass-rim {
+    box-shadow: var(--shadow-glass);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .glass-shimmer { animation: none; }
+  .glass-press[data-active="true"] { animation: none; }
+  [data-rim-sweep="true"] { animation: none; }
 }
 
 /* Tap-target visualiser (dev only — toggle via html[data-debug-hit="true"]) */
