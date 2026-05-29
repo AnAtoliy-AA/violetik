@@ -59,10 +59,10 @@ type UiStatus =
   | { kind: "validation"; issues: Record<string, string> }
   | { kind: "error"; message: string };
 
-const inputClass =
-  "w-full rounded border border-line bg-surface px-3 py-2 text-[14px]";
-const textareaClass =
-  "w-full min-h-[80px] rounded border border-line bg-surface px-3 py-2 text-[14px]";
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
+const inputClass = `w-full rounded border border-line bg-surface px-3 py-2.5 text-base text-text ${focusRing}`;
+const textareaClass = `w-full min-h-[80px] rounded border border-line bg-surface px-3 py-2.5 text-base text-text ${focusRing}`;
 
 /** Converts a major-units string ("95", "95.5") to integer minor units. */
 function majorToCents(input: string): number {
@@ -348,14 +348,14 @@ export function ServiceEditor({
           disabled={isPending}
           className={buttonClassName({ variant: "gold", size: "md" })}
         >
-          {t("cta_save")}
+          {isPending ? t("saving") : t("cta_save")}
         </button>
         {uiStatus.kind === "saved" ? (
           <span role="status" className="text-[12px] text-text-2">
             {t("saved")}
           </span>
         ) : uiStatus.kind === "error" ? (
-          <span role="alert" className="text-[12px] text-accent">
+          <span role="alert" className="text-[12px] text-rose">
             {t("save_failed", { error: uiStatus.message })}
           </span>
         ) : null}
@@ -391,7 +391,7 @@ function Field({
         <span className="text-[11px] text-text-3">{hint}</span>
       ) : null}
       {error ? (
-        <span className={cn("text-[12px] text-accent")} role="alert">
+        <span className={cn("text-[12px] text-rose")} role="alert">
           {error}
         </span>
       ) : null}

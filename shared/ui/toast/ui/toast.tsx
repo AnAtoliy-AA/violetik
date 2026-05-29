@@ -62,9 +62,20 @@ export function Toast({ toast, onDismiss, className, ...rest }: ToastProps) {
           type="button"
           aria-label="Dismiss"
           onClick={() => onDismiss(toast.id)}
-          className="text-text-3 hover:text-text transition-colors shrink-0 px-1 leading-none"
+          className="-my-1.5 inline-flex size-11 shrink-0 items-center justify-center rounded-full text-text-3 transition-colors hover:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
         >
-          ×
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            width={14}
+            height={14}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+          >
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
         </button>
       </GlassSurface>
     </m.div>

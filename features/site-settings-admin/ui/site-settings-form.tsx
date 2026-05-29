@@ -233,7 +233,7 @@ export function SiteSettingsForm({
             max={10_000}
             placeholder="—"
             aria-label="VIP price override"
-            className="w-24 rounded border border-line bg-surface px-2 py-1 text-right"
+            className="w-24 rounded border border-line bg-surface px-2 py-2 text-right text-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
             value={vipOverride}
             onChange={(e) => setVipOverride(e.target.value)}
           />
@@ -252,7 +252,7 @@ export function SiteSettingsForm({
               min={0}
               max={90}
               aria-label="discount percent"
-              className="w-20 rounded border border-line bg-surface px-2 py-1 text-right"
+              className="w-20 rounded border border-line bg-surface px-2 py-2 text-right text-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               value={discountPercent}
               onChange={(e) =>
                 setDiscountPercent(
@@ -288,7 +288,7 @@ export function SiteSettingsForm({
               min={0}
               max={1000}
               aria-label="markup percent"
-              className="w-20 rounded border border-line bg-surface px-2 py-1 text-right"
+              className="w-20 rounded border border-line bg-surface px-2 py-2 text-right text-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               value={markupPercent}
               onChange={(e) =>
                 setMarkupPercent(
@@ -322,7 +322,7 @@ export function SiteSettingsForm({
             {t("site_settings_saved")}
           </span>
         ) : status.kind === "error" ? (
-          <span role="alert" className="text-[12px] text-accent">
+          <span role="alert" className="text-[12px] text-rose">
             {t("site_settings_error", { error: status.message })}
           </span>
         ) : null}

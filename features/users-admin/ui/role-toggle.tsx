@@ -60,7 +60,8 @@ export function RoleToggle(props: RoleToggleProps) {
               if (!checked) submit(value);
             }}
             className={cn(
-              "rounded-full px-3 py-1 font-mono uppercase tracking-[0.18em] transition-colors duration-fast",
+              "rounded-full px-3 py-1.5 font-mono uppercase tracking-[0.18em] transition-colors duration-fast",
+              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent",
               checked ? "bg-gold text-bg" : "text-text-2",
             )}
           >
@@ -69,7 +70,7 @@ export function RoleToggle(props: RoleToggleProps) {
         );
       })}
       {error ? (
-        <span className="ml-2 text-[10px] text-red-400">{error}</span>
+        <span className="ml-2 text-[10px] text-rose">{error}</span>
       ) : null}
     </div>
   );

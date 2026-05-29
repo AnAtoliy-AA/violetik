@@ -8,6 +8,13 @@ import type { Locale } from "@/i18n/routing";
 import { SortableList } from "./sortable-list";
 import type { OnboardingSlideRow } from "@/db/schema";
 
+// §2 — padded ≥44px hit area + focus ring so the adjacent Edit/Delete
+// actions aren't easy to mis-tap. Delete dims while a mutation is pending.
+const actionBase =
+  "inline-flex min-h-[44px] items-center rounded px-1.5 font-mono text-[12px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent";
+const editAction = `${actionBase} text-accent`;
+const deleteAction = `${actionBase} text-rose disabled:opacity-50`;
+
 type Reorder = (
   ids: string[],
 ) => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -28,7 +35,7 @@ export function AdminOnboardingList({
 }: AdminOnboardingListProps) {
   const t = useTranslations("AdminOnboarding");
   const locale = useLocale() as Locale;
-  const [, startReorder] = useTransition();
+  const [isPending, startReorder] = useTransition();
   const [notice, setNotice] = useState<string | null>(null);
 
   const rows = slides.map((s) => ({
@@ -41,7 +48,7 @@ export function AdminOnboardingList({
   return (
     <div className="flex flex-col gap-6 px-[22px] py-6">
       {notice ? (
-        <p role="alert" className="rounded border-[0.5px] border-accent bg-surface-2 p-3 text-[13px] text-accent">
+        <p role="alert" className="rounded border-[0.5px] border-rose bg-surface-2 p-3 text-[13px] text-rose">
           {notice}
         </p>
       ) : null}
@@ -49,7 +56,7 @@ export function AdminOnboardingList({
         <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
           {t("section_slides")}
         </h2>
-        <Link href="/admin/onboarding/new" className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent">
+        <Link href="/admin/onboarding/new" className={editAction}>
           {t("cta_new_slide")}
         </Link>
       </div>
@@ -66,14 +73,16 @@ export function AdminOnboardingList({
                 {s.id} · {s.hasImage ? t("badge_has_image") : t("badge_no_image")}
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Link href={`/admin/onboarding/${s.id}`} className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent">
+            <div className="flex items-center gap-1">
+              <Link href={`/admin/onboarding/${s.id}`} className={editAction}>
                 {t("cta_edit")}
               </Link>
               <button
                 type="button"
-                className="font-mono text-[12px] uppercase tracking-[0.16em] text-rose"
+                disabled={isPending}
+                className={deleteAction}
                 onClick={() => {
+                  if (!window.confirm(t("confirm_delete_slide"))) return;
                   setNotice(null);
                   startReorder(async () => {
                     const r = await deleteSlideAction(s.id);

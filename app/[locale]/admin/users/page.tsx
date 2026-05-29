@@ -151,7 +151,7 @@ export default async function AdminUsersRoute({
             name="q"
             defaultValue={q}
             placeholder={t("search_placeholder")}
-            className="min-w-[200px] flex-1 rounded-[10px] border-[0.5px] border-line bg-surface-1 px-3 py-2 text-[13px]"
+            className="min-w-[200px] flex-1 rounded-[10px] border-[0.5px] border-line bg-surface-1 px-3 py-2.5 text-base text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
           />
           <input type="hidden" name="role" value={role} />
           <input type="hidden" name="vip" value={vip} />

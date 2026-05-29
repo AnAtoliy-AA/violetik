@@ -55,7 +55,7 @@ export function SpecialtyPicker({ services, value, onChange }: Props) {
       </legend>
       <p className="text-[11px] text-text-3">{t("label_specialties_hint")}</p>
       {selected.size === 0 ? (
-        <p className="text-[12px] text-accent" role="alert">
+        <p className="text-[12px] text-rose" role="alert">
           {t("specialties_empty_warning")}
         </p>
       ) : null}
@@ -70,14 +70,14 @@ export function SpecialtyPicker({ services, value, onChange }: Props) {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  className="text-[10px] uppercase tracking-[0.16em] text-accent hover:underline"
+                  className="rounded px-1 py-1 text-[10px] uppercase tracking-[0.16em] text-accent hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                   onClick={() => selectAll(ids)}
                 >
                   {t("specialties_select_all")}
                 </button>
                 <button
                   type="button"
-                  className="text-[10px] uppercase tracking-[0.16em] text-text-3 hover:underline"
+                  className="rounded px-1 py-1 text-[10px] uppercase tracking-[0.16em] text-text-3 hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                   onClick={() => clearGroup(ids)}
                 >
                   {t("specialties_clear")}

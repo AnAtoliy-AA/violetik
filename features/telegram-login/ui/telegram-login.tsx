@@ -65,7 +65,19 @@ export function TelegramLogin({
     script.setAttribute("data-radius", "20");
     container.appendChild(script);
 
+    // The widget injects an <iframe> we don't render; give it an
+    // accessible title (a11y: frames must be titled) once it appears.
+    const observer = new MutationObserver(() => {
+      const iframe = container.querySelector("iframe");
+      if (iframe && !iframe.title) {
+        iframe.title = "Telegram login";
+        observer.disconnect();
+      }
+    });
+    observer.observe(container, { childList: true, subtree: true });
+
     return () => {
+      observer.disconnect();
       delete window.onTelegramAuth;
     };
   }, [botUsername, size, callbackUrl]);
