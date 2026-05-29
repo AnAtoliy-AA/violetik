@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { buildTonightStripData } from "./get-tonight-data";
-import type { WorkingWindow } from "@/shared/lib/google-calendar/types";
+import type {
+  BusyWindow,
+  WorkingWindow,
+} from "@/shared/lib/google-calendar/types";
 
 const HOURS: WorkingWindow[] = [
   { dayOfWeek: 1, startTime: "10:00", endTime: "19:00" },
@@ -68,5 +71,27 @@ describe("buildTonightStripData", () => {
 
   it("returns null when no working hours are configured", () => {
     expect(buildTonightStripData({ workingHours: [] })).toBeNull();
+  });
+
+  it("drops slots that overlap a busy window", () => {
+    // Monday 2026-05-25 10:00Z. Today's slots are 14:00–18:00 Minsk.
+    // 15:00 Minsk (UTC+3) == 12:00Z; a 12:00–13:00Z busy window must
+    // remove the 15:00 opening while leaving 14:00 and 16:00 intact.
+    const busy: BusyWindow[] = [
+      {
+        start: new Date("2026-05-25T12:00:00Z"),
+        end: new Date("2026-05-25T13:00:00Z"),
+      },
+    ];
+    const data = buildTonightStripData({
+      workingHours: HOURS,
+      now: new Date("2026-05-25T10:00:00Z"),
+      busy,
+    });
+    expect(data).not.toBeNull();
+    const today = data!.slots.filter((s) => s.isToday).map((s) => s.time);
+    expect(today).not.toContain("15:00");
+    expect(today).toContain("14:00");
+    expect(today).toContain("16:00");
   });
 });
