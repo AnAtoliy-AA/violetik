@@ -41,6 +41,8 @@ export const serviceFormSchema = z.object({
   durationMinutes: z.number().int().min(1).max(1_440),
   sortOrder: z.number().int().min(0).optional(),
   status: statusSchema,
+  /** Masters who perform this service. Mirrors masterFormSchema.serviceIds. */
+  masterIds: z.array(slugSchema).max(200).default([]),
 });
 
 export type ServiceFormInput = z.infer<typeof serviceFormSchema>;

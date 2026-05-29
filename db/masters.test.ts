@@ -13,6 +13,7 @@ import {
   listPublishedMasters,
   getMasterById,
   getMasterIdsForService,
+  getAllMasterIdsForService,
   getServiceIdsForMaster,
   getServiceIdsHavingAnyPublishedMaster,
 } from "./masters";
@@ -29,6 +30,9 @@ describe("db/masters — db-null tolerance", () => {
   });
   it("getMasterIdsForService returns []", async () => {
     expect(await getMasterIdsForService("any")).toEqual([]);
+  });
+  it("getAllMasterIdsForService returns []", async () => {
+    expect(await getAllMasterIdsForService("any")).toEqual([]);
   });
   it("getServiceIdsForMaster returns []", async () => {
     expect(await getServiceIdsForMaster("any")).toEqual([]);

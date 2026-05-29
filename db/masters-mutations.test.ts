@@ -13,6 +13,7 @@ import {
   createMaster,
   archiveMaster,
   countUpcomingBookingsForMaster,
+  setServiceMasters,
 } from "./masters-mutations";
 
 describe("db/masters-mutations — db-null tolerance", () => {
@@ -46,5 +47,11 @@ describe("db/masters-mutations — db-null tolerance", () => {
   });
   it("countUpcomingBookingsForMaster returns 0 with no db", async () => {
     expect(await countUpcomingBookingsForMaster("x")).toBe(0);
+  });
+  it("setServiceMasters returns db_unavailable", async () => {
+    expect(await setServiceMasters("svc", ["m1"])).toEqual({
+      ok: false,
+      error: "db_unavailable",
+    });
   });
 });

@@ -5,6 +5,7 @@ import { redirect } from "@/i18n/navigation";
 import { requireAdmin } from "@/shared/lib/auth-server";
 import { AppHeader } from "@/widgets/app-header";
 import { getServiceById, listAllCategories } from "@/db/services";
+import { listAllMasters, getAllMasterIdsForService } from "@/db/masters";
 import { getStudioPhoto } from "@/db/studio-photos";
 import { isPhotoStorageConfigured } from "@/shared/lib/photo-storage";
 import { pickLocalizedName } from "@/entities/service";
@@ -14,6 +15,7 @@ import {
   createServiceAction,
   updateServiceAction,
   type ServiceEditorInitial,
+  type MasterOption,
 } from "@/features/services-admin";
 import { PhotoUploadRow } from "@/features/photo-upload-admin";
 import type { ServiceFormInput } from "@/entities/service/model/schema";
@@ -48,10 +50,19 @@ export default async function ServiceEditorRoute({
   setRequestLocale(locale);
   const t = await getTranslations("AdminServices");
 
-  const categoryRows = await listAllCategories();
+  const [categoryRows, masterRows] = await Promise.all([
+    listAllCategories(),
+    listAllMasters(),
+  ]);
   const categories = categoryRows
     .filter((c) => c.status === "published")
     .map((c) => ({ id: c.id, name: pickLocalizedName(c, locale as Locale) }));
+  // Non-archived masters only — same posture as the master editor's
+  // service list. Draft masters are linkable so they can be pre-assigned
+  // before publishing (the service stays hidden until one is published).
+  const masters: MasterOption[] = masterRows
+    .filter((m) => m.status !== "archived")
+    .map((m) => ({ id: m.id, name: pickLocalizedName(m, locale as Locale) }));
 
   const mode: "create" | "edit" = id === "new" ? "create" : "edit";
 
@@ -73,16 +84,19 @@ export default async function ServiceEditorRoute({
       durationMinutes: 60,
       sortOrder: 0,
       status: "draft",
+      masterIds: [],
     };
   } else {
-    const [row, p] = await Promise.all([
+    const [row, p, masterIds] = await Promise.all([
       getServiceById(id),
       getStudioPhoto("service", id),
+      getAllMasterIdsForService(id),
     ]);
     if (!row) notFound();
     photo = p;
     initial = {
       id: row.id,
+      masterIds,
       categoryId: row.categoryId,
       nameEn: row.nameEn,
       nameRu: row.nameRu,
@@ -116,6 +130,7 @@ export default async function ServiceEditorRoute({
       durationMinutes: patch.durationMinutes,
       sortOrder: patch.sortOrder,
       status: patch.status,
+      masterIds: patch.masterIds,
     };
     return updateServiceAction(id, rest);
   }
@@ -141,6 +156,7 @@ export default async function ServiceEditorRoute({
         mode={mode}
         initial={initial}
         categories={categories}
+        masters={masters}
         onSubmit={onSubmit}
         photoSlot={photoSlot}
       />
