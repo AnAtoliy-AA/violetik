@@ -203,7 +203,7 @@ export function WelcomePage({
               block: true,
             })}
           >
-            {t("cta_home")}
+            {t("cta_main")}
           </Link>
           <Link
             href="/services"
