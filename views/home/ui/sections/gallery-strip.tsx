@@ -73,7 +73,12 @@ export function GalleryStrip() {
           {t("gallery_view_all")} <ArrowRight />
         </Link>
       </div>
-      <LetterpressRule className="mx-[22px] mb-4" />
+      {/* Pad via a wrapper, not mx- on the rule itself: LetterpressRule is
+          w-full, so outer horizontal margins would make it 100%+44px wide and
+          push the page off-screen (horizontal scroll on narrow viewports). */}
+      <div className="mb-4 px-[22px]">
+        <LetterpressRule />
+      </div>
       <div ref={viewportRef} className="overflow-hidden">
         <m.div
           ref={trackRef}

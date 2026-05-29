@@ -19,7 +19,8 @@ export function BookingStepper({
     <GlassSurface
       tint="cool"
       blur="md"
-      elevation={1}
+      rim
+      elevation={2}
       role="group"
       aria-label={ariaLabel}
       className={cn("flex flex-col gap-2", className)}

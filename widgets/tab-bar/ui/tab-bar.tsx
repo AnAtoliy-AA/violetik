@@ -68,7 +68,7 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
         elevation={3}
         className="glass-top pointer-events-auto relative h-14 rounded-full"
       >
-        <ul role="list" className="flex h-full items-center justify-around">
+        <ul role="list" className="flex h-full items-center justify-around px-1.5">
         {tabs.map(({ key, href, Icon }) => {
           const isActive = key === active;
           return (
@@ -78,12 +78,17 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
                 aria-current={isActive ? "page" : undefined}
                 data-rim-sweep={isActive ? "true" : undefined}
                 className={cn(
-                  "relative flex items-center justify-center rounded-full px-5 py-2",
-                  "transition-[color,opacity] duration-fast ease-out",
+                  // Compact base padding: five tabs (with the Admin tab) at the
+                  // old px-5 overran the rounded-full pill and clipped the last
+                  // label in the corner. The active tab gets extra width so its
+                  // gilded thumb reads as an expanded pill; inactive tabs stay
+                  // tight so all five still clear the corner radius.
+                  "relative flex items-center justify-center rounded-full py-2",
+                  "transition-[color,opacity,padding] duration-fast ease-out",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                   isActive
-                    ? "text-text opacity-100"
-                    : "text-text-3 opacity-50 hover:text-text-2 hover:opacity-100",
+                    ? "px-4 text-text opacity-100"
+                    : "px-2 text-text-3 opacity-50 hover:text-text-2 hover:opacity-100",
                 )}
               >
                 {isActive ? (

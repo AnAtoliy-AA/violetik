@@ -124,6 +124,7 @@ export function TonightStripClient({
     <GlassSurface
       tint="warm"
       blur="md"
+      rim
       elevation={1}
       aria-label={t("label")}
       className={
