@@ -2,10 +2,19 @@ import { NextResponse } from "next/server";
 import { ANALYTICS_EVENT_NAMES } from "@/shared/lib/analytics/event-types";
 import type { AnalyticsEventName } from "@/shared/lib/analytics/event-types";
 import { pushEvent } from "@/shared/lib/analytics/queue";
+import { rateLimit } from "@/shared/lib/security/rate-limit";
 
 const NAME_SET = new Set<string>(ANALYTICS_EVENT_NAMES);
 const MAX_PAYLOAD_KEYS = 16;
 const MAX_BATCH = 50;
+// Public, unauthenticated endpoint — cap per-IP to blunt flooding.
+const RATE_LIMIT = { limit: 100, windowMs: 60_000 };
+
+function clientIp(req: Request): string {
+  const fwd = req.headers.get("x-forwarded-for");
+  if (fwd) return fwd.split(",")[0]!.trim();
+  return req.headers.get("x-real-ip") ?? "anon";
+}
 
 function isValidPayload(p: unknown): p is Record<string, string | number | boolean> {
   if (p === undefined || p === null) return true;
@@ -27,6 +36,19 @@ interface IncomingEvent {
 }
 
 export async function POST(req: Request) {
+  const limit = rateLimit(`event:${clientIp(req)}`, RATE_LIMIT);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "rate_limited" },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)),
+        },
+      },
+    );
+  }
+
   let parsed: unknown;
   try {
     parsed = await req.json();
