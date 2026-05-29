@@ -252,13 +252,8 @@
     "cta_services": "Services",
     "cta_tonight": "Tonight's openings",
     "home_link": "Go to home",
-    "proof_est": "EST · MMXIV",
-    "proof_chair": "BY APPOINTMENT · SINGLE CHAIR",
-    "proof_open_until": "OPEN NOW · UNTIL {time}",
-    "proof_opens_on": "OPENS {day} {time}",
-    "ribbon_fully_booked": "· FULLY BOOKED TONIGHT · NEXT OPENING {day} ·",
-    "ribbon_join_at": "{time} · {service}",
-    "ribbon_label": "Tonight in the studio"
+    "status_open_until": "OPEN NOW · UNTIL {time}",
+    "status_opens_on": "OPENS {day} {time}"
   },
   "Nav": {
     "trigger_label": "Open navigation",

@@ -11,7 +11,6 @@ import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { FlameMonogram } from "@/shared/ui/flame-monogram";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
-import { Stamp } from "@/shared/ui/stamp";
 import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { LetterReveal } from "./letter-reveal";
 
@@ -22,31 +21,23 @@ export type WelcomeStatus =
   | { state: "closed"; day: string; time: string }
   | { state: "no-hours" };
 
-export interface WelcomeNextOpening {
-  date: string;
-  time: string;
-  isToday: boolean;
-  service: string | null;
-  /**
-   * Headline service id, used to pre-select the ritual in the booking
-   * store via `?selected=` so the visitor doesn't bounce off Confirm
-   * for missing-service after picking a time.
-   */
-  serviceId?: string | null;
-  dayName: string | null;
-}
-
 export interface WelcomePageProps {
   status?: WelcomeStatus;
-  nextOpening?: WelcomeNextOpening | null;
 }
 
 export function WelcomePage({
   status = { state: "no-hours" },
-  nextOpening = null,
 }: WelcomePageProps = {}) {
   const t = useTranslations("Welcome");
   const reduceMotion = useReducedMotion();
+
+  const statusLabel =
+    status.state === "open"
+      ? t("status_open_until", { time: status.closesAt })
+      : status.state === "closed"
+        ? t("status_opens_on", { day: status.day, time: status.time })
+        : null;
+  const statusIsOpen = status.state === "open";
 
   // §16 — Phase 2 analytics. Fires once per mount; the emit helper is
   // SSR-safe and a no-op until window is available.
@@ -65,14 +56,6 @@ export function WelcomePage({
     animate: { opacity: 1, y: 0 },
     transition: { duration: reduceMotion ? 0 : 1.1, ease: EASE_OUT, delay },
   });
-
-  const statusLabel =
-    status.state === "open"
-      ? t("proof_open_until", { time: status.closesAt })
-      : status.state === "closed"
-        ? t("proof_opens_on", { day: status.day, time: status.time })
-        : null;
-  const statusIsOpen = status.state === "open";
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
@@ -153,32 +136,20 @@ export function WelcomePage({
             {t("tagline")}
           </m.p>
 
-          {/* §3.1 — three proof points, staggered after the tagline */}
-          <div className="mt-6 flex flex-col items-center gap-3">
-            <m.div {...fade(2.6)}>
-              <Stamp size="sm">{t("proof_est")}</Stamp>
-            </m.div>
+          {statusLabel && (
             <m.div
-              className="font-mono text-[10px] uppercase tracking-[0.32em] text-text-3"
-              {...fade(2.72)}
+              className="mt-6 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-[0.32em] text-text-2"
+              {...fade(2.6)}
             >
-              {t("proof_chair")}
+              <span
+                aria-hidden
+                className={`inline-block size-1.5 rounded-full ${
+                  statusIsOpen ? "bg-status-open" : "bg-accent"
+                } motion-safe:animate-soft-pulse`}
+              />
+              <span>{statusLabel}</span>
             </m.div>
-            {statusLabel && (
-              <m.div
-                className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.32em] text-text-2"
-                {...fade(2.84)}
-              >
-                <span
-                  aria-hidden
-                  className={`inline-block size-1.5 rounded-full ${
-                    statusIsOpen ? "bg-status-open" : "bg-accent"
-                  } motion-safe:animate-soft-pulse`}
-                />
-                <span>{statusLabel}</span>
-              </m.div>
-            )}
-          </div>
+          )}
         </div>
 
         <m.div className="flex flex-col gap-3 pb-9" {...rise(2.4)}>
@@ -215,31 +186,6 @@ export function WelcomePage({
           >
             {t("cta_services")}
           </Link>
-          {/* §3.3 — tonight ribbon */}
-          {nextOpening && (
-            <m.div
-              className="mt-3 mx-auto text-center font-mono text-[10px] uppercase tracking-[0.32em] text-text-3 max-w-[320px]"
-              aria-label={t("ribbon_label")}
-              {...fade(3.0)}
-            >
-              {nextOpening.isToday ? (
-                <span>
-                  ·{" "}
-                  {t("ribbon_join_at", {
-                    time: nextOpening.time,
-                    service: nextOpening.service ?? "—",
-                  })}{" "}
-                  ·
-                </span>
-              ) : (
-                <span>
-                  {t("ribbon_fully_booked", {
-                    day: nextOpening.dayName ?? "—",
-                  })}
-                </span>
-              )}
-            </m.div>
-          )}
         </m.div>
       </div>
     </div>
