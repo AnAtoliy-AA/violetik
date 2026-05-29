@@ -141,6 +141,13 @@
       "when": 1779820703577,
       "tag": "0019_charming_eternity",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1780052129634,
+      "tag": "0020_fluffy_amphibian",
+      "breakpoints": true
     }
   ]
 }
