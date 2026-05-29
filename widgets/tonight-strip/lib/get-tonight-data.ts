@@ -1,31 +1,51 @@
-import { getLocale } from "next-intl/server";
 import { computeAvailableSlots } from "@/shared/lib/google-calendar/slots";
 import {
   WEEKLY_DEFAULT_HOURS,
   bookingTimeZoneFallback,
 } from "@/shared/lib/google-calendar/working-hours";
-import { getNextOpening } from "@/shared/lib/atelier/next-opening";
 import type { WorkingWindow } from "@/shared/lib/google-calendar/types";
-import type { TonightStripData } from "../ui/tonight-strip-client";
+
+/** One bookable opening within the today/tomorrow window. */
+export interface TonightStripSlot {
+  /** Local "HH:MM" start time. */
+  time: string;
+  /** Studio-timezone date YYYY-MM-DD this slot belongs to. */
+  dateISO: string;
+  /** True when `dateISO` is today in the studio timezone. */
+  isToday: boolean;
+}
+
+/** Pure builder output — locale-agnostic; day labels resolved downstream. */
+export interface TonightAvailability {
+  slots: TonightStripSlot[];
+}
 
 interface BuildOptions {
   workingHours?: WorkingWindow[];
-  serviceLabel?: string;
   now?: Date;
 }
 
 /**
- * Builds the data shape the TonightStripClient needs from working hours +
- * an optional service label. Pure — does no DB I/O. Caller can override
- * `now` for tests.
+ * Builds the data the TonightStripClient needs: the studio's available
+ * openings for *today and tomorrow only*, in order. Pure — does no DB I/O.
+ * Caller can override `now` for tests.
+ *
+ * Today's slots respect a 60min booking lead; tomorrow's are the full day.
+ * Returns `null` only when no working hours are configured at all; an
+ * empty `slots` array means both days are fully booked (the client shows
+ * a "no openings today or tomorrow" line). Day labels are locale-aware and
+ * resolved by the server component, not here.
  */
 export function buildTonightStripData(
   options: BuildOptions = {},
-): TonightStripData | null {
+): TonightAvailability | null {
   const now = options.now ?? new Date();
   const hours = options.workingHours ?? WEEKLY_DEFAULT_HOURS;
+  if (hours.length === 0) return null;
+
   const tz = bookingTimeZoneFallback();
   const todayISO = isoDateInTZ(now, tz);
+  const tomorrowISO = isoDateInTZ(addDays(now, 1), tz);
 
   const todaySlots = computeAvailableSlots({
     workingHours: hours,
@@ -37,43 +57,35 @@ export function buildTonightStripData(
     now,
     minLeadMinutes: 60,
   });
-
-  if (todaySlots.length > 0) {
-    return {
-      isToday: true,
-      time: todaySlots[0],
-      service: options.serviceLabel ?? null,
-      laterSlots: todaySlots.slice(1).map((time) => ({
-        time,
-        service: options.serviceLabel ?? null,
-      })),
-    };
-  }
-
-  const next = getNextOpening({
+  const tomorrowSlots = computeAvailableSlots({
     workingHours: hours,
+    busy: [],
+    serviceDurationMin: 60,
+    dayISO: tomorrowISO,
     timeZone: tz,
+    granularityMin: 60,
     now,
-    serviceLabel: options.serviceLabel,
+    minLeadMinutes: 0,
   });
-  if (!next) return null;
-  return {
-    isToday: false,
-    time: next.time,
-    service: next.serviceLabel ?? null,
-    next: {
-      dayName: "", // resolved in the server component (locale-dependent).
-      time: next.time,
-      service: next.serviceLabel ?? null,
-    },
-  };
+
+  const slots = [
+    ...todaySlots.map((time) => ({
+      time,
+      dateISO: todayISO,
+      isToday: true,
+    })),
+    ...tomorrowSlots.map((time) => ({
+      time,
+      dateISO: tomorrowISO,
+      isToday: false,
+    })),
+  ];
+
+  return { slots };
 }
 
-/** Resolves a locale-aware short day label for the supplied YYYY-MM-DD. */
-export async function localizedDayName(
-  isoDate: string,
-): Promise<string> {
-  const locale = await getLocale();
+/** Synchronous short weekday label (uppercased) for a YYYY-MM-DD date. */
+export function weekdayLabel(isoDate: string, locale: string): string {
   const [y, m, d] = isoDate.split("-").map(Number);
   return new Intl.DateTimeFormat(locale, { weekday: "short" })
     .format(new Date(y, m - 1, d))
@@ -91,4 +103,10 @@ function isoDateInTZ(d: Date, timeZone: string): string {
   const m = parts.find((p) => p.type === "month")?.value;
   const day = parts.find((p) => p.type === "day")?.value;
   return `${y}-${m}-${day}`;
+}
+
+function addDays(d: Date, days: number): Date {
+  const out = new Date(d.getTime());
+  out.setUTCDate(out.getUTCDate() + days);
+  return out;
 }

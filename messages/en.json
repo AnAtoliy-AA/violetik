@@ -579,7 +579,8 @@
   },
   "Tonight": {
     "label": "Tonight in the studio",
-    "fully_booked": "· FULLY BOOKED TONIGHT · NEXT {day} · {time} {service} ·",
+    "today": "TODAY",
+    "none_today_tomorrow": "· NO OPENINGS TODAY OR TOMORROW · SEE THE CALENDAR ·",
     "dismiss": "Hide tonight's openings"
   },
   "Error": {

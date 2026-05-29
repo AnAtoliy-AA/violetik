@@ -7,29 +7,26 @@ import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { Marquee } from "@/shared/ui/marquee";
 import { GlassSurface } from "@/shared/ui/glass-surface";
 
-export interface TonightStripData {
-  isToday: boolean;
+/** One opening enriched with a locale-aware day label, ready to render. */
+export interface TonightStripSlotView {
+  /** Local "HH:MM" start time. */
   time: string;
-  service: string | null;
   /**
-   * §3.3 / §6.2 — service id used to pre-select the ritual in the
-   * booking store via `?selected=` so the visitor doesn't bounce off
-   * Confirm for missing-service after picking a slot.
+   * §3.3 / §6.2 — service id used to pre-select the ritual in the booking
+   * store via `?selected=` so the visitor doesn't bounce off Confirm.
    */
   serviceId?: string | null;
-  /** Additional same-day slots (excluding `time`) to make the marquee feel populated. */
-  laterSlots?: ReadonlyArray<{
-    time: string;
-    service: string | null;
-    serviceId?: string | null;
-  }>;
-  /** Used when `isToday` is false — the next available day/time. */
-  next?: {
-    dayName: string;
-    time: string;
-    service: string | null;
-    serviceId?: string | null;
-  };
+  /** Locale-aware short day label, e.g. "TODAY" or "TUE". */
+  dayLabel: string;
+  /** True when this slot is today (drives the `prefilter=tonight` link). */
+  isToday: boolean;
+  /** Studio-timezone date YYYY-MM-DD — used as the `date` link param. */
+  dateISO: string;
+}
+
+export interface TonightStripData {
+  /** Today's + tomorrow's openings, in order. Empty → fully booked. */
+  slots: ReadonlyArray<TonightStripSlotView>;
 }
 
 const SESSION_KEY = "violetta.tonight-strip-dismissed";
@@ -74,51 +71,19 @@ export function TonightStripClient({
     }
   };
 
-  const buildHref = (
-    opts: { time: string; serviceId?: string | null; tonight: boolean },
-  ): string => {
+  const buildHref = (slot: TonightStripSlotView): string => {
     const p = new URLSearchParams();
-    if (opts.tonight) p.set("prefilter", "tonight");
-    p.set("time", opts.time);
-    if (opts.serviceId) p.set("selected", opts.serviceId);
+    if (slot.isToday) {
+      p.set("prefilter", "tonight");
+    } else {
+      p.set("date", slot.dateISO);
+    }
+    p.set("time", slot.time);
+    if (slot.serviceId) p.set("selected", slot.serviceId);
     return `/booking/when?${p.toString()}`;
   };
 
-  const slots: Array<{ time: string; service: string | null; href: string }> =
-    data.isToday
-      ? [
-          {
-            time: data.time,
-            service: data.service,
-            href: buildHref({
-              time: data.time,
-              serviceId: data.serviceId,
-              tonight: true,
-            }),
-          },
-          ...(data.laterSlots ?? []).map((s) => ({
-            time: s.time,
-            service: s.service,
-            href: buildHref({
-              time: s.time,
-              serviceId: s.serviceId ?? data.serviceId,
-              tonight: true,
-            }),
-          })),
-        ]
-      : data.next
-        ? [
-            {
-              time: data.next.time,
-              service: data.next.service,
-              href: buildHref({
-                time: data.next.time,
-                serviceId: data.next.serviceId,
-                tonight: false,
-              }),
-            },
-          ]
-        : [];
+  const hasSlots = data.slots.length > 0;
 
   return (
     <GlassSurface
@@ -131,9 +96,9 @@ export function TonightStripClient({
         "relative w-full border-y border-line/40 " + (className ?? "")
       }
     >
-      {data.isToday ? (
+      {hasSlots ? (
         <Marquee className="py-2" duration="48s">
-          {slots.flatMap((s, i) => [
+          {data.slots.flatMap((s, i) => [
             <span
               key={`dot-${i}`}
               aria-hidden
@@ -143,29 +108,25 @@ export function TonightStripClient({
             </span>,
             <Link
               key={`slot-${i}`}
-              href={s.href}
+              href={buildHref(s)}
               onClick={() => emitAnalytics("tonight_ribbon_tapped")}
               className="font-mono uppercase tracking-[0.2em] text-[10px] text-text-2 hover:text-text whitespace-nowrap"
             >
-              {s.time} {s.service ?? ""}
+              <span className="text-accent">{s.dayLabel}</span> {s.time}
             </Link>,
           ])}
         </Marquee>
-      ) : data.next ? (
+      ) : (
         <div className="px-4 py-2 text-center">
           <Link
-            href={slots[0]?.href ?? "/booking"}
+            href="/booking"
             onClick={() => emitAnalytics("tonight_ribbon_tapped")}
             className="font-mono uppercase tracking-[0.2em] text-[10px] text-text-2 hover:text-text"
           >
-            {t("fully_booked", {
-              day: data.next.dayName,
-              time: data.next.time,
-              service: data.next.service ?? "—",
-            })}
+            {t("none_today_tomorrow")}
           </Link>
         </div>
-      ) : null}
+      )}
       <button
         type="button"
         aria-label={t("dismiss")}

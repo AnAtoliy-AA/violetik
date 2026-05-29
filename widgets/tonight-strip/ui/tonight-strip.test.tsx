@@ -24,31 +24,79 @@ import { TonightStripClient } from "./tonight-strip-client";
 const messages = {
   Tonight: {
     label: "Tonight in the studio",
-    fully_booked: "· FULLY BOOKED TONIGHT · NEXT {day} · {time} {service} ·",
+    today: "TODAY",
+    none_today_tomorrow:
+      "· NO OPENINGS TODAY OR TOMORROW · SEE THE CALENDAR ·",
     dismiss: "Hide tonight's openings",
   },
 };
 
 const sampleData = {
-  isToday: true,
-  time: "20:00",
-  service: "Haircut",
-  serviceId: "svc-1",
-  laterSlots: [],
+  slots: [
+    {
+      time: "15:00",
+      serviceId: "svc-1",
+      dayLabel: "TODAY",
+      isToday: true,
+      dateISO: "2026-05-25",
+    },
+    {
+      time: "11:00",
+      serviceId: "svc-1",
+      dayLabel: "TUE",
+      isToday: false,
+      dateISO: "2026-05-26",
+    },
+  ],
 };
+
+function wrap(ui: React.ReactNode) {
+  return (
+    <NextIntlClientProvider locale="en" messages={messages}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+}
 
 describe("TonightStrip — glass ribbon", () => {
   it("renders the ribbon as a GlassSurface", () => {
-    render(
-      <NextIntlClientProvider locale="en" messages={messages}>
-        <TonightStripClient data={sampleData} />
-      </NextIntlClientProvider>,
-    );
+    render(wrap(<TonightStripClient data={sampleData} />));
     const candidates = document.querySelectorAll("[data-glass='true']");
     const ribbon = Array.from(candidates).find((el) =>
       el.className.includes("glass-warm"),
     );
     expect(ribbon).not.toBeUndefined();
     expect((ribbon as HTMLElement).className).toMatch(/glass-md/);
+  });
+
+  it("labels today's and tomorrow's slots and links each appropriately", () => {
+    const { getAllByRole } = render(
+      wrap(<TonightStripClient data={sampleData} />),
+    );
+    // Marquee duplicates its track, so each slot appears twice. Day + time
+    // only — no service name in the label.
+    const today = getAllByRole("link", { name: "TODAY 15:00" });
+    const tomorrow = getAllByRole("link", { name: "TUE 11:00" });
+    expect(today.length).toBeGreaterThan(0);
+    expect(tomorrow.length).toBeGreaterThan(0);
+    // Today links via the tonight prefilter; tomorrow links via its date.
+    expect(today[0]).toHaveAttribute(
+      "href",
+      expect.stringContaining("prefilter=tonight"),
+    );
+    expect(tomorrow[0]).toHaveAttribute(
+      "href",
+      expect.stringContaining("date=2026-05-26"),
+    );
+  });
+
+  it("shows the no-openings line when both days are full", () => {
+    const { getByRole } = render(
+      wrap(<TonightStripClient data={{ slots: [] }} />),
+    );
+    const link = getByRole("link", {
+      name: /NO OPENINGS TODAY OR TOMORROW/,
+    });
+    expect(link).toHaveAttribute("href", "/booking");
   });
 });
