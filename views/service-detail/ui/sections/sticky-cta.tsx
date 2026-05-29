@@ -50,10 +50,12 @@ export function StickyCta({
 
   return (
     <div
-      className="glass-top sticky bottom-0 px-[22px] pb-6 pt-3.5"
+      // pb clears the fixed SiteFooter credit strip (~39px) so the CTA row
+      // doesn't sit on top of "CREATED WITH LOVE BY…"; +safe-area for notches.
+      className="glass-top sticky bottom-0 px-[22px] pb-[calc(48px+env(safe-area-inset-bottom))] pt-3.5"
       style={{
         background:
-          "linear-gradient(to top, var(--color-bg) 70%, transparent)",
+          "linear-gradient(to top, var(--color-bg) 72%, transparent)",
         backdropFilter: "var(--backdrop-blur-lg)",
         WebkitBackdropFilter: "var(--backdrop-blur-lg)",
       }}

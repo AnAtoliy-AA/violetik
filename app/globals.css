@@ -617,6 +617,41 @@ body {
   animation: var(--animate-shimmer);
 }
 
+/* Gold CTA shine / blick — a diagonal highlight that sweeps across the gold
+ * fill on a loop. Applied to every variant="gold" button (Reserve, Book,
+ * Continue, Confirm, …) via buttonClassName, so they all glint without each
+ * call site repeating the markup. The ::after sits above the fill; the gold
+ * variant's own content stays legible because the sweep is narrow and
+ * screen-blended (a passing glint, not a wash). */
+.btn-gold {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-gold::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 250, 236, 0.7) 48%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 250, 236, 0.7) 52%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  mix-blend-mode: screen;
+  animation: shimmer 3.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-gold::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 /* Continuous brand-palette colour cycle for hero wordmarks.
  * Used on the welcome screen's "Violetta" — gently drifts the letter color
  * through the cream / gold / rose / violet palette without ever leaving the

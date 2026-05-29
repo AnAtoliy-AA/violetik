@@ -273,10 +273,12 @@ export function BookingPage({
       </div>
 
       <div
-        className="sticky bottom-0 px-[22px] pb-[22px] pt-3"
+        // pb clears the fixed SiteFooter credit strip (~39px) so the gold CTA
+        // doesn't sit on top of "CREATED WITH LOVE BY…"; +safe-area for notches.
+        className="sticky bottom-0 px-[22px] pb-[calc(48px+env(safe-area-inset-bottom))] pt-3"
         style={{
           background:
-            "linear-gradient(to top, var(--color-bg) 60%, transparent)",
+            "linear-gradient(to top, var(--color-bg) 72%, transparent)",
         }}
       >
         {canAdvance ? (

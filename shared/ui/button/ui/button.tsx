@@ -18,7 +18,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 // the glass styling lives in the component, not in this helper.
 const variantClass: Partial<Record<ButtonVariant, string>> = {
   solid: "bg-text text-bg hover:bg-text/90",
-  gold: "bg-gold text-bg hover:[background-position:100%_50%] bg-[length:200%_100%] bg-[position:0%_50%] transition-[background-position] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]",
+  gold: "btn-gold bg-gold text-bg hover:[background-position:100%_50%] bg-[length:200%_100%] bg-[position:0%_50%] transition-[background-position] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(0,0,0,0.25)]",
   outline: "border border-line-strong text-text hover:bg-surface/60",
   ghost: "bg-transparent text-text hover:bg-surface/40",
 };
