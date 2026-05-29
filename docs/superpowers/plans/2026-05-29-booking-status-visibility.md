@@ -16,11 +16,11 @@
 
 ## File Structure
 
-**Create:**
-- `shared/ui/booking-status-badge/booking-status-badge.tsx` — the pill component.
-- `shared/ui/booking-status-badge/booking-status-badge.test.tsx` — Vitest unit test.
-- `shared/ui/booking-status-badge/booking-status-badge.stories.tsx` — Storybook story.
-- `shared/ui/booking-status-badge/index.ts` — public API.
+**Create (FSD shared/ui shape — nested `ui/` subdir, per the `new-ui-component` skill):**
+- `shared/ui/booking-status-badge/index.ts` — public API (re-exports from `./ui/...`).
+- `shared/ui/booking-status-badge/ui/booking-status-badge.tsx` — the pill component.
+- `shared/ui/booking-status-badge/ui/booking-status-badge.test.tsx` — Vitest unit test.
+- `shared/ui/booking-status-badge/ui/booking-status-badge.stories.tsx` — Storybook story.
 - `app/api/cron/booking-gcal-sync/route.ts` — daily confirm-sync cron.
 - `app/api/cron/booking-gcal-sync/route.test.ts` — cron route test.
 
@@ -96,19 +96,21 @@ git commit -m "i18n(profile): add booking_status labels (en/ru/by)"
 
 ## Task 2: `BookingStatusBadge` shared/ui component
 
-Follow the `new-ui-component` skill: Tailwind, mandatory Storybook story, mandatory Vitest test, public `index.ts`. Reference patterns: [shared/ui/vip-badge/vip-badge.tsx](../../../shared/ui/vip-badge/vip-badge.tsx) (clsx + CSS-var pill) and [shared/ui/eyebrow/](../../../shared/ui/eyebrow/) (story/test shape).
+Follow the `new-ui-component` skill: Tailwind only, **`cn` helper (not `clsx`)**, nested `ui/` subdir, mandatory Storybook story + Vitest test, public `index.ts` re-exporting from `./ui/...`. Reference patterns: [shared/ui/vip-badge/ui/vip-badge.tsx](../../../shared/ui/vip-badge/ui/vip-badge.tsx) (`cn` + per-variant `Record` pill) and [shared/ui/button/](../../../shared/ui/button/) (canonical structure).
 
-Badge is a **dark, opaque** pill (per the project's glass-readability rule — no light tints on the dark/cream theme), colored hairline + text. The status word is real text (not color-only) for a11y. Label text is passed in by the caller (server components already hold the translator), so the component itself stays presentation-only and locale-agnostic.
+Badge is a **dark, opaque** pill (per the project's glass-readability rule — no light tints on the dark/cream theme): dark `bg-scrim` fill + a thin colored border + colored text. The status word is real text (not color-only) for a11y. Label is passed in by the caller (server components already hold the translator), so the component stays presentation-only and locale-agnostic.
+
+**Real tokens** (verified in `app/globals.css`, exposed as Tailwind v4 utilities): `bg-scrim` (dark opaque), `text-status-warn` (#e8b07a amber), `text-status-open` (#7fc7a1 green), `text-rose`, `text-text-3`, `border-line`. The earlier draft's `--color-ink`/`--color-gold-*` tokens **do not exist** — do not use them.
 
 **Files:**
-- Create: `shared/ui/booking-status-badge/booking-status-badge.tsx`
-- Test: `shared/ui/booking-status-badge/booking-status-badge.test.tsx`
-- Create: `shared/ui/booking-status-badge/booking-status-badge.stories.tsx`
+- Create: `shared/ui/booking-status-badge/ui/booking-status-badge.tsx`
+- Test: `shared/ui/booking-status-badge/ui/booking-status-badge.test.tsx`
+- Create: `shared/ui/booking-status-badge/ui/booking-status-badge.stories.tsx`
 - Create: `shared/ui/booking-status-badge/index.ts`
 
 - [ ] **Step 1: Write the failing test**
 
-`shared/ui/booking-status-badge/booking-status-badge.test.tsx`:
+`shared/ui/booking-status-badge/ui/booking-status-badge.test.tsx`:
 
 ```tsx
 import { render, screen } from "@testing-library/react";
@@ -121,60 +123,65 @@ describe("BookingStatusBadge", () => {
     expect(screen.getByText("Pending")).toBeInTheDocument();
   });
 
-  it("exposes the status as an accessible label", () => {
+  it("renders an uppercase mono pill", () => {
     render(<BookingStatusBadge status="confirmed" label="Confirmed" />);
     expect(screen.getByText("Confirmed")).toHaveClass("uppercase");
   });
 
-  it("applies a status-specific class for each status", () => {
+  it("tags each status via data-status", () => {
     const statuses = ["pending", "confirmed", "cancelled", "completed"] as const;
     const seen = new Set<string>();
     for (const s of statuses) {
       const { container, unmount } = render(
         <BookingStatusBadge status={s} label={s} />,
       );
-      const cls = container.firstElementChild?.getAttribute("data-status");
-      expect(cls).toBe(s);
-      seen.add(cls!);
+      const attr = container.firstElementChild?.getAttribute("data-status");
+      expect(attr).toBe(s);
+      seen.add(attr!);
       unmount();
     }
     expect(seen.size).toBe(4);
+  });
+
+  it("respects a passed className", () => {
+    const { container } = render(
+      <BookingStatusBadge status="pending" label="Pending" className="mt-2" />,
+    );
+    expect(container.firstElementChild).toHaveClass("mt-2");
   });
 });
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `npx vitest run shared/ui/booking-status-badge/booking-status-badge.test.tsx`
+Run: `npx vitest run shared/ui/booking-status-badge/ui/booking-status-badge.test.tsx`
 Expected: FAIL — cannot resolve `./booking-status-badge`.
 
 - [ ] **Step 3: Write the component**
 
-`shared/ui/booking-status-badge/booking-status-badge.tsx`:
+`shared/ui/booking-status-badge/ui/booking-status-badge.tsx`:
 
 ```tsx
-import { clsx } from "clsx";
+import type { HTMLAttributes } from "react";
+import { cn } from "@/shared/lib/cn";
 
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
 
-export interface BookingStatusBadgeProps {
+export interface BookingStatusBadgeProps
+  extends HTMLAttributes<HTMLSpanElement> {
   status: BookingStatus;
   /** Localized status word; caller supplies it (server holds the translator). */
   label: string;
-  className?: string;
 }
 
-// Dark, opaque pills (glass-readability rule): a near-ink fill with a thin
-// colored ring + colored text. Tokens from app/globals.css @theme.
+// Dark, opaque pills (glass-readability rule): a dark scrim fill with a thin
+// colored border + colored text. Tokens from app/globals.css @theme, exposed
+// as Tailwind v4 utilities.
 const TONE: Record<BookingStatus, string> = {
-  pending:
-    "bg-[var(--color-ink)]/70 ring-[var(--color-gold-500)]/50 text-[var(--color-gold-300)]",
-  confirmed:
-    "bg-[var(--color-ink)]/70 ring-[var(--color-gold-500)]/70 text-[var(--color-gold-200)]",
-  cancelled:
-    "bg-[var(--color-ink)]/70 ring-[var(--color-rose)]/50 text-[var(--color-rose)]",
-  completed:
-    "bg-[var(--color-ink)]/60 ring-[var(--color-line)] text-[var(--color-text-3)]",
+  pending: "border-status-warn/40 text-status-warn",
+  confirmed: "border-status-open/40 text-status-open",
+  cancelled: "border-rose/40 text-rose",
+  completed: "border-line text-text-3",
 };
 
 /**
@@ -185,16 +192,18 @@ export function BookingStatusBadge({
   status,
   label,
   className,
+  ...rest
 }: BookingStatusBadgeProps) {
   return (
     <span
       data-status={status}
-      className={clsx(
-        "inline-flex items-center justify-center rounded-full px-2 py-0.5",
-        "font-mono text-[9px] uppercase tracking-[0.18em] ring-1",
+      className={cn(
+        "inline-flex items-center justify-center rounded-full border bg-scrim px-2 py-0.5",
+        "font-mono text-[9px] uppercase leading-none tracking-[0.18em]",
         TONE[status],
         className,
       )}
+      {...rest}
     >
       {label}
     </span>
@@ -204,38 +213,46 @@ export function BookingStatusBadge({
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `npx vitest run shared/ui/booking-status-badge/booking-status-badge.test.tsx`
-Expected: PASS (3 tests).
+Run: `npx vitest run shared/ui/booking-status-badge/ui/booking-status-badge.test.tsx`
+Expected: PASS (4 tests).
 
 - [ ] **Step 5: Write the public API**
 
 `shared/ui/booking-status-badge/index.ts`:
 
 ```ts
-export { BookingStatusBadge } from "./booking-status-badge";
+export { BookingStatusBadge } from "./ui/booking-status-badge";
 export type {
   BookingStatus,
   BookingStatusBadgeProps,
-} from "./booking-status-badge";
+} from "./ui/booking-status-badge";
 ```
 
 - [ ] **Step 6: Write the Storybook story**
 
-`shared/ui/booking-status-badge/booking-status-badge.stories.tsx`:
+`shared/ui/booking-status-badge/ui/booking-status-badge.stories.tsx`:
 
 ```tsx
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { BookingStatusBadge } from "./booking-status-badge";
 
-const meta = {
-  title: "Shared/BookingStatusBadge",
+const meta: Meta<typeof BookingStatusBadge> = {
+  title: "shared/ui/BookingStatusBadge",
   component: BookingStatusBadge,
-  parameters: { layout: "centered" },
-} satisfies Meta<typeof BookingStatusBadge>;
-
+  tags: ["autodocs"],
+  argTypes: {
+    status: {
+      control: "select",
+      options: ["pending", "confirmed", "cancelled", "completed"],
+    },
+    label: { control: "text" },
+  },
+  args: { status: "pending", label: "Pending" },
+};
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof BookingStatusBadge>;
 
+export const Default: Story = {};
 export const Pending: Story = { args: { status: "pending", label: "Pending" } };
 export const Confirmed: Story = {
   args: { status: "confirmed", label: "Confirmed" },
@@ -245,6 +262,17 @@ export const Cancelled: Story = {
 };
 export const Completed: Story = {
   args: { status: "completed", label: "Completed" },
+};
+
+export const AllVariants: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-2">
+      <BookingStatusBadge status="pending" label="Pending" />
+      <BookingStatusBadge status="confirmed" label="Confirmed" />
+      <BookingStatusBadge status="cancelled" label="Cancelled" />
+      <BookingStatusBadge status="completed" label="Completed" />
+    </div>
+  ),
 };
 ```
 
