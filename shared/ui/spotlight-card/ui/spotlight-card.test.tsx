@@ -30,4 +30,24 @@ describe("SpotlightCard", () => {
     expect(node).toHaveClass("spotlight");
     expect(node).toHaveClass("border");
   });
+
+  it("renders glass variant with nested spotlight inside a GlassSurface", () => {
+    render(<SpotlightCard variant="glass">body</SpotlightCard>);
+    const text = screen.getByText("body");
+    const spotlight = text.closest(".spotlight")!;
+    const surface = text.closest("[data-glass]")!;
+    expect(spotlight).not.toBeNull();
+    expect(surface).not.toBeNull();
+    // The glass surface is the outer of the two — spotlight is its descendant.
+    expect(surface.contains(spotlight)).toBe(true);
+    expect(surface.className).toMatch(/glass-warm/);
+    expect(surface.className).toMatch(/glass-specular/);
+  });
+
+  it("solid variant is unchanged (no GlassSurface wrapper)", () => {
+    render(<SpotlightCard variant="solid">body</SpotlightCard>);
+    const text = screen.getByText("body");
+    expect(text.closest("[data-glass]")).toBeNull();
+    expect(text.closest(".spotlight")).not.toBeNull();
+  });
 });

@@ -41,4 +41,19 @@ describe("Button", () => {
     render(<Button icon={<svg data-testid="ic" aria-hidden />}>Save</Button>);
     expect(screen.getByTestId("ic")).toBeInTheDocument();
   });
+
+  it("renders glass variant via GlassSurface", () => {
+    render(<Button variant="glass">Press</Button>);
+    const btn = screen.getByRole("button", { name: "Press" });
+    expect(btn.getAttribute("data-glass")).toBe("true");
+    expect(btn.className).toMatch(/glass-warm/);
+    expect(btn.className).toMatch(/glass-md/);
+  });
+
+  it("preserves existing solid variant (no glass classes)", () => {
+    render(<Button variant="solid">Press</Button>);
+    const btn = screen.getByRole("button", { name: "Press" });
+    expect(btn.getAttribute("data-glass")).toBeNull();
+    expect(btn.className).not.toMatch(/glass-/);
+  });
 });

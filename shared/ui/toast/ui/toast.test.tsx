@@ -85,3 +85,20 @@ describe("ToastProvider + useToast", () => {
     consoleError.mockRestore();
   });
 });
+
+describe("Toast glass surface", () => {
+  it("renders the toast as a GlassSurface (data-glass='true')", () => {
+    const onDismiss = vi.fn();
+    render(
+      <Toast
+        toast={{ id: "1", body: "Hello", intent: "info" }}
+        onDismiss={onDismiss}
+      />,
+    );
+    const root = screen.getByText("Hello").closest("[data-glass]")!;
+    expect(root.getAttribute("data-glass")).toBe("true");
+    expect(root.className).toMatch(/glass-warm/);
+    expect(root.className).toMatch(/glass-lg/);
+    expect(root.className).toMatch(/glass-rim/);
+  });
+});

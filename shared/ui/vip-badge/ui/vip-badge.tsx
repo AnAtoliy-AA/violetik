@@ -23,7 +23,7 @@ export function VipBadge({
     <span
       aria-label={`${label} member`}
       className={cn(
-        "gilded inline-flex items-center rounded-full font-mono uppercase text-accent leading-none",
+        "gold-shine gilded inline-flex items-center rounded-full font-mono uppercase text-accent leading-none",
         sizeClass[size],
         className,
       )}

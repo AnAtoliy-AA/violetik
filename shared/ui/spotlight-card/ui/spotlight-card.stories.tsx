@@ -39,3 +39,29 @@ export const AsArticle: Story = {
     </SpotlightCard>
   ),
 };
+
+export const Glass: Story = {
+  decorators: [
+    (Story) => (
+      <div
+        className="flex items-center justify-center min-h-[300px] rounded-xl"
+        style={{
+          background:
+            "linear-gradient(135deg, #1a0a2e 0%, #2d1155 50%, #0d1a3a 100%)",
+        }}
+      >
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => (
+    <SpotlightCard variant="glass" className="w-80 p-6">
+      <p className="font-display italic text-2xl text-text">Liquid Glass</p>
+      <p className="text-sm text-text-2 mt-2">
+        The outer GlassSurface owns the specular highlight; the inner{" "}
+        <code>.spotlight</code> div tracks the pointer gradient — two{" "}
+        <code>::after</code> layers coexisting without conflict.
+      </p>
+    </SpotlightCard>
+  ),
+};

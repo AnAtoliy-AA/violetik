@@ -95,4 +95,12 @@ describe("NavSheet", () => {
       dialog.querySelector('[role="radiogroup"][aria-label="Language"]'),
     ).not.toBeNull();
   });
+
+  it("sheet body carries data-glass attribute when open", async () => {
+    const user = userEvent.setup();
+    renderSheet();
+    await user.click(screen.getByRole("button", { name: /open navigation/i }));
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveAttribute("data-glass", "true");
+  });
 });

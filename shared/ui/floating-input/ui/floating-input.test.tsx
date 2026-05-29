@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FloatingInput } from "./floating-input";
 
@@ -37,5 +37,26 @@ describe("FloatingInput", () => {
   it("renders a hint when no error is set", () => {
     render(<FloatingInput label="Email" hint="We will only message you." />);
     expect(screen.getByText("We will only message you.")).toBeInTheDocument();
+  });
+});
+
+describe("FloatingInput — glass container", () => {
+  it("wraps input in a GlassSurface", () => {
+    render(<FloatingInput label="Email" />);
+    const input = screen.getByLabelText("Email");
+    const surface = input.closest("[data-glass]");
+    expect(surface).not.toBeNull();
+    expect(surface?.getAttribute("data-glass")).toBe("true");
+  });
+
+  it("toggles --rim-opacity on focus and blur", () => {
+    render(<FloatingInput label="Email" />);
+    const input = screen.getByLabelText("Email");
+    const surface = input.closest("[data-glass]") as HTMLElement;
+    expect(surface.style.getPropertyValue("--rim-opacity")).toBe("0");
+    fireEvent.focus(input);
+    expect(surface.style.getPropertyValue("--rim-opacity")).toBe("1");
+    fireEvent.blur(input);
+    expect(surface.style.getPropertyValue("--rim-opacity")).toBe("0");
   });
 });

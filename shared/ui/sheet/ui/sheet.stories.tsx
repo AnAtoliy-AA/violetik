@@ -47,3 +47,8 @@ export const Default: Story = { render: () => <Demo /> };
 export const ThreeSnaps: Story = {
   render: () => <Demo snapPoints={[0.3, 0.6, 0.9]} />,
 };
+
+export const GlassBody: Story = {
+  render: () => <Demo />,
+  name: "Glass Body (warm · 2xl · rim · specular)",
+};

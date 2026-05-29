@@ -95,4 +95,20 @@ describe("AdminServicesList", () => {
     expect(screen.getByText("Care")).toBeInTheDocument();
     expect(screen.getByText("Signature Manicure")).toBeInTheDocument();
   });
+
+  it("renders category and service names in the active locale", () => {
+    render(
+      <NextIntlClientProvider locale="ru" messages={en}>
+        <AdminServicesList
+          categories={categories}
+          services={services}
+          reorderCategoriesAction={vi.fn()}
+          reorderServicesAction={vi.fn()}
+        />
+      </NextIntlClientProvider>,
+    );
+    expect(screen.getByText("Уход")).toBeInTheDocument();
+    expect(screen.getByText("Сигнатурный маникюр")).toBeInTheDocument();
+    expect(screen.queryByText("Care")).not.toBeInTheDocument();
+  });
 });

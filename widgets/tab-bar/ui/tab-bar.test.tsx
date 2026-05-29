@@ -34,6 +34,21 @@ function renderTabBar(showAdmin = false) {
   );
 }
 
+describe("TabBar — glass dock", () => {
+  it("renders the tab dock as a GlassSurface inside the nav", () => {
+    pathnameMock.current = "/home";
+    renderTabBar();
+    const nav = screen.getByRole("navigation");
+    const dock = nav.querySelector("[data-glass]")!;
+    expect(dock).not.toBeNull();
+    expect(dock.getAttribute("data-glass")).toBe("true");
+    expect(dock.className).toMatch(/glass-warm/);
+    expect(dock.className).toMatch(/glass-2xl/);
+    expect(dock.className).toMatch(/glass-rim/);
+    expect(dock.className).toMatch(/glass-specular/);
+  });
+});
+
 describe("TabBar", () => {
   it("renders four tab links in canonical order", () => {
     pathnameMock.current = "/home";
