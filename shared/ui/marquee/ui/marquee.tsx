@@ -45,8 +45,12 @@ export function Marquee({
         <div className="flex items-center shrink-0" style={{ gap }}>
           {children}
         </div>
+        {/* Visual duplicate for the seamless loop. `inert` removes its
+            focusable descendants (links/buttons) from the tab order and
+            a11y tree so they aren't reachable while aria-hidden. */}
         <div
           aria-hidden
+          inert
           className="flex items-center shrink-0"
           style={{ gap }}
         >
