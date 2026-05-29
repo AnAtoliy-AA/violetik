@@ -37,7 +37,6 @@
     "atelier_motion_caption_design": "Дэталь",
     "signatures_title": "Сігнатуры.",
     "signatures_all_link": "Усе шэсць",
-    "sittings_label": "{n, plural, one {# СЕАНС} few {# СЕАНСЫ} many {# СЕАНСАЎ} other {# СЕАНСАЎ}}",
     "master_stat_years": "{years, plural, one {# год} few {# гады} many {# гадоў} other {# гадоў}}",
     "master_stat_sets": "{label} сэтаў",
     "gallery_title_a": "Свежыя",
