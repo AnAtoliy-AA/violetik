@@ -28,7 +28,7 @@ export function ApproveForm({ requestId, defaultExpiry, approveLabel }: ApproveF
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        className="rounded border-[0.5px] border-line bg-transparent px-2 py-1 text-[12px]"
+        className="rounded border-[0.5px] border-line bg-transparent px-3 py-2 text-base text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
       />
       <button
         type="submit"
