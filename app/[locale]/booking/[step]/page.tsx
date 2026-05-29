@@ -4,11 +4,7 @@ import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { loadServicesForLocale } from "@/entities/service/api/load";
 import { loadMastersForLocale } from "@/entities/master/api/load";
-import {
-  resolvePrice,
-  studioLocationLine,
-  type ResolvedPrice,
-} from "@/entities/site-settings";
+import { priceServices, studioLocationLine } from "@/entities/site-settings";
 import type { CurrencyCode } from "@/db/schema";
 import { routing, type Locale } from "@/i18n/routing";
 import {
@@ -56,10 +52,7 @@ export default async function BookingRoute({
     loadServicesForLocale(locale),
     loadMastersForLocale(locale, { publishedOnly: true }),
   ]);
-  const pricedServices: Record<string, ResolvedPrice> = {};
-  for (const s of services) {
-    pricedServices[s.id] = resolvePrice(`service:${s.id}`, s.price, settings);
-  }
+  const pricedServices = priceServices(services, settings);
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
   const location = studioLocationLine(settings, locale);

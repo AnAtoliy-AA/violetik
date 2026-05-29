@@ -2,7 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ServiceMenuItem } from "@/entities/service";
 import { loadServicesForLocale } from "@/entities/service/api/load";
-import { resolvePrice, type ResolvedPrice } from "@/entities/site-settings";
+import { priceServices } from "@/entities/site-settings";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { countBookingsByServiceId } from "@/db/bookings";
 import type { CurrencyCode } from "@/db/schema";
@@ -52,10 +52,7 @@ export async function SignaturesList() {
   const services = ranked.slice(0, 4);
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
-  const pricedServices: Record<string, ResolvedPrice> = {};
-  for (const s of services) {
-    pricedServices[s.id] = resolvePrice(`service:${s.id}`, s.price, settings);
-  }
+  const pricedServices = priceServices(services, settings);
   return (
     <section className="px-[22px] pb-6 pt-12">
       <div className="mb-3 flex items-end justify-between">

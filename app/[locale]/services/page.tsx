@@ -4,6 +4,7 @@ import { listPublishedCategories } from "@/db/services";
 import { loadServicesForLocale } from "@/entities/service/api/load";
 import type { ServiceCategoryRef } from "@/entities/service";
 import type { CurrencyCode } from "@/db/schema";
+import { priceServices } from "@/entities/site-settings";
 import { ServicesCatalogPage } from "@/views/services-catalog";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
@@ -47,10 +48,12 @@ export default async function ServicesRoute({
   });
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
+  const pricedServices = priceServices(services, settings);
   return (
     <ServicesCatalogPage
       services={services}
       categories={categories}
+      pricedServices={pricedServices}
       currency={currency}
       locale={locale}
       showAdmin={sessionUser?.role === "admin"}
