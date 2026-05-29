@@ -196,14 +196,24 @@ export function WelcomePage({
             </Link>
           </MagneticButton>
           <Link
-            href="/booking/service"
+            href="/home"
             className={buttonClassName({
               variant: "ghost",
               size: "lg",
               block: true,
             })}
           >
-            {t("cta_returning")}
+            {t("cta_home")}
+          </Link>
+          <Link
+            href="/services"
+            className={buttonClassName({
+              variant: "ghost",
+              size: "lg",
+              block: true,
+            })}
+          >
+            {t("cta_services")}
           </Link>
           {/* §3.3 — tonight ribbon */}
           {nextOpening && (
