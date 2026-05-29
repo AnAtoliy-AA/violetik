@@ -1,4 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// Force the db-unavailable path so the test is hermetic regardless of
+// whether the runner has DATABASE_URL set (locally it does, via .env.local).
+vi.mock("./index", () => ({ db: null, schema: {} }));
+
 import {
   createGalleryCategory,
   updateGalleryCategory,
