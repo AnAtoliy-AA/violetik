@@ -3,11 +3,14 @@
  * `headers()` for every route.
  *
  * CSP note: this app cannot use a nonce/strict-dynamic policy. The
- * Telegram Login Widget injects an external script from telegram.org and
- * an inline `data-onauth` handler, and the LocalBusiness JSON-LD is an
- * inline <script>; both require `'unsafe-inline'`. A nonce CSP would also
- * force every page into dynamic rendering. We instead keep `'unsafe-inline'`
- * for script/style but tightly restrict origins (connect/frame/object/
+ * Telegram Login Widget injects an external script from telegram.org, and
+ * the LocalBusiness JSON-LD is an inline <script>; both require
+ * `'unsafe-inline'`. We use the widget in redirect mode (`data-auth-url`)
+ * rather than callback mode (`data-onauth`) specifically so we do NOT need
+ * `'unsafe-eval'`: Telegram parses `data-onauth` with `new Function(...)`
+ * (eval), which our prod CSP blocks. A nonce CSP would also force every
+ * page into dynamic rendering. We instead keep `'unsafe-inline'` for
+ * script/style but tightly restrict origins (connect/frame/object/
  * base-uri/form-action/frame-ancestors), which blocks data exfiltration,
  * form hijacking, framing/clickjacking, and plugin injection.
  */
