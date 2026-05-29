@@ -627,19 +627,22 @@ body {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  /* Gentle "breathing" size pulse on the element itself (the glint lives on
-     ::after, so this slot is free). scale() doesn't reflow neighbours. The
-     timing is intentionally offset from the 3.2s glint so the two effects
-     drift in and out of phase rather than beating in lockstep. */
+  /* Gentle "breathing" pulse. Driven by filter: drop-shadow (a gold glow that
+     swells and fades), NOT transform: scale — scale changes the element's
+     bounding box, which never settles under an infinite loop and makes
+     Playwright's click-stability check time out on every gold CTA. drop-shadow
+     leaves the layout box untouched (clicks stay stable) and isn't clipped by
+     our own overflow:hidden. Timing is offset from the 3.2s glint so the two
+     effects drift in and out of phase rather than beating in lockstep. */
   animation: goldPulse 2.6s ease-in-out infinite;
 }
 @keyframes goldPulse {
   0%,
   100% {
-    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(201, 169, 110, 0));
   }
   50% {
-    transform: scale(1.035);
+    filter: drop-shadow(0 0 9px rgba(201, 169, 110, 0.55));
   }
 }
 @media (prefers-reduced-motion: reduce) {
