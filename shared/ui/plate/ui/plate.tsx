@@ -22,7 +22,7 @@ export function Plate({
     // shows only the section name (no "PLATE NN" prefix).
     return (
       <div className={cn("flex items-end gap-3", className)} {...rest}>
-        <span className="font-display text-[72px] italic leading-[0.85] tracking-[-0.04em] text-gold">
+        <span className="font-display text-[72px] italic leading-none tracking-[-0.04em] text-gold pb-[0.06em]">
           {padded}
         </span>
         {label ? <Eyebrow className="pb-2">{label}</Eyebrow> : null}
