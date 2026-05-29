@@ -11,7 +11,6 @@ import type { PhotoSlotKind } from "@/db/schema";
 
 const KINDS: readonly PhotoSlotKind[] = [
   "service",
-  "gallery",
   "atelier",
   "master",
   "profile",

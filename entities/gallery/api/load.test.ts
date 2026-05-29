@@ -97,10 +97,13 @@ describe("loadGallery", () => {
     expect(data.items[0]!.h).toBe(300);
   });
 
-  it("degrades to empty collections when the DB returns nothing", async () => {
+  it("falls back to the legacy gallery when the DB returns nothing", async () => {
     listGalleryCategories.mockResolvedValue([]);
     listGalleryItems.mockResolvedValue([]);
     const data = await loadGallery("en");
-    expect(data).toEqual({ categories: [], items: [] });
+    // Legacy snapshot: 5 categories, 8 tiles — so the page never goes blank.
+    expect(data.categories).toHaveLength(5);
+    expect(data.items).toHaveLength(8);
+    expect(data.categories.map((c) => c.id)).toContain("chrome");
   });
 });

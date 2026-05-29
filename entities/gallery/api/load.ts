@@ -2,6 +2,7 @@
 // client components / stories never pull the DB into their bundle.
 import { listGalleryCategories, listGalleryItems } from "@/db/gallery";
 import { pickLocalizedName, pickLocalizedCaption } from "../lib/pick-localized";
+import { legacyGalleryData } from "../lib/legacy-fallback";
 import type {
   GalleryCategoryView,
   GalleryData,
@@ -39,6 +40,12 @@ export async function loadGallery(locale: Locale): Promise<GalleryData> {
     listGalleryCategories(),
     listGalleryItems(),
   ]);
+
+  // DB unavailable / not yet seeded → fall back to the legacy gallery so
+  // the customer page never renders blank (matches the seed in 0021).
+  if (categoryRows.length === 0 && itemRows.length === 0) {
+    return legacyGalleryData(locale);
+  }
 
   const categories: GalleryCategoryView[] = categoryRows.map((c) => ({
     id: c.id,
