@@ -247,17 +247,13 @@
   },
   "Welcome": {
     "tagline": "Прыватнае атэлье манікюру — адно крэсла, адна гадзіна, адзін ціхі рытуал за раз.",
-    "cta_enter": "Увайсці",
-    "cta_returning": "Я ўжо тут",
+    "cta_enter": "Я тут упершыню",
+    "cta_main": "Галоўная",
+    "cta_services": "Паслугі",
     "cta_tonight": "Вокны на сёння",
     "home_link": "На галоўную",
-    "proof_est": "З · MMXIV",
-    "proof_chair": "ПА ЗАПІСУ · АДНО КРЭСЛА",
-    "proof_open_until": "АДКРЫТА · ДА {time}",
-    "proof_opens_on": "АДКРЫЕМСЯ {day} {time}",
-    "ribbon_fully_booked": "· СЁННЯ ПОЎНА · БЛІЖЭЙШАЕ АКНО {day} ·",
-    "ribbon_join_at": "{time} · {service}",
-    "ribbon_label": "Сёння ў студыі"
+    "status_open_until": "АДКРЫТА · ДА {time}",
+    "status_opens_on": "АДКРЫЕМСЯ {day} {time}"
   },
   "Nav": {
     "trigger_label": "Адкрыць навігацыю",

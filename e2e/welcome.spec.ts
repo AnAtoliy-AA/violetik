@@ -10,11 +10,10 @@ test("renders the English tagline and CTAs at /en/welcome", async ({ page }) => 
   await page.goto("/en/welcome");
   await expect(page.getByText(/A private nail atelier/i)).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /^Step inside$/i }),
+    page.getByRole("link", { name: /^I'm new here$/i }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: /^Returning$/i }),
-  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Main$/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Services$/i })).toBeVisible();
 });
 
 test("renders the Belarusian tagline at /be/welcome", async ({ page }) => {

@@ -247,17 +247,13 @@
   },
   "Welcome": {
     "tagline": "Частное ателье маникюра — одно кресло, один час, один тихий ритуал за раз.",
-    "cta_enter": "Войти",
-    "cta_returning": "Я уже здесь",
+    "cta_enter": "Я здесь впервые",
+    "cta_main": "Главная",
+    "cta_services": "Услуги",
     "cta_tonight": "Окна на сегодня",
     "home_link": "На главную",
-    "proof_est": "С · MMXIV",
-    "proof_chair": "ПО ЗАПИСИ · ОДНО КРЕСЛО",
-    "proof_open_until": "ОТКРЫТО · ДО {time}",
-    "proof_opens_on": "ОТКРОЕМСЯ {day} {time}",
-    "ribbon_fully_booked": "· СЕГОДНЯ ПОЛНО · БЛИЖАЙШЕЕ ОКНО {day} ·",
-    "ribbon_join_at": "{time} · {service}",
-    "ribbon_label": "Сегодня в студии"
+    "status_open_until": "ОТКРЫТО · ДО {time}",
+    "status_opens_on": "ОТКРОЕМСЯ {day} {time}"
   },
   "Nav": {
     "trigger_label": "Открыть навигацию",
