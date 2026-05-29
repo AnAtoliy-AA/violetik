@@ -40,13 +40,40 @@ describe("bucketBookings", () => {
     expect(out.history.map((r) => r.id)).toEqual(["c"]);
   });
 
-  it("excludes cancelled rows even if listUserBookings somehow returned them", () => {
-    const rows = [
-      row({ id: "x", scheduledFor: new Date("2026-05-25T10:00:00Z"), status: "cancelled" }),
-    ];
-    const out = bucketBookings(rows, now);
-    expect(out.upcoming).toEqual([]);
-    expect(out.history).toEqual([]);
+  it("puts cancelled rows into history, newest first", () => {
+    const now = new Date("2026-01-01T12:00:00Z");
+    const older = row({
+      id: "bk_old_cancel",
+      status: "cancelled",
+      scheduledFor: new Date("2025-12-10T10:00:00Z"),
+    });
+    const newer = row({
+      id: "bk_new_cancel",
+      status: "cancelled",
+      scheduledFor: new Date("2025-12-20T10:00:00Z"),
+    });
+    const result = bucketBookings([older, newer], now);
+    expect(result.upcoming).toHaveLength(0);
+    expect(result.history.map((r) => r.id)).toEqual([
+      "bk_new_cancel",
+      "bk_old_cancel",
+    ]);
+  });
+
+  it("interleaves cancelled and completed in history by date desc", () => {
+    const now = new Date("2026-01-01T12:00:00Z");
+    const completed = row({
+      id: "bk_done",
+      status: "completed",
+      scheduledFor: new Date("2025-12-15T10:00:00Z"),
+    });
+    const cancelled = row({
+      id: "bk_cx",
+      status: "cancelled",
+      scheduledFor: new Date("2025-12-25T10:00:00Z"),
+    });
+    const result = bucketBookings([completed, cancelled], now);
+    expect(result.history.map((r) => r.id)).toEqual(["bk_cx", "bk_done"]);
   });
 
   it("treats a future completed row as history (defensive)", () => {

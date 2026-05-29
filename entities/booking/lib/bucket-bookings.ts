@@ -8,8 +8,7 @@ export interface BookingBuckets {
 /**
  * Partitions user bookings into "upcoming" and "history" for the
  * profile view. Upcoming = future, status pending or confirmed.
- * History = status completed. Cancelled rows are excluded from both
- * (the spec hides cancelled rows from the customer entirely).
+ * History = completed or cancelled (newest first).
  *
  * Upcoming is sorted ascending (soonest first); history is sorted
  * descending (most recent first).
@@ -21,8 +20,7 @@ export function bucketBookings(
   const upcoming: UserBookingRow[] = [];
   const history: UserBookingRow[] = [];
   for (const row of rows) {
-    if (row.status === "cancelled") continue;
-    if (row.status === "completed") {
+    if (row.status === "completed" || row.status === "cancelled") {
       history.push(row);
       continue;
     }
