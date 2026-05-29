@@ -12,7 +12,6 @@ import { GalleryStrip } from "./sections/gallery-strip";
 import { HomeHero } from "./sections/home-hero";
 import { MembershipCard } from "./sections/membership-card";
 import { SignaturesList } from "./sections/signatures-list";
-import { TrustStrip } from "./sections/trust-strip";
 import { HomeFooterAsync } from "./sections/home-footer-async";
 import { MasterStripAsync } from "./sections/master-strip-async";
 import { TestimonialCardAsync } from "./sections/testimonial-card-async";
@@ -42,7 +41,6 @@ export function HomePage({ locale, showAdmin = false }: HomePageProps) {
       <Suspense fallback={<MasterStripSkeleton />}>
         <MasterStripAsync locale={locale} />
       </Suspense>
-      <TrustStrip />
       <GalleryStrip />
       {/* §14.4 — AtelierMotion ships three <video> elements; defer until
         * the visitor scrolls within 400px so the LCP-critical hero never

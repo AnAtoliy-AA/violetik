@@ -4,6 +4,7 @@ import { Aurora } from "@/shared/ui/aurora";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { PaperGrain } from "@/shared/ui/paper-grain";
+import { VipBadge } from "@/shared/ui/vip-badge";
 import { AppHeader } from "@/widgets/app-header";
 import { getCurrentTier } from "@/db/vip-requests";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
@@ -55,7 +56,18 @@ export async function MembershipPage() {
         <div className="relative z-10">
           <Eyebrow gold>{t("eyebrow")}</Eyebrow>
           <h1 className="my-2.5 mt-3 font-display text-h1 font-normal leading-tight tracking-[-0.02em]">
-            {t.rich("hero_title", { em: (c) => <em>{c}</em> })}
+            {t.rich("hero_title", {
+              // §membership — the VIP word reads as a gilded pill rather than
+              // a clipped serif italic. Sized in `em` so it scales with the
+              // clamped h1 across breakpoints; `align-middle` + a small lift
+              // optically seat it on the cap-height of the surrounding serif.
+              em: () => (
+                <VipBadge
+                  aria-label="VIP"
+                  className="relative top-[-0.08em] mx-[0.06em] align-middle px-[0.7em] py-[0.34em] text-[0.36em] tracking-[0.2em]"
+                />
+              ),
+            })}
           </h1>
           <LetterpressRule className="mt-3 max-w-[440px]" />
           <p className="dropcap m-0 mt-4 max-w-[540px] text-[14px] text-text-2">

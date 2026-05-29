@@ -1,4 +1,6 @@
 export { resolvePrice } from "./model/resolve-price";
+export { priceServices } from "./model/price-services";
+export type { PriceableService } from "./model/price-services";
 export { DEFAULT_SITE_SETTINGS } from "./model/types";
 export type {
   PriceOverrideKey,
