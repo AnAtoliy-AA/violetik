@@ -193,9 +193,9 @@ export interface UserBookingRow extends schema.Booking {
 }
 
 /**
- * Bookings for one user, excluding cancelled rows. Sorted ascending
- * by scheduledFor; the view buckets into upcoming / history using a
- * single `now` captured server-side.
+ * All bookings for one user (all statuses, including cancelled). Sorted
+ * ascending by scheduledFor; the view buckets into upcoming / history
+ * using a single `now` captured server-side.
  */
 export async function listUserBookings(
   userId: string,
@@ -214,12 +214,7 @@ export async function listUserBookings(
       schema.masters,
       eq(schema.bookings.masterId, schema.masters.id),
     )
-    .where(
-      and(
-        eq(schema.bookings.userId, userId),
-        ne(schema.bookings.status, "cancelled"),
-      ),
-    )
+    .where(eq(schema.bookings.userId, userId))
     .orderBy(asc(schema.bookings.scheduledFor));
   return rows.map((r) => ({
     ...r.booking,
