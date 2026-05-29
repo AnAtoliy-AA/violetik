@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { m, useReducedMotion, type PanInfo } from "motion/react";
-import type { GalleryItem } from "@/entities/studio";
+import type { GalleryItemView } from "@/entities/gallery";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
@@ -29,7 +29,7 @@ export interface GalleryLightboxLabels {
 }
 
 export interface GalleryLightboxProps {
-  item: GalleryItem;
+  item: GalleryItemView;
   setNumber: number;
   labels: GalleryLightboxLabels;
   onClose: () => void;

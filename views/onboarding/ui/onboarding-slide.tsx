@@ -1,6 +1,7 @@
 "use client";
 
 import { m, useReducedMotion, type MotionValue } from "motion/react";
+import type { ImageAsset } from "@/entities/studio";
 import type { NailTilePalette, NailTileVariant } from "@/shared/ui/nail-tile";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
@@ -19,6 +20,8 @@ export interface OnboardingSlideProps {
   body: string;
   /** Optional attribution (e.g. "— V.") rendered after the body. */
   attribution?: string;
+  /** Optional real photograph; falls back to the palette gradient when absent. */
+  image?: ImageAsset;
 }
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -32,6 +35,7 @@ export function OnboardingSlide({
   title,
   body,
   attribution,
+  image,
 }: OnboardingSlideProps) {
   const reduceMotion = useReducedMotion();
   const fanPalette: NailTilePalette = [palette[0], "#14091a"];
@@ -60,7 +64,13 @@ export function OnboardingSlide({
                 : { duration: 0.7, ease: EASE_OUT }
           }
         >
-          <NailTile palette={palette} variant={variant} className="size-full" />
+          <NailTile
+            palette={palette}
+            variant={variant}
+            image={image}
+            imageSizes="(max-width: 480px) 100vw, 480px"
+            className="size-full"
+          />
         </m.div>
         <PaperGrain className="opacity-[0.06]" />
         <m.div

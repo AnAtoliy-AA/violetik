@@ -482,6 +482,121 @@ export const studioPhotos = pgTable(
   }),
 );
 
+/**
+ * Admin-managed gallery. `gallery_categories` are the localized filter
+ * groups (seeded from the legacy hardcoded tags); `gallery_items` are the
+ * pictures, each pointing at one Vercel Blob `src` and belonging to exactly
+ * one category. `onDelete: restrict` on the FK enforces "you can't delete a
+ * category that still holds pictures" — the admin must move/remove them
+ * first. Replaces the old `STUDIO_DATA.gallery` + `studio_photos` slot kind
+ * `'gallery'`.
+ */
+export const galleryCategories = pgTable(
+  "gallery_categories",
+  {
+    id: text("id").primaryKey(),
+    nameEn: text("name_en").notNull(),
+    nameRu: text("name_ru").notNull(),
+    nameBy: text("name_by").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedBy: text("updated_by").references(() => users.id),
+  },
+  (table) => ({
+    sortIdx: index("gallery_categories_sort_idx").on(table.sortOrder),
+    updatedByIdx: index("gallery_categories_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
+  }),
+);
+
+export const galleryItems = pgTable(
+  "gallery_items",
+  {
+    id: text("id").primaryKey(),
+    categoryId: text("category_id")
+      .notNull()
+      .references(() => galleryCategories.id, { onDelete: "restrict" }),
+    // Captions are nullable; when absent the gallery view falls back to the
+    // category name (the legacy auto-generated lightbox caption behavior).
+    captionEn: text("caption_en"),
+    captionRu: text("caption_ru"),
+    captionBy: text("caption_by"),
+    // `alt` + `src` are nullable so the seeded demo items (which have no
+    // uploaded photo) keep rendering the palette gradient fallback exactly
+    // as the legacy hardcoded gallery did. The admin item editor requires
+    // both when a real photo is uploaded.
+    alt: text("alt"),
+    src: text("src"),
+    width: integer("width"),
+    height: integer("height"),
+    blurDataUrl: text("blur_data_url"),
+    palette: jsonb("palette").$type<string[]>(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedBy: text("updated_by").references(() => users.id),
+  },
+  (table) => ({
+    categoryIdx: index("gallery_items_category_idx").on(table.categoryId),
+    sortIdx: index("gallery_items_sort_idx").on(table.sortOrder),
+    updatedByIdx: index("gallery_items_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
+  }),
+);
+
+/**
+ * Admin-managed onboarding carousel. Each row is one slide with localized
+ * eyebrow/title/body, an optional Vercel Blob `src` (gradient placeholder
+ * when null), and the `NailTile` variant used for the gradient. Replaces
+ * the hardcoded `SLIDES` array in `views/onboarding`.
+ */
+export const onboardingSlides = pgTable(
+  "onboarding_slides",
+  {
+    id: text("id").primaryKey(),
+    eyebrowEn: text("eyebrow_en").notNull(),
+    eyebrowRu: text("eyebrow_ru").notNull(),
+    eyebrowBy: text("eyebrow_by").notNull(),
+    titleEn: text("title_en").notNull(),
+    titleRu: text("title_ru").notNull(),
+    titleBy: text("title_by").notNull(),
+    bodyEn: text("body_en").notNull(),
+    bodyRu: text("body_ru").notNull(),
+    bodyBy: text("body_by").notNull(),
+    src: text("src"),
+    width: integer("width"),
+    height: integer("height"),
+    blurDataUrl: text("blur_data_url"),
+    palette: jsonb("palette").$type<string[]>(),
+    variant: integer("variant").notNull().default(1),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedBy: text("updated_by").references(() => users.id),
+  },
+  (table) => ({
+    sortIdx: index("onboarding_slides_sort_idx").on(table.sortOrder),
+    updatedByIdx: index("onboarding_slides_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
+  }),
+);
+
 export const testimonialStatus = pgEnum("testimonial_status", [
   "pending",
   "approved",
@@ -549,6 +664,12 @@ export type NewSiteSettingsRow = typeof siteSettings.$inferInsert;
 export type StudioPhotoRow = typeof studioPhotos.$inferSelect;
 export type NewStudioPhotoRow = typeof studioPhotos.$inferInsert;
 export type PhotoSlotKind = (typeof photoSlotKind.enumValues)[number];
+export type GalleryCategoryRow = typeof galleryCategories.$inferSelect;
+export type NewGalleryCategory = typeof galleryCategories.$inferInsert;
+export type GalleryItemRow = typeof galleryItems.$inferSelect;
+export type NewGalleryItem = typeof galleryItems.$inferInsert;
+export type OnboardingSlideRow = typeof onboardingSlides.$inferSelect;
+export type NewOnboardingSlide = typeof onboardingSlides.$inferInsert;
 export type ServiceCategoryRow = typeof serviceCategories.$inferSelect;
 export type NewServiceCategory = typeof serviceCategories.$inferInsert;
 export type Service = typeof services.$inferSelect;

@@ -3,11 +3,10 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
-import {
-  STUDIO_DATA,
-  type GalleryItem,
-  type GalleryTag,
-} from "@/entities/studio";
+import type {
+  GalleryCategoryView,
+  GalleryItemView,
+} from "@/entities/gallery";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Ornament } from "@/shared/ui/ornament";
 import { PaperGrain } from "@/shared/ui/paper-grain";
@@ -18,74 +17,54 @@ import { GalleryCard } from "./gallery-card";
 import { GalleryLightbox } from "./gallery-lightbox";
 import { TagFilter, type TagFilterValue } from "./tag-filter";
 
-const TAGS: readonly GalleryTag[] = [
-  "Editorial",
-  "Gel",
-  "Chrome",
-  "Lace",
-  "Bridal",
-];
-
 export interface GalleryPageProps {
-  /**
-   * Optional gallery items with `image` populated from `studio_photos`.
-   * When omitted, falls back to the in-memory STUDIO_DATA.gallery.
-   */
-  items?: readonly GalleryItem[];
+  /** Admin-managed filter categories, resolved for the active locale. */
+  categories?: readonly GalleryCategoryView[];
+  /** Admin-managed gallery pictures, resolved for the active locale. */
+  items?: readonly GalleryItemView[];
   showAdmin?: boolean;
 }
 
 export function GalleryPage({
-  items,
+  categories = [],
+  items = [],
   showAdmin = false,
 }: GalleryPageProps = {}) {
   const t = useTranslations("Gallery");
-  const tCat = useTranslations("Gallery.category");
   const [active, setActive] = useState<TagFilterValue>("All");
   const [openId, setOpenId] = useState<string | null>(null);
   // §9.3 — tapping a palette dot filters the grid to other cards that
   // share that color. Null clears the filter.
   const [paletteFilter, setPaletteFilter] = useState<string | null>(null);
 
-  const tags: readonly TagFilterValue[] = useMemo(() => ["All", ...TAGS], []);
-
-  const labels = useMemo<Record<string, string>>(
-    () => ({
-      All: t("category_all"),
-      Editorial: tCat("Editorial"),
-      Gel: tCat("Gel"),
-      Chrome: tCat("Chrome"),
-      Lace: tCat("Lace"),
-      Bridal: tCat("Bridal"),
-    }),
-    [t, tCat],
+  const tags: readonly TagFilterValue[] = useMemo(
+    () => ["All", ...categories.map((c) => c.id)],
+    [categories],
   );
 
-  const source = items ?? STUDIO_DATA.gallery;
+  const labels = useMemo<Record<string, string>>(() => {
+    const map: Record<string, string> = { All: t("category_all") };
+    for (const c of categories) map[c.id] = c.name;
+    return map;
+  }, [t, categories]);
+
   const filtered = useMemo(() => {
-    const byTag =
-      active === "All" ? source : source.filter((g) => g.tag === active);
-    if (!paletteFilter) return byTag;
-    return byTag.filter((g) => {
+    const byCategory =
+      active === "All" ? items : items.filter((g) => g.categoryId === active);
+    if (!paletteFilter) return byCategory;
+    return byCategory.filter((g) => {
       const dots = g.paletteDots ?? g.palette;
       return dots.includes(paletteFilter);
     });
-  }, [active, source, paletteFilter]);
+  }, [active, items, paletteFilter]);
 
-  const openItem = openId
-    ? (STUDIO_DATA.gallery.find((g) => g.id === openId) ?? null)
-    : null;
-  const openIndex = openItem
-    ? STUDIO_DATA.gallery.findIndex((g) => g.id === openItem.id)
-    : -1;
+  const openIndex = openId ? items.findIndex((g) => g.id === openId) : -1;
+  const openItem = openIndex >= 0 ? items[openIndex]! : null;
   const setNumber = openItem ? openIndex + 1 : 0;
 
   const navigateLightbox = (direction: 1 | -1) => {
-    if (openIndex < 0) return;
-    const next = STUDIO_DATA.gallery[
-      (openIndex + direction + STUDIO_DATA.gallery.length) %
-        STUDIO_DATA.gallery.length
-    ];
+    if (openIndex < 0 || items.length === 0) return;
+    const next = items[(openIndex + direction + items.length) % items.length];
     if (next) setOpenId(next.id);
   };
 
@@ -173,14 +152,16 @@ export function GalleryPage({
             labels={{
               eyebrow: t("lightbox_eyebrow", {
                 number: setNumber.toString().padStart(2, "0"),
-                tag: labels[openItem.tag] ?? openItem.tag,
+                tag: openItem.categoryName,
               }),
-              title: t("lightbox_title", {
-                tag: labels[openItem.tag] ?? openItem.tag,
-              }),
-              caption: t("lightbox_caption", {
-                tag: labels[openItem.tag] ?? openItem.tag,
-              }),
+              // Admin-authored caption wins; otherwise fall back to the
+              // category-derived auto title/caption (legacy behavior).
+              title:
+                openItem.caption ??
+                t("lightbox_title", { tag: openItem.categoryName }),
+              caption:
+                openItem.caption ??
+                t("lightbox_caption", { tag: openItem.categoryName }),
               closeLabel: t("lightbox_close"),
               shareLabel: t("lightbox_share_label"),
               shareSheetTitle: t("lightbox_share_sheet_title"),
@@ -189,7 +170,7 @@ export function GalleryPage({
               shareDownload: t("lightbox_share_download"),
               shareCopiedToast: t("lightbox_share_copied_toast"),
               shareNativeText: t("lightbox_share_native_text", {
-                tag: labels[openItem.tag] ?? openItem.tag,
+                tag: openItem.categoryName,
               }),
               nextLabel: t("lightbox_next"),
               prevLabel: t("lightbox_prev"),
