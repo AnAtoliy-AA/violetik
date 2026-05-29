@@ -37,7 +37,6 @@
     "atelier_motion_caption_design": "The detail",
     "signatures_title": "Signatures.",
     "signatures_all_link": "All six",
-    "sittings_label": "{n, plural, one {# SITTING} other {# SITTINGS}}",
     "master_stat_years": "{years, plural, one {# year} other {# years}}",
     "master_stat_sets": "{label} sets",
     "gallery_title_a": "Recent",

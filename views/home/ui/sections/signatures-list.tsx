@@ -89,14 +89,6 @@ export async function SignaturesList() {
                 resolvedPrice={pricedServices[service.id]}
                 currency={currency}
                 locale={locale}
-                sittingsCount={bookingCounts.get(service.id) ?? 0}
-                sittingsLabel={
-                  (bookingCounts.get(service.id) ?? 0) > 0
-                    ? t("sittings_label", {
-                        n: bookingCounts.get(service.id) ?? 0,
-                      })
-                    : undefined
-                }
               />
             </Link>
           </SpotlightCard>
