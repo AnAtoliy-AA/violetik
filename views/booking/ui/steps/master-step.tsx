@@ -57,6 +57,7 @@ export function MasterStep({ masters }: MasterStepProps) {
               aria-pressed={selected}
               className={cn(
                 "gilded rounded-[20px] p-4 text-left transition-colors duration-fast ease-out",
+                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                 selected ? "bg-surface-2" : "hover:bg-surface-2",
               )}
             >

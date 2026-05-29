@@ -65,6 +65,7 @@ export function NotificationSettings({
                 onClick={() => toggle(c)}
                 className={cn(
                   "h-6 w-11 rounded-full border border-line transition-colors",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                   checked ? "bg-accent" : "bg-surface-2",
                 )}
               >

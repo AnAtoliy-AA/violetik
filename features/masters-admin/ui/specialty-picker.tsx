@@ -70,14 +70,14 @@ export function SpecialtyPicker({ services, value, onChange }: Props) {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  className="text-[10px] uppercase tracking-[0.16em] text-accent hover:underline"
+                  className="rounded px-1 py-1 text-[10px] uppercase tracking-[0.16em] text-accent hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                   onClick={() => selectAll(ids)}
                 >
                   {t("specialties_select_all")}
                 </button>
                 <button
                   type="button"
-                  className="text-[10px] uppercase tracking-[0.16em] text-text-3 hover:underline"
+                  className="rounded px-1 py-1 text-[10px] uppercase tracking-[0.16em] text-text-3 hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                   onClick={() => clearGroup(ids)}
                 >
                   {t("specialties_clear")}

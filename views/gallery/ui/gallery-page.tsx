@@ -120,7 +120,7 @@ export function GalleryPage({
                 <button
                   type="button"
                   onClick={() => setPaletteFilter(null)}
-                  className="ml-1 underline-offset-2 hover:text-text"
+                  className="ml-1 rounded px-1 py-1 underline-offset-2 hover:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                 >
                   {t("palette_filter_clear")}
                 </button>
