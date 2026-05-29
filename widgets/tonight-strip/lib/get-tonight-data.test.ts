@@ -15,8 +15,9 @@ const HOURS: WorkingWindow[] = [
 
 describe("buildTonightStripData", () => {
   it("returns today's remaining slots followed by tomorrow's slots", () => {
-    // Monday 2026-05-25 10:00Z → 13:00 Minsk (UTC+3). With a 60min lead,
-    // today's first bookable slot is 14:00.
+    // Monday 2026-05-25 10:00Z → 13:00 Minsk (UTC+3). The strip mirrors
+    // the booking flow's 180-min minimum lead, so today's first bookable
+    // slot is 16:00 (13:00 + 3h).
     const data = buildTonightStripData({
       workingHours: HOURS,
       now: new Date("2026-05-25T10:00:00Z"),
@@ -27,14 +28,8 @@ describe("buildTonightStripData", () => {
     const today = slots.filter((s) => s.isToday);
     const tomorrow = slots.filter((s) => !s.isToday);
 
-    // Today: 14:00–18:00 hourly.
-    expect(today.map((s) => s.time)).toEqual([
-      "14:00",
-      "15:00",
-      "16:00",
-      "17:00",
-      "18:00",
-    ]);
+    // Today: 16:00–18:00 hourly (earlier slots fall inside the 3h lead).
+    expect(today.map((s) => s.time)).toEqual(["16:00", "17:00", "18:00"]);
     expect(today.every((s) => s.dateISO === "2026-05-25")).toBe(true);
 
     // Tomorrow (Tue): full day 10:00–18:00.
@@ -74,13 +69,14 @@ describe("buildTonightStripData", () => {
   });
 
   it("drops slots that overlap a busy window", () => {
-    // Monday 2026-05-25 10:00Z. Today's slots are 14:00–18:00 Minsk.
-    // 15:00 Minsk (UTC+3) == 12:00Z; a 12:00–13:00Z busy window must
-    // remove the 15:00 opening while leaving 14:00 and 16:00 intact.
+    // Monday 2026-05-25 10:00Z → 13:00 Minsk; with the 180-min lead the
+    // first today slot is 16:00. 17:00 Minsk (UTC+3) == 14:00Z; a
+    // 14:00–15:00Z busy window removes the 17:00 opening while leaving
+    // 16:00 and 18:00 intact.
     const busy: BusyWindow[] = [
       {
-        start: new Date("2026-05-25T12:00:00Z"),
-        end: new Date("2026-05-25T13:00:00Z"),
+        start: new Date("2026-05-25T14:00:00Z"),
+        end: new Date("2026-05-25T15:00:00Z"),
       },
     ];
     const data = buildTonightStripData({
@@ -90,8 +86,8 @@ describe("buildTonightStripData", () => {
     });
     expect(data).not.toBeNull();
     const today = data!.slots.filter((s) => s.isToday).map((s) => s.time);
-    expect(today).not.toContain("15:00");
-    expect(today).toContain("14:00");
+    expect(today).not.toContain("17:00");
     expect(today).toContain("16:00");
+    expect(today).toContain("18:00");
   });
 });

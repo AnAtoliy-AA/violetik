@@ -8,6 +8,12 @@ import type {
   WorkingWindow,
 } from "@/shared/lib/google-calendar/types";
 
+// Mirror of views/booking/lib/booking-steps.ts#MIN_BOOKING_LEAD_MINUTES.
+// FSD forbids a widget importing from views/, so the value is duplicated —
+// keep it in sync with the booking flow so the strip never advertises a
+// slot the flow would reject as "too soon".
+const MIN_LEAD_MINUTES = 180;
+
 /** One bookable opening within the today/tomorrow window. */
 export interface TonightStripSlot {
   /** Local "HH:MM" start time. */
@@ -39,7 +45,8 @@ interface BuildOptions {
  * openings for *today and tomorrow only*, in order. Pure — does no DB I/O.
  * Caller can override `now` for tests.
  *
- * Today's slots respect a 60min booking lead; tomorrow's are the full day.
+ * Today's slots respect the booking flow's lead time; tomorrow's are the
+ * full day.
  * Returns `null` only when no working hours are configured at all; an
  * empty `slots` array means both days are fully booked (the client shows
  * a "no openings today or tomorrow" line). Day labels are locale-aware and
@@ -65,7 +72,7 @@ export function buildTonightStripData(
     timeZone: tz,
     granularityMin: 60,
     now,
-    minLeadMinutes: 60,
+    minLeadMinutes: MIN_LEAD_MINUTES,
   });
   const tomorrowSlots = computeAvailableSlots({
     workingHours: hours,

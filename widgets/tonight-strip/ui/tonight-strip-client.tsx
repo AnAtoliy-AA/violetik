@@ -18,7 +18,7 @@ export interface TonightStripSlotView {
   serviceId?: string | null;
   /** Locale-aware short day label, e.g. "TODAY" or "TUE". */
   dayLabel: string;
-  /** True when this slot is today (drives the `prefilter=tonight` link). */
+  /** True when this slot is today (drives the "TODAY" day label). */
   isToday: boolean;
   /** Studio-timezone date YYYY-MM-DD — used as the `date` link param. */
   dateISO: string;
@@ -72,15 +72,14 @@ export function TonightStripClient({
   };
 
   const buildHref = (slot: TonightStripSlotView): string => {
+    // Land on step 1 (service) with the ritual preselected, carrying the
+    // chosen day + time so the later "when" step opens already filled in.
+    // The booking page reads selected/date/time into the store on mount.
     const p = new URLSearchParams();
-    if (slot.isToday) {
-      p.set("prefilter", "tonight");
-    } else {
-      p.set("date", slot.dateISO);
-    }
-    p.set("time", slot.time);
     if (slot.serviceId) p.set("selected", slot.serviceId);
-    return `/booking/when?${p.toString()}`;
+    p.set("date", slot.dateISO);
+    p.set("time", slot.time);
+    return `/booking/service?${p.toString()}`;
   };
 
   const hasSlots = data.slots.length > 0;

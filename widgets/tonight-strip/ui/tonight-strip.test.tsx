@@ -69,7 +69,7 @@ describe("TonightStrip — glass ribbon", () => {
     expect((ribbon as HTMLElement).className).toMatch(/glass-md/);
   });
 
-  it("labels today's and tomorrow's slots and links each appropriately", () => {
+  it("labels today's and tomorrow's slots and links each into step 1", () => {
     const { getAllByRole } = render(
       wrap(<TonightStripClient data={sampleData} />),
     );
@@ -79,10 +79,21 @@ describe("TonightStrip — glass ribbon", () => {
     const tomorrow = getAllByRole("link", { name: "TUE 11:00" });
     expect(today.length).toBeGreaterThan(0);
     expect(tomorrow.length).toBeGreaterThan(0);
-    // Today links via the tonight prefilter; tomorrow links via its date.
+    // Both land on step 1 (service) with the ritual preselected and the
+    // chosen day + time carried so the later "when" step opens prefilled.
     expect(today[0]).toHaveAttribute(
       "href",
-      expect.stringContaining("prefilter=tonight"),
+      expect.stringContaining("/booking/service"),
+    );
+    expect(today[0]).toHaveAttribute("href", expect.stringContaining("selected=svc-1"));
+    expect(today[0]).toHaveAttribute(
+      "href",
+      expect.stringContaining("date=2026-05-25"),
+    );
+    expect(today[0]).toHaveAttribute("href", expect.stringContaining("time=15"));
+    expect(tomorrow[0]).toHaveAttribute(
+      "href",
+      expect.stringContaining("/booking/service"),
     );
     expect(tomorrow[0]).toHaveAttribute(
       "href",
