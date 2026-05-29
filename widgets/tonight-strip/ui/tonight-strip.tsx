@@ -2,12 +2,12 @@ import { loadServicesForLocale } from "@/entities/service/api/load";
 import { getLocale, getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import {
-  buildTonightStripData,
+  tonightCandidateDays,
   weekdayLabel,
 } from "../lib/get-tonight-data";
 import {
   TonightStripClient,
-  type TonightStripData,
+  type TonightStripDay,
 } from "./tonight-strip-client";
 
 export interface TonightStripProps {
@@ -15,10 +15,12 @@ export interface TonightStripProps {
 }
 
 /**
- * Server-rendered tonight strip. Builds today's + tomorrow's openings,
- * resolves a locale-aware day label per slot, and threads the first
- * published service id through so each slot link pre-selects a ritual.
- * Delegates to TonightStripClient for dismiss + marquee.
+ * Server shell for the tonight ribbon. Resolves the first published
+ * service id (for the live slot query + booking link) and the two
+ * candidate days (today + tomorrow) with locale-aware labels. The client
+ * then fetches genuinely-open times from `/api/booking/slots` — the same
+ * endpoint the booking flow's time grid uses — so the ribbon can never
+ * drift from real availability.
  */
 export async function TonightStrip({ className }: TonightStripProps) {
   const locale = (await getLocale()) as Locale;
@@ -28,19 +30,17 @@ export async function TonightStrip({ className }: TonightStripProps) {
   ]);
   const serviceId = services[0]?.id ?? null;
 
-  const availability = buildTonightStripData();
+  const days: TonightStripDay[] = tonightCandidateDays().map((d) => ({
+    dateISO: d.dateISO,
+    isToday: d.isToday,
+    dayLabel: d.isToday ? t("today") : weekdayLabel(d.dateISO, locale),
+  }));
 
-  const payload: TonightStripData | null = availability
-    ? {
-        slots: availability.slots.map((s) => ({
-          time: s.time,
-          serviceId,
-          isToday: s.isToday,
-          dateISO: s.dateISO,
-          dayLabel: s.isToday ? t("today") : weekdayLabel(s.dateISO, locale),
-        })),
-      }
-    : null;
-
-  return <TonightStripClient data={payload} className={className} />;
+  return (
+    <TonightStripClient
+      serviceId={serviceId}
+      days={days}
+      className={className}
+    />
+  );
 }

@@ -7,42 +7,44 @@ import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { Marquee } from "@/shared/ui/marquee";
 import { GlassSurface } from "@/shared/ui/glass-surface";
 
-/** One opening enriched with a locale-aware day label, ready to render. */
-export interface TonightStripSlotView {
-  /** Local "HH:MM" start time. */
-  time: string;
-  /**
-   * §3.3 / §6.2 — service id used to pre-select the ritual in the booking
-   * store via `?selected=` so the visitor doesn't bounce off Confirm.
-   */
-  serviceId?: string | null;
+/** A day the strip queries for openings, with its localized label. */
+export interface TonightStripDay {
+  /** Studio-timezone date YYYY-MM-DD. */
+  dateISO: string;
   /** Locale-aware short day label, e.g. "TODAY" or "TUE". */
   dayLabel: string;
-  /** True when this slot is today (drives the "TODAY" day label). */
+  /** True when this day is today (drives the "TODAY" label). */
   isToday: boolean;
-  /** Studio-timezone date YYYY-MM-DD — used as the `date` link param. */
-  dateISO: string;
 }
 
-export interface TonightStripData {
-  /** Today's + tomorrow's openings, in order. Empty → fully booked. */
-  slots: ReadonlyArray<TonightStripSlotView>;
+/** One resolved opening, ready to render in the marquee. */
+interface SlotView {
+  time: string;
+  dateISO: string;
+  dayLabel: string;
+  isToday: boolean;
 }
 
 const SESSION_KEY = "violetta.tonight-strip-dismissed";
 
 export interface TonightStripClientProps {
-  data: TonightStripData | null;
+  /** First published service id — used for the live slot query + link. */
+  serviceId: string | null;
+  /** Today + tomorrow in studio time, with labels. */
+  days: TonightStripDay[];
   className?: string;
 }
 
 export function TonightStripClient({
-  data,
+  serviceId,
+  days,
   className,
 }: TonightStripClientProps) {
   const t = useTranslations("Tonight");
   const [hidden, setHidden] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  // null = still loading; [] = loaded, no openings.
+  const [slots, setSlots] = useState<SlotView[] | null>(null);
 
   useEffect(() => {
     // SSR/hydration gate — flip after mount so we can read sessionStorage.
@@ -57,10 +59,55 @@ export function TonightStripClient({
     }
   }, []);
 
-  if (!data || hidden) return null;
+  // Ask the SAME endpoint the booking flow's time grid uses, so the strip
+  // shows exactly the times a visitor can actually book — real Google
+  // Calendar + DB busy windows, real service duration, real lead time.
+  const daysKey = days.map((d) => d.dateISO).join(",");
+  useEffect(() => {
+    const controller = new AbortController();
+    let cancelled = false;
+    (async () => {
+      // Nothing to query (no published service / no days) → resolved empty.
+      if (!serviceId || days.length === 0) {
+        if (!cancelled) setSlots([]);
+        return;
+      }
+      const collected: SlotView[] = [];
+      for (const day of days) {
+        try {
+          const res = await fetch(
+            `/api/booking/slots?date=${day.dateISO}&serviceId=${serviceId}`,
+            { signal: controller.signal },
+          );
+          const json = (await res.json()) as { slots?: string[] };
+          if (Array.isArray(json.slots)) {
+            for (const time of json.slots) {
+              collected.push({
+                time,
+                dateISO: day.dateISO,
+                dayLabel: day.dayLabel,
+                isToday: day.isToday,
+              });
+            }
+          }
+        } catch {
+          /* skip this day; a network blip shouldn't blank the strip */
+        }
+      }
+      if (!cancelled) setSlots(collected);
+    })();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+    // daysKey captures the meaningful identity of `days`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceId, daysKey]);
 
-  // Avoid rendering before hydration so SSR/client output match.
-  if (!hydrated) return null;
+  if (hidden) return null;
+  // Avoid rendering before hydration so SSR/client output match, and while
+  // the live availability is still loading (no flash of stale times).
+  if (!hydrated || slots === null) return null;
 
   const dismiss = () => {
     setHidden(true);
@@ -71,18 +118,18 @@ export function TonightStripClient({
     }
   };
 
-  const buildHref = (slot: TonightStripSlotView): string => {
+  const buildHref = (slot: SlotView): string => {
     // Land on step 1 (service) with the ritual preselected, carrying the
     // chosen day + time so the later "when" step opens already filled in.
     // The booking page reads selected/date/time into the store on mount.
     const p = new URLSearchParams();
-    if (slot.serviceId) p.set("selected", slot.serviceId);
+    if (serviceId) p.set("selected", serviceId);
     p.set("date", slot.dateISO);
     p.set("time", slot.time);
     return `/booking/service?${p.toString()}`;
   };
 
-  const hasSlots = data.slots.length > 0;
+  const hasSlots = slots.length > 0;
 
   return (
     <GlassSurface
@@ -97,7 +144,7 @@ export function TonightStripClient({
     >
       {hasSlots ? (
         <Marquee className="py-2" duration="48s">
-          {data.slots.flatMap((s, i) => [
+          {slots.flatMap((s, i) => [
             <span
               key={`dot-${i}`}
               aria-hidden

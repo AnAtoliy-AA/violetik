@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { AnchorHTMLAttributes } from "react";
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 
 vi.mock("@/i18n/navigation", () => ({
@@ -19,7 +19,10 @@ vi.mock("@/shared/lib/analytics/emit", () => ({
   emitAnalytics: vi.fn(),
 }));
 
-import { TonightStripClient } from "./tonight-strip-client";
+import {
+  TonightStripClient,
+  type TonightStripDay,
+} from "./tonight-strip-client";
 
 const messages = {
   Tonight: {
@@ -31,24 +34,10 @@ const messages = {
   },
 };
 
-const sampleData = {
-  slots: [
-    {
-      time: "15:00",
-      serviceId: "svc-1",
-      dayLabel: "TODAY",
-      isToday: true,
-      dateISO: "2026-05-25",
-    },
-    {
-      time: "11:00",
-      serviceId: "svc-1",
-      dayLabel: "TUE",
-      isToday: false,
-      dateISO: "2026-05-26",
-    },
-  ],
-};
+const DAYS: TonightStripDay[] = [
+  { dateISO: "2026-05-25", dayLabel: "TODAY", isToday: true },
+  { dateISO: "2026-05-26", dayLabel: "TUE", isToday: false },
+];
 
 function wrap(ui: React.ReactNode) {
   return (
@@ -58,56 +47,97 @@ function wrap(ui: React.ReactNode) {
   );
 }
 
-describe("TonightStrip — glass ribbon", () => {
-  it("renders the ribbon as a GlassSurface", () => {
-    render(wrap(<TonightStripClient data={sampleData} />));
+/** Mock the live slots endpoint: date → available "HH:MM" times. */
+function mockSlots(byDate: Record<string, string[]>) {
+  return vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+    const url = typeof input === "string" ? input : (input as Request).url;
+    const date = new URL(url, "http://x").searchParams.get("date") ?? "";
+    return Promise.resolve(
+      new Response(JSON.stringify({ slots: byDate[date] ?? [] }), {
+        status: 200,
+      }),
+    );
+  });
+}
+
+beforeEach(() => {
+  try {
+    sessionStorage.clear();
+  } catch {
+    /* noop */
+  }
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe("TonightStrip — live availability ribbon", () => {
+  it("renders only the times the slots endpoint returns", async () => {
+    mockSlots({ "2026-05-25": ["16:00"], "2026-05-26": ["10:00"] });
+    render(wrap(<TonightStripClient serviceId="svc-1" days={DAYS} />));
+
+    // Marquee duplicates its track, so each slot appears twice.
+    const today = await screen.findAllByRole("link", { name: "TODAY 16:00" });
+    const tomorrow = await screen.findAllByRole("link", { name: "TUE 10:00" });
+    expect(today.length).toBeGreaterThan(0);
+    expect(tomorrow.length).toBeGreaterThan(0);
+
+    // A time the endpoint did NOT return must never appear.
+    expect(screen.queryByRole("link", { name: "TODAY 11:00" })).toBeNull();
+  });
+
+  it("links each open slot into step 1 with selected + date + time", async () => {
+    mockSlots({ "2026-05-25": ["16:00"], "2026-05-26": [] });
+    render(wrap(<TonightStripClient serviceId="svc-1" days={DAYS} />));
+
+    const today = await screen.findAllByRole("link", { name: "TODAY 16:00" });
+    expect(today[0]).toHaveAttribute(
+      "href",
+      expect.stringContaining("/booking/service"),
+    );
+    expect(today[0]).toHaveAttribute(
+      "href",
+      expect.stringContaining("selected=svc-1"),
+    );
+    expect(today[0]).toHaveAttribute(
+      "href",
+      expect.stringContaining("date=2026-05-25"),
+    );
+    expect(today[0]).toHaveAttribute("href", expect.stringContaining("time=16"));
+  });
+
+  it("shows the no-openings line when the endpoint returns nothing", async () => {
+    mockSlots({ "2026-05-25": [], "2026-05-26": [] });
+    render(wrap(<TonightStripClient serviceId="svc-1" days={DAYS} />));
+
+    const link = await screen.findByRole("link", {
+      name: /NO OPENINGS TODAY OR TOMORROW/,
+    });
+    expect(link).toHaveAttribute("href", "/booking");
+  });
+
+  it("shows the no-openings line when there is no service to query", async () => {
+    const spy = mockSlots({});
+    render(wrap(<TonightStripClient serviceId={null} days={DAYS} />));
+
+    const link = await screen.findByRole("link", {
+      name: /NO OPENINGS TODAY OR TOMORROW/,
+    });
+    expect(link).toHaveAttribute("href", "/booking");
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("renders the ribbon as a GlassSurface", async () => {
+    mockSlots({ "2026-05-25": ["16:00"], "2026-05-26": [] });
+    render(wrap(<TonightStripClient serviceId="svc-1" days={DAYS} />));
+    await screen.findAllByRole("link", { name: "TODAY 16:00" });
+
     const candidates = document.querySelectorAll("[data-glass='true']");
     const ribbon = Array.from(candidates).find((el) =>
       el.className.includes("glass-warm"),
     );
     expect(ribbon).not.toBeUndefined();
     expect((ribbon as HTMLElement).className).toMatch(/glass-md/);
-  });
-
-  it("labels today's and tomorrow's slots and links each into step 1", () => {
-    const { getAllByRole } = render(
-      wrap(<TonightStripClient data={sampleData} />),
-    );
-    // Marquee duplicates its track, so each slot appears twice. Day + time
-    // only — no service name in the label.
-    const today = getAllByRole("link", { name: "TODAY 15:00" });
-    const tomorrow = getAllByRole("link", { name: "TUE 11:00" });
-    expect(today.length).toBeGreaterThan(0);
-    expect(tomorrow.length).toBeGreaterThan(0);
-    // Both land on step 1 (service) with the ritual preselected and the
-    // chosen day + time carried so the later "when" step opens prefilled.
-    expect(today[0]).toHaveAttribute(
-      "href",
-      expect.stringContaining("/booking/service"),
-    );
-    expect(today[0]).toHaveAttribute("href", expect.stringContaining("selected=svc-1"));
-    expect(today[0]).toHaveAttribute(
-      "href",
-      expect.stringContaining("date=2026-05-25"),
-    );
-    expect(today[0]).toHaveAttribute("href", expect.stringContaining("time=15"));
-    expect(tomorrow[0]).toHaveAttribute(
-      "href",
-      expect.stringContaining("/booking/service"),
-    );
-    expect(tomorrow[0]).toHaveAttribute(
-      "href",
-      expect.stringContaining("date=2026-05-26"),
-    );
-  });
-
-  it("shows the no-openings line when both days are full", () => {
-    const { getByRole } = render(
-      wrap(<TonightStripClient data={{ slots: [] }} />),
-    );
-    const link = getByRole("link", {
-      name: /NO OPENINGS TODAY OR TOMORROW/,
-    });
-    expect(link).toHaveAttribute("href", "/booking");
   });
 });

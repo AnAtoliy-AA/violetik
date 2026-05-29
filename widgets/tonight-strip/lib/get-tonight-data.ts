@@ -1,104 +1,30 @@
-import { computeAvailableSlots } from "@/shared/lib/google-calendar/slots";
-import {
-  WEEKLY_DEFAULT_HOURS,
-  bookingTimeZoneFallback,
-} from "@/shared/lib/google-calendar/working-hours";
-import type {
-  BusyWindow,
-  WorkingWindow,
-} from "@/shared/lib/google-calendar/types";
+import { bookingTimeZoneFallback } from "@/shared/lib/google-calendar/working-hours";
 
-// Mirror of views/booking/lib/booking-steps.ts#MIN_BOOKING_LEAD_MINUTES.
-// FSD forbids a widget importing from views/, so the value is duplicated —
-// keep it in sync with the booking flow so the strip never advertises a
-// slot the flow would reject as "too soon".
-const MIN_LEAD_MINUTES = 180;
-
-/** One bookable opening within the today/tomorrow window. */
-export interface TonightStripSlot {
-  /** Local "HH:MM" start time. */
-  time: string;
-  /** Studio-timezone date YYYY-MM-DD this slot belongs to. */
+/** One candidate day (today / tomorrow) the strip queries for openings. */
+export interface TonightCandidateDay {
+  /** Studio-timezone date YYYY-MM-DD. */
   dateISO: string;
   /** True when `dateISO` is today in the studio timezone. */
   isToday: boolean;
 }
 
-/** Pure builder output — locale-agnostic; day labels resolved downstream. */
-export interface TonightAvailability {
-  slots: TonightStripSlot[];
-}
-
-interface BuildOptions {
-  workingHours?: WorkingWindow[];
-  now?: Date;
-  /**
-   * Busy windows (DB bookings + Google Calendar free/busy) that block
-   * slots. Defaults to none — callers with real availability data pass
-   * them so the strip only advertises genuinely-open times.
-   */
-  busy?: BusyWindow[];
-}
-
 /**
- * Builds the data the TonightStripClient needs: the studio's available
- * openings for *today and tomorrow only*, in order. Pure — does no DB I/O.
- * Caller can override `now` for tests.
- *
- * Today's slots respect the booking flow's lead time; tomorrow's are the
- * full day.
- * Returns `null` only when no working hours are configured at all; an
- * empty `slots` array means both days are fully booked (the client shows
- * a "no openings today or tomorrow" line). Day labels are locale-aware and
- * resolved by the server component, not here.
+ * The two days the tonight ribbon advertises — today and tomorrow in the
+ * studio timezone. Pure + cheap; the client then asks the live
+ * `/api/booking/slots` endpoint (the same source the booking flow uses)
+ * which of these days' times are genuinely open, so the strip can never
+ * drift from the booking grid.
  */
-export function buildTonightStripData(
-  options: BuildOptions = {},
-): TonightAvailability | null {
-  const now = options.now ?? new Date();
-  const hours = options.workingHours ?? WEEKLY_DEFAULT_HOURS;
-  if (hours.length === 0) return null;
-
-  const busy = options.busy ?? [];
-  const tz = bookingTimeZoneFallback();
+export function tonightCandidateDays(
+  now: Date = new Date(),
+  tz: string = bookingTimeZoneFallback(),
+): TonightCandidateDay[] {
   const todayISO = isoDateInTZ(now, tz);
   const tomorrowISO = isoDateInTZ(addDays(now, 1), tz);
-
-  const todaySlots = computeAvailableSlots({
-    workingHours: hours,
-    busy,
-    serviceDurationMin: 60,
-    dayISO: todayISO,
-    timeZone: tz,
-    granularityMin: 60,
-    now,
-    minLeadMinutes: MIN_LEAD_MINUTES,
-  });
-  const tomorrowSlots = computeAvailableSlots({
-    workingHours: hours,
-    busy,
-    serviceDurationMin: 60,
-    dayISO: tomorrowISO,
-    timeZone: tz,
-    granularityMin: 60,
-    now,
-    minLeadMinutes: 0,
-  });
-
-  const slots = [
-    ...todaySlots.map((time) => ({
-      time,
-      dateISO: todayISO,
-      isToday: true,
-    })),
-    ...tomorrowSlots.map((time) => ({
-      time,
-      dateISO: tomorrowISO,
-      isToday: false,
-    })),
+  return [
+    { dateISO: todayISO, isToday: true },
+    { dateISO: tomorrowISO, isToday: false },
   ];
-
-  return { slots };
 }
 
 /** Synchronous short weekday label (uppercased) for a YYYY-MM-DD date. */
