@@ -261,14 +261,30 @@
     "aria_label": "Навигация по ателье",
     "title": "Ателье",
     "description": "Найдите зал, ритуал или вернитесь в свой профиль.",
-    "home": { "label": "Главная" },
-    "services": { "label": "Услуги" },
-    "gallery": { "label": "Галерея" },
-    "masters": { "label": "Мастера" },
-    "membership": { "label": "Членство" },
-    "book": { "label": "Записаться" },
-    "profile": { "label": "Профиль" },
-    "notifications": { "label": "Уведомления" }
+    "home": {
+      "label": "Главная"
+    },
+    "services": {
+      "label": "Услуги"
+    },
+    "gallery": {
+      "label": "Галерея"
+    },
+    "masters": {
+      "label": "Мастера"
+    },
+    "membership": {
+      "label": "Членство"
+    },
+    "book": {
+      "label": "Записаться"
+    },
+    "profile": {
+      "label": "Профиль"
+    },
+    "notifications": {
+      "label": "Уведомления"
+    }
   },
   "LocaleSwitcher": {
     "label": "Язык",
@@ -512,7 +528,11 @@
       "upload_error_auth": "Войдите как админ для загрузки",
       "upload_error_validation": "Заполните все поля",
       "edit_service": "Редактировать"
-    }
+    },
+    "inbox_gallery": "Галерея",
+    "inbox_gallery_caption": "Снимки и категории",
+    "inbox_onboarding": "Онбординг",
+    "inbox_onboarding_caption": "Приветственные слайды"
   },
   "AdminStudio": {
     "meta_title": "Студия",
@@ -902,5 +922,99 @@
     "category_testimonial_submitted_label": "Новый отзыв (админ)",
     "category_testimonial_submitted_push_title": "Новый отзыв",
     "category_testimonial_submitted_push_body": "{customer} оставил(а) отзыв."
+  },
+  "AdminGallery": {
+    "meta_title": "Галерея — админ",
+    "plate_title": "Галерея",
+    "eyebrow": "Кураторство",
+    "title": "Управление галереей",
+    "paragraph": "Добавляйте снимки, описывайте их и группируйте по категориям. Перетаскивайте за ручку, чтобы изменить порядок.",
+    "section_categories": "Категории",
+    "section_items": "Снимки",
+    "cta_new_category": "Новая категория",
+    "cta_new_item": "Новый снимок",
+    "cta_edit": "Изменить",
+    "cta_delete": "Удалить",
+    "cta_save": "Сохранить",
+    "saved": "Сохранено",
+    "save_failed": "Не удалось сохранить: {error}",
+    "delete_failed": "Не удалось удалить: {error}",
+    "delete_category_blocked": "Сначала переместите или удалите её снимки ({n}).",
+    "item_count": "Снимков: {n}",
+    "badge_has_image": "Фото",
+    "badge_no_image": "Только градиент",
+    "title_new_category": "Новая категория",
+    "title_edit_category": "Изменить категорию",
+    "title_new_item": "Новый снимок",
+    "title_edit_item": "Изменить снимок",
+    "label_slug": "ID (слаг)",
+    "label_slug_hint": "Строчные буквы, цифры и дефисы. Позже изменить нельзя.",
+    "label_name_en": "Название (английский)",
+    "label_name_ru": "Название (русский)",
+    "label_name_by": "Название (белорусский)",
+    "label_category": "Категория",
+    "label_image": "Изображение",
+    "label_image_hint": "Необязательно. Без фото карточка показывает цветной градиент.",
+    "label_alt": "Альтернативный текст",
+    "label_alt_hint": "Описание изображения для скринридеров.",
+    "label_caption_en": "Подпись (английский)",
+    "label_caption_ru": "Подпись (русский)",
+    "label_caption_by": "Подпись (белорусский)",
+    "label_file": "Файл фото",
+    "upload": "Загрузить",
+    "uploading": "Загрузка…",
+    "uploaded": "Загружено",
+    "remove_image": "Удалить фото",
+    "error_too_large": "Слишком большое изображение (макс. 25 МБ).",
+    "error_failed": "Не удалось загрузить. Попробуйте ещё раз.",
+    "storage_not_configured": "Хранилище изображений не настроено.",
+    "validation_required": "Обязательно",
+    "validation_slug_invalid": "Только строчные буквы, цифры и дефисы.",
+    "validation_id_required": "Введите ID перед загрузкой."
+  },
+  "AdminOnboarding": {
+    "meta_title": "Онбординг — админ",
+    "plate_title": "Онбординг",
+    "eyebrow": "Первое впечатление",
+    "title": "Управление онбордингом",
+    "paragraph": "Редактируйте приветственные слайды — текст и изображения. Добавляйте, удаляйте и меняйте порядок.",
+    "section_slides": "Слайды",
+    "cta_new_slide": "Новый слайд",
+    "cta_edit": "Изменить",
+    "cta_delete": "Удалить",
+    "cta_save": "Сохранить",
+    "saved": "Сохранено",
+    "save_failed": "Не удалось сохранить: {error}",
+    "delete_failed": "Не удалось удалить: {error}",
+    "title_new_slide": "Новый слайд",
+    "title_edit_slide": "Изменить слайд",
+    "label_slug": "ID (слаг)",
+    "label_slug_hint": "Строчные буквы, цифры и дефисы. Позже изменить нельзя.",
+    "label_eyebrow_en": "Надзаголовок (английский)",
+    "label_eyebrow_ru": "Надзаголовок (русский)",
+    "label_eyebrow_by": "Надзаголовок (белорусский)",
+    "label_title_en": "Заголовок (английский)",
+    "label_title_ru": "Заголовок (русский)",
+    "label_title_by": "Заголовок (белорусский)",
+    "label_body_en": "Текст (английский)",
+    "label_body_ru": "Текст (русский)",
+    "label_body_by": "Текст (белорусский)",
+    "label_variant": "Вариант градиента",
+    "label_variant_hint": "0–5, стиль фонового градиента.",
+    "label_image": "Изображение",
+    "label_image_hint": "Необязательно. Без фото слайд показывает цветной градиент.",
+    "label_file": "Файл фото",
+    "upload": "Загрузить",
+    "uploading": "Загрузка…",
+    "uploaded": "Загружено",
+    "remove_image": "Удалить фото",
+    "error_too_large": "Слишком большое изображение (макс. 25 МБ).",
+    "error_failed": "Не удалось загрузить. Попробуйте ещё раз.",
+    "storage_not_configured": "Хранилище изображений не настроено.",
+    "validation_required": "Обязательно",
+    "validation_slug_invalid": "Только строчные буквы, цифры и дефисы.",
+    "validation_id_required": "Введите ID перед загрузкой.",
+    "badge_has_image": "Фото",
+    "badge_no_image": "Только градиент"
   }
 }

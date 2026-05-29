@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   m,
   useMotionValue,
@@ -10,47 +10,57 @@ import {
 } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import type { OnboardingSlideView } from "@/entities/onboarding";
 import { cn } from "@/shared/lib/cn";
 import { buttonClassName } from "@/shared/ui/button";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { Wordmark } from "@/shared/ui/wordmark";
-import type { NailTilePalette, NailTileVariant } from "@/shared/ui/nail-tile";
+import type { NailTileVariant } from "@/shared/ui/nail-tile";
 import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { OnboardingSlide } from "./onboarding-slide";
-
-interface SlideMeta {
-  id: "atelier" | "ritual";
-  palette: NailTilePalette;
-  variant: NailTileVariant;
-  /** Onboarding namespace key for the voice quote rendered as the body. */
-  voiceKey: "voice_what_we_do" | "voice_how_a_sitting_feels";
-}
-
-// §4 — two cards only. The third (membership) recruited later via
-// /membership; here we keep onboarding short and let Violetta's voice
-// carry the warmth instead of stock copy.
-const SLIDES: readonly SlideMeta[] = [
-  {
-    id: "atelier",
-    palette: ["#c9a96e", "#7d3a6f"],
-    variant: 1,
-    voiceKey: "voice_what_we_do",
-  },
-  {
-    id: "ritual",
-    palette: ["#d9a3b6", "#3a2050"],
-    variant: 2,
-    voiceKey: "voice_how_a_sitting_feels",
-  },
-];
 
 const EASE_IN_OUT: [number, number, number, number] = [0.65, 0, 0.35, 1];
 const SNAP_THRESHOLD = 0.25;
 const SWIPE_VELOCITY = 400;
 
-export function OnboardingPage() {
+export interface OnboardingPageProps {
+  /**
+   * Admin-managed slides resolved for the active locale. When empty (DB
+   * unavailable / not yet seeded) the page falls back to the built-in
+   * two-slide default sourced from translations, so onboarding is never
+   * blank.
+   */
+  slides?: readonly OnboardingSlideView[];
+}
+
+export function OnboardingPage({ slides: slidesProp }: OnboardingPageProps = {}) {
   const t = useTranslations("Onboarding");
   const reduceMotion = useReducedMotion();
+
+  // §4 — two cards by default. Admin can now add/remove/reorder them.
+  const defaultSlides = useMemo<OnboardingSlideView[]>(
+    () => [
+      {
+        id: "atelier",
+        eyebrow: t("atelier_eyebrow"),
+        title: t("atelier_title"),
+        body: t("voice_what_we_do"),
+        palette: ["#c9a96e", "#7d3a6f"],
+        variant: 1,
+      },
+      {
+        id: "ritual",
+        eyebrow: t("ritual_eyebrow"),
+        title: t("ritual_title"),
+        body: t("voice_how_a_sitting_feels"),
+        palette: ["#d9a3b6", "#3a2050"],
+        variant: 2,
+      },
+    ],
+    [t],
+  );
+  const SLIDES =
+    slidesProp && slidesProp.length > 0 ? slidesProp : defaultSlides;
   const [index, setIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
@@ -116,13 +126,14 @@ export function OnboardingPage() {
             <OnboardingSlide
               key={slide.id}
               palette={slide.palette}
-              variant={slide.variant}
+              variant={slide.variant as NailTileVariant}
               active={i === index}
               parallaxY={reduceMotion ? undefined : parallaxY}
-              eyebrow={t(`${slide.id}_eyebrow`)}
-              title={t(`${slide.id}_title`)}
-              body={t(slide.voiceKey)}
+              eyebrow={slide.eyebrow}
+              title={slide.title}
+              body={slide.body}
               attribution={t("voice_attribution")}
+              image={slide.image}
             />
           ))}
         </m.div>

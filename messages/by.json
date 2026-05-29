@@ -261,14 +261,30 @@
     "aria_label": "Навігацыя па атэлье",
     "title": "Атэлье",
     "description": "Знайдзіце залу, рытуал або свой профіль.",
-    "home": { "label": "Галоўная" },
-    "services": { "label": "Паслугі" },
-    "gallery": { "label": "Галерэя" },
-    "masters": { "label": "Майстры" },
-    "membership": { "label": "Сяброўства" },
-    "book": { "label": "Запісацца" },
-    "profile": { "label": "Профіль" },
-    "notifications": { "label": "Апавяшчэнні" }
+    "home": {
+      "label": "Галоўная"
+    },
+    "services": {
+      "label": "Паслугі"
+    },
+    "gallery": {
+      "label": "Галерэя"
+    },
+    "masters": {
+      "label": "Майстры"
+    },
+    "membership": {
+      "label": "Сяброўства"
+    },
+    "book": {
+      "label": "Запісацца"
+    },
+    "profile": {
+      "label": "Профіль"
+    },
+    "notifications": {
+      "label": "Апавяшчэнні"
+    }
   },
   "LocaleSwitcher": {
     "label": "Мова",
@@ -512,7 +528,11 @@
       "upload_error_auth": "Увайдзіце як адмін для загрузкі",
       "upload_error_validation": "Запоўніце ўсе палі",
       "edit_service": "Рэдагаваць"
-    }
+    },
+    "inbox_gallery": "Галерэя",
+    "inbox_gallery_caption": "Здымкі і катэгорыі",
+    "inbox_onboarding": "Анбордынг",
+    "inbox_onboarding_caption": "Вітальныя слайды"
   },
   "AdminStudio": {
     "meta_title": "Студыя",
@@ -902,5 +922,99 @@
     "category_testimonial_submitted_label": "Новы водгук (адмін)",
     "category_testimonial_submitted_push_title": "Новы водгук",
     "category_testimonial_submitted_push_body": "{customer} пакінуў(ла) водгук."
+  },
+  "AdminGallery": {
+    "meta_title": "Галерэя — адмін",
+    "plate_title": "Галерэя",
+    "eyebrow": "Кураванне",
+    "title": "Кіраванне галерэяй",
+    "paragraph": "Дадавайце здымкі, апісвайце іх і групуйце па катэгорыях. Перацягвайце за ручку, каб змяніць парадак.",
+    "section_categories": "Катэгорыі",
+    "section_items": "Здымкі",
+    "cta_new_category": "Новая катэгорыя",
+    "cta_new_item": "Новы здымак",
+    "cta_edit": "Змяніць",
+    "cta_delete": "Выдаліць",
+    "cta_save": "Захаваць",
+    "saved": "Захавана",
+    "save_failed": "Не ўдалося захаваць: {error}",
+    "delete_failed": "Не ўдалося выдаліць: {error}",
+    "delete_category_blocked": "Спачатку перанясіце або выдаліце яе здымкі ({n}).",
+    "item_count": "Здымкаў: {n}",
+    "badge_has_image": "Фота",
+    "badge_no_image": "Толькі градыент",
+    "title_new_category": "Новая катэгорыя",
+    "title_edit_category": "Змяніць катэгорыю",
+    "title_new_item": "Новы здымак",
+    "title_edit_item": "Змяніць здымак",
+    "label_slug": "ID (слаг)",
+    "label_slug_hint": "Малыя літары, лічбы і злучкі. Пазней змяніць нельга.",
+    "label_name_en": "Назва (англійская)",
+    "label_name_ru": "Назва (руская)",
+    "label_name_by": "Назва (беларуская)",
+    "label_category": "Катэгорыя",
+    "label_image": "Выява",
+    "label_image_hint": "Неабавязкова. Без фота картка паказвае каляровы градыент.",
+    "label_alt": "Альтэрнатыўны тэкст",
+    "label_alt_hint": "Апісанне выявы для скрынрыдараў.",
+    "label_caption_en": "Подпіс (англійская)",
+    "label_caption_ru": "Подпіс (руская)",
+    "label_caption_by": "Подпіс (беларуская)",
+    "label_file": "Файл фота",
+    "upload": "Загрузіць",
+    "uploading": "Загрузка…",
+    "uploaded": "Загружана",
+    "remove_image": "Выдаліць фота",
+    "error_too_large": "Завялікая выява (макс. 25 МБ).",
+    "error_failed": "Не ўдалося загрузіць. Паспрабуйце зноў.",
+    "storage_not_configured": "Сховішча выяў не наладжана.",
+    "validation_required": "Абавязкова",
+    "validation_slug_invalid": "Толькі малыя літары, лічбы і злучкі.",
+    "validation_id_required": "Увядзіце ID перад загрузкай."
+  },
+  "AdminOnboarding": {
+    "meta_title": "Анбордынг — адмін",
+    "plate_title": "Анбордынг",
+    "eyebrow": "Першае ўражанне",
+    "title": "Кіраванне анбордынгам",
+    "paragraph": "Рэдагуйце вітальныя слайды — тэкст і выявы. Дадавайце, выдаляйце і мяняйце парадак.",
+    "section_slides": "Слайды",
+    "cta_new_slide": "Новы слайд",
+    "cta_edit": "Змяніць",
+    "cta_delete": "Выдаліць",
+    "cta_save": "Захаваць",
+    "saved": "Захавана",
+    "save_failed": "Не ўдалося захаваць: {error}",
+    "delete_failed": "Не ўдалося выдаліць: {error}",
+    "title_new_slide": "Новы слайд",
+    "title_edit_slide": "Змяніць слайд",
+    "label_slug": "ID (слаг)",
+    "label_slug_hint": "Малыя літары, лічбы і злучкі. Пазней змяніць нельга.",
+    "label_eyebrow_en": "Надзагаловак (англійская)",
+    "label_eyebrow_ru": "Надзагаловак (руская)",
+    "label_eyebrow_by": "Надзагаловак (беларуская)",
+    "label_title_en": "Загаловак (англійская)",
+    "label_title_ru": "Загаловак (руская)",
+    "label_title_by": "Загаловак (беларуская)",
+    "label_body_en": "Тэкст (англійская)",
+    "label_body_ru": "Тэкст (руская)",
+    "label_body_by": "Тэкст (беларуская)",
+    "label_variant": "Варыянт градыенту",
+    "label_variant_hint": "0–5, стыль фонавага градыенту.",
+    "label_image": "Выява",
+    "label_image_hint": "Неабавязкова. Без фота слайд паказвае каляровы градыент.",
+    "label_file": "Файл фота",
+    "upload": "Загрузіць",
+    "uploading": "Загрузка…",
+    "uploaded": "Загружана",
+    "remove_image": "Выдаліць фота",
+    "error_too_large": "Завялікая выява (макс. 25 МБ).",
+    "error_failed": "Не ўдалося загрузіць. Паспрабуйце зноў.",
+    "storage_not_configured": "Сховішча выяў не наладжана.",
+    "validation_required": "Абавязкова",
+    "validation_slug_invalid": "Толькі малыя літары, лічбы і злучкі.",
+    "validation_id_required": "Увядзіце ID перад загрузкай.",
+    "badge_has_image": "Фота",
+    "badge_no_image": "Толькі градыент"
   }
 }

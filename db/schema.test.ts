@@ -174,3 +174,46 @@ describe("users.preferredLocale", () => {
     expect(users.preferredLocale).toBeDefined();
   });
 });
+
+describe("db/schema — gallery & onboarding", () => {
+  it("declares the gallery + onboarding tables", async () => {
+    const {
+      galleryCategories,
+      galleryItems,
+      onboardingSlides,
+    } = await import("./schema");
+    expect(galleryCategories).toBeDefined();
+    expect(galleryItems).toBeDefined();
+    expect(onboardingSlides).toBeDefined();
+  });
+
+  it("infers Insert types with the required i18n + image columns", async () => {
+    const m = await import("./schema");
+    const _cat: import("./schema").NewGalleryCategory = {
+      id: "editorial",
+      nameEn: "Editorial",
+      nameRu: "Эдиториал",
+      nameBy: "Эдыторыял",
+    };
+    const _item: import("./schema").NewGalleryItem = {
+      id: "g1",
+      categoryId: "editorial",
+    };
+    const _slide: import("./schema").NewOnboardingSlide = {
+      id: "atelier",
+      eyebrowEn: "01",
+      eyebrowRu: "01",
+      eyebrowBy: "01",
+      titleEn: "t",
+      titleRu: "t",
+      titleBy: "t",
+      bodyEn: "b",
+      bodyRu: "b",
+      bodyBy: "b",
+    };
+    expect(_cat.id).toBe("editorial");
+    expect(_item.categoryId).toBe("editorial");
+    expect(_slide.id).toBe("atelier");
+    expect(m.galleryItems.src).toBeDefined();
+  });
+});

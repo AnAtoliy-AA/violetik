@@ -99,7 +99,17 @@ export function installQueryWatchdog(pg: PgClient): PgClient {
  * process, so this cache is a no-op there.
  */
 function createClientPair(): ClientPair | null {
-  const url = process.env.DATABASE_URL;
+  const isBuild = process.env.NEXT_PHASE === "phase-production-build";
+  // During `next build`, ~11 SSG workers each open a connection at once.
+  // The transaction pooler (DATABASE_URL, port 6543) has a small per-project
+  // *client*-connection cap on Supabase's free tier, so that burst — on top
+  // of any other connected app — starves the build and pages hang past the
+  // 60s static-generation timeout. The direct/session connection (DIRECT_URL,
+  // port 5432) maps 1:1 to Postgres backends (60 max, far more headroom), so
+  // we prefer it at build time. Runtime still uses the transaction pooler,
+  // which is the right choice for serverless.
+  const url =
+    (isBuild && process.env.DIRECT_URL) || process.env.DATABASE_URL;
   if (!url) return null;
   try {
     // `max: 1` only applies during the production build. Many SSG
@@ -116,7 +126,6 @@ function createClientPair(): ClientPair | null {
     // make the next admin page wait 30s for the dev-timeout to fire.
     // `max: 20` gives enough headroom that a handful of leaked conns
     // don't starve real traffic; well below Supabase PgBouncer's cap.
-    const isBuild = process.env.NEXT_PHASE === "phase-production-build";
     const maxPool = isBuild ? 1 : 20;
 
     // Per-query statement_timeout cannot be enforced here: the Supabase

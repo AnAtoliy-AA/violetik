@@ -261,14 +261,30 @@
     "aria_label": "Atelier navigation",
     "title": "Atelier",
     "description": "Find a room, a ritual, or your own thread.",
-    "home": { "label": "Home" },
-    "services": { "label": "Services" },
-    "gallery": { "label": "Gallery" },
-    "masters": { "label": "Masters" },
-    "membership": { "label": "Membership" },
-    "book": { "label": "Book a sitting" },
-    "profile": { "label": "You" },
-    "notifications": { "label": "Notifications" }
+    "home": {
+      "label": "Home"
+    },
+    "services": {
+      "label": "Services"
+    },
+    "gallery": {
+      "label": "Gallery"
+    },
+    "masters": {
+      "label": "Masters"
+    },
+    "membership": {
+      "label": "Membership"
+    },
+    "book": {
+      "label": "Book a sitting"
+    },
+    "profile": {
+      "label": "You"
+    },
+    "notifications": {
+      "label": "Notifications"
+    }
   },
   "LocaleSwitcher": {
     "label": "Language",
@@ -512,7 +528,11 @@
       "upload_error_auth": "Sign in as admin to upload",
       "upload_error_validation": "Some fields are missing",
       "edit_service": "Edit service"
-    }
+    },
+    "inbox_gallery": "Gallery",
+    "inbox_gallery_caption": "Pictures & categories",
+    "inbox_onboarding": "Onboarding",
+    "inbox_onboarding_caption": "Welcome slides"
   },
   "AdminStudio": {
     "meta_title": "Studio",
@@ -902,5 +922,99 @@
     "category_testimonial_submitted_label": "New testimonial submitted (admin)",
     "category_testimonial_submitted_push_title": "New testimonial",
     "category_testimonial_submitted_push_body": "{customer} left a testimonial."
+  },
+  "AdminGallery": {
+    "meta_title": "Gallery admin",
+    "plate_title": "Gallery",
+    "eyebrow": "Curation",
+    "title": "Manage the gallery",
+    "paragraph": "Add pictures, write their descriptions, and group them into categories. Drag the handle to reorder.",
+    "section_categories": "Categories",
+    "section_items": "Pictures",
+    "cta_new_category": "New category",
+    "cta_new_item": "New picture",
+    "cta_edit": "Edit",
+    "cta_delete": "Delete",
+    "cta_save": "Save",
+    "saved": "Saved",
+    "save_failed": "Couldn’t save: {error}",
+    "delete_failed": "Couldn’t delete: {error}",
+    "delete_category_blocked": "Move or remove its {n} picture(s) first.",
+    "item_count": "{n} picture(s)",
+    "badge_has_image": "Photo",
+    "badge_no_image": "Gradient only",
+    "title_new_category": "New category",
+    "title_edit_category": "Edit category",
+    "title_new_item": "New picture",
+    "title_edit_item": "Edit picture",
+    "label_slug": "ID (slug)",
+    "label_slug_hint": "Lowercase letters, numbers and dashes. Can’t be changed later.",
+    "label_name_en": "Name (English)",
+    "label_name_ru": "Name (Russian)",
+    "label_name_by": "Name (Belarusian)",
+    "label_category": "Category",
+    "label_image": "Image",
+    "label_image_hint": "Optional. Without a photo the card shows a colour gradient.",
+    "label_alt": "Alt text",
+    "label_alt_hint": "Describes the image for screen readers.",
+    "label_caption_en": "Caption (English)",
+    "label_caption_ru": "Caption (Russian)",
+    "label_caption_by": "Caption (Belarusian)",
+    "label_file": "Photo file",
+    "upload": "Upload",
+    "uploading": "Uploading…",
+    "uploaded": "Uploaded",
+    "remove_image": "Remove photo",
+    "error_too_large": "Image is too large (max 25 MB).",
+    "error_failed": "Upload failed. Please try again.",
+    "storage_not_configured": "Image storage isn’t configured.",
+    "validation_required": "Required",
+    "validation_slug_invalid": "Use lowercase letters, numbers and dashes only.",
+    "validation_id_required": "Enter an ID before uploading."
+  },
+  "AdminOnboarding": {
+    "meta_title": "Onboarding admin",
+    "plate_title": "Onboarding",
+    "eyebrow": "First impression",
+    "title": "Manage onboarding",
+    "paragraph": "Edit the welcome slides — their text and images. Add, remove and drag to reorder.",
+    "section_slides": "Slides",
+    "cta_new_slide": "New slide",
+    "cta_edit": "Edit",
+    "cta_delete": "Delete",
+    "cta_save": "Save",
+    "saved": "Saved",
+    "save_failed": "Couldn’t save: {error}",
+    "delete_failed": "Couldn’t delete: {error}",
+    "title_new_slide": "New slide",
+    "title_edit_slide": "Edit slide",
+    "label_slug": "ID (slug)",
+    "label_slug_hint": "Lowercase letters, numbers and dashes. Can’t be changed later.",
+    "label_eyebrow_en": "Eyebrow (English)",
+    "label_eyebrow_ru": "Eyebrow (Russian)",
+    "label_eyebrow_by": "Eyebrow (Belarusian)",
+    "label_title_en": "Title (English)",
+    "label_title_ru": "Title (Russian)",
+    "label_title_by": "Title (Belarusian)",
+    "label_body_en": "Body (English)",
+    "label_body_ru": "Body (Russian)",
+    "label_body_by": "Body (Belarusian)",
+    "label_variant": "Gradient variant",
+    "label_variant_hint": "0–5, picks the placeholder gradient style.",
+    "label_image": "Image",
+    "label_image_hint": "Optional. Without a photo the slide shows a colour gradient.",
+    "label_file": "Photo file",
+    "upload": "Upload",
+    "uploading": "Uploading…",
+    "uploaded": "Uploaded",
+    "remove_image": "Remove photo",
+    "error_too_large": "Image is too large (max 25 MB).",
+    "error_failed": "Upload failed. Please try again.",
+    "storage_not_configured": "Image storage isn’t configured.",
+    "validation_required": "Required",
+    "validation_slug_invalid": "Use lowercase letters, numbers and dashes only.",
+    "validation_id_required": "Enter an ID before uploading.",
+    "badge_has_image": "Photo",
+    "badge_no_image": "Gradient only"
   }
 }

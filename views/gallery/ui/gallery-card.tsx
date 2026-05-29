@@ -1,14 +1,14 @@
 "use client";
 
 import { m, useReducedMotion } from "motion/react";
-import type { GalleryItem } from "@/entities/studio";
+import type { GalleryItemView } from "@/entities/gallery";
 import { cn } from "@/shared/lib/cn";
 import { useInView } from "@/shared/lib/use-in-view";
 import { NailTile, type NailTileVariant } from "@/shared/ui/nail-tile";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 export interface GalleryCardProps {
-  item: GalleryItem;
+  item: GalleryItemView;
   index: number;
   onOpen: (id: string) => void;
   /**
@@ -60,7 +60,7 @@ export function GalleryCard({
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
       )}
       style={{ height: item.h }}
-      aria-label={item.tag}
+      aria-label={item.categoryName}
     >
       <m.div
         layoutId={`gallery-image-${item.id}`}
@@ -83,7 +83,7 @@ export function GalleryCard({
         Nº {String(index + 1).padStart(2, "0")}
       </span>
       <span className="absolute bottom-2.5 left-2.5 rounded-full bg-[rgba(20,9,26,0.55)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-text backdrop-blur-md">
-        {item.tag}
+        {item.categoryName}
       </span>
       {/* §9.3 — palette dots, four tiny swatches in a glass capsule at
         * bottom-right. Tapping a dot bubbles up `onPaletteSelect` so
