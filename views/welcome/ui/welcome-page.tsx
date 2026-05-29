@@ -169,7 +169,7 @@ export function WelcomePage({
           <Link
             href="/home"
             className={buttonClassName({
-              variant: "ghost",
+              variant: "outline",
               size: "lg",
               block: true,
             })}
@@ -179,7 +179,7 @@ export function WelcomePage({
           <Link
             href="/services"
             className={buttonClassName({
-              variant: "ghost",
+              variant: "outline",
               size: "lg",
               block: true,
             })}
