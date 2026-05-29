@@ -18,6 +18,8 @@ function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
     priceOverrides: row.priceOverrides ?? {},
     discountPercent: row.discountPercent,
     discountActive: row.discountActive,
+    markupPercent: row.markupPercent,
+    markupActive: row.markupActive,
     currency: row.currency,
     addressEn: row.addressEn,
     addressRu: row.addressRu,

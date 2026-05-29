@@ -54,6 +54,8 @@ export function SiteSettingsForm({
     initial.discountPercent,
   );
   const [discountActive, setDiscountActive] = useState(initial.discountActive);
+  const [markupPercent, setMarkupPercent] = useState(initial.markupPercent);
+  const [markupActive, setMarkupActive] = useState(initial.markupActive);
 
   const [vipOverride, setVipOverride] = useState<OverrideInput>(() =>
     "membership:VIP" in initial.priceOverrides
@@ -85,6 +87,8 @@ export function SiteSettingsForm({
       priceOverrides,
       discountPercent: Math.max(0, Math.min(90, Math.round(discountPercent))),
       discountActive,
+      markupPercent: Math.max(0, Math.min(1000, Math.round(markupPercent))),
+      markupActive,
     };
   }
 
@@ -265,6 +269,42 @@ export function SiteSettingsForm({
               onChange={(e) => setDiscountActive(e.target.checked)}
             />
             {t("site_settings_discount_active")}
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset aria-label={t("site_settings_section_markup")}>
+        <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("site_settings_section_markup")}
+        </legend>
+        <p className="mb-2 text-[12px] text-text-3">
+          {t("site_settings_markup_hint")}
+        </p>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 text-[13px]">
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={1000}
+              aria-label="markup percent"
+              className="w-20 rounded border border-line bg-surface px-2 py-1 text-right"
+              value={markupPercent}
+              onChange={(e) =>
+                setMarkupPercent(
+                  Math.max(0, Math.min(1000, Number(e.target.value) || 0)),
+                )
+              }
+            />
+            <span>%</span>
+          </label>
+          <label className="flex items-center gap-2 text-[13px]">
+            <input
+              type="checkbox"
+              checked={markupActive}
+              onChange={(e) => setMarkupActive(e.target.checked)}
+            />
+            {t("site_settings_markup_active")}
           </label>
         </div>
       </fieldset>

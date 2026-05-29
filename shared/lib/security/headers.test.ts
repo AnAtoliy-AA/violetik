@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SECURITY_HEADERS } from "./headers";
+import { SECURITY_HEADERS, buildCsp } from "./headers";
 
 function header(key: string): string {
   const found = SECURITY_HEADERS.find((h) => h.key === key);
@@ -49,5 +49,17 @@ describe("SECURITY_HEADERS", () => {
     const csp = header("Content-Security-Policy");
     expect(csp).toContain("https://telegram.org");
     expect(csp).toContain("https://oauth.telegram.org");
+  });
+});
+
+describe("buildCsp", () => {
+  it("allows 'unsafe-eval' in development for Turbopack/React HMR", () => {
+    const csp = buildCsp(true);
+    expect(csp).toMatch(/script-src[^;]*'unsafe-eval'/);
+  });
+
+  it("never emits 'unsafe-eval' in production", () => {
+    const csp = buildCsp(false);
+    expect(csp).not.toContain("'unsafe-eval'");
   });
 });

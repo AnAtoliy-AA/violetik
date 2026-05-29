@@ -234,6 +234,10 @@ export const siteSettings = pgTable(
       .default({}),
     discountPercent: integer("discount_percent").notNull().default(0),
     discountActive: boolean("discount_active").notNull().default(false),
+    // Anchor markup: inflates the struck "old" price above the real price
+    // (which becomes the current price) so listings read as discounted.
+    markupPercent: integer("markup_percent").notNull().default(0),
+    markupActive: boolean("markup_active").notNull().default(false),
     currency: currencyCode("currency").notNull().default("EUR"),
     addressEn: text("address_en")
       .notNull()
@@ -266,6 +270,10 @@ export const siteSettings = pgTable(
     discountRange: check(
       "site_settings_discount_range",
       sql`${table.discountPercent} BETWEEN 0 AND 90`,
+    ),
+    markupRange: check(
+      "site_settings_markup_range",
+      sql`${table.markupPercent} BETWEEN 0 AND 1000`,
     ),
     latRange: check(
       "site_settings_lat_range",

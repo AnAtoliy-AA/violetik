@@ -10,6 +10,9 @@ export interface SiteSettings {
   priceOverrides: Readonly<Record<string, number>>;
   discountPercent: number;
   discountActive: boolean;
+  /** Anchor markup: % the struck "old" price is inflated above the real price. */
+  markupPercent: number;
+  markupActive: boolean;
   currency: CurrencyCode;
   addressEn: string;
   addressRu: string;
@@ -38,6 +41,8 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = Object.freeze({
   priceOverrides: Object.freeze({}),
   discountPercent: 0,
   discountActive: false,
+  markupPercent: 0,
+  markupActive: false,
   currency: "EUR" as CurrencyCode,
   addressEn: "By appointment · Verbena Lane 14, Studio B",
   addressRu: "По записи · Verbena Lane 14, Studio B",
