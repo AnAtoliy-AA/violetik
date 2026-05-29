@@ -64,7 +64,7 @@ export async function SignaturesList() {
           href="/services"
           className="inline-flex items-center gap-1.5 pb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-accent"
         >
-          {t("signatures_all_link")} <ArrowRight />
+          {t("signatures_all_link", { n: all.length })} <ArrowRight />
         </Link>
       </div>
       <h2 className="mt-1 font-display text-h2 font-normal italic leading-[1.05] tracking-[-0.02em]">
