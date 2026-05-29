@@ -50,6 +50,11 @@ describe("SECURITY_HEADERS", () => {
     expect(csp).toContain("https://telegram.org");
     expect(csp).toContain("https://oauth.telegram.org");
   });
+
+  it("allows the OpenStreetMap embed origin so the studio map can frame", () => {
+    const csp = header("Content-Security-Policy");
+    expect(csp).toMatch(/frame-src[^;]*https:\/\/www\.openstreetmap\.org/);
+  });
 });
 
 describe("buildCsp", () => {

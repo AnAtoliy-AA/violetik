@@ -110,7 +110,7 @@ export function TonightStripClient({
               key={`slot-${i}`}
               href={buildHref(s)}
               onClick={() => emitAnalytics("tonight_ribbon_tapped")}
-              className="font-mono uppercase tracking-[0.2em] text-[10px] text-text-2 hover:text-text whitespace-nowrap"
+              className="relative font-mono uppercase tracking-[0.2em] text-[10px] text-text-2 hover:text-text whitespace-nowrap before:absolute before:-inset-y-[14px] before:-inset-x-1 before:content-['']"
             >
               <span className="text-accent">{s.dayLabel}</span> {s.time}
             </Link>,

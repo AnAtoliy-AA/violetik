@@ -79,7 +79,10 @@ const VISIT: readonly NavEntry[] = [
 ];
 
 const triggerClass = cn(
-  "inline-flex size-[38px] items-center justify-center rounded-full border-[0.5px] border-line-strong bg-transparent text-text",
+  "relative inline-flex size-[38px] items-center justify-center rounded-full border-[0.5px] border-line-strong bg-transparent text-text",
+  // Visible glyph stays 38px; a `before` pseudo extends the tap target to
+  // ~46px so the menu trigger clears the 44px touch-target minimum on mobile.
+  "before:absolute before:-inset-1 before:content-['']",
   "transition-colors duration-fast ease-out hover:bg-surface/60",
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
 );
@@ -308,7 +311,9 @@ export function NavSheet() {
                       aria-label={t("close_label")}
                       onClick={close}
                       className={cn(
-                        "shrink-0 inline-flex size-9 items-center justify-center rounded-full border-[0.5px] border-line text-text-2",
+                        "relative shrink-0 inline-flex size-9 items-center justify-center rounded-full border-[0.5px] border-line text-text-2",
+                        // Pseudo-element extends the 36px close glyph to a ~44px tap target.
+                        "before:absolute before:-inset-1 before:content-['']",
                         "transition-colors duration-fast ease-out hover:text-text hover:bg-surface-2/60",
                         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                       )}

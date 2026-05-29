@@ -35,8 +35,10 @@ export function buildCsp(isDev: boolean): string {
     "font-src": "'self' data:",
     // Same-origin only: analytics (/api/event) and booking slots are local.
     "connect-src": "'self'",
-    // The Telegram login flow renders an oauth.telegram.org iframe.
-    "frame-src": "https://oauth.telegram.org https://telegram.org",
+    // The Telegram login flow renders an oauth.telegram.org iframe; the
+    // studio map widget embeds an openstreetmap.org export iframe.
+    "frame-src":
+      "https://oauth.telegram.org https://telegram.org https://www.openstreetmap.org",
     "worker-src": "'self'",
     "object-src": "'none'",
     "base-uri": "'self'",
