@@ -7,6 +7,8 @@ import { AppHeader } from "@/widgets/app-header";
 import { getServiceById, listAllCategories } from "@/db/services";
 import { getStudioPhoto } from "@/db/studio-photos";
 import { isPhotoStorageConfigured } from "@/shared/lib/photo-storage";
+import { pickLocalizedName } from "@/entities/service";
+import type { Locale } from "@/i18n/routing";
 import {
   ServiceEditor,
   createServiceAction,
@@ -49,7 +51,7 @@ export default async function ServiceEditorRoute({
   const categoryRows = await listAllCategories();
   const categories = categoryRows
     .filter((c) => c.status === "published")
-    .map((c) => ({ id: c.id, name: c.nameEn }));
+    .map((c) => ({ id: c.id, name: pickLocalizedName(c, locale as Locale) }));
 
   const mode: "create" | "edit" = id === "new" ? "create" : "edit";
 

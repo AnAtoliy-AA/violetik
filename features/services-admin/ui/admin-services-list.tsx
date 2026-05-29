@@ -1,8 +1,10 @@
 "use client";
 
 import { useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { pickLocalizedName } from "@/entities/service";
+import type { Locale } from "@/i18n/routing";
 import { SortableList } from "./sortable-list";
 import type { Service, ServiceCategoryRow } from "@/db/schema";
 
@@ -40,11 +42,12 @@ export function AdminServicesList({
   reorderServicesAction,
 }: AdminServicesListProps) {
   const t = useTranslations("AdminServices");
+  const locale = useLocale() as Locale;
   const [, startReorder] = useTransition();
 
   const catItems: CategoryItem[] = categories.map((c) => ({
     id: c.id,
-    name: c.nameEn,
+    name: pickLocalizedName(c, locale),
     status: c.status,
     serviceCount: services.filter(
       (s) => s.categoryId === c.id && s.status !== "archived",
@@ -53,7 +56,7 @@ export function AdminServicesList({
 
   const svcItems: ServiceItem[] = services.map((s) => ({
     id: s.id,
-    name: s.nameEn,
+    name: pickLocalizedName(s, locale),
     status: s.status,
     categoryId: s.categoryId,
     priceCents: s.priceCents,

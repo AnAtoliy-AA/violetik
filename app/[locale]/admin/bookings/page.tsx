@@ -14,6 +14,8 @@ import {
   BookingsRefreshControls,
 } from "@/features/bookings-admin";
 import { VipBadge } from "@/shared/ui/vip-badge";
+import { pickLocalizedName } from "@/entities/service";
+import type { Locale } from "@/i18n/routing";
 import type { Booking } from "@/db/schema";
 import { cn } from "@/shared/lib/cn";
 
@@ -151,7 +153,9 @@ export default async function AdminBookingsRoute({
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="font-display text-[22px] italic">
-                    {service?.nameEn ?? b.serviceId}
+                    {service
+                      ? pickLocalizedName(service, locale as Locale)
+                      : b.serviceId}
                   </div>
                   <div
                     className={cn(
