@@ -16,12 +16,17 @@ vi.mock("@/db/services-mutations", () => ({
   reorderCategories: vi.fn(async () => ({ ok: true })),
   reorderServices: vi.fn(async () => ({ ok: true })),
 }));
+vi.mock("@/db/masters-mutations", () => ({
+  setServiceMasters: vi.fn(async () => ({ ok: true })),
+}));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 import { requireAdmin } from "@/shared/lib/auth-server";
 import * as mutations from "@/db/services-mutations";
+import { setServiceMasters } from "@/db/masters-mutations";
 import { createCategoryAction } from "./create-category";
 import { createServiceAction } from "./create-service";
+import { updateServiceAction } from "./update-service";
 import { archiveCategoryAction } from "./archive-category";
 
 const ADMIN = { id: "u_admin" };
@@ -106,6 +111,42 @@ describe("services-admin actions", () => {
     });
     expect(result.ok).toBe(false);
     expect(mutations.createService).not.toHaveBeenCalled();
+  });
+
+  it("createServiceAction links the chosen masters after creating the row", async () => {
+    vi.mocked(requireAdmin).mockResolvedValue({
+      ok: true,
+      user: ADMIN as never,
+    });
+    const result = await createServiceAction({
+      ...goodService,
+      masterIds: ["violetik", "anna-k"],
+    });
+    expect(result.ok).toBe(true);
+    expect(mutations.createService).toHaveBeenCalledTimes(1);
+    // The extra masterIds field must not leak into the services-table write.
+    expect(mutations.createService).toHaveBeenCalledWith(
+      expect.not.objectContaining({ masterIds: expect.anything() }),
+    );
+    expect(setServiceMasters).toHaveBeenCalledWith("signature", [
+      "violetik",
+      "anna-k",
+    ]);
+  });
+
+  it("updateServiceAction replaces the service's master links", async () => {
+    vi.mocked(requireAdmin).mockResolvedValue({
+      ok: true,
+      user: ADMIN as never,
+    });
+    // updateSchema omits `id`, so the extra id on goodService is stripped.
+    const result = await updateServiceAction("signature", {
+      ...goodService,
+      masterIds: ["violetik"],
+    });
+    expect(result.ok).toBe(true);
+    expect(mutations.updateService).toHaveBeenCalledTimes(1);
+    expect(setServiceMasters).toHaveBeenCalledWith("signature", ["violetik"]);
   });
 
   it("archiveCategoryAction refuses when the category has non-archived services", async () => {

@@ -92,4 +92,23 @@ describe("serviceFormSchema", () => {
       serviceFormSchema.safeParse({ ...base, durationMinutes: 0 }).success,
     ).toBe(false);
   });
+  it("defaults masterIds to [] when omitted", () => {
+    const parsed = serviceFormSchema.safeParse(base);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.masterIds).toEqual([]);
+  });
+  it("accepts a masterIds array of slugs", () => {
+    const parsed = serviceFormSchema.safeParse({
+      ...base,
+      masterIds: ["violetik", "anna-k"],
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success)
+      expect(parsed.data.masterIds).toEqual(["violetik", "anna-k"]);
+  });
+  it("rejects a non-slug master id", () => {
+    expect(
+      serviceFormSchema.safeParse({ ...base, masterIds: ["Bad Id"] }).success,
+    ).toBe(false);
+  });
 });

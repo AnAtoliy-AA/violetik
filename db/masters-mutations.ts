@@ -152,6 +152,47 @@ export async function setMasterServices(
 }
 
 /**
+ * Replaces the full set of masters linked to a service with the given
+ * list. Diff-based, single transaction — the inverse of
+ * setMasterServices. Lets the service editor manage master links from
+ * the service side.
+ */
+export async function setServiceMasters(
+  serviceId: string,
+  masterIds: readonly string[],
+): Promise<MutationResult> {
+  if (!db) return DB_UNAVAILABLE;
+  return withGuard<MutationResult>(async () => {
+    await db!.transaction(async (tx) => {
+      if (masterIds.length === 0) {
+        await tx
+          .delete(schema.masterServices)
+          .where(eq(schema.masterServices.serviceId, serviceId));
+      } else {
+        await tx
+          .delete(schema.masterServices)
+          .where(
+            and(
+              eq(schema.masterServices.serviceId, serviceId),
+              notInArray(
+                schema.masterServices.masterId,
+                masterIds as string[],
+              ),
+            ),
+          );
+      }
+      for (const mid of masterIds) {
+        await tx
+          .insert(schema.masterServices)
+          .values({ masterId: mid, serviceId })
+          .onConflictDoNothing();
+      }
+    });
+    return { ok: true };
+  }, DB_UNAVAILABLE);
+}
+
+/**
  * Counts upcoming, non-cancelled bookings tied to a master. Used by
  * archiveMaster to refuse archiving until future bookings have been
  * reassigned or cancelled.

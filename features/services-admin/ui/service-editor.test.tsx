@@ -79,6 +79,32 @@ describe("ServiceEditor", () => {
     expect(screen.getAllByText(/Required/).length).toBeGreaterThan(0);
   });
 
+  it("renders the master picker and includes masterIds on submit", async () => {
+    const onSubmit = vi.fn(async () => ({ ok: true as const }));
+    const user = userEvent.setup();
+    render(
+      <NextIntlClientProvider locale="en" messages={en}>
+        <ServiceEditor
+          mode="edit"
+          initial={{ ...makeInitial(), masterIds: ["violetik"] }}
+          categories={categories}
+          masters={[
+            { id: "violetik", name: "Violetik" },
+            { id: "anna-k", name: "Anna K" },
+          ]}
+          onSubmit={onSubmit}
+        />
+      </NextIntlClientProvider>,
+    );
+    expect(screen.getByLabelText("Violetik")).toBeChecked();
+    expect(screen.getByLabelText("Anna K")).not.toBeChecked();
+    await user.click(screen.getByLabelText("Anna K"));
+    await user.click(screen.getByRole("button", { name: /^Save$/ }));
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ masterIds: ["violetik", "anna-k"] }),
+    );
+  });
+
   // Regression: PhotoUploadRow has its own <form action={uploadAction}>.
   // If photoSlot is rendered inside the editor's <form>, React surfaces a
   // hydration error ("<form> cannot be a descendant of <form>").

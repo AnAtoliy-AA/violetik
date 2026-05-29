@@ -11,6 +11,7 @@ import {
   IncludesFieldset,
   type IncludeEntry,
 } from "./includes-fieldset";
+import { MasterPicker, type MasterOption } from "./master-picker";
 
 type Status = "draft" | "published" | "archived";
 
@@ -28,6 +29,8 @@ export interface ServiceEditorInitial {
   durationMinutes: number;
   sortOrder: number;
   status: Status;
+  /** Masters linked to this service. Optional; defaults to none. */
+  masterIds?: string[];
 }
 
 export interface CategoryOption {
@@ -43,6 +46,8 @@ export interface ServiceEditorProps {
   mode: "create" | "edit";
   initial: ServiceEditorInitial;
   categories: readonly CategoryOption[];
+  /** Masters available to link. Omit to hide the picker. */
+  masters?: readonly MasterOption[];
   onSubmit: ServiceEditorSubmit;
   /** Optional photo slot — rendered when present, swapped for null on create. */
   photoSlot?: React.ReactNode;
@@ -77,6 +82,7 @@ export function ServiceEditor({
   mode,
   initial,
   categories,
+  masters,
   onSubmit,
   photoSlot,
 }: ServiceEditorProps) {
@@ -98,6 +104,7 @@ export function ServiceEditor({
     String(initial.durationMinutes),
   );
   const [status, setStatus] = useState<Status>(initial.status);
+  const [masterIds, setMasterIds] = useState<string[]>(initial.masterIds ?? []);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -116,6 +123,7 @@ export function ServiceEditor({
       durationMinutes: Number(durationMinutes) || 0,
       sortOrder: initial.sortOrder,
       status,
+      masterIds,
     };
     const parsed = serviceFormSchema.safeParse(payload);
     if (!parsed.success) {
@@ -293,6 +301,14 @@ export function ServiceEditor({
       </Field>
 
       <IncludesFieldset items={includes} onChange={setIncludes} />
+
+      {masters ? (
+        <MasterPicker
+          masters={masters}
+          value={masterIds}
+          onChange={setMasterIds}
+        />
+      ) : null}
 
       <div className="grid grid-cols-2 gap-4">
         <Field

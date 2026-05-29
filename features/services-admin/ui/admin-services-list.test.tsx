@@ -96,6 +96,40 @@ describe("AdminServicesList", () => {
     expect(screen.getByText("Signature Manicure")).toBeInTheDocument();
   });
 
+  it("flags a service listed in hiddenServiceIds with the no-master badge", () => {
+    render(
+      <NextIntlClientProvider locale="en" messages={en}>
+        <AdminServicesList
+          categories={categories}
+          services={services}
+          hiddenServiceIds={["signature"]}
+          reorderCategoriesAction={vi.fn()}
+          reorderServicesAction={vi.fn()}
+        />
+      </NextIntlClientProvider>,
+    );
+    expect(
+      screen.getByText(/Hidden — no published master/),
+    ).toBeInTheDocument();
+  });
+
+  it("shows no no-master badge when hiddenServiceIds is empty", () => {
+    render(
+      <NextIntlClientProvider locale="en" messages={en}>
+        <AdminServicesList
+          categories={categories}
+          services={services}
+          hiddenServiceIds={[]}
+          reorderCategoriesAction={vi.fn()}
+          reorderServicesAction={vi.fn()}
+        />
+      </NextIntlClientProvider>,
+    );
+    expect(
+      screen.queryByText(/Hidden — no published master/),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders category and service names in the active locale", () => {
     render(
       <NextIntlClientProvider locale="ru" messages={en}>

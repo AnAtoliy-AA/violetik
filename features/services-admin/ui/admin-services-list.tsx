@@ -15,6 +15,11 @@ export type ReorderAction = (
 export interface AdminServicesListProps {
   categories: readonly ServiceCategoryRow[];
   services: readonly Service[];
+  /**
+   * Published service ids that are hidden from the public menu because
+   * they have no published master linked. Flagged with a badge.
+   */
+  hiddenServiceIds?: readonly string[];
   reorderCategoriesAction: ReorderAction;
   reorderServicesAction: ReorderAction;
 }
@@ -33,17 +38,20 @@ interface ServiceItem {
   categoryId: string;
   priceCents: number;
   durationMinutes: number;
+  hidden: boolean;
 }
 
 export function AdminServicesList({
   categories,
   services,
+  hiddenServiceIds,
   reorderCategoriesAction,
   reorderServicesAction,
 }: AdminServicesListProps) {
   const t = useTranslations("AdminServices");
   const locale = useLocale() as Locale;
   const [, startReorder] = useTransition();
+  const hidden = new Set(hiddenServiceIds ?? []);
 
   const catItems: CategoryItem[] = categories.map((c) => ({
     id: c.id,
@@ -61,6 +69,7 @@ export function AdminServicesList({
     categoryId: s.categoryId,
     priceCents: s.priceCents,
     durationMinutes: s.durationMinutes,
+    hidden: hidden.has(s.id),
   }));
 
   const categoryKey = catItems.map((c) => c.id).join("|");
@@ -146,6 +155,11 @@ export function AdminServicesList({
                       ? t("status_draft")
                       : t("status_archived")}
                 </div>
+                {s.hidden ? (
+                  <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+                    {t("badge_no_master")}
+                  </div>
+                ) : null}
               </div>
               <Link
                 href={`/admin/services/${s.id}`}

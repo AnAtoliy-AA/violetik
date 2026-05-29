@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { serviceFormSchema } from "@/entities/service/model/schema";
 import { createService } from "@/db/services-mutations";
+import { setServiceMasters } from "@/db/masters-mutations";
 import { gateAdmin, joinIssues, type ActionResult } from "./_common";
 
 function slugifyEn(name: string): string {
@@ -43,11 +44,12 @@ export async function createServiceAction(
     return { ok: false, error: joinIssues(parsed.error) };
   }
 
-  const result = await createService({
-    ...parsed.data,
-    updatedBy: gate.updatedBy,
-  });
+  const { masterIds, ...row } = parsed.data;
+  const result = await createService({ ...row, updatedBy: gate.updatedBy });
   if (!result.ok) return { ok: false, error: result.error };
+
+  const linked = await setServiceMasters(row.id, masterIds);
+  if (!linked.ok) return { ok: false, error: linked.error };
 
   revalidatePath("/", "layout");
   return { ok: true };

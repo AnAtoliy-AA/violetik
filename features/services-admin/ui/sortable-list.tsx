@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -45,6 +45,11 @@ export function SortableList<T extends SortableItem>({
   dragLabel = "Drag",
 }: SortableListProps<T>) {
   const [items, setItems] = useState<readonly T[]>(initialItems);
+  // dnd-kit derives its aria-describedby id from an internal global
+  // counter that drifts between SSR and client (a second DndContext on
+  // the page, or StrictMode's double-mount, offsets it), causing a
+  // hydration mismatch. A stable useId() pins the id on both sides.
+  const dndContextId = useId();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -66,6 +71,7 @@ export function SortableList<T extends SortableItem>({
 
   return (
     <DndContext
+      id={dndContextId}
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleEnd}
