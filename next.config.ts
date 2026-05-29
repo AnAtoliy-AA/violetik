@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { withSerwist } from "@serwist/turbopack";
+import { SECURITY_HEADERS } from "./shared/lib/security/headers";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
@@ -30,6 +31,16 @@ const nextConfig: NextConfig = {
         hostname: "*.public.blob.vercel-storage.com",
       },
     ],
+  },
+  // Site-wide HTTP security headers (HSTS, CSP, anti-clickjacking, etc.).
+  // Source of truth: shared/lib/security/headers.ts.
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [...SECURITY_HEADERS],
+      },
+    ];
   },
 };
 

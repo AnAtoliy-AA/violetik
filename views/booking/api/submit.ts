@@ -1,7 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { z } from "zod";
 import { auth } from "@/auth";
+import { rateLimit } from "@/shared/lib/security/rate-limit";
 import {
   bookingTimeZoneFromSettings,
   createCalendarEvent,
@@ -68,6 +70,20 @@ export interface SubmitBookingInput {
   locale: string;
 }
 
+// Defence-in-depth input validation. Drizzle already parameterizes
+// queries; this rejects malformed values before any DB work and keys the
+// shapes we depend on downstream (ISO date, HH:MM time, known locale).
+const inputSchema = z.object({
+  serviceId: z.string().min(1),
+  masterId: z.string().min(1).nullable(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time: z.string().regex(/^\d{2}:\d{2}$/),
+  locale: z.enum(["en", "ru", "by"]),
+});
+
+// Per-user cap to stop booking spam / accidental double-submits.
+const RATE_LIMIT = { limit: 10, windowMs: 5 * 60_000 };
+
 export type SubmitBookingResult =
   | { ok: true; bookingId: string }
   | {
@@ -79,6 +95,7 @@ export type SubmitBookingResult =
         | "no_master_available"
         | "master_not_eligible"
         | "too_soon"
+        | "rate_limited"
         | "unknown";
     };
 
@@ -101,13 +118,17 @@ export async function submitBooking(
     );
   }
 
+  const parsed = inputSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: "invalid_input" };
+  }
+
+  if (!rateLimit(`booking:${session.user.id}`, RATE_LIMIT).ok) {
+    return { ok: false, error: "rate_limited" };
+  }
+
   const service = await getServiceById(input.serviceId);
-  if (
-    !service ||
-    service.status !== "published" ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(input.date) ||
-    !/^\d{2}:\d{2}$/.test(input.time)
-  ) {
+  if (!service || service.status !== "published") {
     return { ok: false, error: "invalid_input" };
   }
 
