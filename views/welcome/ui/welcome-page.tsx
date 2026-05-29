@@ -152,7 +152,7 @@ export function WelcomePage({
           )}
         </div>
 
-        <m.div className="flex flex-col gap-3 pb-9" {...rise(2.4)}>
+        <m.div className="flex flex-col gap-3 pb-20" {...rise(2.4)}>
           <MagneticButton className="block w-full">
             <Link
               href="/onboarding"
