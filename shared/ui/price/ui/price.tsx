@@ -53,7 +53,10 @@ export function Price({
     >
       <span>{effective}</span>
       {resolved.hasDiscount ? (
-        <s className="font-mono text-[11px] text-text-3">{base}</s>
+        // The pre-discount price stays struck (it's the old price) but
+        // legible: a relative size so it scales with whatever price size
+        // it sits in, and text-2 rather than the near-invisible text-3.
+        <s className="font-mono text-[0.7em] text-text-2">{base}</s>
       ) : null}
     </span>
   );
