@@ -6,8 +6,16 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
     page.getByRole("heading", { level: 2, name: /Choose your ritual/i }),
   ).toBeVisible();
 
-  // Pick a ritual
-  await page.getByRole("radio", { name: /Couture Gel/i }).click();
+  // Pick the first ritual and capture its name dynamically. Hardcoding a
+  // service name ("Couture Gel") couples the test to a specific DB seed and
+  // breaks against any other dataset; instead read the chosen tile's display
+  // name (the text-[20px] node, distinct from the duration eyebrow + blurb)
+  // and re-assert that same name on the confirm step.
+  const firstRitual = page.getByRole("radio").first();
+  const serviceName = (
+    await firstRitual.locator("div.text-\\[20px\\]").innerText()
+  ).trim();
+  await firstRitual.click();
   await page.getByRole("button", { name: /^Forward$/i }).click();
 
   // §6.1–6.2 — solo studios collapse master + date + time into a single
@@ -41,7 +49,7 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
   await expect(
     page.getByRole("heading", { level: 2, name: /A quiet review/i }),
   ).toBeVisible();
-  await expect(page.getByText("Couture Gel")).toBeVisible();
+  await expect(page.getByText(serviceName)).toBeVisible();
   await expect(page.getByText("14:30")).toBeVisible();
 
   // Submit (Phase 2 microcopy: "Confirm"). The post-submit landing
