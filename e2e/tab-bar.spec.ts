@@ -13,7 +13,7 @@ test.describe("TabBar — appears on tab-bar routes", () => {
       await expect(nav).toBeVisible();
       // All four tab links present.
       await expect(nav.getByRole("link", { name: /Home/i })).toBeVisible();
-      await expect(nav.getByRole("link", { name: /Menu/i })).toBeVisible();
+      await expect(nav.getByRole("link", { name: /Services/i })).toBeVisible();
       await expect(nav.getByRole("link", { name: /Gallery/i })).toBeVisible();
       await expect(nav.getByRole("link", { name: /You/i })).toBeVisible();
     });
