@@ -18,8 +18,16 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
     page.getByRole("heading", { level: 2, name: /Pick a day/i }),
   ).toBeVisible();
 
-  // Pick the second Tuesday in the strip (2026-05-26)
-  await page.getByRole("button", { name: /Tue 26/i }).click();
+  // Pick an enabled day from the rolling 14-day strip. We can't hardcode a
+  // date — the strip starts at "today", so a fixed day falls out of range as
+  // the calendar moves. Day buttons are aria-label'd "<Dow> <DayNum>" and
+  // Sun/Mon are disabled; take the LAST enabled one so it's well past the
+  // booking lead-time window and the full slot list (incl. 14:30) is offered.
+  await page
+    .getByRole("button", { name: /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d+$/ })
+    .and(page.locator("button:not([disabled])"))
+    .last()
+    .click();
 
   // Pick 14:30 (not reserved). Wait for the slot grid to be stable —
   // it re-renders after async data loads and Playwright otherwise sees
