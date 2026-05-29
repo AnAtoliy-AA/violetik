@@ -161,7 +161,10 @@ export function PwaInstallButton() {
         title={t("aria_label")}
         onClick={onClick}
         className={cn(
-          "inline-flex size-[38px] items-center justify-center rounded-full border-[0.5px] border-line-strong bg-transparent text-text",
+          "relative inline-flex size-[38px] items-center justify-center rounded-full border-[0.5px] border-line-strong bg-transparent text-text",
+          // Visible glyph stays 38px; a `before` pseudo extends the tap target
+          // to ~46px so the button clears the 44px touch-target minimum.
+          "before:absolute before:-inset-1 before:content-['']",
           "transition-colors duration-fast ease-out hover:bg-surface/60",
           "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
         )}
