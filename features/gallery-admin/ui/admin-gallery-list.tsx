@@ -8,6 +8,13 @@ import type { Locale } from "@/i18n/routing";
 import { SortableList } from "./sortable-list";
 import type { GalleryCategoryRow, GalleryItemRow } from "@/db/schema";
 
+// §2 — padded ≥44px hit area + focus ring so the adjacent Edit/Delete
+// actions aren't easy to mis-tap. Delete dims while a mutation is pending.
+const actionBase =
+  "inline-flex min-h-[44px] items-center rounded px-1.5 font-mono text-[12px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent";
+const editAction = `${actionBase} text-accent`;
+const deleteAction = `${actionBase} text-rose disabled:opacity-50`;
+
 type Reorder = (
   ids: string[],
 ) => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -39,7 +46,7 @@ export function AdminGalleryList({
 }: AdminGalleryListProps) {
   const t = useTranslations("AdminGallery");
   const locale = useLocale() as Locale;
-  const [, startReorder] = useTransition();
+  const [isPending, startReorder] = useTransition();
   const [notice, setNotice] = useState<string | null>(null);
 
   const nameById = new Map(
@@ -65,7 +72,7 @@ export function AdminGalleryList({
   return (
     <div className="flex flex-col gap-10 px-[22px] py-6">
       {notice ? (
-        <p role="alert" className="rounded border-[0.5px] border-accent bg-surface-2 p-3 text-[13px] text-accent">
+        <p role="alert" className="rounded border-[0.5px] border-rose bg-surface-2 p-3 text-[13px] text-rose">
           {notice}
         </p>
       ) : null}
@@ -75,7 +82,7 @@ export function AdminGalleryList({
           <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
             {t("section_categories")}
           </h2>
-          <Link href="/admin/gallery/categories/new" className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent">
+          <Link href="/admin/gallery/categories/new" className={editAction}>
             {t("cta_new_category")}
           </Link>
         </div>
@@ -92,14 +99,16 @@ export function AdminGalleryList({
                   {t("item_count", { n: c.itemCount })}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Link href={`/admin/gallery/categories/${c.id}`} className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent">
+              <div className="flex items-center gap-1">
+                <Link href={`/admin/gallery/categories/${c.id}`} className={editAction}>
                   {t("cta_edit")}
                 </Link>
                 <button
                   type="button"
-                  className="font-mono text-[12px] uppercase tracking-[0.16em] text-rose"
+                  disabled={isPending}
+                  className={deleteAction}
                   onClick={() => {
+                    if (!window.confirm(t("confirm_delete_category"))) return;
                     setNotice(null);
                     startReorder(async () => {
                       const r = await deleteCategoryAction(c.id);
@@ -126,7 +135,7 @@ export function AdminGalleryList({
           <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
             {t("section_items")}
           </h2>
-          <Link href="/admin/gallery/new" className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent">
+          <Link href="/admin/gallery/new" className={editAction}>
             {t("cta_new_item")}
           </Link>
         </div>
@@ -144,14 +153,16 @@ export function AdminGalleryList({
                 </div>
                 {i.caption ? <div className="mt-1 text-[12px] text-text-2">{i.caption}</div> : null}
               </div>
-              <div className="flex items-center gap-3">
-                <Link href={`/admin/gallery/${i.id}`} className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent">
+              <div className="flex items-center gap-1">
+                <Link href={`/admin/gallery/${i.id}`} className={editAction}>
                   {t("cta_edit")}
                 </Link>
                 <button
                   type="button"
-                  className="font-mono text-[12px] uppercase tracking-[0.16em] text-rose"
+                  disabled={isPending}
+                  className={deleteAction}
                   onClick={() => {
+                    if (!window.confirm(t("confirm_delete_item"))) return;
                     setNotice(null);
                     startReorder(async () => {
                       const r = await deleteItemAction(i.id);

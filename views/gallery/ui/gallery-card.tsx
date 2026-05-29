@@ -97,7 +97,7 @@ export function GalleryCard({
         * affordance is keyboard- and screen-reader-accessible without
         * the illegal nesting.
         */}
-      <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-[rgba(20,9,26,0.55)] px-1.5 py-1 backdrop-blur-md">
+      <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1.5 rounded-full bg-[rgba(20,9,26,0.55)] px-2 py-1.5 backdrop-blur-md">
         {(item.paletteDots ?? item.palette).slice(0, 4).map((color, i) => {
           const isActive = activePalette === color;
           const activate = () => onPaletteSelect?.(color);
@@ -119,7 +119,11 @@ export function GalleryCard({
                 }
               }}
               className={cn(
-                "size-2 rounded-full ring-[0.5px] ring-white/30 transition-transform",
+                // §2 — the visible swatch stays a small 10px dot to fit the
+                // capsule, but a `before` pseudo extends the tap area ~8px in
+                // every direction so the dots aren't pixel-perfect targets.
+                "relative size-2.5 rounded-full ring-[0.5px] ring-white/30 transition-transform",
+                "before:absolute before:-inset-1 before:content-['']",
                 "hover:scale-125 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent",
                 isActive && "scale-125 ring-1 ring-accent",
               )}

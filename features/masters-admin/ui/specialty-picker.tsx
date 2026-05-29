@@ -55,7 +55,7 @@ export function SpecialtyPicker({ services, value, onChange }: Props) {
       </legend>
       <p className="text-[11px] text-text-3">{t("label_specialties_hint")}</p>
       {selected.size === 0 ? (
-        <p className="text-[12px] text-accent" role="alert">
+        <p className="text-[12px] text-rose" role="alert">
           {t("specialties_empty_warning")}
         </p>
       ) : null}

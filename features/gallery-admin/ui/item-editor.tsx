@@ -107,6 +107,11 @@ export function GalleryItemEditor({
         if (!(path in issues)) issues[path] = issue.message;
       }
       setStatus({ kind: "validation", issues });
+      const firstPath = parsed.error.issues[0]?.path.join(".");
+      const elId = firstPath ? FIELD_IDS[firstPath] : undefined;
+      if (elId) {
+        requestAnimationFrame(() => document.getElementById(elId)?.focus());
+      }
       return;
     }
     startTransition(async () => {
@@ -185,12 +190,12 @@ export function GalleryItemEditor({
 
       <div className="flex items-center gap-3">
         <button type="submit" disabled={isPending} className={buttonClassName({ variant: "gold", size: "md" })}>
-          {t("cta_save")}
+          {isPending ? t("saving") : t("cta_save")}
         </button>
         {status.kind === "saved" ? (
           <span role="status" className="text-[12px] text-text-2">{t("saved")}</span>
         ) : status.kind === "error" ? (
-          <span role="alert" className="text-[12px] text-accent">{t("save_failed", { error: status.message })}</span>
+          <span role="alert" className="text-[12px] text-rose">{t("save_failed", { error: status.message })}</span>
         ) : null}
       </div>
     </form>
@@ -198,7 +203,18 @@ export function GalleryItemEditor({
 }
 
 const inputClass =
-  "w-full rounded border border-line bg-surface px-3 py-2 text-[14px]";
+  "w-full rounded border border-line bg-surface px-3 py-2.5 text-base text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
+
+// Maps Zod issue paths to the DOM id of the field that renders them, so a
+// failed submit can move focus to the first invalid input (§8 focus-management).
+const FIELD_IDS: Record<string, string> = {
+  id: "gitem-slug",
+  categoryId: "gitem-cat",
+  alt: "gitem-alt",
+  captionEn: "gitem-cap-en",
+  captionRu: "gitem-cap-ru",
+  captionBy: "gitem-cap-by",
+};
 
 function Field({
   id,
@@ -221,7 +237,7 @@ function Field({
       {children}
       {hint ? <span className="text-[11px] text-text-3">{hint}</span> : null}
       {error ? (
-        <span className={cn("text-[12px] text-accent")} role="alert">{error}</span>
+        <span className={cn("text-[12px] text-rose")} role="alert">{error}</span>
       ) : null}
     </div>
   );

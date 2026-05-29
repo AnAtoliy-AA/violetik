@@ -65,6 +65,11 @@ export function GalleryCategoryEditor({
         if (!(path in issues)) issues[path] = issue.message;
       }
       setStatus({ kind: "validation", issues });
+      const firstPath = parsed.error.issues[0]?.path.join(".");
+      const elId = firstPath ? FIELD_IDS[firstPath] : undefined;
+      if (elId) {
+        requestAnimationFrame(() => document.getElementById(elId)?.focus());
+      }
       return;
     }
     startTransition(async () => {
@@ -116,12 +121,12 @@ export function GalleryCategoryEditor({
 
       <div className="flex items-center gap-3">
         <button type="submit" disabled={isPending} className={buttonClassName({ variant: "gold", size: "md" })}>
-          {t("cta_save")}
+          {isPending ? t("saving") : t("cta_save")}
         </button>
         {status.kind === "saved" ? (
           <span role="status" className="text-[12px] text-text-2">{t("saved")}</span>
         ) : status.kind === "error" ? (
-          <span role="alert" className="text-[12px] text-accent">{t("save_failed", { error: status.message })}</span>
+          <span role="alert" className="text-[12px] text-rose">{t("save_failed", { error: status.message })}</span>
         ) : null}
       </div>
     </form>
@@ -129,7 +134,14 @@ export function GalleryCategoryEditor({
 }
 
 const inputClass =
-  "w-full rounded border border-line bg-surface px-3 py-2 text-[14px]";
+  "w-full rounded border border-line bg-surface px-3 py-2.5 text-base text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
+
+const FIELD_IDS: Record<string, string> = {
+  id: "gcat-slug",
+  nameEn: "gcat-name-en",
+  nameRu: "gcat-name-ru",
+  nameBy: "gcat-name-by",
+};
 
 function Field({
   id,
@@ -152,7 +164,7 @@ function Field({
       {children}
       {hint ? <span className="text-[11px] text-text-3">{hint}</span> : null}
       {error ? (
-        <span className={cn("text-[12px] text-accent")} role="alert">
+        <span className={cn("text-[12px] text-rose")} role="alert">
           {error}
         </span>
       ) : null}

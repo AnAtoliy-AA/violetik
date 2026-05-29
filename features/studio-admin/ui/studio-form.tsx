@@ -98,7 +98,7 @@ export function StudioForm({
   }
 
   const inputClass =
-    "w-full rounded border border-line bg-surface px-2 py-1 text-[13px]";
+    "w-full rounded border border-line bg-surface px-3 py-2.5 text-base text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
   const labelClass =
     "block font-mono text-[10px] uppercase tracking-[0.18em] text-text-3";
 
@@ -312,7 +312,7 @@ export function StudioForm({
             {t("saved")}
           </span>
         ) : status.kind === "error" ? (
-          <span role="alert" className="text-[12px] text-accent">
+          <span role="alert" className="text-[12px] text-rose">
             {t("error", { error: status.message })}
           </span>
         ) : null}
