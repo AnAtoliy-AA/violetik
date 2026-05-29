@@ -76,6 +76,11 @@ export function CategoryEditor({
         if (!(path in issues)) issues[path] = issue.message;
       }
       setStatus({ kind: "validation", issues });
+      const firstPath = parsed.error.issues[0]?.path.join(".");
+      const elId = firstPath ? FIELD_IDS[firstPath] : undefined;
+      if (elId) {
+        requestAnimationFrame(() => document.getElementById(elId)?.focus());
+      }
       return;
     }
     startTransition(async () => {
@@ -108,7 +113,7 @@ export function CategoryEditor({
       {archiveBlockingCount && archiveBlockingCount > 0 ? (
         <p
           role="alert"
-          className="rounded border-[0.5px] border-accent bg-surface-2 p-3 text-[13px] text-accent"
+          className="rounded border-[0.5px] border-rose bg-surface-2 p-3 text-[13px] text-rose"
         >
           {t("archive_blocked", { n: archiveBlockingCount })}
         </p>
@@ -191,14 +196,14 @@ export function CategoryEditor({
           disabled={isPending}
           className={buttonClassName({ variant: "gold", size: "md" })}
         >
-          {t("cta_save")}
+          {isPending ? t("saving") : t("cta_save")}
         </button>
         {status.kind === "saved" ? (
           <span role="status" className="text-[12px] text-text-2">
             {t("saved")}
           </span>
         ) : status.kind === "error" ? (
-          <span role="alert" className="text-[12px] text-accent">
+          <span role="alert" className="text-[12px] text-rose">
             {t("save_failed", { error: status.message })}
           </span>
         ) : null}
@@ -208,7 +213,15 @@ export function CategoryEditor({
 }
 
 const inputClass =
-  "w-full rounded border border-line bg-surface px-3 py-2 text-[14px]";
+  "w-full rounded border border-line bg-surface px-3 py-2.5 text-base text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
+
+const FIELD_IDS: Record<string, string> = {
+  id: "cat-slug",
+  nameEn: "cat-name-en",
+  nameRu: "cat-name-ru",
+  nameBy: "cat-name-be",
+  status: "cat-status",
+};
 
 function Field({
   id,
@@ -240,7 +253,7 @@ function Field({
         </span>
       ) : null}
       {error ? (
-        <span id={errorId} className={cn("text-[12px] text-accent")} role="alert">
+        <span id={errorId} className={cn("text-[12px] text-rose")} role="alert">
           {error}
         </span>
       ) : null}

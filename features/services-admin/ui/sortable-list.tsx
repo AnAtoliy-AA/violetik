@@ -112,11 +112,18 @@ function SortableRow({
       <button
         type="button"
         aria-label={dragLabel}
-        className="cursor-grab text-text-3 active:cursor-grabbing"
+        className="-m-1.5 inline-flex size-11 shrink-0 cursor-grab items-center justify-center rounded text-text-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
-        ⠿
+        <svg aria-hidden viewBox="0 0 16 16" width={16} height={16} fill="currentColor">
+          <circle cx="5" cy="3" r="1.4" />
+          <circle cx="11" cy="3" r="1.4" />
+          <circle cx="5" cy="8" r="1.4" />
+          <circle cx="11" cy="8" r="1.4" />
+          <circle cx="5" cy="13" r="1.4" />
+          <circle cx="11" cy="13" r="1.4" />
+        </svg>
       </button>
       <div className="flex-1">{children}</div>
     </li>

@@ -24,6 +24,7 @@ export function LetterReveal({
 
   return (
     <span
+      role="img"
       aria-label={text}
       className={cn("inline-flex overflow-hidden leading-[0.95]", className)}
     >

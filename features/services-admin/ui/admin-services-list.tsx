@@ -8,6 +8,10 @@ import type { Locale } from "@/i18n/routing";
 import { SortableList } from "./sortable-list";
 import type { Service, ServiceCategoryRow } from "@/db/schema";
 
+// §2 — padded ≥44px hit area + focus ring for the row/header navigation links.
+const actionLink =
+  "inline-flex min-h-[44px] items-center rounded px-1.5 font-mono text-[12px] uppercase tracking-[0.16em] text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent";
+
 export type ReorderAction = (
   ids: string[],
 ) => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -84,7 +88,7 @@ export function AdminServicesList({
           </h2>
           <Link
             href="/admin/services/categories/new"
-            className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
+            className={actionLink}
           >
             {t("cta_new_category")}
           </Link>
@@ -113,7 +117,7 @@ export function AdminServicesList({
               </div>
               <Link
                 href={`/admin/services/categories/${c.id}`}
-                className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
+                className={actionLink}
               >
                 {t("cta_edit")}
               </Link>
@@ -129,7 +133,7 @@ export function AdminServicesList({
           </h2>
           <Link
             href="/admin/services/new"
-            className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
+            className={actionLink}
           >
             {t("cta_new_service")}
           </Link>
@@ -163,7 +167,7 @@ export function AdminServicesList({
               </div>
               <Link
                 href={`/admin/services/${s.id}`}
-                className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
+                className={actionLink}
               >
                 {t("cta_edit")}
               </Link>

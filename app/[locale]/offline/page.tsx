@@ -16,7 +16,7 @@ export default async function OfflinePage({
   const t = await getTranslations({ locale, namespace: "Notifications" });
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-bg px-6 text-center">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-bg px-6 text-center">
       <Ornament className="mx-auto w-[180px] text-accent" />
       <h1 className="font-display text-h2 italic">{t("offline_title")}</h1>
       <p className="max-w-prose font-display italic text-[18px] leading-[1.5] text-text-2">

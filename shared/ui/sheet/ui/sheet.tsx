@@ -197,7 +197,7 @@ export function Sheet({
                 : { type: "spring", stiffness: 380, damping: 30, mass: 0.5 }
             }
             className={cn(
-              "relative w-full max-w-[640px] h-[100vh]",
+              "relative w-full max-w-[640px] h-[100dvh]",
               "text-text rounded-t-2xl",
               "outline-none flex flex-col",
               glassSurfaceClassName({

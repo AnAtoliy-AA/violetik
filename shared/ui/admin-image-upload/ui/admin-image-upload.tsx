@@ -155,7 +155,7 @@ export function AdminImageUpload({
               accept="image/jpeg,image/png,image/webp,image/avif"
               onChange={onFileChange}
               disabled={!storageConfigured || isUploading}
-              className="mt-1.5 block w-full text-[13px] text-text-2 file:mr-3 file:cursor-pointer file:rounded-full file:border file:border-line-strong file:bg-transparent file:px-3 file:py-1.5 file:text-text disabled:cursor-not-allowed disabled:opacity-40"
+              className="mt-1.5 block w-full rounded text-[13px] text-text-2 file:mr-3 file:cursor-pointer file:rounded-full file:border file:border-line-strong file:bg-transparent file:px-3 file:py-1.5 file:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:cursor-not-allowed disabled:opacity-40"
             />
           </label>
 

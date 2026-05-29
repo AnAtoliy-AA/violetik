@@ -32,15 +32,19 @@ export function GalleryCard({
   activePalette,
 }: GalleryCardProps) {
   const reduceMotion = useReducedMotion();
-  const [observerRef, inView] = useInView<HTMLButtonElement>({
+  const [observerRef, inView] = useInView<HTMLDivElement>({
     rootMargin: "200px",
   });
   const shouldRenderImage = eager || inView;
   return (
-    <m.button
+    // The card is a plain container; the open action is a stretched
+    // <button> overlay (`.gc-open`) and the palette dots are sibling
+    // <button>s — never nested inside another button. This keeps each
+    // control a single, real, keyboard-reachable tab stop (avoids the
+    // `nested-interactive` WCAG violation). The wrapper mirrors the
+    // open-button's focus ring via `has-[.gc-open:focus-visible]`.
+    <m.div
       ref={observerRef}
-      type="button"
-      onClick={() => onOpen(item.id)}
       onPointerMove={(event) => {
         const el = event.currentTarget;
         const r = el.getBoundingClientRect();
@@ -56,11 +60,10 @@ export function GalleryCard({
       }}
       whileHover={reduceMotion ? undefined : { y: -2 }}
       className={cn(
-        "gilded-lift spotlight relative w-full overflow-hidden rounded-[18px] p-0",
-        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+        "gilded-lift spotlight relative w-full overflow-hidden rounded-[18px]",
+        "has-[.gc-open:focus-visible]:ring-1 has-[.gc-open:focus-visible]:ring-accent has-[.gc-open:focus-visible]:ring-offset-2 has-[.gc-open:focus-visible]:ring-offset-bg",
       )}
       style={{ height: item.h }}
-      aria-label={item.categoryName}
     >
       <m.div
         layoutId={`gallery-image-${item.id}`}
@@ -79,47 +82,41 @@ export function GalleryCard({
           <Skeleton variant="rect" className="size-full rounded-none" />
         )}
       </m.div>
-      <span className="absolute left-2.5 top-2.5 rounded-full bg-[rgba(20,9,26,0.45)] px-2 py-[3px] font-display text-[12px] italic text-text backdrop-blur-md">
+
+      {/* Primary action: open the lightbox. Stretched over the whole card. */}
+      <button
+        type="button"
+        onClick={() => onOpen(item.id)}
+        aria-label={item.categoryName}
+        className="gc-open absolute inset-0 z-[1] focus:outline-none"
+      />
+
+      <span className="pointer-events-none absolute left-2.5 top-2.5 z-[2] rounded-full bg-[rgba(20,9,26,0.45)] px-2 py-[3px] font-display text-[12px] italic text-text backdrop-blur-md">
         Nº {String(index + 1).padStart(2, "0")}
       </span>
-      <span className="absolute bottom-2.5 left-2.5 rounded-full bg-[rgba(20,9,26,0.55)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-text backdrop-blur-md">
+      <span className="pointer-events-none absolute bottom-2.5 left-2.5 z-[2] rounded-full bg-[rgba(20,9,26,0.55)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-text backdrop-blur-md">
         {item.categoryName}
       </span>
-      {/* §9.3 — palette dots, four tiny swatches in a glass capsule at
-        * bottom-right. Tapping a dot bubbles up `onPaletteSelect` so
-        * the grid can filter to other cards sharing that color. Falls
-        * back to the two `palette` colors when no extended
-        * `paletteDots` is provided.
-        *
-        * Note: the parent card is itself a <button>, so the dots can't
-        * be real <button> elements (HTML forbids nested buttons → React
-        * hydration error). Use `role="button"` on <span> so the
-        * affordance is keyboard- and screen-reader-accessible without
-        * the illegal nesting.
-        */}
-      <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-[rgba(20,9,26,0.55)] px-1.5 py-1 backdrop-blur-md">
+      {/* §9.3 — palette dots, real sibling buttons in a glass capsule at
+        * bottom-right. Tapping a dot filters the grid to other cards
+        * sharing that color. Falls back to the two `palette` colors when
+        * no extended `paletteDots` is provided. */}
+      <span className="absolute bottom-2.5 right-2.5 z-[2] inline-flex items-center gap-1.5 rounded-full bg-[rgba(20,9,26,0.55)] px-2 py-1.5 backdrop-blur-md">
         {(item.paletteDots ?? item.palette).slice(0, 4).map((color, i) => {
           const isActive = activePalette === color;
-          const activate = () => onPaletteSelect?.(color);
           return (
-            <span
+            <button
+              type="button"
               key={`${color}-${i}`}
-              role="button"
-              tabIndex={0}
               aria-label={color}
-              onClick={(e) => {
-                e.stopPropagation();
-                activate();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  activate();
-                }
-              }}
+              aria-pressed={isActive}
+              onClick={() => onPaletteSelect?.(color)}
               className={cn(
-                "size-2 rounded-full ring-[0.5px] ring-white/30 transition-transform",
+                // The visible swatch stays a small 10px dot to fit the
+                // capsule, but a `before` pseudo extends the tap area ~8px
+                // in every direction so the dots aren't pixel-perfect targets.
+                "relative size-2.5 rounded-full ring-[0.5px] ring-white/30 transition-transform",
+                "before:absolute before:-inset-1 before:content-['']",
                 "hover:scale-125 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent",
                 isActive && "scale-125 ring-1 ring-accent",
               )}
@@ -128,6 +125,6 @@ export function GalleryCard({
           );
         })}
       </span>
-    </m.button>
+    </m.div>
   );
 }

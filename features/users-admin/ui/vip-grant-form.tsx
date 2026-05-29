@@ -46,7 +46,7 @@ export function VipGrantForm(props: VipGrantFormProps) {
           value={expiry}
           disabled={noExpiry}
           onChange={(e) => setExpiry(e.target.value)}
-          className="rounded-[10px] border-[0.5px] border-line bg-surface-1 px-3 py-2 text-[13px]"
+          className="rounded-[10px] border-[0.5px] border-line bg-surface-1 px-3 py-2.5 text-base text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
         />
       </label>
       <label className="inline-flex items-center gap-2 text-[13px]">
