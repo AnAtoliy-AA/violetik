@@ -617,18 +617,37 @@ body {
   animation: var(--animate-shimmer);
 }
 
-/* Gold CTA shine / blick — a diagonal highlight that sweeps across the gold
- * fill on a loop. Applied to every variant="gold" button (Reserve, Book,
- * Continue, Confirm, …) via buttonClassName, so they all glint without each
- * call site repeating the markup. The ::after sits above the fill; the gold
- * variant's own content stays legible because the sweep is narrow and
+/* Gold shine / blick — a diagonal highlight that sweeps across the element on
+ * a loop. Reused by every variant="gold" button (Reserve, Book, Continue,
+ * Confirm, …) via buttonClassName and by the VIP badge, so all the gilded
+ * surfaces glint without each call site repeating the markup. The ::after sits
+ * above the fill; content stays legible because the sweep is narrow and
  * screen-blended (a passing glint, not a wash). */
-.btn-gold {
+.gold-shine {
   position: relative;
   overflow: hidden;
   isolation: isolate;
+  /* Gentle "breathing" size pulse on the element itself (the glint lives on
+     ::after, so this slot is free). scale() doesn't reflow neighbours. The
+     timing is intentionally offset from the 3.2s glint so the two effects
+     drift in and out of phase rather than beating in lockstep. */
+  animation: goldPulse 2.6s ease-in-out infinite;
 }
-.btn-gold::after {
+@keyframes goldPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gold-shine {
+    animation: none;
+  }
+}
+.gold-shine::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -643,10 +662,13 @@ body {
   );
   background-size: 220% 100%;
   mix-blend-mode: screen;
-  animation: shimmer 3.2s ease-in-out infinite;
+  /* alternate → the glint sweeps across in one direction, then travels back,
+     rather than hard-jumping to the start each loop. ease-in-out eases the
+     turnaround at each end. */
+  animation: shimmer 3.2s ease-in-out infinite alternate;
 }
 @media (prefers-reduced-motion: reduce) {
-  .btn-gold::after {
+  .gold-shine::after {
     animation: none;
     opacity: 0;
   }
