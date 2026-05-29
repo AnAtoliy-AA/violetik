@@ -88,6 +88,8 @@ export function ServiceDetailPage({
       <StickyCta
         serviceId={service.id}
         resolvedPrice={resolvedPrice}
+        currency={currency}
+        locale={locale}
         serviceName={service.name}
         telegramUsername={telegramUsername}
       />

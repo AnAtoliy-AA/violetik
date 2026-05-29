@@ -1,4 +1,6 @@
 import { useTranslations } from "next-intl";
+import type { CurrencyCode } from "@/db/schema";
+import type { Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { buttonClassName } from "@/shared/ui/button";
@@ -8,6 +10,10 @@ import { Price } from "@/shared/ui/price";
 export interface StickyCtaProps {
   serviceId: string;
   resolvedPrice: ResolvedPrice;
+  /** Active display currency. Defaults to EUR for legacy callers. */
+  currency?: CurrencyCode;
+  /** Active locale. Defaults to en for legacy callers. */
+  locale?: Locale;
   /** Service name used to pre-fill the "Ask first" Telegram message. */
   serviceName?: string;
   /** Telegram handle (without @) used as the deep-link target. */
@@ -34,6 +40,8 @@ function ArrowRight() {
 export function StickyCta({
   serviceId,
   resolvedPrice,
+  currency = "EUR",
+  locale = "en",
   serviceName,
   telegramUsername,
 }: StickyCtaProps) {
@@ -66,7 +74,7 @@ export function StickyCta({
             {t("from")}
           </div>
           <div className="font-display text-[28px] font-normal italic leading-none text-gold-shimmer">
-            <Price resolved={resolvedPrice} />
+            <Price resolved={resolvedPrice} currency={currency} locale={locale} />
           </div>
         </div>
         <div className="flex flex-1 items-center gap-2">
