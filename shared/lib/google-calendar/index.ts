@@ -1,6 +1,11 @@
 export { computeAvailableSlots } from "./slots";
 export { fetchBusyWindows } from "./free-busy";
-export { createCalendarEvent, deleteCalendarEvent } from "./events";
+export {
+  createCalendarEvent,
+  deleteCalendarEvent,
+  getCalendarEvent,
+  setCalendarEventStatus,
+} from "./events";
 export {
   buildAuthUrl,
   exchangeCode,
