@@ -7,12 +7,10 @@ import { Aurora } from "@/shared/ui/aurora";
 import { DeferUntilVisible } from "@/shared/ui/defer-until-visible";
 import { PaperGrain } from "@/shared/ui/paper-grain";
 import { TonightStrip } from "@/widgets/tonight-strip";
-import { AnnouncementCapsule } from "./sections/announcement-capsule";
 import { AtelierMotion } from "./sections/atelier-motion";
 import { GalleryStrip } from "./sections/gallery-strip";
 import { HomeHero } from "./sections/home-hero";
 import { MembershipCard } from "./sections/membership-card";
-import { NextOpeningLine } from "./sections/next-opening-line";
 import { SignaturesList } from "./sections/signatures-list";
 import { TrustStrip } from "./sections/trust-strip";
 import { HomeFooterAsync } from "./sections/home-footer-async";
@@ -39,9 +37,7 @@ export function HomePage({ locale, showAdmin = false }: HomePageProps) {
         <Aurora intensity="subtle" />
         <PaperGrain />
         <HomeHero />
-        <NextOpeningLine />
       </section>
-      <AnnouncementCapsule />
       <SignaturesList />
       <Suspense fallback={<MasterStripSkeleton />}>
         <MasterStripAsync locale={locale} />
