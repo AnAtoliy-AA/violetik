@@ -61,7 +61,7 @@ export function GalleryStrip() {
     <section className="pb-7 pt-5">
       <div className="mb-3 flex items-end justify-between px-[22px]">
         <div>
-          <Plate folio number={4} label={t("plate_portfolio").toUpperCase()} />
+          <Plate folio number={3} label={t("plate_portfolio").toUpperCase()} />
           <h2 className="mt-2 font-display text-h2 font-normal italic leading-[1.05] tracking-[-0.02em]">
             {t("gallery_title_a")} <em>{t("gallery_title_b")}</em>.
           </h2>

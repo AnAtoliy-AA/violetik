@@ -23,7 +23,7 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
   const dateYear = toRomanNumeral(testimonial.createdAt.getFullYear());
   return (
     <section className="px-[22px] py-7">
-      <Plate number={3} label={t("plate_word").toUpperCase()} />
+      <Plate folio number={5} label={t("plate_word").toUpperCase()} />
       <div className="gilded glass-top relative mt-4 overflow-hidden rounded-[28px] px-7 py-9">
         <div
           aria-hidden

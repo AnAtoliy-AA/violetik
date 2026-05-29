@@ -39,7 +39,7 @@ export function MembershipCard() {
         <div className="absolute right-5 top-5">
           <MonogramSeal letter="V" />
         </div>
-        <Plate number={5} label={t("plate_invitation").toUpperCase()} />
+        <Plate folio number={6} label={t("plate_invitation").toUpperCase()} />
         <h3 className="my-3 font-display text-[32px] font-normal italic leading-tight tracking-[-0.01em]">
           {t("membership_title_lead")}{" "}
           <span className="text-gold-shimmer">{t("membership_title_word")}</span>.
