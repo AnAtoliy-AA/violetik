@@ -18,7 +18,7 @@
     "address_copied_toast": "Адрас скапіяваны",
     "address_maps_toast": "Адкрываем мапу…",
     "cta_gallery": "Галерэя",
-    "plate_menu": "Меню",
+    "plate_menu": "Паслугі",
     "plate_master": "Майстар",
     "plate_portfolio": "Партфоліа",
     "plate_word": "З вуснаў у вусны",
@@ -30,7 +30,7 @@
     "atelier_motion_caption_polish": "Пакрыццё",
     "atelier_motion_caption_design": "Дэталь",
     "signatures_title": "Сігнатуры.",
-    "signatures_all_link": "Усе шэсць",
+    "signatures_all_link": "Усе {n}",
     "master_stat_years": "{years, plural, one {# год} few {# гады} many {# гадоў} other {# гадоў}}",
     "master_stat_sets": "{label} сэтаў",
     "gallery_title_a": "Свежыя",
@@ -266,7 +266,7 @@
     "title": "Атэлье",
     "description": "Знайдзіце залу, рытуал або свой профіль.",
     "home": { "label": "Галоўная" },
-    "services": { "label": "Меню" },
+    "services": { "label": "Паслугі" },
     "gallery": { "label": "Галерэя" },
     "masters": { "label": "Майстры" },
     "membership": { "label": "Сяброўства" },
@@ -400,7 +400,7 @@
       "label": "Дом"
     },
     "services": {
-      "label": "Меню"
+      "label": "Паслугі"
     },
     "gallery": {
       "label": "Галерэя"

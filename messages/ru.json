@@ -18,7 +18,7 @@
     "address_copied_toast": "Адрес скопирован",
     "address_maps_toast": "Открываем карту…",
     "cta_gallery": "Галерея",
-    "plate_menu": "Меню",
+    "plate_menu": "Услуги",
     "plate_master": "Мастер",
     "plate_portfolio": "Портфолио",
     "plate_word": "Сарафанное радио",
@@ -30,7 +30,7 @@
     "atelier_motion_caption_polish": "Покрытие",
     "atelier_motion_caption_design": "Деталь",
     "signatures_title": "Сигнатуры.",
-    "signatures_all_link": "Все шесть",
+    "signatures_all_link": "Все {n}",
     "master_stat_years": "{years, plural, one {# год} few {# года} many {# лет} other {# лет}}",
     "master_stat_sets": "{label} сетов",
     "gallery_title_a": "Свежие",
@@ -266,7 +266,7 @@
     "title": "Ателье",
     "description": "Найдите зал, ритуал или вернитесь в свой профиль.",
     "home": { "label": "Главная" },
-    "services": { "label": "Меню" },
+    "services": { "label": "Услуги" },
     "gallery": { "label": "Галерея" },
     "masters": { "label": "Мастера" },
     "membership": { "label": "Членство" },
@@ -400,7 +400,7 @@
       "label": "Дом"
     },
     "services": {
-      "label": "Меню"
+      "label": "Услуги"
     },
     "gallery": {
       "label": "Галерея"
