@@ -1,10 +1,16 @@
 "use client";
 
 import { useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { pickLocalizedName } from "@/entities/service";
+import type { Locale } from "@/i18n/routing";
 import { SortableList } from "./sortable-list";
 import type { Service, ServiceCategoryRow } from "@/db/schema";
+
+// §2 — padded ≥44px hit area + focus ring for the row/header navigation links.
+const actionLink =
+  "inline-flex min-h-[44px] items-center rounded px-1.5 font-mono text-[12px] uppercase tracking-[0.16em] text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent";
 
 export type ReorderAction = (
   ids: string[],
@@ -13,6 +19,11 @@ export type ReorderAction = (
 export interface AdminServicesListProps {
   categories: readonly ServiceCategoryRow[];
   services: readonly Service[];
+  /**
+   * Published service ids that are hidden from the public menu because
+   * they have no published master linked. Flagged with a badge.
+   */
+  hiddenServiceIds?: readonly string[];
   reorderCategoriesAction: ReorderAction;
   reorderServicesAction: ReorderAction;
 }
@@ -31,20 +42,24 @@ interface ServiceItem {
   categoryId: string;
   priceCents: number;
   durationMinutes: number;
+  hidden: boolean;
 }
 
 export function AdminServicesList({
   categories,
   services,
+  hiddenServiceIds,
   reorderCategoriesAction,
   reorderServicesAction,
 }: AdminServicesListProps) {
   const t = useTranslations("AdminServices");
+  const locale = useLocale() as Locale;
   const [, startReorder] = useTransition();
+  const hidden = new Set(hiddenServiceIds ?? []);
 
   const catItems: CategoryItem[] = categories.map((c) => ({
     id: c.id,
-    name: c.nameEn,
+    name: pickLocalizedName(c, locale),
     status: c.status,
     serviceCount: services.filter(
       (s) => s.categoryId === c.id && s.status !== "archived",
@@ -53,11 +68,12 @@ export function AdminServicesList({
 
   const svcItems: ServiceItem[] = services.map((s) => ({
     id: s.id,
-    name: s.nameEn,
+    name: pickLocalizedName(s, locale),
     status: s.status,
     categoryId: s.categoryId,
     priceCents: s.priceCents,
     durationMinutes: s.durationMinutes,
+    hidden: hidden.has(s.id),
   }));
 
   const categoryKey = catItems.map((c) => c.id).join("|");
@@ -72,7 +88,7 @@ export function AdminServicesList({
           </h2>
           <Link
             href="/admin/services/categories/new"
-            className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
+            className={actionLink}
           >
             {t("cta_new_category")}
           </Link>
@@ -101,7 +117,7 @@ export function AdminServicesList({
               </div>
               <Link
                 href={`/admin/services/categories/${c.id}`}
-                className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
+                className={actionLink}
               >
                 {t("cta_edit")}
               </Link>
@@ -117,7 +133,7 @@ export function AdminServicesList({
           </h2>
           <Link
             href="/admin/services/new"
-            className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
+            className={actionLink}
           >
             {t("cta_new_service")}
           </Link>
@@ -143,10 +159,15 @@ export function AdminServicesList({
                       ? t("status_draft")
                       : t("status_archived")}
                 </div>
+                {s.hidden ? (
+                  <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+                    {t("badge_no_master")}
+                  </div>
+                ) : null}
               </div>
               <Link
                 href={`/admin/services/${s.id}`}
-                className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
+                className={actionLink}
               >
                 {t("cta_edit")}
               </Link>

@@ -31,41 +31,40 @@ function renderWithIntl() {
 }
 
 describe("OnboardingPage", () => {
-  it("starts on the first slide and shows a Continue button", () => {
+  it("starts on the first slide and shows the Forward button", () => {
     renderWithIntl();
     expect(screen.getByText("A studio of one")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /^Continue$/i }),
+      screen.getByRole("button", { name: /^Forward$/i }),
     ).toBeInTheDocument();
   });
 
-  it("advances slides and swaps the CTA to Begin on the last one", async () => {
+  it("advances to the second slide and swaps the CTA to Step inside", async () => {
     const user = userEvent.setup();
     renderWithIntl();
-    await user.click(screen.getByRole("button", { name: /^Continue$/i }));
+    await user.click(screen.getByRole("button", { name: /^Forward$/i }));
     expect(screen.getByText("Designed like couture")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: /^Continue$/i }));
-    expect(screen.getByText("Yours, by appointment")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /^Continue$/i })).toBeNull();
-    expect(screen.getByRole("link", { name: /^Begin$/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Forward$/i })).toBeNull();
+    expect(
+      screen.getByRole("link", { name: /^Step inside$/i }),
+    ).toBeInTheDocument();
   });
 
-  it("allows jumping to a specific slide via the dot indicator", async () => {
+  it("renders exactly two dots after the 2-card recut", async () => {
     const user = userEvent.setup();
     renderWithIntl();
     const dots = screen.getAllByRole("tab");
-    expect(dots).toHaveLength(3);
+    expect(dots).toHaveLength(2);
     expect(dots[0]).toHaveAttribute("aria-selected", "true");
-    await user.click(dots[2]);
-    expect(dots[2]).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("Yours, by appointment")).toBeInTheDocument();
+    await user.click(dots[1]);
+    expect(dots[1]).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("Designed like couture")).toBeInTheDocument();
   });
 
-  it("Skip and Begin links both point at /home", () => {
+  it("Skip-equivalent link points at /home", () => {
     renderWithIntl();
-    expect(screen.getByRole("link", { name: /^Skip$/i })).toHaveAttribute(
-      "href",
-      "/home",
-    );
+    expect(
+      screen.getByRole("link", { name: /^Take me home$/i }),
+    ).toHaveAttribute("href", "/home");
   });
 });

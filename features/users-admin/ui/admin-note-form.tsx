@@ -42,7 +42,7 @@ export function AdminNoteForm(props: AdminNoteFormProps) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         rows={4}
-        className="w-full rounded-[12px] border-[0.5px] border-line bg-surface-1 p-3 text-[14px]"
+        className="w-full rounded-[12px] border-[0.5px] border-line bg-surface-1 p-3 text-base text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
       />
       <div className="flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">

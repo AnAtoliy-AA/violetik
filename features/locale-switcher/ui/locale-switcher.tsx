@@ -50,7 +50,11 @@ export function LocaleSwitcher({ variant = "header" }: LocaleSwitcherProps) {
               });
             }}
             className={cn(
-              "rounded-full font-mono uppercase tracking-[0.18em]",
+              "relative rounded-full font-mono uppercase tracking-[0.18em]",
+              // The pills stay visually compact; a `before` pseudo extends the
+              // tap target vertically to ~44px so each locale clears the touch
+              // minimum on mobile. Vertical-only keeps neighbours unambiguous.
+              "before:absolute before:-inset-y-[11px] before:inset-x-0 before:content-['']",
               sizeClass,
               "transition-colors duration-fast ease-out",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",

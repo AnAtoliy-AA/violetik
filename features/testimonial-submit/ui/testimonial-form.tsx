@@ -135,6 +135,8 @@ function serverErrorMessage(
       return t("testimonial_form_duplicate");
     case "invalid_master":
       return t("testimonial_form_invalid_master");
+    case "rate_limited":
+      return t("testimonial_form_rate_limited");
     case "unauthenticated":
     case "unknown":
     default:

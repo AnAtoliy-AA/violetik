@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 
 const COLORS = ["var(--color-accent)", "var(--color-violet)", "var(--color-rose)"];
 
@@ -46,7 +46,7 @@ export function ConfettiBurst({ count = 28 }: ConfettiBurstProps) {
   return (
     <>
       {dots.map((d, i) => (
-        <motion.span
+        <m.span
           key={i}
           aria-hidden
           className="pointer-events-none absolute rounded-full"

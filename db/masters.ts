@@ -88,6 +88,28 @@ export async function getMasterIdsForService(
   }
 }
 
+/**
+ * All master ids linked to a service, regardless of master status.
+ * Unlike getMasterIdsForService (published-only, used by the menu),
+ * the service editor needs every link — including draft masters — to
+ * seed its picker. Mirrors getServiceIdsForMaster on the master side.
+ */
+export async function getAllMasterIdsForService(
+  serviceId: string,
+): Promise<string[]> {
+  if (!db) return [];
+  try {
+    const rows = await db
+      .select({ masterId: schema.masterServices.masterId })
+      .from(schema.masterServices)
+      .where(eq(schema.masterServices.serviceId, serviceId));
+    return rows.map((r) => r.masterId);
+  } catch (error) {
+    if (isMissingTable(error)) return [];
+    throw error;
+  }
+}
+
 export async function getServiceIdsForMaster(
   masterId: string,
 ): Promise<string[]> {

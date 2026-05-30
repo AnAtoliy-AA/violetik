@@ -5,6 +5,7 @@ import { requireAdmin } from "@/shared/lib/auth-server";
 import { AppHeader } from "@/widgets/app-header";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { listAllCategories, listAllServices } from "@/db/services";
+import { getServiceIdsHavingAnyPublishedMaster } from "@/db/masters";
 import {
   AdminServicesList,
   reorderCategoriesAction,
@@ -39,10 +40,20 @@ export default async function AdminServicesRoute({
   setRequestLocale(locale);
   const t = await getTranslations("AdminServices");
 
-  const [categories, services] = await Promise.all([
+  const [categories, services, eligible] = await Promise.all([
     listAllCategories(),
     listAllServices(),
+    getServiceIdsHavingAnyPublishedMaster(),
   ]);
+  // Mirror listPublishedServices()'s real hiding rule, including the
+  // zero-masters fall-through: when no master is published anywhere, the
+  // menu shows everything, so nothing is "hidden".
+  const hiddenServiceIds =
+    eligible.size === 0
+      ? []
+      : services
+          .filter((s) => s.status === "published" && !eligible.has(s.id))
+          .map((s) => s.id);
 
   return (
     <div className="pb-16">
@@ -59,6 +70,7 @@ export default async function AdminServicesRoute({
       <AdminServicesList
         categories={categories}
         services={services}
+        hiddenServiceIds={hiddenServiceIds}
         reorderCategoriesAction={reorderCategoriesAction}
         reorderServicesAction={reorderServicesAction}
       />

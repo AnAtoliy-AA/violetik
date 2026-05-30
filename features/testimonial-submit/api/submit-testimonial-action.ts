@@ -7,11 +7,19 @@ import { getMasterById } from "@/db/masters";
 import { createTestimonial } from "@/db/testimonials";
 import { listAdminUserIds } from "@/db/users-admin";
 import { dispatchNotification } from "@/shared/lib/notifications";
+import { rateLimit } from "@/shared/lib/security/rate-limit";
 
 const inputSchema = z.object({
   masterId: z.string().min(1),
   body: z.string(),
+  // §11.3 — optional. Lets a customer tag a review to the specific
+  // service they sat for. Service detail page filters by this when
+  // present; legacy rows stay master-level.
+  serviceId: z.string().min(1).optional(),
 });
+
+// Per-user cap to stop review spam.
+const RATE_LIMIT = { limit: 5, windowMs: 10 * 60_000 };
 
 export type SubmitTestimonialResult =
   | { ok: true; id: string }
@@ -23,15 +31,20 @@ export type SubmitTestimonialResult =
         | "body_required"
         | "body_too_long"
         | "duplicate_pending"
+        | "rate_limited"
         | "unknown";
     };
 
 export async function submitTestimonialAction(
-  rawInput: { masterId: string; body: string },
+  rawInput: { masterId: string; body: string; serviceId?: string | null },
 ): Promise<SubmitTestimonialResult> {
   try {
     const user = await getCurrentSessionUser();
     if (!user) return { ok: false, reason: "unauthenticated" };
+
+    if (!rateLimit(`testimonial:${user.id}`, RATE_LIMIT).ok) {
+      return { ok: false, reason: "rate_limited" };
+    }
 
     const parsed = inputSchema.safeParse(rawInput);
     if (!parsed.success) return { ok: false, reason: "invalid_master" };
@@ -49,6 +62,7 @@ export async function submitTestimonialAction(
       userId: user.id,
       masterId: parsed.data.masterId,
       body,
+      serviceId: parsed.data.serviceId ?? null,
     });
     if (!result) {
       return { ok: false, reason: "unknown" };

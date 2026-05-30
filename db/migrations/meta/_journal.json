@@ -120,6 +120,48 @@
       "when": 1780300000000,
       "tag": "0016_pwa_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1780400000000,
+      "tag": "0017_faithful_mister_sinister",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1779820502933,
+      "tag": "0018_mute_manta",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1779820703577,
+      "tag": "0019_charming_eternity",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1780052129634,
+      "tag": "0020_fluffy_amphibian",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1780061822812,
+      "tag": "0021_yielding_odin",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1780125715586,
+      "tag": "0022_windy_franklin_storm",
+      "breakpoints": true
     }
   ]
 }

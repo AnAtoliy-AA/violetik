@@ -31,9 +31,9 @@ export function computeAvailableSlots(input: SlotComputationInput): string[] {
       const slotEnd = new Date(
         slotStart.getTime() + input.serviceDurationMin * 60_000,
       );
-      if (!intersectsAny(slotStart, slotEnd, input.busy)) {
-        slots.push(formatHM(t));
-      }
+      if (intersectsAny(slotStart, slotEnd, input.busy)) continue;
+      if (isBeforeLead(slotStart, input.now, input.minLeadMinutes)) continue;
+      slots.push(formatHM(t));
     }
   }
   return slots;
@@ -79,6 +79,17 @@ function localTimeToUtc(
   );
   const tzOffsetMs = getTimeZoneOffsetMs(naive, timeZone);
   return new Date(naive.getTime() - tzOffsetMs);
+}
+
+// Local duplicate of views/booking/lib/lead-time.ts#isTooSoon —
+// shared/ cannot import from views/ per FSD. Two lines; unlikely to drift.
+function isBeforeLead(
+  slotStart: Date,
+  now: Date | undefined,
+  minLeadMinutes: number | undefined,
+): boolean {
+  if (!now || minLeadMinutes === undefined) return false;
+  return slotStart.getTime() - now.getTime() < minLeadMinutes * 60_000;
 }
 
 function getTimeZoneOffsetMs(at: Date, timeZone: string): number {

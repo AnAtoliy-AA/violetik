@@ -6,11 +6,13 @@
     "hero_title_lead": "гэта",
     "hero_title_word": "партрэт.",
     "hero_paragraph": "Аўтарскі нэйл-дызайн з атэлье Віалеты на адно крэсла. У нядзелю а 20:00 адкрываецца каляндар — раім не спазняцца.",
-    "cta_book": "Забраніраваць",
+    "cta_book": "Запісацца",
+    "address_copy_label": "Скапіяваць адрас",
+    "address_maps_label": "Адкрыць на мапе",
+    "address_copied_toast": "Адрас скапіяваны",
+    "address_maps_toast": "Адкрываем мапу…",
     "cta_gallery": "Галерэя",
-    "capsule_eyebrow": "На тыдні · Лімітаваная капсула",
-    "capsule_title": "Моў і Гранат — толькі шэсць рук.",
-    "plate_menu": "Меню",
+    "plate_menu": "Паслугі",
     "plate_master": "Майстар",
     "plate_portfolio": "Партфоліа",
     "plate_word": "З вуснаў у вусны",
@@ -22,7 +24,7 @@
     "atelier_motion_caption_polish": "Пакрыццё",
     "atelier_motion_caption_design": "Дэталь",
     "signatures_title": "Сігнатуры.",
-    "signatures_all_link": "Усе шэсць",
+    "signatures_all_link": "Усе {n}",
     "master_stat_years": "{years, plural, one {# год} few {# гады} many {# гадоў} other {# гадоў}}",
     "master_stat_sets": "{label} сэтаў",
     "gallery_title_a": "Свежыя",
@@ -38,7 +40,7 @@
     "meta_title": "Сяброўства",
     "plate_title": "Сяброўства",
     "eyebrow": "Па запрашэнні · Вузкі круг",
-    "hero_title": "Станьце сябрам або <em>VIP</em>.",
+    "hero_title": "Станьце сябрам або <em>VIP</em>",
     "hero_paragraph": "Невялікі круг сталых гасцей. Тры узроўні, адно крэсла, поўная ўвага.",
     "billing_aria": "Перыядычнасць аплаты",
     "billing_monthly": "Штомесяц",
@@ -72,7 +74,7 @@
     "progress_aria": "Прагрэс браніравання",
     "back_aria": "Назад",
     "cta_continue": "Далей",
-    "cta_confirm": "Пацвердзіць запіс",
+    "cta_confirm": "Пацвердзіць",
     "cta_pick_service": "Абярыце рытуал",
     "cta_pick_date": "Абярыце дзень",
     "cta_pick_time": "Абярыце час",
@@ -81,6 +83,7 @@
       "master": "Майстар",
       "date": "Дата",
       "time": "Час",
+      "when": "Калі",
       "confirm": "Пацвярджэнне"
     },
     "service": {
@@ -106,14 +109,39 @@
       "eyebrow": "Крок 04 / Час",
       "title": "Абярыце <em>гадзіну</em>.",
       "no_date": "Спачатку абярыце дату.",
+      "none_available": "На гэту дату часу не засталося — выберыце іншы дзень.",
       "zone_suffix": "Час па часавым поясе студыі.",
       "reserved": "Занята",
       "available": "Вольна"
     },
+    "step_label_of": "{current} з {total} · {label}",
+    "step_label_service": "Паслуга",
+    "step_label_when": "Калі",
+    "step_label_confirm": "Пацверджанне",
+    "when": {
+      "eyebrow": "Крок 02 / Калі",
+      "title": "Выберыце <em>дзень і гадзіну</em>.",
+      "paragraph": "Гартайце дні. Тапніце плітку, каб запісацца.",
+      "no_slots": "— НЯМА АКОН — ПАСПРАБУЙЦЕ НАСТУПНЫ ДЗЕНЬ"
+    },
+    "service_tile_duration": "· {n} ХВ ·",
+    "service_tile_more": "{n} яшчэ",
+    "save_sheet": {
+      "title": "Мы трымаем ваша месца",
+      "body": "Месца за вамі на 5 хвілін. Працягвайце — ці адпраўце спасылку сабе.",
+      "cta_continue": "Працягнуць",
+      "cta_telegram": "Адправіць у Telegram",
+      "cta_discard": "Адмяніць"
+    },
+    "policy_strip": "ПЕРАНОС БЯСПЛАТНА · ЗА 12Г · НЯ-З'ЯЎЛЕННЕ ЎТРЫМЛІВАЕ 50%",
+    "arrival_eyebrow": "УВАХОД",
+    "arrival_body": "3 паверх, званок адзін раз.",
     "errors": {
       "slot_taken": "Гэты слот толькі што заняты. Выберыце іншы.",
       "db_unavailable": "Запіс часова недаступны. Паспрабуйце праз хвіліну.",
       "invalid_input": "Выберыце паслугу, дату і час перад пацверджаннем.",
+      "too_soon": "Гэты час занадта блізкі да зараз. Запіс магчымы не пазней, чым за 3 гадзіны — выберыце іншы час.",
+      "rate_limited": "Занадта шмат спроб. Пачакайце хвіліну і паспрабуйце зноў.",
       "unknown": "Нешта пайшло не так. Паспрабуйце яшчэ раз."
     },
     "confirm": {
@@ -147,7 +175,15 @@
     "missing_date": "—",
     "missing_time": "—",
     "cta_calendar": "Дадаць у каляндар",
-    "cta_return": "Вярнуцца ў атэлье"
+    "cta_return": "Вярнуцца ў атэлье",
+    "headline": "Пацверджана.",
+    "calendar_apple": "Apple",
+    "calendar_google": "Google",
+    "calendar_ics": "Спампаваць",
+    "telegram_remind_eyebrow": "· НАГАДАЦЬ · ЗА 24Г · У TELEGRAM ·",
+    "share_eyebrow": "ПРЫВЯДЗІ СЯБРОЎКУ",
+    "share_cta": "Скапіяваць рэферальную спасылку",
+    "share_copied": "Спасылка скапіявана"
   },
   "ServiceDetail": {
     "meta_subtitle": "Рытуал",
@@ -155,7 +191,16 @@
     "includes_eyebrow": "—— Што ўваходзіць",
     "recent_eyebrow": "—— Свежыя працы ў гэтым стылі",
     "from": "Ад",
-    "cta_reserve": "Забраніраваць крэсла"
+    "cta_reserve": "Забраніраваць крэсла",
+    "cta_ask_first": "Спачатку спытаць",
+    "ask_first_template": "Прывітанне — цікавіць {service}, калі бліжэйшае акно?",
+    "aftercare_eyebrow": "ДАГЛЯД ПАСЛЯ",
+    "aftercare_body": "Што спатрэбіцца пасля — гадзіна без гарачай вады і дзень без прамога сонца. Поўную памятку прышлем паведамленнем.",
+    "pairs_eyebrow": "—— Добра спалучаецца",
+    "master_eyebrow": "—— Вашы рукі",
+    "master_cta": "Запіс да {initial}.",
+    "reviews_eyebrow": "—— З водгукаў",
+    "reviews_verified": "ВЕРЫФІКАВАНА"
   },
   "Services": {
     "meta_title": "Меню",
@@ -175,9 +220,12 @@
   },
   "Onboarding": {
     "meta_title": "Знаёмства",
-    "skip": "Прапусціць",
+    "skip": "На галоўную",
     "cta_continue": "Далей",
-    "cta_begin": "Пачаць",
+    "cta_begin": "Увайсці",
+    "voice_attribution": "— В.",
+    "voice_what_we_do": "Адно крэсла, адна гадзіна, адна пара рук — вашы. Без чэргаў і падслуханых размоў. Толькі пакой і тое, што мы ствараем.",
+    "voice_how_a_sitting_feels": "Візіт — гэта маленькая цырымонія. Гарбата, гутарка пра настрой, потым дзевяноста ціхіх хвілін працы.",
     "aria_carousel": "Карусель знаёмства",
     "aria_dots": "Індыкатар слайдаў",
     "aria_dot": "Слайд {n} з {total}",
@@ -194,13 +242,58 @@
   "Welcome": {
     "tagline": "Прыватнае атэлье манікюру — адно крэсла, адна гадзіна, адзін ціхі рытуал за раз.",
     "cta_enter": "Я тут упершыню",
-    "cta_returning": "Запісацца"
+    "cta_main": "Галоўная",
+    "cta_services": "Паслугі",
+    "cta_tonight": "Вокны на сёння",
+    "home_link": "На галоўную",
+    "status_open_until": "АДКРЫТА · ДА {time}",
+    "status_opens_on": "АДКРЫЕМСЯ {day} {time}"
+  },
+  "Nav": {
+    "trigger_label": "Адкрыць навігацыю",
+    "close_label": "Закрыць навігацыю",
+    "aria_label": "Навігацыя па атэлье",
+    "title": "Атэлье",
+    "description": "Знайдзіце залу, рытуал або свой профіль.",
+    "home": {
+      "label": "Галоўная"
+    },
+    "services": {
+      "label": "Паслугі"
+    },
+    "gallery": {
+      "label": "Галерэя"
+    },
+    "masters": {
+      "label": "Майстры"
+    },
+    "membership": {
+      "label": "Сяброўства"
+    },
+    "book": {
+      "label": "Запісацца"
+    },
+    "profile": {
+      "label": "Профіль"
+    },
+    "notifications": {
+      "label": "Апавяшчэнні"
+    }
   },
   "LocaleSwitcher": {
     "label": "Мова",
     "en": "Англійская",
     "ru": "Руская",
     "by": "Беларуская"
+  },
+  "PwaInstall": {
+    "aria_label": "Усталяваць праграму",
+    "ios_instructions": "На iPhone ці iPad націсніце кнопку «Падзяліцца» ў Safari і абярыце «На экран «Дадому»», каб усталяваць атэлье як праграму.",
+    "ios_close": "Закрыць",
+    "sheet_title": "Дадайце Віалету на галоўны экран",
+    "sheet_body": "Хутчэй, чым закладка.",
+    "sheet_cta_install": "Дадаць",
+    "sheet_cta_dismiss": "Не зараз"
   },
   "Gallery": {
     "meta_title": "Партфоліа",
@@ -213,10 +306,21 @@
     "filter_aria": "Фільтр па тэгу",
     "category_all": "Усе",
     "empty": "Пад фільтр нічога не падыходзіць.",
+    "palette_filter_eyebrow": "ФІЛЬТР ПА КОЛЕРУ",
+    "palette_filter_clear": "Скінуць",
     "lightbox_eyebrow": "Сэт {number} · {tag}",
     "lightbox_title": "Этуд: {tag}.",
     "lightbox_caption": "Зроблена Віалетай — фініш {tag}.",
     "lightbox_close": "Закрыць",
+    "lightbox_share_label": "Падзяліцца",
+    "lightbox_share_sheet_title": "Падзяліцца гэтым сэтам",
+    "lightbox_share_copy_link": "Скапіяваць спасылку",
+    "lightbox_share_telegram": "Адправіць у Telegram",
+    "lightbox_share_download": "Спампаваць выяву",
+    "lightbox_share_copied_toast": "Спасылка скапіявана",
+    "lightbox_share_native_text": "Этуд: {tag} — атэлье Віалеты",
+    "lightbox_next": "Наступнае",
+    "lightbox_prev": "Папярэдняе",
     "category": {
       "Editorial": "Эдыторыял",
       "Gel": "Гель",
@@ -232,11 +336,23 @@
     "badge_pending_vip": "VIP у апрацоўцы",
     "joined": "Далучылася ў {year}",
     "next_visit_eyebrow": "Наступны візіт",
+    "booking_status": {
+      "pending": "Чакае",
+      "confirmed": "Пацверджана",
+      "cancelled": "Адменена",
+      "completed": "Завершана"
+    },
     "countdown": {
       "today": "Сёння",
       "tomorrow": "Заўтра",
-      "in_days": "Праз {n} дн."
+      "in_days": "Праз {n} дн.",
+      "in_hours": "Праз {n} г.",
+      "now": "Зараз"
     },
+    "signout": "Зачыніць дзверы",
+    "rebook_cta": "Паўтарыць",
+    "palettes_eyebrow": "Захаваныя палітры",
+    "palettes_empty": "Прымерце палітру — яна захаваецца тут.",
     "quick_links_aria": "Спасылкі акаўнта",
     "quick_links": {
       "bookings": "Мае запісы",
@@ -267,6 +383,7 @@
     "testimonial_form_required": "Напішы, калі ласка, некалькі словаў.",
     "testimonial_form_duplicate": "У цябе ўжо ёсць водгук на мадэрацыі для гэтага майстра.",
     "testimonial_form_invalid_master": "Абяры майстра.",
+    "testimonial_form_rate_limited": "Занадта шмат спроб. Пачакайце некалькі хвілін і паспрабуйце зноў.",
     "testimonial_form_generic_error": "Нешта пайшло не так. Паспрабуй яшчэ раз.",
     "status_pending": "На мадэрацыі",
     "status_approved": "Апублікавана",
@@ -295,7 +412,7 @@
       "label": "Дом"
     },
     "services": {
-      "label": "Меню"
+      "label": "Паслугі"
     },
     "gallery": {
       "label": "Галерэя"
@@ -328,11 +445,32 @@
     "site_settings_section_discount": "Агульная скідка",
     "site_settings_section_currency": "Валюта",
     "site_settings_discount_active": "Скідка актыўная",
+    "site_settings_section_markup": "Завышаная старая цана",
+    "site_settings_markup_hint": "Паказвае завышаную перакрэсленую цану побач з рэальнай, каб прапановы выглядалі са зніжкай. Перавызначае агульную скідку, калі актыўная.",
+    "site_settings_markup_active": "Паказваць завышаную старую цану",
     "site_settings_base_label": "База €{price}",
     "site_settings_vip_base_label": "База €{price} / мес.",
     "site_settings_save": "Захаваць",
     "site_settings_saved": "Захавана",
     "site_settings_error": "Не атрымалася захаваць: {error}",
+    "inbox_page_seo": "SEO старонак",
+    "inbox_page_seo_caption": "Загалоўкі і апісанні",
+    "page_seo_plate_title": "SEO старонак",
+    "page_seo_intro": "Змяніце пошукавы загаловак і мета-апісанне для кожнай публічнай старонкі, для кожнай мовы. Пакіньце поле пустым, каб выкарыстаць значэнне па змаўчанні.",
+    "page_seo_title_label": "Загаловак",
+    "page_seo_description_label": "Апісанне",
+    "page_seo_save": "Захаваць",
+    "page_seo_saved": "Захавана",
+    "page_seo_error": "Не атрымалася захаваць: {error}",
+    "page_seo_page_home": "Галоўная",
+    "page_seo_page_services": "Паслугі",
+    "page_seo_page_gallery": "Галерэя",
+    "page_seo_page_master": "Майстар",
+    "page_seo_page_membership": "Сяброўства",
+    "page_seo_page_welcome": "Вітанне",
+    "page_seo_page_onboarding": "Анбордынг",
+    "page_seo_page_profile": "Профіль",
+    "page_seo_page_sign_in": "Уваход",
     "inbox_photos": "Фатаграфіі",
     "inbox_photos_caption": "Загрузка і кіраванне выявамі",
     "inbox_services": "Паслугі",
@@ -343,11 +481,47 @@
     "inbox_studio_caption": "Адрас, карта, часавы пояс",
     "inbox_users": "Карыстальнікі",
     "inbox_users_caption": "Спіс, ролі, VIP, аб'яднанне",
+    "analytics": {
+      "title": "Сігналы",
+      "window_eyebrow": "За 7 дзён",
+      "total": "{count} падзей",
+      "empty": "У гэтым акне пакуль няма трафіку.",
+      "funnel_eyebrow": "—— Варонка браніравання",
+      "funnel_row": "{entered} → {completed} · {drop}% адсеў",
+      "events": {
+        "welcome_landed": "Зайшлі на welcome",
+        "welcome_cta_step_inside": "Націснулі «Увайсці»",
+        "welcome_cta_tonight": "Націснулі «Сёння»",
+        "onboarding_completed": "Прайшлі анбордынг",
+        "onboarding_skipped": "Прапусцілі анбордынг",
+        "home_next_opening_tapped": "Тап на бліжэйшае акно",
+        "service_detail_opened": "Адкрылі паслугу",
+        "service_detail_pairs_with_opened": "Адкрылі сумежную паслугу",
+        "booking_step_entered": "Увайшлі ў крок запісу",
+        "booking_step_completed": "Прайшлі крок запісу",
+        "booking_save_sheet_shown": "Паказалі «Захаваць месца»",
+        "booking_save_sheet_resumed": "Вярнуліся з «Захаваць месца»",
+        "booking_submit_success": "Запіс пацверджаны",
+        "booking_submit_error": "Памылка пры запісе",
+        "confirmation_share_link_copied": "Скапіявалі реф-спасылку",
+        "confirmation_add_to_calendar": "Дадалі ў каляндар",
+        "palette_switched": "Памянялі палітру",
+        "tonight_ribbon_tapped": "Тап на стужку «Сёння»"
+      },
+      "steps": {
+        "service": "Выбар рытуала",
+        "master": "Выбар майстра",
+        "date": "Выбар дня",
+        "time": "Выбар часу",
+        "when": "Выбар часу",
+        "confirm": "Пацверджанне"
+      }
+    },
     "photos": {
       "plate_title": "Фатаграфіі",
       "eyebrow": "Выявы атэлье",
       "title": "Фота атэлье.",
-      "paragraph": "Загрузіце JPEG, PNG, WebP або AVIF (да 8 МБ) для кожнага слота — паслугі, галерэя, партрэт майстра, аватары водгукаў, атэлье і аватар профілю. Кожная загрузка замяняе папярэднюю. Сховішча: Vercel Blob.",
+      "paragraph": "Загрузіце JPEG, PNG, WebP або AVIF (да 25 МБ) для кожнага слота — паслугі, галерэя, партрэт майстра, аватары водгукаў, атэлье і аватар профілю. Кожная загрузка замяняе папярэднюю. Сховішча: Vercel Blob.",
       "storage_not_configured_banner": "BLOB_READ_WRITE_TOKEN адсутнічае · загрузкі адключаныя ў гэтай зборцы",
       "storage_not_configured": "Сховішча не настроенае · загрузкі адключаныя",
       "group_service": "Паслугі",
@@ -367,12 +541,16 @@
       "upload_error_not_configured": "Vercel Blob не настроены",
       "upload_error_empty_file": "Файл пусты",
       "upload_error_unsupported_type": "Непадтрымліваемы тып файла",
-      "upload_error_too_large": "Файл занадта вялікі (макс. 8 МБ)",
+      "upload_error_too_large": "Фота {size} МБ · максімум {max} МБ. Сцісніце або паменшыце памер выявы і паспрабуйце яшчэ раз.",
       "upload_error_upload_failed": "Збой загрузкі · паспрабуйце яшчэ раз",
       "upload_error_auth": "Увайдзіце як адмін для загрузкі",
       "upload_error_validation": "Запоўніце ўсе палі",
       "edit_service": "Рэдагаваць"
-    }
+    },
+    "inbox_gallery": "Галерэя",
+    "inbox_gallery_caption": "Здымкі і катэгорыі",
+    "inbox_onboarding": "Анбордынг",
+    "inbox_onboarding_caption": "Вітальныя слайды"
   },
   "AdminStudio": {
     "meta_title": "Студыя",
@@ -425,10 +603,17 @@
     "og_title": "Violetta Beauty",
     "meta_title_with_city": "Violetta — манікюр і прыгажосць у {city}",
     "meta_description_with_city": "Студыя дызайну пазногцяў у {city}. Манікюр, гель, дызайн — якасна і даступна.",
-    "meta_keywords_with_city": "манікюр {city}, пазногці {city}, прыгажосць {city}, гель {city}, недарагі якасны манікюр {city}"
+    "meta_keywords_with_city": "манікюр {city}, пазногці {city}, прыгажосць {city}, гель {city}, недарагі якасны манікюр {city}",
+    "skip_to_content": "Да асноўнага зместу"
   },
   "SiteFooter": {
     "credit_prefix": "Створана з любоўю"
+  },
+  "Tonight": {
+    "label": "Сёння ў студыі",
+    "today": "СЁННЯ",
+    "none_today_tomorrow": "· НЯМА АКОН СЁННЯ І ЗАЎТРА · ГЛЯДЗЕЦЬ КАЛЯНДАР ·",
+    "dismiss": "Схаваць вокны на сёння"
   },
   "Error": {
     "meta_title": "Нешта зрушылася",
@@ -450,7 +635,8 @@
     "divider_or": "або",
     "not_configured": "УВАХОД ЯШЧЭ НЕ НАЛАДЖАНЫ",
     "cta_sign_out": "Выйсці",
-    "signed_in_as": "Вы ўвайшлі як"
+    "signed_in_as": "Вы ўвайшлі як",
+    "signing_in": "Выконваем уваход…"
   },
   "AdminBookings": {
     "meta_title": "Запісы",
@@ -460,6 +646,8 @@
     "empty": "ЗАПІСАЎ ПАКУЛЬ НЯМА",
     "cta_confirm": "Пацвердзіць",
     "cta_decline": "Адхіліць",
+    "cta_refresh": "Абнавіць",
+    "n_new_pending": "{n} новых — абнавіць",
     "status": {
       "pending": "Чакае",
       "confirmed": "Пацверджана",
@@ -482,6 +670,7 @@
     "cta_approve": "Зацвердзіць",
     "cta_decline": "Адхіліць",
     "cta_downgrade": "Зніжыць",
+    "cta_refresh": "Абнавіць",
     "cta_show_all_expired": "Паказаць усе {total}",
     "expires_in_days": "заканчваецца праз {n}д",
     "expires_lifetime": "назаўсёды",
@@ -507,6 +696,7 @@
     "status_rejected": "Адхілены",
     "cta_approve": "Адобрыць",
     "cta_reject": "Адхіліць",
+    "cta_refresh": "Абнавіць",
     "cta_delete": "Выдаліць",
     "cta_confirm_delete": "Пацвердзіць выдаленне",
     "cta_cancel": "Скасаваць",
@@ -615,6 +805,7 @@
     "cta_archive": "У архіў",
     "cta_restore": "Аднавіць",
     "cta_save": "Захаваць",
+    "saving": "Захаванне…",
     "saved": "Захавана",
     "save_failed": "Не захавалася: {error}",
     "title_new_category": "Новая катэгорыя",
@@ -644,6 +835,10 @@
     "label_category": "Катэгорыя",
     "label_photo": "Фота",
     "label_photo_hint": "5:6 партрэт · мініяцюра і герой старонкі",
+    "label_masters": "Майстры",
+    "label_masters_hint": "Адзначце кожнага майстра, які выконвае гэту паслугу. Паслуга не з'явіцца ў публічным меню, пакуль хаця б адзін звязаны майстар не апублікаваны.",
+    "masters_none": "Майстроў пакуль няма. Спачатку дадайце майстра, потым звяжыце яго тут.",
+    "badge_no_master": "Схавана — няма апублікаванага майстра",
     "validation_required": "Абавязкова",
     "validation_slug_invalid": "Толькі малыя лацінскія літары, лічбы і злучкі",
     "validation_includes_max": "Максімум 8 пунктаў",
@@ -662,7 +857,9 @@
     "section_drafts": "Чарнавікі",
     "section_archived": "Архіў",
     "cta_new": "Новы майстар",
+    "cta_edit": "Змяніць",
     "cta_save": "Захаваць",
+    "saving": "Захаванне…",
     "cta_archive": "У архіў",
     "cta_restore": "Аднавіць",
     "label_slug": "Slug",
@@ -720,6 +917,7 @@
     "vapid_missing": "Ключы апавяшчэнняў не наладжаныя. Папрасіце адміна задаць пераменныя VAPID_*.",
     "offline_title": "Няма злучэння",
     "offline_body": "Падключыцеся да сеткі, каб працягваць.",
+    "offline_brand_line": "Не ў сетцы · але мы будзем тут, калі вернецеся",
     "profile_tile_title": "Апавяшчэнні",
     "profile_tile_description": "Абярыце, якія абнаўленні вы хочаце атрымліваць.",
     "category_booking_created_label": "Новы запіс (адмін)",
@@ -746,5 +944,104 @@
     "category_testimonial_submitted_label": "Новы водгук (адмін)",
     "category_testimonial_submitted_push_title": "Новы водгук",
     "category_testimonial_submitted_push_body": "{customer} пакінуў(ла) водгук."
+  },
+  "AdminGallery": {
+    "meta_title": "Галерэя — адмін",
+    "plate_title": "Галерэя",
+    "eyebrow": "Кураванне",
+    "title": "Кіраванне галерэяй",
+    "paragraph": "Дадавайце здымкі, апісвайце іх і групуйце па катэгорыях. Перацягвайце за ручку, каб змяніць парадак.",
+    "section_categories": "Катэгорыі",
+    "section_items": "Здымкі",
+    "cta_new_category": "Новая катэгорыя",
+    "cta_new_item": "Новы здымак",
+    "cta_edit": "Змяніць",
+    "cta_delete": "Выдаліць",
+    "cta_save": "Захаваць",
+    "saved": "Захавана",
+    "save_failed": "Не ўдалося захаваць: {error}",
+    "delete_failed": "Не ўдалося выдаліць: {error}",
+    "delete_category_blocked": "Спачатку перанясіце або выдаліце яе здымкі ({n}).",
+    "confirm_delete_category": "Выдаліць гэту катэгорыю? Дзеянне нельга адмяніць.",
+    "confirm_delete_item": "Выдаліць гэты здымак? Дзеянне нельга адмяніць.",
+    "saving": "Захаванне…",
+    "item_count": "Здымкаў: {n}",
+    "badge_has_image": "Фота",
+    "badge_no_image": "Толькі градыент",
+    "title_new_category": "Новая катэгорыя",
+    "title_edit_category": "Змяніць катэгорыю",
+    "title_new_item": "Новы здымак",
+    "title_edit_item": "Змяніць здымак",
+    "label_slug": "ID (слаг)",
+    "label_slug_hint": "Малыя літары, лічбы і злучкі. Пазней змяніць нельга.",
+    "label_name_en": "Назва (англійская)",
+    "label_name_ru": "Назва (руская)",
+    "label_name_by": "Назва (беларуская)",
+    "label_category": "Катэгорыя",
+    "label_image": "Выява",
+    "label_image_hint": "Неабавязкова. Без фота картка паказвае каляровы градыент.",
+    "label_alt": "Альтэрнатыўны тэкст",
+    "label_alt_hint": "Апісанне выявы для скрынрыдараў.",
+    "label_caption_en": "Подпіс (англійская)",
+    "label_caption_ru": "Подпіс (руская)",
+    "label_caption_by": "Подпіс (беларуская)",
+    "label_file": "Файл фота",
+    "upload": "Загрузіць",
+    "uploading": "Загрузка…",
+    "uploaded": "Загружана",
+    "remove_image": "Выдаліць фота",
+    "error_too_large": "Завялікая выява (макс. 25 МБ).",
+    "error_failed": "Не ўдалося загрузіць. Паспрабуйце зноў.",
+    "storage_not_configured": "Сховішча выяў не наладжана.",
+    "validation_required": "Абавязкова",
+    "validation_slug_invalid": "Толькі малыя літары, лічбы і злучкі.",
+    "validation_id_required": "Увядзіце ID перад загрузкай."
+  },
+  "AdminOnboarding": {
+    "meta_title": "Анбордынг — адмін",
+    "plate_title": "Анбордынг",
+    "eyebrow": "Першае ўражанне",
+    "title": "Кіраванне анбордынгам",
+    "paragraph": "Рэдагуйце вітальныя слайды — тэкст і выявы. Дадавайце, выдаляйце і мяняйце парадак.",
+    "section_slides": "Слайды",
+    "cta_new_slide": "Новы слайд",
+    "cta_edit": "Змяніць",
+    "cta_delete": "Выдаліць",
+    "cta_save": "Захаваць",
+    "saved": "Захавана",
+    "save_failed": "Не ўдалося захаваць: {error}",
+    "delete_failed": "Не ўдалося выдаліць: {error}",
+    "confirm_delete_slide": "Выдаліць гэты слайд? Дзеянне нельга адмяніць.",
+    "saving": "Захаванне…",
+    "title_new_slide": "Новы слайд",
+    "title_edit_slide": "Змяніць слайд",
+    "label_slug": "ID (слаг)",
+    "label_slug_hint": "Малыя літары, лічбы і злучкі. Пазней змяніць нельга.",
+    "label_eyebrow_en": "Надзагаловак (англійская)",
+    "label_eyebrow_ru": "Надзагаловак (руская)",
+    "label_eyebrow_by": "Надзагаловак (беларуская)",
+    "label_title_en": "Загаловак (англійская)",
+    "label_title_ru": "Загаловак (руская)",
+    "label_title_by": "Загаловак (беларуская)",
+    "label_body_en": "Тэкст (англійская)",
+    "label_body_ru": "Тэкст (руская)",
+    "label_body_by": "Тэкст (беларуская)",
+    "label_variant": "Варыянт градыенту",
+    "label_variant_hint": "0–5, стыль фонавага градыенту.",
+    "label_image": "Выява",
+    "label_image_hint": "Неабавязкова. Без фота слайд паказвае каляровы градыент.",
+    "label_file": "Файл фота",
+    "upload": "Загрузіць",
+    "uploading": "Загрузка…",
+    "uploaded": "Загружана",
+    "remove_image": "Выдаліць фота",
+    "error_too_large": "Завялікая выява (макс. 25 МБ).",
+    "error_failed": "Не ўдалося загрузіць. Паспрабуйце зноў.",
+    "storage_not_configured": "Сховішча выяў не наладжана.",
+    "validation_required": "Абавязкова",
+    "validation_slug_invalid": "Толькі малыя літары, лічбы і злучкі.",
+    "validation_id_required": "Увядзіце ID перад загрузкай.",
+    "badge_has_image": "Фота",
+    "badge_no_image": "Толькі градыент"
   }
 }

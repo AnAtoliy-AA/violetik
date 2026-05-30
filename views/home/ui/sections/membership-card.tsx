@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { Plate } from "@/shared/ui/plate";
+import { VipBadge } from "@/shared/ui/vip-badge";
 
 function ArrowRight() {
   return (
@@ -39,10 +40,13 @@ export function MembershipCard() {
         <div className="absolute right-5 top-5">
           <MonogramSeal letter="V" />
         </div>
-        <Plate number={5} label={t("plate_invitation").toUpperCase()} />
+        <Plate folio number={6} label={t("plate_invitation").toUpperCase()} />
         <h3 className="my-3 font-display text-[32px] font-normal italic leading-tight tracking-[-0.01em]">
           {t("membership_title_lead")}{" "}
-          <span className="text-gold-shimmer">{t("membership_title_word")}</span>.
+          <VipBadge
+            aria-label={t("membership_title_word")}
+            className="relative top-[-0.06em] mx-[0.06em] align-middle px-[0.7em] py-[0.34em] text-[0.4em] tracking-[0.2em]"
+          />
         </h3>
         <p className="dropcap m-0 max-w-[300px] text-[13.5px] leading-[1.55] text-text-2">
           {t("membership_blurb")}

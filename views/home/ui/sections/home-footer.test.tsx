@@ -3,12 +3,13 @@ import { render } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { DEFAULT_SITE_SETTINGS } from "@/entities/site-settings";
 import messages from "@/messages/en.json";
+import { ToastProvider } from "@/shared/ui/toast";
 import { HomeFooter } from "./home-footer";
 
 function wrap(ui: React.ReactNode) {
   return (
     <NextIntlClientProvider locale="en" messages={messages}>
-      {ui}
+      <ToastProvider>{ui}</ToastProvider>
     </NextIntlClientProvider>
   );
 }

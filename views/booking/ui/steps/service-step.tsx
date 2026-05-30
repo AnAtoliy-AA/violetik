@@ -39,6 +39,7 @@ export function ServiceStep({
   currency = "EUR",
 }: ServiceStepProps) {
   const t = useTranslations("Booking.service");
+  const tBooking = useTranslations("Booking");
   const locale = useLocale() as Locale;
   const serviceId = useBookingStore((s) => s.serviceId);
   const setService = useBookingStore((s) => s.setService);
@@ -63,7 +64,7 @@ export function ServiceStep({
               aria-checked={active}
               onClick={() => setService(s.id)}
               className={cn(
-                "gilded flex items-center gap-3.5 rounded-[18px] p-3.5 text-left text-text",
+                "group gilded flex items-start gap-3.5 rounded-[18px] p-3.5 text-left text-text",
                 "transition-colors duration-fast ease-out",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                 active ? "glass-top" : "hover:bg-surface-2",
@@ -77,12 +78,48 @@ export function ServiceStep({
                 />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="font-display text-[20px] font-normal italic leading-[1.05]">
+                {/* §6.4 — duration eyebrow above the name, mono caps. */}
+                <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-text-3">
+                  {tBooking("service_tile_duration", {
+                    n: s.durationMinutes,
+                  })}
+                </div>
+                <div className="mt-1 font-display text-[20px] font-normal italic leading-[1.05]">
                   {s.name}
                 </div>
-                <div className="mt-1 flex items-baseline gap-1 font-mono text-[11px] uppercase tracking-[0.08em] text-text-3">
-                  <span>{s.duration}</span>
-                  <span>·</span>
+                {/* §6.4 — 1-line italic fragment of what's in the service.
+                  * Reveals the full list on hover/focus via grid-template-
+                  * rows expand (no layout shift below — the row collapses
+                  * back to 0fr when the tile loses focus). */}
+                {s.includes.length > 0 ? (
+                  <>
+                    <div className="mt-1.5 line-clamp-1 font-display text-[13.5px] italic leading-snug text-text-2 group-hover:hidden group-focus-visible:hidden">
+                      {s.includes[0]}
+                    </div>
+                    <div
+                      aria-hidden
+                      className="mt-1.5 grid grid-rows-[0fr] transition-[grid-template-rows] duration-[220ms] ease-out group-hover:grid-rows-[1fr] group-focus-visible:grid-rows-[1fr] motion-reduce:transition-none"
+                    >
+                      <ul className="m-0 list-none overflow-hidden p-0">
+                        {s.includes.map((line, i) => (
+                          <li
+                            key={`${line}-${i}`}
+                            className="flex items-baseline gap-2 py-0.5 font-display text-[13px] italic leading-snug text-text-2"
+                          >
+                            <span
+                              aria-hidden
+                              className="font-mono text-[9px] text-gold"
+                            >
+                              ·
+                            </span>
+                            {line}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                ) : null}
+                <div className="mt-2 flex items-baseline gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
                   {pricedServices?.[s.id] ? (
                     <Price
                       resolved={pricedServices[s.id]}

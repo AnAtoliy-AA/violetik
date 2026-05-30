@@ -5,6 +5,7 @@ import { studioLocationLine } from "@/entities/site-settings";
 import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { Ornament } from "@/shared/ui/ornament";
 import { StudioMap } from "@/widgets/studio-map";
+import { TappableAddress } from "./tappable-address";
 
 export interface HomeFooterProps {
   settings: SiteSettings;
@@ -32,11 +33,17 @@ export function HomeFooter({ settings, locale }: HomeFooterProps) {
           mapAria: tFooter("map_aria"),
           mapTitle: tFooter("map_title"),
           getDirections: tFooter("get_directions"),
+          stampOverlay: addressLine ? addressLine.toUpperCase() : undefined,
         }}
       />
-      <div className="mt-4 font-mono text-[9px] uppercase tracking-[0.32em]">
-        {addressLine}
-      </div>
+      <TappableAddress
+        address={addressLine}
+        mapsHref={
+          settings.latitude !== null && settings.longitude !== null
+            ? `https://www.google.com/maps/search/?api=1&query=${settings.latitude},${settings.longitude}`
+            : null
+        }
+      />
       <div className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.32em]">
         {t("footer_copyright")}
       </div>

@@ -6,11 +6,13 @@
     "hero_title_lead": "это",
     "hero_title_word": "портрет.",
     "hero_paragraph": "Авторский нейл-дизайн из ателье Виолетты на одно кресло. По воскресеньям в 20:00 открывается календарь — рекомендуем не опаздывать.",
-    "cta_book": "Забронировать",
+    "cta_book": "Записаться",
+    "address_copy_label": "Скопировать адрес",
+    "address_maps_label": "Открыть на карте",
+    "address_copied_toast": "Адрес скопирован",
+    "address_maps_toast": "Открываем карту…",
     "cta_gallery": "Галерея",
-    "capsule_eyebrow": "На неделе · Лимитированная капсула",
-    "capsule_title": "Мов и Гранат — только шесть рук.",
-    "plate_menu": "Меню",
+    "plate_menu": "Услуги",
     "plate_master": "Мастер",
     "plate_portfolio": "Портфолио",
     "plate_word": "Сарафанное радио",
@@ -22,7 +24,7 @@
     "atelier_motion_caption_polish": "Покрытие",
     "atelier_motion_caption_design": "Деталь",
     "signatures_title": "Сигнатуры.",
-    "signatures_all_link": "Все шесть",
+    "signatures_all_link": "Все {n}",
     "master_stat_years": "{years, plural, one {# год} few {# года} many {# лет} other {# лет}}",
     "master_stat_sets": "{label} сетов",
     "gallery_title_a": "Свежие",
@@ -38,7 +40,7 @@
     "meta_title": "Членство",
     "plate_title": "Членство",
     "eyebrow": "По приглашению · Узкий круг",
-    "hero_title": "Станьте членом или <em>VIP</em>.",
+    "hero_title": "Станьте членом или <em>VIP</em>",
     "hero_paragraph": "Небольшой круг постоянных гостей. Три уровня, одно кресло, полное внимание.",
     "billing_aria": "Периодичность оплаты",
     "billing_monthly": "Ежемесячно",
@@ -72,7 +74,7 @@
     "progress_aria": "Прогресс бронирования",
     "back_aria": "Назад",
     "cta_continue": "Дальше",
-    "cta_confirm": "Подтвердить запись",
+    "cta_confirm": "Подтвердить",
     "cta_pick_service": "Выберите ритуал",
     "cta_pick_date": "Выберите день",
     "cta_pick_time": "Выберите время",
@@ -81,6 +83,7 @@
       "master": "Мастер",
       "date": "Дата",
       "time": "Время",
+      "when": "Когда",
       "confirm": "Подтверждение"
     },
     "service": {
@@ -106,14 +109,39 @@
       "eyebrow": "Шаг 04 / Время",
       "title": "Выберите <em>час</em>.",
       "no_date": "Сначала выберите дату.",
+      "none_available": "На эту дату времени не осталось — выберите другой день.",
       "zone_suffix": "Время по часовому поясу студии.",
       "reserved": "Занято",
       "available": "Свободно"
     },
+    "step_label_of": "{current} из {total} · {label}",
+    "step_label_service": "Услуга",
+    "step_label_when": "Когда",
+    "step_label_confirm": "Подтверждение",
+    "when": {
+      "eyebrow": "Шаг 02 / Когда",
+      "title": "Выберите <em>день и час</em>.",
+      "paragraph": "Листайте дни. Тапните плитку, чтобы записаться.",
+      "no_slots": "— НЕТ ОКОН — ПОПРОБУЙТЕ СЛЕДУЮЩИЙ ДЕНЬ"
+    },
+    "service_tile_duration": "· {n} МИН ·",
+    "service_tile_more": "{n} ещё",
+    "save_sheet": {
+      "title": "Мы держим ваше место",
+      "body": "Место за вами на 5 минут. Продолжите — или отправьте ссылку себе.",
+      "cta_continue": "Продолжить",
+      "cta_telegram": "Отправить в Telegram",
+      "cta_discard": "Отменить"
+    },
+    "policy_strip": "ПЕРЕНОС БЕСПЛАТНО · ЗА 12Ч · НЕЯВКА УДЕРЖИВАЕТ 50%",
+    "arrival_eyebrow": "ВХОД",
+    "arrival_body": "3 этаж, звонок один раз.",
     "errors": {
       "slot_taken": "Этот слот только что заняли. Выберите другой.",
       "db_unavailable": "Запись временно недоступна. Повторите попытку через минуту.",
       "invalid_input": "Выберите услугу, дату и время перед подтверждением.",
+      "too_soon": "Это время слишком близко к сейчас. Записаться можно не позднее, чем за 3 часа — выберите другое время.",
+      "rate_limited": "Слишком много попыток. Подождите минуту и попробуйте снова.",
       "unknown": "Что-то пошло не так. Попробуйте ещё раз."
     },
     "confirm": {
@@ -147,7 +175,15 @@
     "missing_date": "—",
     "missing_time": "—",
     "cta_calendar": "Добавить в календарь",
-    "cta_return": "Вернуться в ателье"
+    "cta_return": "Вернуться в ателье",
+    "headline": "Подтверждено.",
+    "calendar_apple": "Apple",
+    "calendar_google": "Google",
+    "calendar_ics": "Скачать",
+    "telegram_remind_eyebrow": "· НАПОМНИТЬ · ЗА 24Ч · В TELEGRAM ·",
+    "share_eyebrow": "ПРИВЕДИ ПОДРУГУ",
+    "share_cta": "Скопировать реферальную ссылку",
+    "share_copied": "Ссылка скопирована"
   },
   "ServiceDetail": {
     "meta_subtitle": "Ритуал",
@@ -155,7 +191,16 @@
     "includes_eyebrow": "—— Что входит",
     "recent_eyebrow": "—— Свежие работы в этом стиле",
     "from": "От",
-    "cta_reserve": "Забронировать кресло"
+    "cta_reserve": "Забронировать кресло",
+    "cta_ask_first": "Сначала спросить",
+    "ask_first_template": "Здравствуйте — интересует {service}, когда ближайшее окно?",
+    "aftercare_eyebrow": "УХОД ПОСЛЕ",
+    "aftercare_body": "Что потребуется после — час без горячей воды и день без прямого солнца. Полную памятку пришлём сообщением.",
+    "pairs_eyebrow": "—— Хорошо сочетается",
+    "master_eyebrow": "—— Ваши руки",
+    "master_cta": "Запись к {initial}.",
+    "reviews_eyebrow": "—— Из отзывов",
+    "reviews_verified": "ВЕРИФИЦИРОВАНО"
   },
   "Services": {
     "meta_title": "Меню",
@@ -175,9 +220,12 @@
   },
   "Onboarding": {
     "meta_title": "Знакомство",
-    "skip": "Пропустить",
+    "skip": "На главную",
     "cta_continue": "Дальше",
-    "cta_begin": "Начать",
+    "cta_begin": "Войти",
+    "voice_attribution": "— В.",
+    "voice_what_we_do": "Одно кресло, один час, одна пара рук — ваши. Без очередей и подслушанных разговоров. Только комната и то, что мы создаём.",
+    "voice_how_a_sitting_feels": "Визит — это маленькая церемония. Чай, разговор о настроении, потом девяносто тихих минут работы.",
     "aria_carousel": "Карусель знакомства",
     "aria_dots": "Индикатор слайдов",
     "aria_dot": "Слайд {n} из {total}",
@@ -194,13 +242,58 @@
   "Welcome": {
     "tagline": "Частное ателье маникюра — одно кресло, один час, один тихий ритуал за раз.",
     "cta_enter": "Я здесь впервые",
-    "cta_returning": "Записаться"
+    "cta_main": "Главная",
+    "cta_services": "Услуги",
+    "cta_tonight": "Окна на сегодня",
+    "home_link": "На главную",
+    "status_open_until": "ОТКРЫТО · ДО {time}",
+    "status_opens_on": "ОТКРОЕМСЯ {day} {time}"
+  },
+  "Nav": {
+    "trigger_label": "Открыть навигацию",
+    "close_label": "Закрыть навигацию",
+    "aria_label": "Навигация по ателье",
+    "title": "Ателье",
+    "description": "Найдите зал, ритуал или вернитесь в свой профиль.",
+    "home": {
+      "label": "Главная"
+    },
+    "services": {
+      "label": "Услуги"
+    },
+    "gallery": {
+      "label": "Галерея"
+    },
+    "masters": {
+      "label": "Мастера"
+    },
+    "membership": {
+      "label": "Членство"
+    },
+    "book": {
+      "label": "Записаться"
+    },
+    "profile": {
+      "label": "Профиль"
+    },
+    "notifications": {
+      "label": "Уведомления"
+    }
   },
   "LocaleSwitcher": {
     "label": "Язык",
     "en": "Английский",
     "ru": "Русский",
     "by": "Белорусский"
+  },
+  "PwaInstall": {
+    "aria_label": "Установить приложение",
+    "ios_instructions": "На iPhone или iPad нажмите кнопку «Поделиться» в Safari и выберите «На экран «Домой»», чтобы установить ателье как приложение.",
+    "ios_close": "Закрыть",
+    "sheet_title": "Добавьте Виолетту на главный экран",
+    "sheet_body": "Быстрее, чем закладка.",
+    "sheet_cta_install": "Добавить",
+    "sheet_cta_dismiss": "Не сейчас"
   },
   "Gallery": {
     "meta_title": "Портфолио",
@@ -213,10 +306,21 @@
     "filter_aria": "Фильтр по тегу",
     "category_all": "Все",
     "empty": "Под фильтр ничего не подходит.",
+    "palette_filter_eyebrow": "ФИЛЬТР ПО ЦВЕТУ",
+    "palette_filter_clear": "Сбросить",
     "lightbox_eyebrow": "Сет {number} · {tag}",
     "lightbox_title": "Этюд: {tag}.",
     "lightbox_caption": "Сделано Виалетой — финиш {tag}.",
     "lightbox_close": "Закрыть",
+    "lightbox_share_label": "Поделиться",
+    "lightbox_share_sheet_title": "Поделиться этим сетом",
+    "lightbox_share_copy_link": "Скопировать ссылку",
+    "lightbox_share_telegram": "Отправить в Telegram",
+    "lightbox_share_download": "Скачать изображение",
+    "lightbox_share_copied_toast": "Ссылка скопирована",
+    "lightbox_share_native_text": "Этюд: {tag} — ателье Виолетты",
+    "lightbox_next": "Следующее",
+    "lightbox_prev": "Предыдущее",
     "category": {
       "Editorial": "Эдиториал",
       "Gel": "Гель",
@@ -232,11 +336,23 @@
     "badge_pending_vip": "VIP в обработке",
     "joined": "Присоединилась в {year}",
     "next_visit_eyebrow": "Следующий визит",
+    "booking_status": {
+      "pending": "Ожидает",
+      "confirmed": "Подтверждено",
+      "cancelled": "Отменено",
+      "completed": "Завершено"
+    },
     "countdown": {
       "today": "Сегодня",
       "tomorrow": "Завтра",
-      "in_days": "Через {n} дн."
+      "in_days": "Через {n} дн.",
+      "in_hours": "Через {n} ч.",
+      "now": "Сейчас"
     },
+    "signout": "Закрыть дверь",
+    "rebook_cta": "Повторить",
+    "palettes_eyebrow": "Сохранённые палитры",
+    "palettes_empty": "Примерьте палитру — она сохранится здесь.",
     "quick_links_aria": "Ссылки аккаунта",
     "quick_links": {
       "bookings": "Мои записи",
@@ -267,6 +383,7 @@
     "testimonial_form_required": "Напишите, пожалуйста, несколько слов.",
     "testimonial_form_duplicate": "У вас уже есть отзыв на модерации для этого мастера.",
     "testimonial_form_invalid_master": "Выберите мастера.",
+    "testimonial_form_rate_limited": "Слишком много попыток. Подождите несколько минут и попробуйте снова.",
     "testimonial_form_generic_error": "Что-то пошло не так. Попробуйте ещё раз.",
     "status_pending": "На модерации",
     "status_approved": "Опубликовано",
@@ -295,7 +412,7 @@
       "label": "Дом"
     },
     "services": {
-      "label": "Меню"
+      "label": "Услуги"
     },
     "gallery": {
       "label": "Галерея"
@@ -328,11 +445,32 @@
     "site_settings_section_discount": "Общая скидка",
     "site_settings_section_currency": "Валюта",
     "site_settings_discount_active": "Скидка активна",
+    "site_settings_section_markup": "Завышенная старая цена",
+    "site_settings_markup_hint": "Показывает завышенную зачёркнутую цену рядом с реальной, чтобы предложения выглядели со скидкой. Переопределяет общую скидку, когда активна.",
+    "site_settings_markup_active": "Показывать завышенную старую цену",
     "site_settings_base_label": "База €{price}",
     "site_settings_vip_base_label": "База €{price} / мес.",
     "site_settings_save": "Сохранить",
     "site_settings_saved": "Сохранено",
     "site_settings_error": "Не удалось сохранить: {error}",
+    "inbox_page_seo": "SEO страниц",
+    "inbox_page_seo_caption": "Заголовки и описания",
+    "page_seo_plate_title": "SEO страниц",
+    "page_seo_intro": "Измените поисковый заголовок и мета-описание для каждой публичной страницы, для каждого языка. Оставьте поле пустым, чтобы использовать значение по умолчанию.",
+    "page_seo_title_label": "Заголовок",
+    "page_seo_description_label": "Описание",
+    "page_seo_save": "Сохранить",
+    "page_seo_saved": "Сохранено",
+    "page_seo_error": "Не удалось сохранить: {error}",
+    "page_seo_page_home": "Главная",
+    "page_seo_page_services": "Услуги",
+    "page_seo_page_gallery": "Галерея",
+    "page_seo_page_master": "Мастер",
+    "page_seo_page_membership": "Членство",
+    "page_seo_page_welcome": "Приветствие",
+    "page_seo_page_onboarding": "Онбординг",
+    "page_seo_page_profile": "Профиль",
+    "page_seo_page_sign_in": "Вход",
     "inbox_photos": "Фотографии",
     "inbox_photos_caption": "Загрузка и управление изображениями",
     "inbox_services": "Услуги",
@@ -343,11 +481,47 @@
     "inbox_studio_caption": "Адрес, карта, часовой пояс",
     "inbox_users": "Пользователи",
     "inbox_users_caption": "Список, роли, VIP, объединение",
+    "analytics": {
+      "title": "Сигналы",
+      "window_eyebrow": "За 7 дней",
+      "total": "{count} событий",
+      "empty": "В этом окне пока нет трафика.",
+      "funnel_eyebrow": "—— Воронка бронирования",
+      "funnel_row": "{entered} → {completed} · {drop}% отвал",
+      "events": {
+        "welcome_landed": "Зашли на welcome",
+        "welcome_cta_step_inside": "Нажали «Войти»",
+        "welcome_cta_tonight": "Нажали «Сегодня»",
+        "onboarding_completed": "Прошли онбординг",
+        "onboarding_skipped": "Пропустили онбординг",
+        "home_next_opening_tapped": "Тап на ближайшее окно",
+        "service_detail_opened": "Открыли услугу",
+        "service_detail_pairs_with_opened": "Открыли смежную услугу",
+        "booking_step_entered": "Вошли в шаг записи",
+        "booking_step_completed": "Прошли шаг записи",
+        "booking_save_sheet_shown": "Показали «Сохранить место»",
+        "booking_save_sheet_resumed": "Вернулись из «Сохранить место»",
+        "booking_submit_success": "Запись подтверждена",
+        "booking_submit_error": "Ошибка при записи",
+        "confirmation_share_link_copied": "Скопировали реф-ссылку",
+        "confirmation_add_to_calendar": "Добавили в календарь",
+        "palette_switched": "Сменили палитру",
+        "tonight_ribbon_tapped": "Тап на ленту «Сегодня»"
+      },
+      "steps": {
+        "service": "Выбор ритуала",
+        "master": "Выбор мастера",
+        "date": "Выбор дня",
+        "time": "Выбор времени",
+        "when": "Выбор времени",
+        "confirm": "Подтверждение"
+      }
+    },
     "photos": {
       "plate_title": "Фотографии",
       "eyebrow": "Изображения студии",
       "title": "Фото ателье.",
-      "paragraph": "Загрузите JPEG, PNG, WebP или AVIF (до 8 МБ) для каждого слота — услуги, галерея, портрет мастера, аватары отзывов, ателье и аватар профиля. Каждая загрузка заменяет предыдущую. Хранилище: Vercel Blob.",
+      "paragraph": "Загрузите JPEG, PNG, WebP или AVIF (до 25 МБ) для каждого слота — услуги, галерея, портрет мастера, аватары отзывов, ателье и аватар профиля. Каждая загрузка заменяет предыдущую. Хранилище: Vercel Blob.",
       "storage_not_configured_banner": "BLOB_READ_WRITE_TOKEN отсутствует · загрузки отключены в этой сборке",
       "storage_not_configured": "Хранилище не настроено · загрузки отключены",
       "group_service": "Услуги",
@@ -367,12 +541,16 @@
       "upload_error_not_configured": "Vercel Blob не настроен",
       "upload_error_empty_file": "Файл пуст",
       "upload_error_unsupported_type": "Неподдерживаемый тип файла",
-      "upload_error_too_large": "Файл слишком большой (макс. 8 МБ)",
+      "upload_error_too_large": "Фото {size} МБ · максимум {max} МБ. Сожмите или уменьшите размер изображения и попробуйте снова.",
       "upload_error_upload_failed": "Сбой загрузки · попробуйте ещё раз",
       "upload_error_auth": "Войдите как админ для загрузки",
       "upload_error_validation": "Заполните все поля",
       "edit_service": "Редактировать"
-    }
+    },
+    "inbox_gallery": "Галерея",
+    "inbox_gallery_caption": "Снимки и категории",
+    "inbox_onboarding": "Онбординг",
+    "inbox_onboarding_caption": "Приветственные слайды"
   },
   "AdminStudio": {
     "meta_title": "Студия",
@@ -425,10 +603,17 @@
     "og_title": "Violetta Beauty",
     "meta_title_with_city": "Violetta — маникюр и красота в {city}",
     "meta_description_with_city": "Студия дизайна ногтей в {city}. Маникюр, гель, дизайн — качественно и доступно.",
-    "meta_keywords_with_city": "маникюр {city}, ногти {city}, красота {city}, гель {city}, дешевый качественный маникюр {city}"
+    "meta_keywords_with_city": "маникюр {city}, ногти {city}, красота {city}, гель {city}, дешевый качественный маникюр {city}",
+    "skip_to_content": "К основному контенту"
   },
   "SiteFooter": {
     "credit_prefix": "Создано с любовью"
+  },
+  "Tonight": {
+    "label": "Сегодня в студии",
+    "today": "СЕГОДНЯ",
+    "none_today_tomorrow": "· НЕТ ОКОН СЕГОДНЯ И ЗАВТРА · СМОТРЕТЬ КАЛЕНДАРЬ ·",
+    "dismiss": "Скрыть окна на сегодня"
   },
   "Error": {
     "meta_title": "Что-то сорвалось",
@@ -450,7 +635,8 @@
     "divider_or": "или",
     "not_configured": "ВХОД ПОКА НЕ НАСТРОЕН",
     "cta_sign_out": "Выйти",
-    "signed_in_as": "Вы вошли как"
+    "signed_in_as": "Вы вошли как",
+    "signing_in": "Выполняем вход…"
   },
   "AdminBookings": {
     "meta_title": "Записи",
@@ -460,6 +646,8 @@
     "empty": "ЗАПИСЕЙ ПОКА НЕТ",
     "cta_confirm": "Подтвердить",
     "cta_decline": "Отклонить",
+    "cta_refresh": "Обновить",
+    "n_new_pending": "{n} новых — обновить",
     "status": {
       "pending": "Ожидает",
       "confirmed": "Подтверждено",
@@ -482,6 +670,7 @@
     "cta_approve": "Одобрить",
     "cta_decline": "Отклонить",
     "cta_downgrade": "Понизить",
+    "cta_refresh": "Обновить",
     "cta_show_all_expired": "Показать все {total}",
     "expires_in_days": "истекает через {n}д",
     "expires_lifetime": "навсегда",
@@ -507,6 +696,7 @@
     "status_rejected": "Отклонён",
     "cta_approve": "Одобрить",
     "cta_reject": "Отклонить",
+    "cta_refresh": "Обновить",
     "cta_delete": "Удалить",
     "cta_confirm_delete": "Подтвердить удаление",
     "cta_cancel": "Отмена",
@@ -615,6 +805,7 @@
     "cta_archive": "В архив",
     "cta_restore": "Восстановить",
     "cta_save": "Сохранить",
+    "saving": "Сохранение…",
     "saved": "Сохранено",
     "save_failed": "Не сохранилось: {error}",
     "title_new_category": "Новая категория",
@@ -644,6 +835,10 @@
     "label_category": "Категория",
     "label_photo": "Фото",
     "label_photo_hint": "5:6 портрет · превью и герой страницы",
+    "label_masters": "Мастера",
+    "label_masters_hint": "Отметьте каждого мастера, который выполняет эту услугу. Услуга не появится в публичном меню, пока хотя бы один связанный мастер не опубликован.",
+    "masters_none": "Мастеров пока нет. Сначала добавьте мастера, затем свяжите его здесь.",
+    "badge_no_master": "Скрыто — нет опубликованного мастера",
     "validation_required": "Обязательно",
     "validation_slug_invalid": "Только строчные латинские буквы, цифры и дефисы",
     "validation_includes_max": "Максимум 8 пунктов",
@@ -662,7 +857,9 @@
     "section_drafts": "Черновики",
     "section_archived": "Архив",
     "cta_new": "Новый мастер",
+    "cta_edit": "Изменить",
     "cta_save": "Сохранить",
+    "saving": "Сохранение…",
     "cta_archive": "В архив",
     "cta_restore": "Восстановить",
     "label_slug": "Slug",
@@ -720,6 +917,7 @@
     "vapid_missing": "Ключи уведомлений не настроены. Попросите администратора задать переменные VAPID_*.",
     "offline_title": "Нет соединения",
     "offline_body": "Подключитесь к сети, чтобы продолжить.",
+    "offline_brand_line": "Не в сети · но мы будем здесь, когда вернётесь",
     "profile_tile_title": "Уведомления",
     "profile_tile_description": "Выберите, какие новости вы хотите получать.",
     "category_booking_created_label": "Новая запись (админ)",
@@ -746,5 +944,104 @@
     "category_testimonial_submitted_label": "Новый отзыв (админ)",
     "category_testimonial_submitted_push_title": "Новый отзыв",
     "category_testimonial_submitted_push_body": "{customer} оставил(а) отзыв."
+  },
+  "AdminGallery": {
+    "meta_title": "Галерея — админ",
+    "plate_title": "Галерея",
+    "eyebrow": "Кураторство",
+    "title": "Управление галереей",
+    "paragraph": "Добавляйте снимки, описывайте их и группируйте по категориям. Перетаскивайте за ручку, чтобы изменить порядок.",
+    "section_categories": "Категории",
+    "section_items": "Снимки",
+    "cta_new_category": "Новая категория",
+    "cta_new_item": "Новый снимок",
+    "cta_edit": "Изменить",
+    "cta_delete": "Удалить",
+    "cta_save": "Сохранить",
+    "saved": "Сохранено",
+    "save_failed": "Не удалось сохранить: {error}",
+    "delete_failed": "Не удалось удалить: {error}",
+    "delete_category_blocked": "Сначала переместите или удалите её снимки ({n}).",
+    "confirm_delete_category": "Удалить эту категорию? Действие нельзя отменить.",
+    "confirm_delete_item": "Удалить этот снимок? Действие нельзя отменить.",
+    "saving": "Сохранение…",
+    "item_count": "Снимков: {n}",
+    "badge_has_image": "Фото",
+    "badge_no_image": "Только градиент",
+    "title_new_category": "Новая категория",
+    "title_edit_category": "Изменить категорию",
+    "title_new_item": "Новый снимок",
+    "title_edit_item": "Изменить снимок",
+    "label_slug": "ID (слаг)",
+    "label_slug_hint": "Строчные буквы, цифры и дефисы. Позже изменить нельзя.",
+    "label_name_en": "Название (английский)",
+    "label_name_ru": "Название (русский)",
+    "label_name_by": "Название (белорусский)",
+    "label_category": "Категория",
+    "label_image": "Изображение",
+    "label_image_hint": "Необязательно. Без фото карточка показывает цветной градиент.",
+    "label_alt": "Альтернативный текст",
+    "label_alt_hint": "Описание изображения для скринридеров.",
+    "label_caption_en": "Подпись (английский)",
+    "label_caption_ru": "Подпись (русский)",
+    "label_caption_by": "Подпись (белорусский)",
+    "label_file": "Файл фото",
+    "upload": "Загрузить",
+    "uploading": "Загрузка…",
+    "uploaded": "Загружено",
+    "remove_image": "Удалить фото",
+    "error_too_large": "Слишком большое изображение (макс. 25 МБ).",
+    "error_failed": "Не удалось загрузить. Попробуйте ещё раз.",
+    "storage_not_configured": "Хранилище изображений не настроено.",
+    "validation_required": "Обязательно",
+    "validation_slug_invalid": "Только строчные буквы, цифры и дефисы.",
+    "validation_id_required": "Введите ID перед загрузкой."
+  },
+  "AdminOnboarding": {
+    "meta_title": "Онбординг — админ",
+    "plate_title": "Онбординг",
+    "eyebrow": "Первое впечатление",
+    "title": "Управление онбордингом",
+    "paragraph": "Редактируйте приветственные слайды — текст и изображения. Добавляйте, удаляйте и меняйте порядок.",
+    "section_slides": "Слайды",
+    "cta_new_slide": "Новый слайд",
+    "cta_edit": "Изменить",
+    "cta_delete": "Удалить",
+    "cta_save": "Сохранить",
+    "saved": "Сохранено",
+    "save_failed": "Не удалось сохранить: {error}",
+    "delete_failed": "Не удалось удалить: {error}",
+    "confirm_delete_slide": "Удалить этот слайд? Действие нельзя отменить.",
+    "saving": "Сохранение…",
+    "title_new_slide": "Новый слайд",
+    "title_edit_slide": "Изменить слайд",
+    "label_slug": "ID (слаг)",
+    "label_slug_hint": "Строчные буквы, цифры и дефисы. Позже изменить нельзя.",
+    "label_eyebrow_en": "Надзаголовок (английский)",
+    "label_eyebrow_ru": "Надзаголовок (русский)",
+    "label_eyebrow_by": "Надзаголовок (белорусский)",
+    "label_title_en": "Заголовок (английский)",
+    "label_title_ru": "Заголовок (русский)",
+    "label_title_by": "Заголовок (белорусский)",
+    "label_body_en": "Текст (английский)",
+    "label_body_ru": "Текст (русский)",
+    "label_body_by": "Текст (белорусский)",
+    "label_variant": "Вариант градиента",
+    "label_variant_hint": "0–5, стиль фонового градиента.",
+    "label_image": "Изображение",
+    "label_image_hint": "Необязательно. Без фото слайд показывает цветной градиент.",
+    "label_file": "Файл фото",
+    "upload": "Загрузить",
+    "uploading": "Загрузка…",
+    "uploaded": "Загружено",
+    "remove_image": "Удалить фото",
+    "error_too_large": "Слишком большое изображение (макс. 25 МБ).",
+    "error_failed": "Не удалось загрузить. Попробуйте ещё раз.",
+    "storage_not_configured": "Хранилище изображений не настроено.",
+    "validation_required": "Обязательно",
+    "validation_slug_invalid": "Только строчные буквы, цифры и дефисы.",
+    "validation_id_required": "Введите ID перед загрузкой.",
+    "badge_has_image": "Фото",
+    "badge_no_image": "Только градиент"
   }
 }

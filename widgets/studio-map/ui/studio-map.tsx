@@ -5,6 +5,8 @@ export interface StudioMapDictionary {
   mapAria: string;
   mapTitle: string;
   getDirections: string;
+  /** §11.5 — optional mono caps stamp overlay e.g. "STUDIO · MINSK · ZAVADSKAGA 6A · 3RD FLR" */
+  stampOverlay?: string;
 }
 
 export interface StudioMapProps {
@@ -38,13 +40,23 @@ export function StudioMap({ settings, dictionary }: StudioMapProps) {
       aria-label={dictionary.mapAria}
       className="mx-auto mt-4 flex w-full max-w-[420px] flex-col items-center gap-2"
     >
-      <iframe
-        title={dictionary.mapTitle}
-        src={embedSrc}
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-        className="aspect-[16/9] w-full rounded border-[0.5px] border-line"
-      />
+      <div className="gilded relative w-full overflow-hidden rounded-md">
+        <iframe
+          title={dictionary.mapTitle}
+          src={embedSrc}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="aspect-[16/9] w-full block"
+        />
+        {dictionary.stampOverlay ? (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-2 top-2 rounded-sm bg-bg/80 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.28em] text-text backdrop-blur-sm"
+          >
+            {dictionary.stampOverlay}
+          </div>
+        ) : null}
+      </div>
       <a
         href={directionsHref}
         target="_blank"

@@ -4,6 +4,7 @@ import { buildAuthorDisplay } from "@/entities/testimonial/lib/build-author-disp
 import type { AdminTestimonialRow } from "@/db/testimonials";
 import type { TestimonialStatus } from "@/db/schema";
 import type { Locale } from "@/i18n/routing";
+import { VipBadge } from "@/shared/ui/vip-badge";
 
 export interface TestimonialRowLabels {
   submittedAt: string;
@@ -77,6 +78,7 @@ export function TestimonialRow({
             />
           )}
           <span className="font-display text-[18px] italic">{author}</span>
+          {row.authorIsVip ? <VipBadge size="xs" /> : null}
         </div>
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
           {statusLabel(row.status, labels)}

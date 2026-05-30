@@ -6,11 +6,13 @@
     "hero_title_lead": "are a",
     "hero_title_word": "portrait.",
     "hero_paragraph": "Editorial nail design from Violetta's one-chair studio. Sundays at 20:00, the calendar opens — we recommend punctuality.",
-    "cta_book": "Book a chair",
+    "cta_book": "Reserve",
     "cta_gallery": "Gallery",
-    "capsule_eyebrow": "This week · Limited capsule",
-    "capsule_title": "Mauve & Garnet — six hands only.",
-    "plate_menu": "The menu",
+    "address_copy_label": "Copy address",
+    "address_maps_label": "Open in maps",
+    "address_copied_toast": "Address copied",
+    "address_maps_toast": "Opening maps…",
+    "plate_menu": "Services",
     "plate_master": "The master",
     "plate_portfolio": "Portfolio",
     "plate_word": "Word of mouth",
@@ -22,7 +24,7 @@
     "atelier_motion_caption_polish": "The polish",
     "atelier_motion_caption_design": "The detail",
     "signatures_title": "Signatures.",
-    "signatures_all_link": "All six",
+    "signatures_all_link": "All {n}",
     "master_stat_years": "{years, plural, one {# year} other {# years}}",
     "master_stat_sets": "{label} sets",
     "gallery_title_a": "Recent",
@@ -38,7 +40,7 @@
     "meta_title": "Membership",
     "plate_title": "Membership",
     "eyebrow": "By invitation · Limited circle",
-    "hero_title": "Become a member or <em>VIP</em>.",
+    "hero_title": "Become a member or <em>VIP</em>",
     "hero_paragraph": "A small ring of regulars. Three tiers, one chair, complete attention.",
     "billing_aria": "Billing cadence",
     "billing_monthly": "Monthly",
@@ -71,8 +73,8 @@
     "step_counter": "Step {current} of {total}",
     "progress_aria": "Booking progress",
     "back_aria": "Go back",
-    "cta_continue": "Continue",
-    "cta_confirm": "Confirm appointment",
+    "cta_continue": "Forward",
+    "cta_confirm": "Confirm",
     "cta_pick_service": "Pick a ritual",
     "cta_pick_date": "Pick a day",
     "cta_pick_time": "Pick a time",
@@ -81,6 +83,7 @@
       "master": "Master",
       "date": "Date",
       "time": "Time",
+      "when": "When",
       "confirm": "Confirm"
     },
     "service": {
@@ -106,6 +109,7 @@
       "eyebrow": "Step 04 / Time",
       "title": "Choose your <em>hour</em>.",
       "no_date": "Pick a date first to see availability.",
+      "none_available": "No times left for this date — please pick another day.",
       "zone_suffix": "Times in studio local time.",
       "reserved": "Reserved",
       "available": "Available"
@@ -129,8 +133,32 @@
       "slot_taken": "That slot was just taken. Please pick another.",
       "db_unavailable": "Bookings are temporarily offline. Please try again in a moment.",
       "invalid_input": "Pick a service, date and time before confirming.",
+      "too_soon": "This time is too close to now. Bookings need at least 3 hours' notice — please pick another time.",
+      "rate_limited": "Too many attempts. Please wait a minute and try again.",
       "unknown": "Something slipped. Please try again."
-    }
+    },
+    "step_label_of": "{current} of {total} · {label}",
+    "step_label_service": "Service",
+    "step_label_when": "When",
+    "step_label_confirm": "Confirm",
+    "when": {
+      "eyebrow": "Step 02 / When",
+      "title": "Pick a <em>day & hour</em>.",
+      "paragraph": "Drag the day strip. Tap a tile to reserve.",
+      "no_slots": "— NO OPENINGS — TRY NEXT DAY"
+    },
+    "service_tile_duration": "· {n} MIN ·",
+    "service_tile_more": "{n} more details",
+    "save_sheet": {
+      "title": "We held your seat",
+      "body": "Saved your seat for 5 minutes. Pick up where you left off — or send the link to yourself.",
+      "cta_continue": "Keep going",
+      "cta_telegram": "Send to Telegram",
+      "cta_discard": "Discard"
+    },
+    "policy_strip": "RESCHEDULE FREE · UP TO 12H BEFORE · NO-SHOW HOLDS 50%",
+    "arrival_eyebrow": "ARRIVAL",
+    "arrival_body": "3rd floor, ring once."
   },
   "Confirmation": {
     "meta_title": "Reserved",
@@ -147,7 +175,15 @@
     "missing_date": "—",
     "missing_time": "—",
     "cta_calendar": "Add to calendar",
-    "cta_return": "Return to the atelier"
+    "cta_return": "Return to the atelier",
+    "headline": "Confirmed.",
+    "calendar_apple": "Apple",
+    "calendar_google": "Google",
+    "calendar_ics": "Download",
+    "telegram_remind_eyebrow": "· REMIND ME · 24H BEFORE · BY TELEGRAM ·",
+    "share_eyebrow": "BRING A FRIEND",
+    "share_cta": "Copy referral link",
+    "share_copied": "Referral link copied"
   },
   "ServiceDetail": {
     "meta_subtitle": "Ritual",
@@ -155,7 +191,16 @@
     "includes_eyebrow": "—— What it includes",
     "recent_eyebrow": "—— Recent in this style",
     "from": "From",
-    "cta_reserve": "Reserve a chair"
+    "cta_reserve": "Reserve a chair",
+    "cta_ask_first": "Ask first",
+    "ask_first_template": "Hello — interested in {service}, what's the soonest opening?",
+    "aftercare_eyebrow": "AFTERCARE",
+    "aftercare_body": "What it costs in time after — keep your hands out of hot water for an hour and out of the sun for a day. We send the full sheet by message.",
+    "pairs_eyebrow": "—— Pairs well with",
+    "master_eyebrow": "—— Your hands",
+    "master_cta": "Reserve with {initial}.",
+    "reviews_eyebrow": "—— From clients",
+    "reviews_verified": "VERIFIED"
   },
   "Services": {
     "meta_title": "The menu",
@@ -175,9 +220,12 @@
   },
   "Onboarding": {
     "meta_title": "Onboarding",
-    "skip": "Skip",
-    "cta_continue": "Continue",
-    "cta_begin": "Begin",
+    "skip": "Take me home",
+    "cta_continue": "Forward",
+    "cta_begin": "Step inside",
+    "voice_attribution": "— V.",
+    "voice_what_we_do": "One chair, one hour, one set of hands — yours. No queues, no overhearing. Just the room and what we're making.",
+    "voice_how_a_sitting_feels": "A sitting is a small ceremony. Tea, a mood conversation, then ninety quiet minutes of hands.",
     "aria_carousel": "Welcome carousel",
     "aria_dots": "Slide indicator",
     "aria_dot": "Slide {n} of {total}",
@@ -194,13 +242,58 @@
   "Welcome": {
     "tagline": "A private nail atelier — one chair, one hour, one quiet ritual at a time.",
     "cta_enter": "I'm new here",
-    "cta_returning": "Start booking"
+    "cta_main": "Main",
+    "cta_services": "Services",
+    "cta_tonight": "Tonight's openings",
+    "home_link": "Go to home",
+    "status_open_until": "OPEN NOW · UNTIL {time}",
+    "status_opens_on": "OPENS {day} {time}"
+  },
+  "Nav": {
+    "trigger_label": "Open navigation",
+    "close_label": "Close navigation",
+    "aria_label": "Atelier navigation",
+    "title": "Atelier",
+    "description": "Find a room, a ritual, or your own thread.",
+    "home": {
+      "label": "Home"
+    },
+    "services": {
+      "label": "Services"
+    },
+    "gallery": {
+      "label": "Gallery"
+    },
+    "masters": {
+      "label": "Masters"
+    },
+    "membership": {
+      "label": "Membership"
+    },
+    "book": {
+      "label": "Book a sitting"
+    },
+    "profile": {
+      "label": "You"
+    },
+    "notifications": {
+      "label": "Notifications"
+    }
   },
   "LocaleSwitcher": {
     "label": "Language",
     "en": "English",
     "ru": "Russian",
     "by": "Belarusian"
+  },
+  "PwaInstall": {
+    "aria_label": "Install app",
+    "ios_instructions": "On iPhone or iPad, tap the Share button in Safari and choose 'Add to Home Screen' to install the atelier as an app.",
+    "ios_close": "Close",
+    "sheet_title": "Add Violetta to your home",
+    "sheet_body": "Quicker than a bookmark.",
+    "sheet_cta_install": "Add",
+    "sheet_cta_dismiss": "Not yet"
   },
   "Gallery": {
     "meta_title": "Portfolio",
@@ -213,10 +306,21 @@
     "filter_aria": "Filter by tag",
     "category_all": "All",
     "empty": "No works match this filter yet.",
+    "palette_filter_eyebrow": "FILTERING BY",
+    "palette_filter_clear": "Clear",
     "lightbox_eyebrow": "Set {number} · {tag}",
     "lightbox_title": "A study in {tag}.",
     "lightbox_caption": "Sculpted by Violetta — {tag} finish.",
     "lightbox_close": "Close",
+    "lightbox_share_label": "Share",
+    "lightbox_share_sheet_title": "Share this set",
+    "lightbox_share_copy_link": "Copy link",
+    "lightbox_share_telegram": "Send to Telegram",
+    "lightbox_share_download": "Download image",
+    "lightbox_share_copied_toast": "Link copied",
+    "lightbox_share_native_text": "A study in {tag} — Violetta atelier",
+    "lightbox_next": "Next",
+    "lightbox_prev": "Previous",
     "category": {
       "Editorial": "Editorial",
       "Gel": "Gel",
@@ -232,11 +336,23 @@
     "badge_pending_vip": "Pending VIP",
     "joined": "Joined in {year}",
     "next_visit_eyebrow": "Next visit",
+    "booking_status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
     "countdown": {
       "today": "Today",
       "tomorrow": "Tomorrow",
-      "in_days": "In {n} days"
+      "in_days": "In {n} days",
+      "in_hours": "In {n} hours",
+      "now": "Now"
     },
+    "signout": "Close the door",
+    "rebook_cta": "Book this again",
+    "palettes_eyebrow": "Saved palettes",
+    "palettes_empty": "Try a palette to keep it here.",
     "quick_links_aria": "Account links",
     "quick_links": {
       "bookings": "My bookings",
@@ -267,6 +383,7 @@
     "testimonial_form_required": "Please write a few words.",
     "testimonial_form_duplicate": "You already have a testimonial pending for this master.",
     "testimonial_form_invalid_master": "Please pick a master.",
+    "testimonial_form_rate_limited": "Too many attempts. Please wait a few minutes and try again.",
     "testimonial_form_generic_error": "Something went wrong. Please try again.",
     "status_pending": "Pending review",
     "status_approved": "Published",
@@ -295,7 +412,7 @@
       "label": "Home"
     },
     "services": {
-      "label": "Menu"
+      "label": "Services"
     },
     "gallery": {
       "label": "Gallery"
@@ -328,11 +445,32 @@
     "site_settings_section_discount": "Global discount",
     "site_settings_section_currency": "Currency",
     "site_settings_discount_active": "Discount active",
+    "site_settings_section_markup": "Inflated old price",
+    "site_settings_markup_hint": "Shows a higher struck-through price next to the real price, so listings read as discounted. Overrides the global discount when active.",
+    "site_settings_markup_active": "Show inflated old price",
     "site_settings_base_label": "Base €{price}",
     "site_settings_vip_base_label": "Base €{price} / mo",
     "site_settings_save": "Save",
     "site_settings_saved": "Saved",
     "site_settings_error": "Save failed: {error}",
+    "inbox_page_seo": "Page SEO",
+    "inbox_page_seo_caption": "Titles & descriptions",
+    "page_seo_plate_title": "Page SEO",
+    "page_seo_intro": "Edit the search-engine title and meta description for each public page, per language. Leave a field blank to use the default shown.",
+    "page_seo_title_label": "Title",
+    "page_seo_description_label": "Description",
+    "page_seo_save": "Save",
+    "page_seo_saved": "Saved",
+    "page_seo_error": "Save failed: {error}",
+    "page_seo_page_home": "Home",
+    "page_seo_page_services": "Services",
+    "page_seo_page_gallery": "Gallery",
+    "page_seo_page_master": "Master",
+    "page_seo_page_membership": "Membership",
+    "page_seo_page_welcome": "Welcome",
+    "page_seo_page_onboarding": "Onboarding",
+    "page_seo_page_profile": "Profile",
+    "page_seo_page_sign_in": "Sign in",
     "inbox_photos": "Photography",
     "inbox_photos_caption": "Upload + manage studio imagery",
     "inbox_services": "Services",
@@ -343,11 +481,47 @@
     "inbox_studio_caption": "Address, map, timezone",
     "inbox_users": "Users",
     "inbox_users_caption": "List, role, VIP, merge",
+    "analytics": {
+      "title": "Signals",
+      "window_eyebrow": "Last 7 days",
+      "total": "{count} events",
+      "empty": "No traffic yet in this window.",
+      "funnel_eyebrow": "—— Booking funnel",
+      "funnel_row": "{entered} → {completed} · {drop}% drop",
+      "events": {
+        "welcome_landed": "Landed on welcome",
+        "welcome_cta_step_inside": "Tapped “Step inside”",
+        "welcome_cta_tonight": "Tapped tonight CTA",
+        "onboarding_completed": "Onboarding finished",
+        "onboarding_skipped": "Onboarding skipped",
+        "home_next_opening_tapped": "Tapped next-opening line",
+        "service_detail_opened": "Opened a service",
+        "service_detail_pairs_with_opened": "Opened a paired service",
+        "booking_step_entered": "Entered a booking step",
+        "booking_step_completed": "Completed a booking step",
+        "booking_save_sheet_shown": "Save-seat sheet shown",
+        "booking_save_sheet_resumed": "Resumed from save sheet",
+        "booking_submit_success": "Booking confirmed",
+        "booking_submit_error": "Booking submit failed",
+        "confirmation_share_link_copied": "Copied referral link",
+        "confirmation_add_to_calendar": "Added to calendar",
+        "palette_switched": "Switched palette",
+        "tonight_ribbon_tapped": "Tapped tonight ribbon"
+      },
+      "steps": {
+        "service": "Picking a ritual",
+        "master": "Picking a master",
+        "date": "Picking a day",
+        "time": "Picking a time",
+        "when": "Picking when",
+        "confirm": "Reviewing & confirming"
+      }
+    },
     "photos": {
       "plate_title": "Photography",
       "eyebrow": "Studio imagery",
       "title": "Atelier photographs.",
-      "paragraph": "Drop a JPEG, PNG, WebP or AVIF (up to 8 MB) for each slot — services, gallery items, master portrait, testimonial avatars, atelier clips, and the demo profile avatar. Each upload replaces what was there. Storage is Vercel Blob.",
+      "paragraph": "Drop a JPEG, PNG, WebP or AVIF (up to 25 MB) for each slot — services, gallery items, master portrait, testimonial avatars, atelier clips, and the demo profile avatar. Each upload replaces what was there. Storage is Vercel Blob.",
       "storage_not_configured_banner": "BLOB_READ_WRITE_TOKEN is missing · uploads are disabled on this build",
       "storage_not_configured": "Storage not configured · uploads disabled",
       "group_service": "Service rituals",
@@ -367,12 +541,16 @@
       "upload_error_not_configured": "Vercel Blob not configured",
       "upload_error_empty_file": "File is empty",
       "upload_error_unsupported_type": "Unsupported file type",
-      "upload_error_too_large": "File is too large (max 8 MB)",
+      "upload_error_too_large": "Photo is {size} MB · max {max} MB. Compress or resize the image and try again.",
       "upload_error_upload_failed": "Upload failed · try again",
       "upload_error_auth": "Sign in as admin to upload",
       "upload_error_validation": "Some fields are missing",
       "edit_service": "Edit service"
-    }
+    },
+    "inbox_gallery": "Gallery",
+    "inbox_gallery_caption": "Pictures & categories",
+    "inbox_onboarding": "Onboarding",
+    "inbox_onboarding_caption": "Welcome slides"
   },
   "AdminStudio": {
     "meta_title": "Studio",
@@ -425,10 +603,17 @@
     "og_title": "Violetta Beauty",
     "meta_title_with_city": "Violetta — nails & beauty in {city}",
     "meta_description_with_city": "Editorial nail design in {city}. Manicure, gel, design — quality work at fair prices.",
-    "meta_keywords_with_city": "{city} nails, {city} manicure, {city} beauty, {city} gel, cheap quality nails {city}"
+    "meta_keywords_with_city": "{city} nails, {city} manicure, {city} beauty, {city} gel, cheap quality nails {city}",
+    "skip_to_content": "Skip to content"
   },
   "SiteFooter": {
     "credit_prefix": "Created with Love by"
+  },
+  "Tonight": {
+    "label": "Tonight in the studio",
+    "today": "TODAY",
+    "none_today_tomorrow": "· NO OPENINGS TODAY OR TOMORROW · SEE THE CALENDAR ·",
+    "dismiss": "Hide tonight's openings"
   },
   "Error": {
     "meta_title": "Something slipped",
@@ -450,7 +635,8 @@
     "divider_or": "or",
     "not_configured": "SIGN-IN NOT YET CONFIGURED",
     "cta_sign_out": "Sign out",
-    "signed_in_as": "Signed in as"
+    "signed_in_as": "Signed in as",
+    "signing_in": "Signing you in…"
   },
   "AdminBookings": {
     "meta_title": "Bookings",
@@ -460,6 +646,8 @@
     "empty": "NO BOOKINGS YET",
     "cta_confirm": "Confirm",
     "cta_decline": "Decline",
+    "cta_refresh": "Refresh",
+    "n_new_pending": "{n} new — refresh",
     "status": {
       "pending": "Pending",
       "confirmed": "Confirmed",
@@ -482,6 +670,7 @@
     "cta_approve": "Approve",
     "cta_decline": "Decline",
     "cta_downgrade": "Downgrade",
+    "cta_refresh": "Refresh",
     "cta_show_all_expired": "Show all {total}",
     "expires_in_days": "expires in {n}d",
     "expires_lifetime": "lifetime",
@@ -507,6 +696,7 @@
     "status_rejected": "Rejected",
     "cta_approve": "Approve",
     "cta_reject": "Reject",
+    "cta_refresh": "Refresh",
     "cta_delete": "Delete",
     "cta_confirm_delete": "Confirm delete",
     "cta_cancel": "Cancel",
@@ -615,6 +805,7 @@
     "cta_archive": "Archive",
     "cta_restore": "Restore",
     "cta_save": "Save",
+    "saving": "Saving…",
     "saved": "Saved",
     "save_failed": "Save failed: {error}",
     "title_new_category": "New category",
@@ -644,6 +835,10 @@
     "label_category": "Category",
     "label_photo": "Photo",
     "label_photo_hint": "5:6 portrait · doubles as thumb + detail hero",
+    "label_masters": "Masters",
+    "label_masters_hint": "Tick every master who performs this service. A service stays off the public menu until at least one linked master is published.",
+    "masters_none": "No masters yet. Add a master first, then link them here.",
+    "badge_no_master": "Hidden — no published master",
     "validation_required": "Required",
     "validation_slug_invalid": "Lowercase letters, digits, and hyphens only",
     "validation_includes_max": "Maximum 8 bullets",
@@ -662,7 +857,9 @@
     "section_drafts": "Drafts",
     "section_archived": "Archived",
     "cta_new": "New master",
+    "cta_edit": "Edit",
     "cta_save": "Save",
+    "saving": "Saving…",
     "cta_archive": "Archive",
     "cta_restore": "Restore",
     "label_slug": "Slug",
@@ -720,6 +917,7 @@
     "vapid_missing": "Notification keys are not configured. Ask the admin to set the VAPID_* environment variables.",
     "offline_title": "You're offline",
     "offline_body": "Reconnect to keep browsing the atelier.",
+    "offline_brand_line": "Offline · but we'll be here when you're back",
     "profile_tile_title": "Notifications",
     "profile_tile_description": "Choose which updates you'd like to receive.",
     "category_booking_created_label": "New booking submitted (admin)",
@@ -746,5 +944,104 @@
     "category_testimonial_submitted_label": "New testimonial submitted (admin)",
     "category_testimonial_submitted_push_title": "New testimonial",
     "category_testimonial_submitted_push_body": "{customer} left a testimonial."
+  },
+  "AdminGallery": {
+    "meta_title": "Gallery admin",
+    "plate_title": "Gallery",
+    "eyebrow": "Curation",
+    "title": "Manage the gallery",
+    "paragraph": "Add pictures, write their descriptions, and group them into categories. Drag the handle to reorder.",
+    "section_categories": "Categories",
+    "section_items": "Pictures",
+    "cta_new_category": "New category",
+    "cta_new_item": "New picture",
+    "cta_edit": "Edit",
+    "cta_delete": "Delete",
+    "cta_save": "Save",
+    "saved": "Saved",
+    "save_failed": "Couldn’t save: {error}",
+    "delete_failed": "Couldn’t delete: {error}",
+    "delete_category_blocked": "Move or remove its {n} picture(s) first.",
+    "confirm_delete_category": "Delete this category? This can’t be undone.",
+    "confirm_delete_item": "Delete this picture? This can’t be undone.",
+    "saving": "Saving…",
+    "item_count": "{n} picture(s)",
+    "badge_has_image": "Photo",
+    "badge_no_image": "Gradient only",
+    "title_new_category": "New category",
+    "title_edit_category": "Edit category",
+    "title_new_item": "New picture",
+    "title_edit_item": "Edit picture",
+    "label_slug": "ID (slug)",
+    "label_slug_hint": "Lowercase letters, numbers and dashes. Can’t be changed later.",
+    "label_name_en": "Name (English)",
+    "label_name_ru": "Name (Russian)",
+    "label_name_by": "Name (Belarusian)",
+    "label_category": "Category",
+    "label_image": "Image",
+    "label_image_hint": "Optional. Without a photo the card shows a colour gradient.",
+    "label_alt": "Alt text",
+    "label_alt_hint": "Describes the image for screen readers.",
+    "label_caption_en": "Caption (English)",
+    "label_caption_ru": "Caption (Russian)",
+    "label_caption_by": "Caption (Belarusian)",
+    "label_file": "Photo file",
+    "upload": "Upload",
+    "uploading": "Uploading…",
+    "uploaded": "Uploaded",
+    "remove_image": "Remove photo",
+    "error_too_large": "Image is too large (max 25 MB).",
+    "error_failed": "Upload failed. Please try again.",
+    "storage_not_configured": "Image storage isn’t configured.",
+    "validation_required": "Required",
+    "validation_slug_invalid": "Use lowercase letters, numbers and dashes only.",
+    "validation_id_required": "Enter an ID before uploading."
+  },
+  "AdminOnboarding": {
+    "meta_title": "Onboarding admin",
+    "plate_title": "Onboarding",
+    "eyebrow": "First impression",
+    "title": "Manage onboarding",
+    "paragraph": "Edit the welcome slides — their text and images. Add, remove and drag to reorder.",
+    "section_slides": "Slides",
+    "cta_new_slide": "New slide",
+    "cta_edit": "Edit",
+    "cta_delete": "Delete",
+    "cta_save": "Save",
+    "saved": "Saved",
+    "save_failed": "Couldn’t save: {error}",
+    "delete_failed": "Couldn’t delete: {error}",
+    "confirm_delete_slide": "Delete this slide? This can’t be undone.",
+    "saving": "Saving…",
+    "title_new_slide": "New slide",
+    "title_edit_slide": "Edit slide",
+    "label_slug": "ID (slug)",
+    "label_slug_hint": "Lowercase letters, numbers and dashes. Can’t be changed later.",
+    "label_eyebrow_en": "Eyebrow (English)",
+    "label_eyebrow_ru": "Eyebrow (Russian)",
+    "label_eyebrow_by": "Eyebrow (Belarusian)",
+    "label_title_en": "Title (English)",
+    "label_title_ru": "Title (Russian)",
+    "label_title_by": "Title (Belarusian)",
+    "label_body_en": "Body (English)",
+    "label_body_ru": "Body (Russian)",
+    "label_body_by": "Body (Belarusian)",
+    "label_variant": "Gradient variant",
+    "label_variant_hint": "0–5, picks the placeholder gradient style.",
+    "label_image": "Image",
+    "label_image_hint": "Optional. Without a photo the slide shows a colour gradient.",
+    "label_file": "Photo file",
+    "upload": "Upload",
+    "uploading": "Uploading…",
+    "uploaded": "Uploaded",
+    "remove_image": "Remove photo",
+    "error_too_large": "Image is too large (max 25 MB).",
+    "error_failed": "Upload failed. Please try again.",
+    "storage_not_configured": "Image storage isn’t configured.",
+    "validation_required": "Required",
+    "validation_slug_invalid": "Use lowercase letters, numbers and dashes only.",
+    "validation_id_required": "Enter an ID before uploading.",
+    "badge_has_image": "Photo",
+    "badge_no_image": "Gradient only"
   }
 }

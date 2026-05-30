@@ -1,0 +1,83 @@
+import { getTranslations } from "next-intl/server";
+import { bucketBookings } from "@/entities/booking";
+import { Link } from "@/i18n/navigation";
+import { BookingStatusBadge } from "@/shared/ui/booking-status-badge";
+import { buttonClassName } from "@/shared/ui/button";
+import { getCachedUserBookings, getCachedAllServices } from "../api/loaders";
+
+function formatDateTime(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+export async function BookingHistory({
+  userId,
+  locale,
+}: {
+  userId: string;
+  locale: string;
+}) {
+  const [t, bookings, services] = await Promise.all([
+    getTranslations("Profile"),
+    getCachedUserBookings(userId),
+    getCachedAllServices(),
+  ]);
+
+  const { history } = bucketBookings(bookings, new Date());
+  const recentHistory = history.slice(0, 20);
+
+  const serviceName = (id: string): string => {
+    const s = services.find((row) => row.id === id);
+    if (!s) return id;
+    return locale === "ru" ? s.nameRu : locale === "by" ? s.nameBy : s.nameEn;
+  };
+
+  const statusLabel = (status: (typeof recentHistory)[number]["status"]) =>
+    t(`booking_status.${status}`);
+
+  if (recentHistory.length === 0) {
+    return <p className="mt-3 text-[13px] text-text-3">{t("history_empty")}</p>;
+  }
+
+  return (
+    <ul className="mt-3 divide-y divide-line">
+      {recentHistory.map((row) => (
+        <li
+          key={row.id}
+          className="flex items-baseline justify-between gap-3 py-3.5"
+        >
+          <div className="min-w-0">
+            <p className="font-display text-[19px] font-normal italic leading-tight">
+              {serviceName(row.serviceId)}
+            </p>
+            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
+              {formatDateTime(row.scheduledFor, locale)}
+            </p>
+            <div className="mt-1">
+              <BookingStatusBadge
+                status={row.status}
+                label={statusLabel(row.status)}
+              />
+            </div>
+          </div>
+          {/* §10.2 — "Book this again" ghost; pre-selects the service. */}
+          <Link
+            href={`/booking/service?selected=${encodeURIComponent(row.serviceId)}`}
+            className={buttonClassName({
+              variant: "ghost",
+              size: "sm",
+              className: "shrink-0",
+            })}
+          >
+            {t("rebook_cta")}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}

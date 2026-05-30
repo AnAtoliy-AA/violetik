@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { serviceFormSchema } from "@/entities/service/model/schema";
 import { updateService } from "@/db/services-mutations";
+import { setServiceMasters } from "@/db/masters-mutations";
 import { gateAdmin, joinIssues, type ActionResult } from "./_common";
 
 const updateSchema = serviceFormSchema.omit({ id: true });
@@ -23,11 +24,12 @@ export async function updateServiceAction(
     return { ok: false, error: joinIssues(parsed.error) };
   }
 
-  const result = await updateService(id, {
-    ...parsed.data,
-    updatedBy: gate.updatedBy,
-  });
+  const { masterIds, ...row } = parsed.data;
+  const result = await updateService(id, { ...row, updatedBy: gate.updatedBy });
   if (!result.ok) return { ok: false, error: result.error };
+
+  const linked = await setServiceMasters(id, masterIds);
+  if (!linked.ok) return { ok: false, error: linked.error };
 
   revalidatePath("/", "layout");
   return { ok: true };

@@ -35,7 +35,7 @@ export function MasterStrip({ master }: MasterStripProps = {}) {
   const stat = setsPart ? `${yearsPart} · ${setsPart}` : yearsPart;
   return (
     <section className="px-[22px] pb-4 pt-7">
-      <Plate number={2} label={t("plate_master").toUpperCase()} />
+      <Plate folio number={2} label={t("plate_master").toUpperCase()} />
       <Link
         href="/master"
         className="gilded glass-top mt-3.5 flex w-full items-center gap-[18px] overflow-hidden rounded-[28px] p-[18px] text-left text-text"

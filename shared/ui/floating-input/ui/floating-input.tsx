@@ -4,10 +4,12 @@ import {
   forwardRef,
   useId,
   useState,
+  type CSSProperties,
   type ChangeEvent,
   type InputHTMLAttributes,
 } from "react";
 import { cn } from "@/shared/lib/cn";
+import { GlassSurface } from "@/shared/ui/glass-surface";
 
 export interface FloatingInputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "placeholder"> {
@@ -22,6 +24,10 @@ export interface FloatingInputProps
 /**
  * A studio-grade input: mono eyebrow label that morphs to italic eyebrow
  * on focus/value, with a gilded underline that draws on focus.
+ *
+ * Wrapped in GlassSurface (tint="body"→"warm" on focus, blur="md", rim,
+ * elevation={1}). The rim ::before is always rendered; only its opacity
+ * transitions via --rim-opacity (0 → 1 on focus).
  *
  * Standalone — no story file (covered by Vitest, the rest is decoration).
  */
@@ -55,14 +61,24 @@ export const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
     const elevated = focused || hasValue;
 
     return (
-      <div className={cn("relative", className)}>
+      <GlassSurface
+        tint={focused ? "warm" : "body"}
+        blur="md"
+        rim
+        elevation={1}
+        className={cn(
+          "relative rounded-md px-3 pt-3 pb-1.5 transition-colors duration-fast ease-out",
+          className,
+        )}
+        style={{ "--rim-opacity": focused ? 1 : 0 } as CSSProperties}
+      >
         <label
           htmlFor={id}
           className={cn(
-            "pointer-events-none absolute left-0 origin-left transition-all duration-fast ease-out",
+            "pointer-events-none absolute left-3 origin-left transition-all duration-fast ease-out",
             "select-none",
             elevated
-              ? "top-0 font-display text-[12px] italic text-accent"
+              ? "top-1 font-display text-[12px] italic text-accent"
               : "top-1/2 -translate-y-1/2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3",
           )}
         >
@@ -117,7 +133,7 @@ export const FloatingInput = forwardRef<HTMLInputElement, FloatingInputProps>(
             {hint}
           </p>
         ) : null}
-      </div>
+      </GlassSurface>
     );
   },
 );

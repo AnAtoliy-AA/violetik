@@ -5,7 +5,10 @@ import { resolvePrice } from "@/entities/site-settings";
 import {
   loadPublishedServiceIds,
   loadServiceByIdForLocale,
+  loadServicesForLocale,
 } from "@/entities/service/api/load";
+import { loadEligibleMastersForService } from "@/entities/master/api/load";
+import { listApprovedTestimonials } from "@/entities/testimonial";
 import type { CurrencyCode } from "@/db/schema";
 import { routing, type Locale } from "@/i18n/routing";
 import { ServiceDetailPage } from "@/views/service-detail";
@@ -47,7 +50,11 @@ export default async function ServiceDetailRoute({
   setRequestLocale(locale);
   const service = await loadServiceByIdForLocale(id, locale);
   if (!service) notFound();
-  const settings = await getSiteSettingsServer();
+  const [settings, allServices, eligibleMasters] = await Promise.all([
+    getSiteSettingsServer(),
+    loadServicesForLocale(locale),
+    loadEligibleMastersForService(service.id, locale),
+  ]);
   const resolvedPrice = resolvePrice(
     `service:${service.id}`,
     service.price,
@@ -55,12 +62,52 @@ export default async function ServiceDetailRoute({
   );
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
+
+  // §8.3 — surface the service's eligible master inline. Solo studios end
+  // up with exactly one row; the section auto-hides when no master exists.
+  const master = eligibleMasters[0] ?? null;
+
+  // §8.1 — "Pairs well with": three sibling services from the same
+  // category (excluding the current one), ranked by sortOrder. The
+  // brief mentions `service.pairsWith` but the entity has no such field
+  // yet; same-category siblings are the closest objective signal we
+  // already model.
+  const pairs = allServices
+    .filter(
+      (s) => s.id !== service.id && s.category.id === service.category.id,
+    )
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .slice(0, 3);
+
+  // §8.2 + §11.3 — service-specific reviews. Testimonials now carry
+  // an optional serviceId; prefer those, fall back to the master's
+  // general reviews until per-service ones accumulate. Empty list
+  // collapses the section entirely (the brief explicitly forbids
+  // filler).
+  let reviews = master
+    ? await listApprovedTestimonials({
+        masterId: master.id,
+        serviceId: service.id,
+        limit: 6,
+      })
+    : [];
+  if (reviews.length === 0 && master) {
+    reviews = await listApprovedTestimonials({
+      masterId: master.id,
+      limit: 6,
+    });
+  }
+
   return (
     <ServiceDetailPage
       service={service}
       resolvedPrice={resolvedPrice}
       currency={currency}
       locale={locale}
+      telegramUsername={settings.telegramUsername}
+      master={master}
+      pairs={pairs}
+      reviews={reviews}
     />
   );
 }

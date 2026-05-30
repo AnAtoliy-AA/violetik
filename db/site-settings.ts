@@ -18,6 +18,8 @@ function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
     priceOverrides: row.priceOverrides ?? {},
     discountPercent: row.discountPercent,
     discountActive: row.discountActive,
+    markupPercent: row.markupPercent,
+    markupActive: row.markupActive,
     currency: row.currency,
     addressEn: row.addressEn,
     addressRu: row.addressRu,
@@ -38,7 +40,8 @@ function rowToSettings(row: schema.SiteSettingsRow): SiteSettings {
 /**
  * Reads the singleton site_settings row, lazily inserting a defaults
  * row on first call. Returns frozen defaults when DATABASE_URL is
- * unset so the app degrades gracefully in local dev / CI.
+ * unset so the app degrades gracefully in local dev / CI, or when the
+ * read fails (pre-migration build-time SSG, missing table, etc.).
  */
 export async function getSiteSettings(): Promise<SiteSettings> {
   if (!db) return DEFAULT_SITE_SETTINGS;

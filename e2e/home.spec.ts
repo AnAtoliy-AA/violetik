@@ -6,7 +6,7 @@ test("renders the editorial hero at /en/home", async ({ page }) => {
     page.getByRole("heading", { level: 1, name: /The hands.*portrait/is }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Book a chair/i }),
+    page.getByRole("link", { name: /^Reserve$/i }).first(),
   ).toBeVisible();
   await expect(
     page.getByRole("link", { name: /Gallery/i }).first(),

@@ -4,6 +4,20 @@ import { BookingStepper } from "./booking-stepper";
 
 const LABELS = ["Service", "Date", "Time", "Confirm"];
 
+describe("BookingStepper — glass chrome", () => {
+  it("renders the chrome as a GlassSurface", () => {
+    const { container } = render(
+      <BookingStepper labels={LABELS} current={0} />,
+    );
+    const candidates = container.querySelectorAll("[data-glass='true']");
+    const stepperSurface = Array.from(candidates).find((el) =>
+      el.className.includes("glass-cool"),
+    );
+    expect(stepperSurface).not.toBeUndefined();
+    expect((stepperSurface as HTMLElement).className).toMatch(/glass-md/);
+  });
+});
+
 describe("BookingStepper", () => {
   it("renders every label", () => {
     render(<BookingStepper labels={LABELS} current={0} />);

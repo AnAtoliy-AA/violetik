@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import type { FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { PALETTES } from "@/shared/config/palettes";
+import { emitAnalytics } from "@/shared/lib/analytics/emit";
 import { cn } from "@/shared/lib/cn";
 import { routing } from "@/i18n/routing";
 import type {
@@ -53,6 +54,8 @@ export function SiteSettingsForm({
     initial.discountPercent,
   );
   const [discountActive, setDiscountActive] = useState(initial.discountActive);
+  const [markupPercent, setMarkupPercent] = useState(initial.markupPercent);
+  const [markupActive, setMarkupActive] = useState(initial.markupActive);
 
   const [vipOverride, setVipOverride] = useState<OverrideInput>(() =>
     "membership:VIP" in initial.priceOverrides
@@ -84,6 +87,8 @@ export function SiteSettingsForm({
       priceOverrides,
       discountPercent: Math.max(0, Math.min(90, Math.round(discountPercent))),
       discountActive,
+      markupPercent: Math.max(0, Math.min(1000, Math.round(markupPercent))),
+      markupActive,
     };
   }
 
@@ -117,7 +122,10 @@ export function SiteSettingsForm({
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                onClick={() => setDefaultPalette(p.id)}
+                onClick={() => {
+                  setDefaultPalette(p.id);
+                  emitAnalytics("palette_switched", { palette: p.id });
+                }}
                 className={cn(
                   "group flex items-center gap-3 rounded-full border-[0.5px] px-3 py-2",
                   "transition-colors duration-fast ease-out",
@@ -225,7 +233,7 @@ export function SiteSettingsForm({
             max={10_000}
             placeholder="—"
             aria-label="VIP price override"
-            className="w-24 rounded border border-line bg-surface px-2 py-1 text-right"
+            className="w-24 rounded border border-line bg-surface px-2 py-2 text-right text-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
             value={vipOverride}
             onChange={(e) => setVipOverride(e.target.value)}
           />
@@ -244,7 +252,7 @@ export function SiteSettingsForm({
               min={0}
               max={90}
               aria-label="discount percent"
-              className="w-20 rounded border border-line bg-surface px-2 py-1 text-right"
+              className="w-20 rounded border border-line bg-surface px-2 py-2 text-right text-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               value={discountPercent}
               onChange={(e) =>
                 setDiscountPercent(
@@ -265,6 +273,42 @@ export function SiteSettingsForm({
         </div>
       </fieldset>
 
+      <fieldset aria-label={t("site_settings_section_markup")}>
+        <legend className="mb-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
+          {t("site_settings_section_markup")}
+        </legend>
+        <p className="mb-2 text-[12px] text-text-3">
+          {t("site_settings_markup_hint")}
+        </p>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 text-[13px]">
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={1000}
+              aria-label="markup percent"
+              className="w-20 rounded border border-line bg-surface px-2 py-2 text-right text-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+              value={markupPercent}
+              onChange={(e) =>
+                setMarkupPercent(
+                  Math.max(0, Math.min(1000, Number(e.target.value) || 0)),
+                )
+              }
+            />
+            <span>%</span>
+          </label>
+          <label className="flex items-center gap-2 text-[13px]">
+            <input
+              type="checkbox"
+              checked={markupActive}
+              onChange={(e) => setMarkupActive(e.target.checked)}
+            />
+            {t("site_settings_markup_active")}
+          </label>
+        </div>
+      </fieldset>
+
       <div className="flex items-center gap-3">
         <button
           type="submit"
@@ -278,7 +322,7 @@ export function SiteSettingsForm({
             {t("site_settings_saved")}
           </span>
         ) : status.kind === "error" ? (
-          <span role="alert" className="text-[12px] text-accent">
+          <span role="alert" className="text-[12px] text-rose">
             {t("site_settings_error", { error: status.message })}
           </span>
         ) : null}

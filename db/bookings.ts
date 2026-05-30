@@ -1,6 +1,15 @@
 import { randomBytes } from "node:crypto";
-import { and, asc, desc, eq, gte, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, ne, sql } from "drizzle-orm";
 import { db, schema } from "./index";
+import { activeVipSubquery } from "./vip-requests";
+
+/**
+ * Bookings created before this date predate the tentative-on-create
+ * behaviour; their GCal events default to "confirmed" in Google, so the
+ * confirm-sync cron must ignore them to avoid mass auto-confirmation.
+ * Set to the feature ship date.
+ */
+export const GCAL_SYNC_CUTOFF = new Date("2026-05-30T00:00:00Z");
 
 export interface NewBookingInput {
   userId: string;
@@ -16,6 +25,7 @@ export interface BookingWithUser extends schema.Booking {
   userFirstName: string | null;
   userLastName: string | null;
   username: string | null;
+  userIsVip: boolean;
   masterNameEn: string | null;
   masterNameRu: string | null;
   masterNameBy: string | null;
@@ -84,11 +94,51 @@ export async function listActiveBookingsFrom(
 }
 
 /**
+ * Per-service count of confirmed + completed bookings. Backs §5.2's
+ * "pin the most-booked" signatures rerank and §11.3's "N sittings"
+ * line on each service tile. Cancelled + pending bookings excluded so
+ * the count reflects realised demand, not interest.
+ */
+export type CountedBookingStatus = "confirmed" | "completed";
+
+export async function countBookingsByServiceId(
+  statuses: ReadonlyArray<CountedBookingStatus> = ["confirmed", "completed"],
+): Promise<ReadonlyMap<string, number>> {
+  if (!db) return new Map();
+  if (statuses.length === 0) return new Map();
+  const rows = await db
+    .select({
+      serviceId: schema.bookings.serviceId,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(schema.bookings)
+    .where(inArray(schema.bookings.status, [...statuses]))
+    .groupBy(schema.bookings.serviceId);
+  const out = new Map<string, number>();
+  for (const r of rows) out.set(r.serviceId, r.count);
+  return out;
+}
+
+/**
+ * Count of bookings with status = 'pending'. Used by the admin
+ * polling endpoint to drive the "N new" badge cheaply.
+ */
+export async function countPendingBookings(): Promise<number> {
+  if (!db) return 0;
+  const rows = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(schema.bookings)
+    .where(eq(schema.bookings.status, "pending"));
+  return rows[0]?.count ?? 0;
+}
+
+/**
  * Admin-facing list: every booking, newest first, with a small profile
  * snapshot of the booker joined in.
  */
 export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
   if (!db) return [];
+  const activeVip = activeVipSubquery();
   const rows = await db
     .select({
       booking: schema.bookings,
@@ -96,12 +146,14 @@ export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
       userFirstName: schema.users.firstName,
       userLastName: schema.users.lastName,
       username: schema.users.username,
+      vipUserId: activeVip.userId,
       masterNameEn: schema.masters.nameEn,
       masterNameRu: schema.masters.nameRu,
       masterNameBy: schema.masters.nameBy,
     })
     .from(schema.bookings)
     .leftJoin(schema.users, eq(schema.bookings.userId, schema.users.id))
+    .leftJoin(activeVip, eq(activeVip.userId, schema.bookings.userId))
     .leftJoin(schema.masters, eq(schema.bookings.masterId, schema.masters.id))
     .orderBy(desc(schema.bookings.scheduledFor));
   return rows.map((r) => ({
@@ -110,6 +162,7 @@ export async function listBookingsForAdmin(): Promise<BookingWithUser[]> {
     userFirstName: r.userFirstName,
     userLastName: r.userLastName,
     username: r.username,
+    userIsVip: r.vipUserId !== null,
     masterNameEn: r.masterNameEn,
     masterNameRu: r.masterNameRu,
     masterNameBy: r.masterNameBy,
@@ -148,9 +201,9 @@ export interface UserBookingRow extends schema.Booking {
 }
 
 /**
- * Bookings for one user, excluding cancelled rows. Sorted ascending
- * by scheduledFor; the view buckets into upcoming / history using a
- * single `now` captured server-side.
+ * All bookings for one user (all statuses, including cancelled). Sorted
+ * ascending by scheduledFor; the view buckets into upcoming / history
+ * using a single `now` captured server-side.
  */
 export async function listUserBookings(
   userId: string,
@@ -165,13 +218,11 @@ export async function listUserBookings(
       masterTelegramUsername: schema.masters.telegramUsername,
     })
     .from(schema.bookings)
-    .leftJoin(schema.masters, eq(schema.bookings.masterId, schema.masters.id))
-    .where(
-      and(
-        eq(schema.bookings.userId, userId),
-        ne(schema.bookings.status, "cancelled"),
-      ),
+    .leftJoin(
+      schema.masters,
+      eq(schema.bookings.masterId, schema.masters.id),
     )
+    .where(eq(schema.bookings.userId, userId))
     .orderBy(asc(schema.bookings.scheduledFor));
   return rows.map((r) => ({
     ...r.booking,
@@ -203,6 +254,29 @@ export async function cancelBookingIfOpen(
     )
     .returning();
   return rows[0] ?? null;
+}
+
+/**
+ * Pending, future bookings that have a GCal event and were created on or
+ * after GCAL_SYNC_CUTOFF. Backs the daily confirm-sync cron: it reads
+ * each event and promotes the row to confirmed when the admin marked the
+ * calendar event confirmed.
+ */
+export async function listPendingBookingsWithGcalEvent(
+  cutoff: Date = GCAL_SYNC_CUTOFF,
+): Promise<schema.Booking[]> {
+  if (!db) return [];
+  return db
+    .select()
+    .from(schema.bookings)
+    .where(
+      and(
+        eq(schema.bookings.status, "pending"),
+        gte(schema.bookings.createdAt, cutoff),
+        gte(schema.bookings.scheduledFor, new Date()),
+        sql`${schema.bookings.gcalEventId} IS NOT NULL`,
+      ),
+    );
 }
 
 /**

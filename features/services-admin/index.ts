@@ -26,6 +26,8 @@ export type {
 } from "./ui/service-editor";
 export { IncludesFieldset } from "./ui/includes-fieldset";
 export type { IncludeEntry } from "./ui/includes-fieldset";
+export { MasterPicker } from "./ui/master-picker";
+export type { MasterOption } from "./ui/master-picker";
 export { AdminServicesList } from "./ui/admin-services-list";
 export type {
   AdminServicesListProps,

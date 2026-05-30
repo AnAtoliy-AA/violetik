@@ -1,2 +1,6 @@
 npm run lint
-npm test
+# Exclude the storybook (chromium) project locally and use the threads
+# pool (lighter than forks on macOS dev machines). CI's verify job
+# (.github/workflows/ci.yml) runs `npm test` with the default pool +
+# both projects, so storybook stories are still gated before merge.
+npx vitest run --project=\!storybook --pool=threads

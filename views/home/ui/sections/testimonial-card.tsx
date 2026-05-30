@@ -1,8 +1,10 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { ApprovedTestimonial } from "@/entities/testimonial";
+import { toRomanNumeral } from "@/shared/lib/format/roman-numeral";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { Plate } from "@/shared/ui/plate";
+import { VipBadge } from "@/shared/ui/vip-badge";
 
 export interface TestimonialCardProps {
   testimonial: ApprovedTestimonial | null;
@@ -10,10 +12,18 @@ export interface TestimonialCardProps {
 
 export function TestimonialCard({ testimonial }: TestimonialCardProps) {
   const t = useTranslations("Home");
+  const locale = useLocale();
   if (!testimonial) return null;
+  // §11.2 — mono caps date eyebrow under each quote, e.g.
+  // "· МАРТ MMXXIV ·". Month follows the locale; year is Roman so it
+  // reads as editorial flair across all three locales.
+  const dateMonth = new Intl.DateTimeFormat(locale, { month: "long" })
+    .format(testimonial.createdAt)
+    .toUpperCase();
+  const dateYear = toRomanNumeral(testimonial.createdAt.getFullYear());
   return (
     <section className="px-[22px] py-7">
-      <Plate number={3} label={t("plate_word").toUpperCase()} />
+      <Plate folio number={5} label={t("plate_word").toUpperCase()} />
       <div className="gilded glass-top relative mt-4 overflow-hidden rounded-[28px] px-7 py-9">
         <div
           aria-hidden
@@ -21,9 +31,12 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
         >
           &ldquo;
         </div>
-        <p className="m-0 mb-5 pl-12 font-display text-[26px] font-normal italic leading-[1.3]">
+        <p className="m-0 mb-3 pl-12 font-display text-[26px] font-normal italic leading-[1.3]">
           {testimonial.body}
         </p>
+        <div className="mb-3 pl-12 font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
+          · {dateMonth} {dateYear} ·
+        </div>
         <LetterpressRule className="mb-4 max-w-[200px]" />
         <div className="flex items-center gap-2.5">
           {testimonial.authorPhotoUrl ? (
@@ -47,8 +60,9 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
               }}
             />
           )}
-          <div>
+          <div className="flex items-center gap-2">
             <div className="text-[13px] font-medium">{testimonial.authorDisplay}</div>
+            {testimonial.authorIsVip ? <VipBadge size="xs" /> : null}
           </div>
         </div>
       </div>

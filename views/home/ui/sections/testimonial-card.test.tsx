@@ -21,11 +21,26 @@ describe("TestimonialCard", () => {
       createdAt: new Date(),
       authorDisplay: "Iris M.",
       authorPhotoUrl: null,
+      authorIsVip: false,
       masterId: "violetta",
     };
     renderWithIntl(<TestimonialCard testimonial={tm} />);
     expect(screen.getByText(/Quiet, private, exquisite/)).toBeInTheDocument();
     expect(screen.getByText("Iris M.")).toBeInTheDocument();
+  });
+
+  it("renders a VIP badge when the author is a VIP", () => {
+    const tm: ApprovedTestimonial = {
+      id: "tst_vip",
+      body: "Truly couture.",
+      createdAt: new Date(),
+      authorDisplay: "Nina V.",
+      authorPhotoUrl: null,
+      authorIsVip: true,
+      masterId: "violetta",
+    };
+    renderWithIntl(<TestimonialCard testimonial={tm} />);
+    expect(screen.getByLabelText("VIP member")).toBeInTheDocument();
   });
 
   it("renders an <img> avatar when authorPhotoUrl is set", () => {
@@ -35,6 +50,7 @@ describe("TestimonialCard", () => {
       createdAt: new Date(),
       authorDisplay: "Joelle P.",
       authorPhotoUrl: "https://t.me/i/userpic/320/joelle.jpg",
+      authorIsVip: false,
       masterId: "violetta",
     };
     renderWithIntl(<TestimonialCard testimonial={tm} />);

@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { upload } from "@vercel/blob/client";
 import {
-  uploadStudioPhotoAction,
+  finalizeStudioPhotoUploadAction,
   deleteStudioPhotoAction,
-  type UploadStudioPhotoResult,
+  type FinalizeStudioPhotoUploadResult,
   type DeleteStudioPhotoResult,
 } from "../api/upload-studio-photo";
 import type { PhotoSlot } from "../model/slot";
@@ -14,6 +15,15 @@ import type { ImageAsset } from "@/entities/studio";
 import { buttonClassName } from "@/shared/ui/button";
 import { FloatingInput } from "@/shared/ui/floating-input";
 import { cn } from "@/shared/lib/cn";
+import {
+  MAX_PHOTO_BYTES,
+  MAX_PHOTO_MB,
+} from "@/shared/lib/photo-storage/limits";
+import { buildBlobKey } from "@/shared/lib/photo-storage/keys";
+
+function formatMb(bytes: number): string {
+  return (bytes / (1024 * 1024)).toFixed(1);
+}
 
 export interface PhotoUploadRowProps {
   slot: PhotoSlot;
@@ -35,14 +45,12 @@ export function PhotoUploadRow({
   storageConfigured,
 }: PhotoUploadRowProps) {
   const t = useTranslations("Admin.photos");
-  const formRef = useRef<HTMLFormElement>(null);
   const [pending, setPending] = useState<PendingFile | null>(null);
+  const [oversizeBytes, setOversizeBytes] = useState<number | null>(null);
   const [alt, setAlt] = useState<string>(current?.alt ?? "");
-
-  const [uploadState, uploadAction, uploadPending] = useActionState<
-    UploadStudioPhotoResult | null,
-    FormData
-  >(uploadStudioPhotoAction, null);
+  const [uploadResult, setUploadResult] =
+    useState<FinalizeStudioPhotoUploadResult | null>(null);
+  const [isUploading, startUpload] = useTransition();
 
   const [deleteState, deleteAction, deletePending] = useActionState<
     DeleteStudioPhotoResult | null,
@@ -50,9 +58,16 @@ export function PhotoUploadRow({
   >(deleteStudioPhotoAction, null);
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setOversizeBytes(null);
+    setUploadResult(null);
     const file = event.target.files?.[0];
     if (!file) {
       setPending(null);
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      setPending(null);
+      setOversizeBytes(file.size);
       return;
     }
     const preview = URL.createObjectURL(file);
@@ -68,13 +83,53 @@ export function PhotoUploadRow({
     img.src = preview;
   }
 
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!pending || !alt.trim()) return;
+    const { file, width, height } = pending;
+    const pathname = buildBlobKey(slot.kind, slot.id, file.type);
+    startUpload(async () => {
+      try {
+        const blob = await upload(pathname, file, {
+          access: "public",
+          handleUploadUrl: "/api/admin/photos/upload-token",
+          contentType: file.type,
+        });
+        const result = await finalizeStudioPhotoUploadAction({
+          slotKind: slot.kind,
+          slotId: slot.id,
+          alt,
+          src: blob.url,
+          pathname: blob.pathname,
+          width,
+          height,
+        });
+        setUploadResult(result);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : String(error ?? "unknown");
+        setUploadResult({
+          ok: false,
+          error: "upload_failed",
+          detail: message,
+        });
+      }
+    });
+  }
+
   const previewSrc = pending?.preview ?? current?.src ?? null;
-  const errorMessage =
-    uploadState && !uploadState.ok
-      ? t(`upload_error_${uploadState.error}` as const)
+  const errorMessage = oversizeBytes
+    ? t("upload_error_too_large", {
+        size: formatMb(oversizeBytes),
+        max: MAX_PHOTO_MB,
+      })
+    : uploadResult && !uploadResult.ok
+      ? t(`upload_error_${uploadResult.error}` as const)
       : null;
   const errorDetail =
-    uploadState && !uploadState.ok ? uploadState.detail : null;
+    uploadResult && !uploadResult.ok && !oversizeBytes
+      ? uploadResult.detail
+      : null;
 
   return (
     <article
@@ -117,24 +172,7 @@ export function PhotoUploadRow({
         </div>
 
         <div className="flex flex-col gap-3">
-          <form
-            ref={formRef}
-            action={uploadAction}
-            className="flex flex-col gap-3"
-          >
-            <input type="hidden" name="slotKind" value={slot.kind} />
-            <input type="hidden" name="slotId" value={slot.id} />
-            <input
-              type="hidden"
-              name="width"
-              value={pending?.width ?? current?.width ?? ""}
-            />
-            <input
-              type="hidden"
-              name="height"
-              value={pending?.height ?? current?.height ?? ""}
-            />
-
+          <form onSubmit={onSubmit} className="flex flex-col gap-3">
             <FloatingInput
               label={t("alt_label")}
               name="alt"
@@ -153,7 +191,7 @@ export function PhotoUploadRow({
                 name="file"
                 accept="image/jpeg,image/png,image/webp,image/avif"
                 onChange={onFileChange}
-                disabled={!storageConfigured}
+                disabled={!storageConfigured || isUploading}
                 required
                 className="mt-1.5 block w-full text-[13px] text-text-2 file:mr-3 file:cursor-pointer file:rounded-full file:border file:border-line-strong file:bg-transparent file:px-3 file:py-1.5 file:text-text file:hover:bg-surface/60 disabled:cursor-not-allowed disabled:opacity-40"
               />
@@ -178,7 +216,7 @@ export function PhotoUploadRow({
               </div>
             ) : null}
 
-            {uploadState && uploadState.ok ? (
+            {uploadResult && uploadResult.ok ? (
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
                 {t("upload_success")}
               </p>
@@ -186,13 +224,15 @@ export function PhotoUploadRow({
 
             <button
               type="submit"
-              disabled={!storageConfigured || uploadPending || pending === null}
+              disabled={
+                !storageConfigured || isUploading || pending === null
+              }
               className={cn(
                 buttonClassName({ variant: "solid", size: "sm" }),
                 "self-start min-w-[120px]",
               )}
             >
-              {uploadPending ? t("uploading") : t("upload")}
+              {isUploading ? t("uploading") : t("upload")}
             </button>
           </form>
 

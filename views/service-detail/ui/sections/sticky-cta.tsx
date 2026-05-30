@@ -1,4 +1,6 @@
 import { useTranslations } from "next-intl";
+import type { CurrencyCode } from "@/db/schema";
+import type { Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import type { ResolvedPrice } from "@/entities/site-settings";
 import { buttonClassName } from "@/shared/ui/button";
@@ -8,6 +10,14 @@ import { Price } from "@/shared/ui/price";
 export interface StickyCtaProps {
   serviceId: string;
   resolvedPrice: ResolvedPrice;
+  /** Active display currency. Defaults to EUR for legacy callers. */
+  currency?: CurrencyCode;
+  /** Active locale. Defaults to en for legacy callers. */
+  locale?: Locale;
+  /** Service name used to pre-fill the "Ask first" Telegram message. */
+  serviceName?: string;
+  /** Telegram handle (without @) used as the deep-link target. */
+  telegramUsername?: string | null;
 }
 
 function ArrowRight() {
@@ -27,13 +37,33 @@ function ArrowRight() {
   );
 }
 
-export function StickyCta({ serviceId, resolvedPrice }: StickyCtaProps) {
+export function StickyCta({
+  serviceId,
+  resolvedPrice,
+  currency = "EUR",
+  locale = "en",
+  serviceName,
+  telegramUsername,
+}: StickyCtaProps) {
   const t = useTranslations("ServiceDetail");
+
+  // §8.5 — Telegram deep-link with a pre-filled "ask first" message.
+  // We use the t.me web URL so it works without the app installed;
+  // mobile platforms automatically hand it off to the Telegram app.
+  const askHref = telegramUsername
+    ? `https://t.me/${telegramUsername}?text=${encodeURIComponent(
+        t("ask_first_template", { service: serviceName ?? "—" }),
+      )}`
+    : null;
+
   return (
     <div
-      className="glass-top sticky bottom-0 px-[22px] pb-6 pt-3.5"
+      // pb clears the fixed SiteFooter credit strip (~39px) so the CTA row
+      // doesn't sit on top of "CREATED WITH LOVE BY…"; +safe-area for notches.
+      className="glass-top sticky bottom-0 px-[22px] pb-[calc(48px+env(safe-area-inset-bottom))] pt-3.5"
       style={{
-        background: "linear-gradient(to top, var(--color-bg) 70%, transparent)",
+        background:
+          "linear-gradient(to top, var(--color-bg) 72%, transparent)",
         backdropFilter: "var(--backdrop-blur-lg)",
         WebkitBackdropFilter: "var(--backdrop-blur-lg)",
       }}
@@ -44,22 +74,37 @@ export function StickyCta({ serviceId, resolvedPrice }: StickyCtaProps) {
             {t("from")}
           </div>
           <div className="font-display text-[28px] font-normal italic leading-none text-gold-shimmer">
-            <Price resolved={resolvedPrice} />
+            <Price resolved={resolvedPrice} currency={currency} locale={locale} />
           </div>
         </div>
-        <MagneticButton className="block w-full">
-          <Link
-            href={`/booking/service?selected=${encodeURIComponent(serviceId)}`}
-            className={buttonClassName({
-              variant: "gold",
-              size: "lg",
-              block: true,
-              className: "gap-2",
-            })}
-          >
-            {t("cta_reserve")} <ArrowRight />
-          </Link>
-        </MagneticButton>
+        <div className="flex flex-1 items-center gap-2">
+          <MagneticButton className="block flex-1">
+            <Link
+              href={`/booking/service?selected=${encodeURIComponent(serviceId)}`}
+              className={buttonClassName({
+                variant: "gold",
+                size: "lg",
+                block: true,
+                className: "gap-2",
+              })}
+            >
+              {t("cta_reserve")} <ArrowRight />
+            </Link>
+          </MagneticButton>
+          {askHref ? (
+            <a
+              href={askHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonClassName({
+                variant: "ghost",
+                size: "lg",
+              })}
+            >
+              {t("cta_ask_first")}
+            </a>
+          ) : null}
+        </div>
       </div>
     </div>
   );

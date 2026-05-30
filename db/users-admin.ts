@@ -157,7 +157,6 @@ export async function countUsers(
     .from(schema.users)
     .leftJoin(activeVip, eq(activeVip.userId, schema.users.id))
     .where(baseFilters.length ? and(...baseFilters) : undefined);
-
   return rows[0]?.n ?? 0;
 }
 

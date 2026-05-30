@@ -12,6 +12,7 @@ import {
 } from "@/db/google-tokens";
 import { listActiveBookingsFrom } from "@/db/bookings";
 import { getServiceById } from "@/db/services";
+import { MIN_BOOKING_LEAD_MINUTES } from "@/views/booking/lib/booking-steps";
 import { slotCache } from "./cache";
 
 const DEFAULT_DURATION_MIN = 60;
@@ -24,6 +25,8 @@ export async function GET(req: Request): Promise<Response> {
   if (!dayISO || !serviceId) {
     return Response.json({ error: "missing_params" }, { status: 400 });
   }
+
+  const now = new Date();
 
   const [service, settings] = await Promise.all([
     getServiceById(serviceId),
@@ -59,6 +62,8 @@ export async function GET(req: Request): Promise<Response> {
       serviceDurationMin: durationMin,
       dayISO,
       timeZone: tz,
+      now,
+      minLeadMinutes: MIN_BOOKING_LEAD_MINUTES,
     });
     slotCache.set(cacheKey, slots);
     return Response.json({ source: "static", slots });
@@ -97,6 +102,8 @@ export async function GET(req: Request): Promise<Response> {
       serviceDurationMin: durationMin,
       dayISO,
       timeZone: tz,
+      now,
+      minLeadMinutes: MIN_BOOKING_LEAD_MINUTES,
     });
     slotCache.set(cacheKey, slots);
     return Response.json({ source: "gcal", slots });
@@ -108,6 +115,8 @@ export async function GET(req: Request): Promise<Response> {
       serviceDurationMin: durationMin,
       dayISO,
       timeZone: tz,
+      now,
+      minLeadMinutes: MIN_BOOKING_LEAD_MINUTES,
     });
     return Response.json({ source: "static-fallback", slots });
   }

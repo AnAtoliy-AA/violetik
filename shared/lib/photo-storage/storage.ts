@@ -2,22 +2,15 @@
 // actions or RSCs. Vitest exercises it directly (with @vercel/blob mocked
 // in storage.test.ts) so we don't add the `server-only` import barrier.
 import { del, put } from "@vercel/blob";
+import {
+  ALLOWED_PHOTO_MIME_TYPES,
+  MAX_PHOTO_BYTES,
+  type PhotoUploadError,
+} from "./limits";
+import { buildBlobKey } from "./keys";
 
-export const ALLOWED_PHOTO_MIME_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/avif",
-] as const;
-
-export const MAX_PHOTO_BYTES = 8 * 1024 * 1024; // 8 MB
-
-export type PhotoUploadError =
-  | "not_configured"
-  | "empty_file"
-  | "unsupported_type"
-  | "too_large"
-  | "upload_failed";
+export type { PhotoUploadError } from "./limits";
+export { ALLOWED_PHOTO_MIME_TYPES, MAX_PHOTO_BYTES } from "./limits";
 
 export interface UploadPhotoInput {
   /** Logical bucket — used to build the blob key. */
@@ -54,29 +47,6 @@ export function isPhotoStorageConfigured(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
-function buildBlobKey(slotKind: string, slotId: string, file: File): string {
-  const ext = mimeToExtension(file.type);
-  const stamp = Date.now().toString(36);
-  // The trailing stamp avoids cache stickiness across replacements — every
-  // upload gets a fresh URL even when the slot identity is unchanged.
-  return `studio/${slotKind}/${slotId}-${stamp}.${ext}`;
-}
-
-function mimeToExtension(mime: string): string {
-  switch (mime) {
-    case "image/jpeg":
-      return "jpg";
-    case "image/png":
-      return "png";
-    case "image/webp":
-      return "webp";
-    case "image/avif":
-      return "avif";
-    default:
-      return "bin";
-  }
-}
-
 function validate(
   file: File,
 ): { ok: true } | { ok: false; reason: PhotoUploadError } {
@@ -111,7 +81,7 @@ export async function uploadPhotoToStorage(
   const check = validate(input.file);
   if (!check.ok) return { ok: false, error: check.reason };
 
-  const key = buildBlobKey(input.slotKind, input.slotId, input.file);
+  const key = buildBlobKey(input.slotKind, input.slotId, input.file.type);
   try {
     const blob = await put(key, input.file, {
       access: "public",

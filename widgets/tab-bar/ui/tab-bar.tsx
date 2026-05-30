@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType, SVGProps } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import {
   Home as HomeIcon,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/cn";
+import { GlassSurface } from "@/shared/ui/glass-surface";
 
 type TabKey = "home" | "services" | "gallery" | "profile" | "admin";
 
@@ -56,18 +57,18 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
   return (
     <nav
       aria-label={t("aria_label")}
-      className="fixed bottom-[22px] left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 px-4 pb-3 pt-2"
+      className="pointer-events-none fixed bottom-[22px] left-1/2 z-40 w-full max-w-[420px] -translate-x-1/2 px-4 pb-3 pt-2"
     >
-      <ul
-        className={cn(
-          "glass-top relative flex items-center justify-around",
-          "h-14 rounded-full border-[0.5px] border-line-strong bg-bg-2/70 shadow-card",
-        )}
-        style={{
-          backdropFilter: "var(--backdrop-blur-lg)",
-          WebkitBackdropFilter: "var(--backdrop-blur-lg)",
-        }}
+      <GlassSurface
+        as="div"
+        tint="warm"
+        blur="2xl"
+        rim
+        specular
+        elevation={3}
+        className="glass-top pointer-events-auto relative h-14 rounded-full"
       >
+        <ul role="list" className="flex h-full items-center justify-around px-1.5">
         {tabs.map(({ key, href, Icon }) => {
           const isActive = key === active;
           return (
@@ -75,18 +76,24 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
               <Link
                 href={href}
                 aria-current={isActive ? "page" : undefined}
+                data-rim-sweep={isActive ? "true" : undefined}
                 className={cn(
-                  "relative flex items-center justify-center rounded-full px-5 py-2",
-                  "transition-[color,opacity] duration-fast ease-out",
+                  // Compact base padding: five tabs (with the Admin tab) at the
+                  // old px-5 overran the rounded-full pill and clipped the last
+                  // label in the corner. The active tab gets extra width so its
+                  // gilded thumb reads as an expanded pill; inactive tabs stay
+                  // tight so all five still clear the corner radius.
+                  "relative flex items-center justify-center rounded-full py-2",
+                  "transition-[color,opacity,padding] duration-fast ease-out",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                   isActive
-                    ? "text-text opacity-100"
-                    : "text-text-3 opacity-50 hover:text-text-2 hover:opacity-100",
+                    ? "px-4 text-text opacity-100"
+                    : "px-2 text-text-3 opacity-50 hover:text-text-2 hover:opacity-100",
                 )}
               >
                 {isActive ? (
                   <>
-                    <motion.span
+                    <m.span
                       layoutId="tab-thumb"
                       aria-hidden
                       className="absolute inset-0 -z-10 rounded-full bg-surface-2"
@@ -96,7 +103,7 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
                           : { type: "spring", stiffness: 380, damping: 32 }
                       }
                     />
-                    <motion.span
+                    <m.span
                       aria-hidden
                       className="gilded pointer-events-none absolute inset-0 rounded-full"
                       initial={reduceMotion ? false : { opacity: 0 }}
@@ -124,7 +131,8 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
             </li>
           );
         })}
-      </ul>
+        </ul>
+      </GlassSurface>
     </nav>
   );
 }

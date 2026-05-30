@@ -17,12 +17,18 @@ import { submitTestimonialAction } from "./submit-testimonial-action";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 import { getMasterById } from "@/db/masters";
 import { createTestimonial } from "@/db/testimonials";
+import { __resetRateLimitStore } from "@/shared/lib/security/rate-limit";
 
 const mockSession = vi.mocked(getCurrentSessionUser);
 const mockGetMaster = vi.mocked(getMasterById);
 const mockCreate = vi.mocked(createTestimonial);
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  // The rate limiter holds module-level state; clear it so per-user
+  // counters don't leak between cases (all cases reuse user tg:1).
+  __resetRateLimitStore();
+});
 
 describe("submitTestimonialAction", () => {
   it("rejects unauthenticated callers", async () => {
@@ -81,6 +87,23 @@ describe("submitTestimonialAction", () => {
       userId: "tg:1",
       masterId: "m1",
       body: "hi",
+      serviceId: null,
     });
+  });
+
+  it("rate-limits a user after too many submissions", async () => {
+    mockSession.mockResolvedValue({ id: "tg:1" } as never);
+    mockGetMaster.mockResolvedValue({ id: "m1", status: "published" } as never);
+    mockCreate.mockResolvedValue({
+      ok: true,
+      row: { id: "tst_x", body: "hi" } as never,
+    });
+    // Limit is 5 per window; the 6th submission must be rejected.
+    for (let i = 0; i < 5; i++) {
+      const out = await submitTestimonialAction({ masterId: "m1", body: "hi" });
+      expect(out.ok).toBe(true);
+    }
+    const blocked = await submitTestimonialAction({ masterId: "m1", body: "hi" });
+    expect(blocked).toEqual({ ok: false, reason: "rate_limited" });
   });
 });

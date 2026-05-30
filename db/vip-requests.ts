@@ -2,6 +2,37 @@ import { randomBytes } from "node:crypto";
 import { and, desc, eq, gt, isNull, lte, or, sql } from "drizzle-orm";
 import { db, schema } from "./index";
 
+/**
+ * Subquery that yields one row per user with an active (approved &
+ * non-expired or lifetime) VIP membership. Designed to be left-joined
+ * onto any table that surfaces a user, so consumers can flag VIPs in
+ * admin lists, testimonial cards, and future per-user reads with a
+ * single shared definition.
+ *
+ * Marked with a stable alias so callers can reference `.userId`.
+ */
+export function activeVipSubquery(now: Date = new Date()) {
+  if (!db) {
+    throw new Error("activeVipSubquery called without a configured db");
+  }
+  return db
+    .select({
+      userId: schema.vipRequests.userId,
+      expiresAt: schema.vipRequests.expiresAt,
+    })
+    .from(schema.vipRequests)
+    .where(
+      and(
+        eq(schema.vipRequests.status, "approved"),
+        or(
+          isNull(schema.vipRequests.expiresAt),
+          gt(schema.vipRequests.expiresAt, now),
+        ),
+      ),
+    )
+    .as("active_vip");
+}
+
 export function generateVipRequestId(): string {
   return `vipreq_${randomBytes(8).toString("hex")}`;
 }

@@ -1,8 +1,14 @@
 import Image from "next/image";
+import { Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { ApprovedTestimonial } from "@/entities/testimonial/model/types";
 import type { Master } from "@/entities/master";
+import {
+  MasterTestimonialsAsync,
+  MasterTestimonialsSkeleton,
+} from "./master-testimonials-async";
+import { MasterTestimonialsList } from "./master-testimonials-list";
 
 interface DisplayMaster {
   name: string;
@@ -19,7 +25,6 @@ import { Eyebrow } from "@/shared/ui/eyebrow";
 import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { PaperGrain } from "@/shared/ui/paper-grain";
-import { SpotlightCard } from "@/shared/ui/spotlight-card";
 import { AppHeader } from "@/widgets/app-header";
 
 function ArrowRight() {
@@ -66,7 +71,6 @@ export function MasterPage({
   // When the masters table is empty (first-run install, db-null), fall
   // back to a static record so the customer-facing page still renders.
   const artist: DisplayMaster = master ?? FALLBACK_MASTER;
-  const testimonials = testimonialsProp ?? [];
   const [firstName, ...rest] = artist.name.split(" ");
   const lastName = rest.join(" ");
 
@@ -172,46 +176,12 @@ export function MasterPage({
         <LetterpressRule className="mt-5" />
       </section>
 
-      {testimonials.length > 0 ? (
-        <section className="px-[22px] pb-7">
-          <Eyebrow>{t("voices_eyebrow")}</Eyebrow>
-          <div className="mt-4 flex flex-col gap-3.5">
-            {testimonials.map((tm) => (
-              <SpotlightCard key={tm.id} className="gilded glass-top rounded-[18px] p-[18px]">
-                <p className="m-0 mb-3 font-display text-[18px] font-normal italic leading-[1.35]">
-                  &ldquo;{tm.body}&rdquo;
-                </p>
-                <LetterpressRule className="mb-3 max-w-[140px]" />
-                <div className="flex items-center gap-2.5">
-                  {tm.authorPhotoUrl ? (
-                    <span className="relative size-[22px] overflow-hidden rounded-full">
-                      <Image
-                        src={tm.authorPhotoUrl}
-                        alt={tm.authorDisplay}
-                        fill
-                        sizes="22px"
-                        unoptimized
-                        className="object-cover"
-                      />
-                    </span>
-                  ) : (
-                    <span
-                      aria-hidden
-                      className="size-[22px] rounded-full"
-                      style={{
-                        background:
-                          "color-mix(in oklab, var(--color-rose) 60%, var(--color-accent))",
-                      }}
-                    />
-                  )}
-                  <div className="text-[12px]">
-                    <span className="font-medium">{tm.authorDisplay}</span>
-                  </div>
-                </div>
-              </SpotlightCard>
-            ))}
-          </div>
-        </section>
+      {testimonialsProp !== undefined ? (
+        <MasterTestimonialsList testimonials={testimonialsProp} />
+      ) : master ? (
+        <Suspense fallback={<MasterTestimonialsSkeleton />}>
+          <MasterTestimonialsAsync masterId={master.id} />
+        </Suspense>
       ) : null}
 
       <section className="px-[22px] pb-10">

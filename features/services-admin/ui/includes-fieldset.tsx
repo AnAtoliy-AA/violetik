@@ -16,7 +16,7 @@ export interface IncludesFieldsetProps {
 }
 
 const inputClass =
-  "w-full rounded border border-line bg-surface px-2 py-1 text-[13px]";
+  "w-full rounded border border-line bg-surface px-3 py-2.5 text-base text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
 export function IncludesFieldset({
   items,
@@ -91,7 +91,7 @@ export function IncludesFieldset({
               <button
                 type="button"
                 onClick={() => remove(i)}
-                className="font-mono text-[11px] uppercase tracking-[0.16em] text-text-3 hover:text-accent"
+                className="inline-flex min-h-[44px] items-center rounded px-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-text-3 hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
               >
                 {t("cta_remove_bullet")}
               </button>
@@ -103,7 +103,7 @@ export function IncludesFieldset({
         type="button"
         onClick={add}
         disabled={items.length >= max}
-        className="self-start font-mono text-[12px] uppercase tracking-[0.16em] text-accent disabled:opacity-50"
+        className="inline-flex min-h-[44px] items-center self-start rounded px-1.5 font-mono text-[12px] uppercase tracking-[0.16em] text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent disabled:opacity-50"
       >
         {t("cta_add_bullet")}
       </button>

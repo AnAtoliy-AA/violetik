@@ -15,14 +15,62 @@ const studio: StudioInfo = {
 };
 
 const gallery: GalleryItem[] = [
-  { id: "g1", tag: "Chrome", palette: ["#c9a96e", "#7d3a6f"], h: 220 },
-  { id: "g2", tag: "Editorial", palette: ["#d9a3b6", "#1a0f1f"], h: 280 },
-  { id: "g3", tag: "Gel", palette: ["#9d7bc7", "#3a2050"], h: 200 },
-  { id: "g4", tag: "Lace", palette: ["#f3ead8", "#7d3a6f"], h: 260 },
-  { id: "g5", tag: "Chrome", palette: ["#e8cf99", "#2a1a30"], h: 240 },
-  { id: "g6", tag: "Editorial", palette: ["#7d3a6f", "#14091a"], h: 300 },
-  { id: "g7", tag: "Bridal", palette: ["#f3ead8", "#d9a3b6"], h: 220 },
-  { id: "g8", tag: "Gel", palette: ["#9d7bc7", "#c9a96e"], h: 250 },
+  {
+    id: "g1",
+    tag: "Chrome",
+    palette: ["#c9a96e", "#7d3a6f"],
+    paletteDots: ["#c9a96e", "#a98850", "#7d3a6f", "#3a1a3a"],
+    h: 220,
+  },
+  {
+    id: "g2",
+    tag: "Editorial",
+    palette: ["#d9a3b6", "#1a0f1f"],
+    paletteDots: ["#d9a3b6", "#a55c7a", "#4a2a48", "#1a0f1f"],
+    h: 280,
+  },
+  {
+    id: "g3",
+    tag: "Gel",
+    palette: ["#9d7bc7", "#3a2050"],
+    paletteDots: ["#9d7bc7", "#6f4ea0", "#3a2050", "#1a1030"],
+    h: 200,
+  },
+  {
+    id: "g4",
+    tag: "Lace",
+    palette: ["#f3ead8", "#7d3a6f"],
+    paletteDots: ["#f3ead8", "#d4a9b8", "#a05080", "#7d3a6f"],
+    h: 260,
+  },
+  {
+    id: "g5",
+    tag: "Chrome",
+    palette: ["#e8cf99", "#2a1a30"],
+    paletteDots: ["#e8cf99", "#b69870", "#5a3848", "#2a1a30"],
+    h: 240,
+  },
+  {
+    id: "g6",
+    tag: "Editorial",
+    palette: ["#7d3a6f", "#14091a"],
+    paletteDots: ["#7d3a6f", "#4f234a", "#2a1530", "#14091a"],
+    h: 300,
+  },
+  {
+    id: "g7",
+    tag: "Bridal",
+    palette: ["#f3ead8", "#d9a3b6"],
+    paletteDots: ["#f3ead8", "#e5c7c4", "#d9a3b6", "#a06080"],
+    h: 220,
+  },
+  {
+    id: "g8",
+    tag: "Gel",
+    palette: ["#9d7bc7", "#c9a96e"],
+    paletteDots: ["#9d7bc7", "#b39ac9", "#d4b890", "#c9a96e"],
+    h: 250,
+  },
 ];
 
 const membership: MembershipTier[] = [

@@ -39,12 +39,15 @@ export async function listAllServices(): Promise<schema.Service[]> {
 export async function listPublishedServices(): Promise<schema.Service[]> {
   if (!db) return [];
   try {
-    const eligibleIds = await getServiceIdsHavingAnyPublishedMaster();
-    const rows = await db
-      .select()
-      .from(schema.services)
-      .where(eq(schema.services.status, "published"))
-      .orderBy(schema.services.sortOrder);
+    // Two independent reads — parallelize so they run concurrently.
+    const [eligibleIds, rows] = await Promise.all([
+      getServiceIdsHavingAnyPublishedMaster(),
+      db
+        .select()
+        .from(schema.services)
+        .where(eq(schema.services.status, "published"))
+        .orderBy(schema.services.sortOrder),
+    ]);
     // Fall through to the unfiltered list when the masters table has
     // no published rows (first-run installs would otherwise show an
     // empty menu). Admin sees orphan badges in /admin/services.

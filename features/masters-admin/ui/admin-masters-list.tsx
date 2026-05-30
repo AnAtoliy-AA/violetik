@@ -5,6 +5,10 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { SortableList } from "./sortable-list";
 
+// §2 — padded ≥44px hit area + focus ring for the row/header navigation links.
+const actionLink =
+  "inline-flex min-h-[44px] items-center rounded px-1.5 font-mono text-[12px] uppercase tracking-[0.16em] text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent";
+
 export type ReorderAction = (
   ids: string[],
 ) => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -41,10 +45,7 @@ export function AdminMastersList({
           <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-text-3">
             {t("section_published")}
           </h2>
-          <Link
-            href="/admin/masters/new"
-            className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
-          >
+          <Link href="/admin/masters/new" className={actionLink}>
             {t("cta_new")}
           </Link>
         </div>
@@ -74,11 +75,8 @@ export function AdminMastersList({
                       : t("status_draft")}
                   </div>
                 </div>
-                <Link
-                  href={`/admin/masters/${m.id}`}
-                  className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
-                >
-                  {t("cta_save")}
+                <Link href={`/admin/masters/${m.id}`} className={actionLink}>
+                  {t("cta_edit")}
                 </Link>
               </div>
             )}
@@ -107,10 +105,7 @@ export function AdminMastersList({
                     {m.role}
                   </div>
                 </div>
-                <Link
-                  href={`/admin/masters/${m.id}`}
-                  className="font-mono text-[12px] uppercase tracking-[0.16em] text-accent"
-                >
+                <Link href={`/admin/masters/${m.id}`} className={actionLink}>
                   {t("cta_restore")}
                 </Link>
               </li>

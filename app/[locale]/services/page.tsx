@@ -4,9 +4,11 @@ import { listPublishedCategories } from "@/db/services";
 import { loadServicesForLocale } from "@/entities/service/api/load";
 import type { ServiceCategoryRef } from "@/entities/service";
 import type { CurrencyCode } from "@/db/schema";
+import { priceServices } from "@/entities/site-settings";
 import { ServicesCatalogPage } from "@/views/services-catalog";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
+import { buildPageMetadata } from "@/shared/lib/page-metadata";
 import { routing, type Locale } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 
@@ -23,7 +25,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Services" });
-  return { title: `Violetta — ${t("meta_title")}` };
+  return buildPageMetadata({
+    locale,
+    pageId: "services",
+    path: "/services",
+    fallbackTitle: `Violetta — ${t("meta_title")}`,
+  });
 }
 
 export default async function ServicesRoute({
@@ -47,10 +54,12 @@ export default async function ServicesRoute({
   });
   const currency =
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
+  const pricedServices = priceServices(services, settings);
   return (
     <ServicesCatalogPage
       services={services}
       categories={categories}
+      pricedServices={pricedServices}
       currency={currency}
       locale={locale}
       showAdmin={sessionUser?.role === "admin"}

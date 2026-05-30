@@ -1,7 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { z } from "zod";
 import { auth } from "@/auth";
+import { rateLimit } from "@/shared/lib/security/rate-limit";
 import {
   bookingTimeZoneFromSettings,
   createCalendarEvent,
@@ -21,6 +23,8 @@ import { getServiceById } from "@/db/services";
 import { getMasterById, getMasterIdsForService } from "@/db/masters";
 import { listAdminUserIds } from "@/db/users-admin";
 import { dispatchNotification } from "@/shared/lib/notifications";
+import { MIN_BOOKING_LEAD_MINUTES } from "@/views/booking/lib/booking-steps";
+import { isTooSoon } from "@/views/booking/lib/lead-time";
 
 function localizedServiceName(
   service: { nameEn: string; nameRu: string; nameBy: string },
@@ -66,6 +70,20 @@ export interface SubmitBookingInput {
   locale: string;
 }
 
+// Defence-in-depth input validation. Drizzle already parameterizes
+// queries; this rejects malformed values before any DB work and keys the
+// shapes we depend on downstream (ISO date, HH:MM time, known locale).
+const inputSchema = z.object({
+  serviceId: z.string().min(1),
+  masterId: z.string().min(1).nullable(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time: z.string().regex(/^\d{2}:\d{2}$/),
+  locale: z.enum(["en", "ru", "by"]),
+});
+
+// Per-user cap to stop booking spam / accidental double-submits.
+const RATE_LIMIT = { limit: 10, windowMs: 5 * 60_000 };
+
 export type SubmitBookingResult =
   | { ok: true; bookingId: string }
   | {
@@ -76,6 +94,8 @@ export type SubmitBookingResult =
         | "invalid_input"
         | "no_master_available"
         | "master_not_eligible"
+        | "too_soon"
+        | "rate_limited"
         | "unknown";
     };
 
@@ -98,13 +118,17 @@ export async function submitBooking(
     );
   }
 
+  const parsed = inputSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: "invalid_input" };
+  }
+
+  if (!rateLimit(`booking:${session.user.id}`, RATE_LIMIT).ok) {
+    return { ok: false, error: "rate_limited" };
+  }
+
   const service = await getServiceById(input.serviceId);
-  if (
-    !service ||
-    service.status !== "published" ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(input.date) ||
-    !/^\d{2}:\d{2}$/.test(input.time)
-  ) {
+  if (!service || service.status !== "published") {
     return { ok: false, error: "invalid_input" };
   }
 
@@ -134,6 +158,11 @@ export async function submitBooking(
   const settings = await getSiteSettingsServer();
   const tz = bookingTimeZoneFromSettings(settings);
   const scheduledFor = localToUtc(input.date, input.time, tz);
+
+  if (isTooSoon(scheduledFor, new Date(), MIN_BOOKING_LEAD_MINUTES)) {
+    return { ok: false, error: "too_soon" };
+  }
+
   const durationMin = service.durationMinutes;
 
   // Safety net: the Auth.js signIn callback is supposed to upsert
@@ -203,6 +232,7 @@ export async function submitBooking(
         start: scheduledFor,
         end,
         timeZone: tz,
+        status: "tentative",
       });
       await setBookingGcalEventId(booking.id, eventId);
       await updateLastRefresh(token.userId);

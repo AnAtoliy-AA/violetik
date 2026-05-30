@@ -32,14 +32,9 @@ export async function listAllPhotoSlots(): Promise<PhotoSlot[]> {
       hint: "5:6 portrait · doubles as thumb + detail hero",
     });
   }
-  for (const g of STUDIO_DATA.gallery) {
-    slots.push({
-      kind: "gallery",
-      id: g.id,
-      label: `${g.tag} · ${g.id}`,
-      hint: "natural ratio · grid + lightbox",
-    });
-  }
+  // Gallery photos moved to their own admin (`/admin/gallery`) backed by a
+  // dedicated gallery_items table; they're no longer managed as fixed
+  // studio_photos slots here.
   for (const clip of STUDIO_DATA.atelierClips) {
     slots.push({
       kind: "atelier",

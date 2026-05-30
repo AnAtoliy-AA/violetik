@@ -21,6 +21,21 @@ import { AppHeader } from "./app-header";
 
 const messages = {
   LocaleSwitcher: { label: "Language", en: "English", ru: "Russian", by: "Belarusian" },
+  Nav: {
+    trigger_label: "Open menu",
+    close_label: "Close",
+    aria_label: "Atelier navigation",
+    title: "Atelier",
+    description: "Navigate the studio.",
+    home: { label: "Home" },
+    services: { label: "Menu" },
+    gallery: { label: "Gallery" },
+    masters: { label: "Masters" },
+    membership: { label: "Membership" },
+    book: { label: "Book" },
+    profile: { label: "You" },
+    notifications: { label: "Notifications" },
+  },
 };
 
 function renderHeader(props?: React.ComponentProps<typeof AppHeader>) {
@@ -31,18 +46,21 @@ function renderHeader(props?: React.ComponentProps<typeof AppHeader>) {
   );
 }
 
+describe("AppHeader — glass chrome", () => {
+  it("renders the header root as a GlassSurface", () => {
+    renderHeader();
+    const header = screen.getByRole("banner");
+    expect(header.getAttribute("data-glass")).toBe("true");
+    expect(header.className).toMatch(/glass-warm/);
+    expect(header.className).toMatch(/glass-xl/);
+  });
+});
+
 describe("AppHeader", () => {
   it("renders the wordmark and a labelled menu button", () => {
     renderHeader();
     expect(screen.getByText("Violetta")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /open menu/i })).toBeInTheDocument();
-  });
-
-  it("uses a custom ariaMenuLabel when provided", () => {
-    renderHeader({ ariaMenuLabel: "Show navigation" });
-    expect(
-      screen.getByRole("button", { name: /show navigation/i }),
-    ).toBeInTheDocument();
   });
 
   it("renders a back link instead of the wordmark when back is set", () => {
@@ -80,8 +98,29 @@ describe("AppHeader", () => {
     ).toBeInTheDocument();
   });
 
-  it("includes the LocaleSwitcher", () => {
-    renderHeader();
-    expect(screen.getByRole("radiogroup", { name: /language/i })).toBeInTheDocument();
+  it("renders nodes passed via the actions slot", () => {
+    renderHeader({
+      actions: (
+        <button type="button" aria-label="Refresh">
+          Refresh
+        </button>
+      ),
+    });
+    expect(screen.getByRole("button", { name: /refresh/i })).toBeInTheDocument();
+  });
+
+  it("places actions before the menu button", () => {
+    renderHeader({
+      actions: (
+        <button type="button" aria-label="Refresh">
+          Refresh
+        </button>
+      ),
+    });
+    const refresh = screen.getByRole("button", { name: /refresh/i });
+    const menu = screen.getByRole("button", { name: /open menu/i });
+    expect(
+      refresh.compareDocumentPosition(menu) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

@@ -156,6 +156,9 @@ export const vipRequests = pgTable(
     pendingUniq: uniqueIndex("vip_requests_one_pending_per_user")
       .on(table.userId)
       .where(sql`status = 'pending'`),
+    decidedByIdx: index("vip_requests_decided_by_idx")
+      .on(table.decidedBy)
+      .where(sql`decided_by IS NOT NULL`),
     activeExpiryIdx: index("vip_requests_active_expiry_idx")
       .on(table.expiresAt)
       .where(sql`status = 'approved'`),
@@ -231,6 +234,10 @@ export const siteSettings = pgTable(
       .default({}),
     discountPercent: integer("discount_percent").notNull().default(0),
     discountActive: boolean("discount_active").notNull().default(false),
+    // Anchor markup: inflates the struck "old" price above the real price
+    // (which becomes the current price) so listings read as discounted.
+    markupPercent: integer("markup_percent").notNull().default(0),
+    markupActive: boolean("markup_active").notNull().default(false),
     currency: currencyCode("currency").notNull().default("EUR"),
     addressEn: text("address_en")
       .notNull()
@@ -264,6 +271,10 @@ export const siteSettings = pgTable(
       "site_settings_discount_range",
       sql`${table.discountPercent} BETWEEN 0 AND 90`,
     ),
+    markupRange: check(
+      "site_settings_markup_range",
+      sql`${table.markupPercent} BETWEEN 0 AND 1000`,
+    ),
     latRange: check(
       "site_settings_lat_range",
       sql`${table.latitude} IS NULL OR ${table.latitude} BETWEEN -90 AND 90`,
@@ -272,8 +283,31 @@ export const siteSettings = pgTable(
       "site_settings_lng_range",
       sql`${table.longitude} IS NULL OR ${table.longitude} BETWEEN -180 AND 180`,
     ),
+    updatedByIdx: index("site_settings_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
   }),
 );
+
+/**
+ * Per-page SEO overrides. One row per public page (id = page slug, see
+ * entities/page-seo PAGE_SEO_PAGES), with a localized title + meta
+ * description column per locale. A blank string means "use the
+ * translation default" — rows only exist for pages an admin has touched.
+ */
+export const pageSeo = pgTable("page_seo", {
+  id: text("id").primaryKey(),
+  titleEn: text("title_en").notNull().default(""),
+  titleRu: text("title_ru").notNull().default(""),
+  titleBy: text("title_by").notNull().default(""),
+  descriptionEn: text("description_en").notNull().default(""),
+  descriptionRu: text("description_ru").notNull().default(""),
+  descriptionBy: text("description_by").notNull().default(""),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  updatedBy: text("updated_by").references(() => users.id),
+});
 
 export const serviceCategories = pgTable(
   "service_categories",
@@ -295,6 +329,9 @@ export const serviceCategories = pgTable(
   (table) => ({
     sortIdx: index("service_categories_sort_idx").on(table.sortOrder),
     statusIdx: index("service_categories_status_idx").on(table.status),
+    updatedByIdx: index("service_categories_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
   }),
 );
 
@@ -331,6 +368,9 @@ export const services = pgTable(
     categoryIdx: index("services_category_idx").on(table.categoryId),
     sortIdx: index("services_sort_idx").on(table.sortOrder),
     statusIdx: index("services_status_idx").on(table.status),
+    updatedByIdx: index("services_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
     includesMax8: check(
       "services_includes_max_8",
       sql`jsonb_array_length(${table.includes}) <= 8`,
@@ -441,6 +481,11 @@ export const studioPhotos = pgTable(
     width: integer("width"),
     height: integer("height"),
     blurDataUrl: text("blur_data_url"),
+    // §9.3 — dominant-color palette extracted from the photo at upload
+    // time via sharp. Stored as a small JSON array of hex strings (4
+    // colors). NULL = legacy row uploaded before the extractor existed
+    // OR the extractor was unavailable at upload time.
+    palette: jsonb("palette").$type<string[]>(),
     uploadedAt: timestamp("uploaded_at", { withTimezone: true })
       .notNull()
       .default(sql`now()`),
@@ -451,6 +496,124 @@ export const studioPhotos = pgTable(
       table.slotKind,
       table.slotId,
     ),
+    uploadedByIdx: index("studio_photos_uploaded_by_idx")
+      .on(table.uploadedBy)
+      .where(sql`uploaded_by IS NOT NULL`),
+  }),
+);
+
+/**
+ * Admin-managed gallery. `gallery_categories` are the localized filter
+ * groups (seeded from the legacy hardcoded tags); `gallery_items` are the
+ * pictures, each pointing at one Vercel Blob `src` and belonging to exactly
+ * one category. `onDelete: restrict` on the FK enforces "you can't delete a
+ * category that still holds pictures" — the admin must move/remove them
+ * first. Replaces the old `STUDIO_DATA.gallery` + `studio_photos` slot kind
+ * `'gallery'`.
+ */
+export const galleryCategories = pgTable(
+  "gallery_categories",
+  {
+    id: text("id").primaryKey(),
+    nameEn: text("name_en").notNull(),
+    nameRu: text("name_ru").notNull(),
+    nameBy: text("name_by").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedBy: text("updated_by").references(() => users.id),
+  },
+  (table) => ({
+    sortIdx: index("gallery_categories_sort_idx").on(table.sortOrder),
+    updatedByIdx: index("gallery_categories_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
+  }),
+);
+
+export const galleryItems = pgTable(
+  "gallery_items",
+  {
+    id: text("id").primaryKey(),
+    categoryId: text("category_id")
+      .notNull()
+      .references(() => galleryCategories.id, { onDelete: "restrict" }),
+    // Captions are nullable; when absent the gallery view falls back to the
+    // category name (the legacy auto-generated lightbox caption behavior).
+    captionEn: text("caption_en"),
+    captionRu: text("caption_ru"),
+    captionBy: text("caption_by"),
+    // `alt` + `src` are nullable so the seeded demo items (which have no
+    // uploaded photo) keep rendering the palette gradient fallback exactly
+    // as the legacy hardcoded gallery did. The admin item editor requires
+    // both when a real photo is uploaded.
+    alt: text("alt"),
+    src: text("src"),
+    width: integer("width"),
+    height: integer("height"),
+    blurDataUrl: text("blur_data_url"),
+    palette: jsonb("palette").$type<string[]>(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedBy: text("updated_by").references(() => users.id),
+  },
+  (table) => ({
+    categoryIdx: index("gallery_items_category_idx").on(table.categoryId),
+    sortIdx: index("gallery_items_sort_idx").on(table.sortOrder),
+    updatedByIdx: index("gallery_items_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
+  }),
+);
+
+/**
+ * Admin-managed onboarding carousel. Each row is one slide with localized
+ * eyebrow/title/body, an optional Vercel Blob `src` (gradient placeholder
+ * when null), and the `NailTile` variant used for the gradient. Replaces
+ * the hardcoded `SLIDES` array in `views/onboarding`.
+ */
+export const onboardingSlides = pgTable(
+  "onboarding_slides",
+  {
+    id: text("id").primaryKey(),
+    eyebrowEn: text("eyebrow_en").notNull(),
+    eyebrowRu: text("eyebrow_ru").notNull(),
+    eyebrowBy: text("eyebrow_by").notNull(),
+    titleEn: text("title_en").notNull(),
+    titleRu: text("title_ru").notNull(),
+    titleBy: text("title_by").notNull(),
+    bodyEn: text("body_en").notNull(),
+    bodyRu: text("body_ru").notNull(),
+    bodyBy: text("body_by").notNull(),
+    src: text("src"),
+    width: integer("width"),
+    height: integer("height"),
+    blurDataUrl: text("blur_data_url"),
+    palette: jsonb("palette").$type<string[]>(),
+    variant: integer("variant").notNull().default(1),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedBy: text("updated_by").references(() => users.id),
+  },
+  (table) => ({
+    sortIdx: index("onboarding_slides_sort_idx").on(table.sortOrder),
+    updatedByIdx: index("onboarding_slides_updated_by_idx")
+      .on(table.updatedBy)
+      .where(sql`updated_by IS NOT NULL`),
   }),
 );
 
@@ -471,6 +634,12 @@ export const testimonials = pgTable(
     masterId: text("master_id")
       .notNull()
       .references(() => masters.id, { onDelete: "cascade" }),
+    // §11.3 — optional service the testimonial is *about*. Nullable so
+    // legacy rows + master-level testimonials keep working; when set,
+    // the service detail page filters its review section by it.
+    // Intentionally NOT a FK (mirrors `bookings.serviceId`) so services
+    // can be archived/renamed without losing reviews.
+    serviceId: text("service_id"),
     body: text("body").notNull(),
     status: testimonialStatus("status").notNull().default("pending"),
     // User-initiated change requests on an approved row. Set together
@@ -493,6 +662,9 @@ export const testimonials = pgTable(
     userIdx: index("testimonials_user_idx").on(table.userId),
     masterIdx: index("testimonials_master_idx").on(table.masterId),
     statusIdx: index("testimonials_status_idx").on(table.status),
+    decidedByIdx: index("testimonials_decided_by_idx")
+      .on(table.decidedBy)
+      .where(sql`decided_by IS NOT NULL`),
     onePendingPerPair: uniqueIndex("testimonials_one_pending_per_pair")
       .on(table.userId, table.masterId)
       .where(sql`status = 'pending'`),
@@ -509,9 +681,17 @@ export type GoogleOauthToken = typeof googleOauthTokens.$inferSelect;
 export type NewGoogleOauthToken = typeof googleOauthTokens.$inferInsert;
 export type SiteSettingsRow = typeof siteSettings.$inferSelect;
 export type NewSiteSettingsRow = typeof siteSettings.$inferInsert;
+export type PageSeoRow = typeof pageSeo.$inferSelect;
+export type NewPageSeoRow = typeof pageSeo.$inferInsert;
 export type StudioPhotoRow = typeof studioPhotos.$inferSelect;
 export type NewStudioPhotoRow = typeof studioPhotos.$inferInsert;
 export type PhotoSlotKind = (typeof photoSlotKind.enumValues)[number];
+export type GalleryCategoryRow = typeof galleryCategories.$inferSelect;
+export type NewGalleryCategory = typeof galleryCategories.$inferInsert;
+export type GalleryItemRow = typeof galleryItems.$inferSelect;
+export type NewGalleryItem = typeof galleryItems.$inferInsert;
+export type OnboardingSlideRow = typeof onboardingSlides.$inferSelect;
+export type NewOnboardingSlide = typeof onboardingSlides.$inferInsert;
 export type ServiceCategoryRow = typeof serviceCategories.$inferSelect;
 export type NewServiceCategory = typeof serviceCategories.$inferInsert;
 export type Service = typeof services.$inferSelect;

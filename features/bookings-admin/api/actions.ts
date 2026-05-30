@@ -7,6 +7,7 @@ import { getActiveGoogleToken } from "@/db/google-tokens";
 import {
   deleteCalendarEvent,
   refreshAccessToken,
+  setCalendarEventStatus,
 } from "@/shared/lib/google-calendar";
 import { dispatchNotification } from "@/shared/lib/notifications";
 
@@ -16,15 +17,41 @@ async function requireAdmin(): Promise<boolean> {
 }
 
 /**
- * Marks a pending booking confirmed. The GCal event was already
- * created at submit-time so the slot stays blocked — only the DB
- * status moves.
+ * Marks a pending booking confirmed and best-effort patches the GCal event
+ * to confirmed so both in-app and calendar stay in sync.
  */
 export async function confirmBooking(bookingId: string): Promise<void> {
   if (!(await requireAdmin())) return;
   await setBookingStatus(bookingId, "confirmed");
 
   const booking = await getBookingById(bookingId);
+
+  if (booking?.gcalEventId) {
+    try {
+      const token = await getActiveGoogleToken();
+      const clientId = process.env.GOOGLE_CLIENT_ID;
+      const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+      if (token && clientId && clientSecret) {
+        const { accessToken } = await refreshAccessToken({
+          clientId,
+          clientSecret,
+          refreshToken: token.refreshToken,
+        });
+        await setCalendarEventStatus({
+          calendarId: token.calendarId,
+          eventId: booking.gcalEventId,
+          accessToken,
+          status: "confirmed",
+        });
+      }
+    } catch (err) {
+      console.warn(
+        "[confirmBooking] GCal status patch failed; DB already confirmed:",
+        err,
+      );
+    }
+  }
+
   if (booking) {
     await dispatchNotification(booking.userId, "booking_confirmed", {
       titleKey: "category_booking_confirmed_push_title",

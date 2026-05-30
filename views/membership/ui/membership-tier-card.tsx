@@ -7,6 +7,7 @@ import { LetterpressRule } from "@/shared/ui/letterpress-rule";
 import { MagneticButton } from "@/shared/ui/magnetic-button";
 import { MonogramSeal } from "@/shared/ui/monogram-seal";
 import { SpotlightCard } from "@/shared/ui/spotlight-card";
+import { VipBadge } from "@/shared/ui/vip-badge";
 import type { MembershipTier } from "@/entities/studio";
 
 export interface MembershipTierCardProps {
@@ -72,7 +73,11 @@ export function MembershipTierCard({
         </>
       ) : null}
 
-      <Eyebrow gold={featured}>{tier.tier}</Eyebrow>
+      {tier.tier === "VIP" ? (
+        <VipBadge />
+      ) : (
+        <Eyebrow gold={featured}>{tier.tier}</Eyebrow>
+      )}
       <h3 className="my-2 mt-2 font-display text-[36px] font-normal italic">
         {priceSlot ?? priceLabel}
         {cadenceLabel ? (

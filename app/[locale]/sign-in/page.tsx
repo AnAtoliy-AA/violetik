@@ -6,6 +6,7 @@ import { Wordmark } from "@/shared/ui/wordmark";
 import { TelegramLogin } from "@/features/telegram-login";
 import { GoogleSignInButton } from "@/features/google-sign-in";
 import { AppHeader } from "@/widgets/app-header";
+import { buildPageMetadata } from "@/shared/lib/page-metadata";
 
 type Params = { locale: string };
 
@@ -16,7 +17,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "SignIn" });
-  return { title: `Violetta — ${t("meta_title")}` };
+  return buildPageMetadata({
+    locale,
+    pageId: "sign-in",
+    path: "/sign-in",
+    fallbackTitle: `Violetta — ${t("meta_title")}`,
+  });
 }
 
 export default async function SignInPage({
@@ -69,7 +75,11 @@ export default async function SignInPage({
             ) : null}
 
             {botUsername ? (
-              <TelegramLogin botUsername={botUsername} />
+              <TelegramLogin
+                botUsername={botUsername}
+                authPath={`/${locale}/auth/telegram`}
+                callbackUrl={`/${locale}/profile`}
+              />
             ) : null}
           </div>
         )}

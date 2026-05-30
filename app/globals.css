@@ -8,9 +8,9 @@
   --color-bg-2: #18091c;
   --color-surface: #1f0e25;
   --color-surface-2: #2a1432;
-  --color-text: #f4ead8;
-  --color-text-2: rgba(244, 234, 216, 0.68);
-  --color-text-3: rgba(244, 234, 216, 0.42);
+  --color-text: #fbf4e6;
+  --color-text-2: rgba(250, 244, 230, 0.86);
+  --color-text-3: rgba(250, 244, 230, 0.66);
   --color-accent: #c9a96e;
   --color-accent-2: #e8cf99;
   --color-plum: #7d3a6f;
@@ -66,10 +66,50 @@
   /* Spotlight tint for pointer-reactive cards */
   --color-spotlight: rgba(244, 234, 216, 0.06);
 
-  /* Stacked-glass blur tokens */
-  --backdrop-blur-sm: blur(8px);
-  --backdrop-blur-md: blur(16px) saturate(160%);
-  --backdrop-blur-lg: blur(28px) saturate(180%);
+  /* Stacked-glass blur scale. Heavier radii so the frosted wash reads clearly
+     through the (now slightly more translucent) glass body without letting
+     sharp background detail compete with text. */
+  --backdrop-blur-xs:  blur(14px) saturate(165%);
+  --backdrop-blur-sm:  blur(22px) saturate(175%);
+  --backdrop-blur-md:  blur(32px) saturate(185%);
+  --backdrop-blur-lg:  blur(48px) saturate(195%);
+  --backdrop-blur-xl:  blur(64px) saturate(205%);
+  --backdrop-blur-2xl: blur(88px) saturate(225%);
+
+  /* Liquid Glass tints, rim, edge, shadow, specular coords.
+     READABILITY FIRST: the theme is dark with cream text, so the glass body
+     must be a DARK, mostly-opaque material (light fills would wash out the
+     cream text). Built from the palette's own surface colours via color-mix
+     so every palette stays correct; the lit edge/sheen below sell the glass. */
+  --color-glass-warm:   color-mix(in oklab, var(--color-surface-2) 92%, transparent);
+  --color-glass-body:   color-mix(in oklab, var(--color-surface) 92%, transparent);
+  --color-glass-cool:   color-mix(in oklab, var(--color-surface) 90%, transparent);
+  --color-glass-clear:  color-mix(in oklab, var(--color-surface) 74%, transparent);
+
+  --color-glass-rim:    rgba(255, 248, 224, 0.7);
+  --color-glass-edge:   rgba(255, 246, 222, 0.22);
+
+  /* Baked-in lens lighting (always on, pure CSS) — a restrained top-edge
+     highlight + bottom contact. Kept subtle so it lights the rim without
+     lifting the panel's midtone into the text. */
+  --glass-sheen-top:    rgba(255, 250, 236, 0.12);
+  --glass-sheen-soft:   rgba(255, 250, 236, 0.03);
+  --glass-contact:      rgba(0, 0, 0, 0.28);
+
+  /* Layered depth — ambient + mid + contact for real lift. */
+  --shadow-glass:
+    0 2px 6px -2px rgba(0, 0, 0, 0.4),
+    0 14px 32px -10px rgba(0, 0, 0, 0.55),
+    0 30px 64px -26px rgba(0, 0, 0, 0.62);
+
+  /* Specular coords — overwritten by useLiquidPress at runtime */
+  --lx: 50%;
+  --ly: 0%;
+
+  /* New keyframe-backed animation tokens */
+  --animate-liquid-press:  liquidPress 320ms var(--ease-out);
+  --animate-rim-sweep:     rimSweep 1400ms var(--ease-out);
+  --animate-glass-shimmer: glassShimmer 18s ease-in-out infinite;
 
   /* Gold gradient as a bg-image utility token (generates `bg-gold`) */
   --background-image-gold: linear-gradient(
@@ -80,6 +120,40 @@
     #d4b27a 65%,
     #a07b48 100%
   );
+
+  /* === Next Wave (Phase 2) tokens === */
+
+  /* Semantic surfaces (used by sticky bars, sheets, toasts) */
+  --color-surface-elevated: color-mix(in oklab, var(--color-surface) 90%, white 10%);
+  --color-surface-translucent: color-mix(in oklab, var(--color-bg) 70%, transparent);
+
+  /* Status colours — palette-agnostic, hand-tuned for AA on bg */
+  --color-status-open: #7fc7a1;
+  --color-status-closed: #c9a96e;
+  --color-status-warn: #e8b07a;
+  --color-status-error: #d97781;
+
+  /* Skeleton shimmer (used for slot loading, gallery defer) */
+  --color-skeleton-1: rgba(243, 234, 216, 0.04);
+  --color-skeleton-2: rgba(243, 234, 216, 0.1);
+
+  /* Sheet / modal scrim */
+  --color-scrim: rgba(8, 4, 10, 0.62);
+
+  /* Confetti palette (uses palette tokens) */
+  --confetti-1: var(--color-accent);
+  --confetti-2: var(--color-accent-2);
+  --confetti-3: var(--color-rose);
+  --confetti-4: var(--color-violet);
+
+  /* Spring physics defaults for motion (consumed via JS) */
+  --spring-soft: "stiffness:140, damping:18, mass:0.6";
+  --spring-snappy: "stiffness:380, damping:30, mass:0.5";
+
+  /* New keyframes */
+  --animate-skeleton: skeleton 1600ms linear infinite;
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-ripple: ripple 700ms var(--ease-out) both;
 }
 
 /* Alias so existing :root-style references to --gold-grad keep working */
@@ -449,6 +523,52 @@
   }
 }
 
+@keyframes skeleton {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes ripple {
+  from {
+    transform: scale(0);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes liquidPress {
+  0%   { transform: scale(1);     }
+  35%  { transform: scale(0.985); }
+  100% { transform: scale(1);     }
+}
+
+@keyframes rimSweep {
+  0%   { background-position: -100% 50%; opacity: 0; }
+  50%  { opacity: 1; }
+  100% { background-position:  200% 50%; opacity: 0; }
+}
+
+@keyframes glassShimmer {
+  0%, 100% { background-position: 0%   50%; }
+  50%      { background-position: 100% 50%; }
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);
@@ -497,12 +617,100 @@ body {
   animation: var(--animate-shimmer);
 }
 
+/* Gold shine / blick — a diagonal highlight that sweeps across the element on
+ * a loop. Reused by every variant="gold" button (Reserve, Book, Continue,
+ * Confirm, …) via buttonClassName and by the VIP badge, so all the gilded
+ * surfaces glint without each call site repeating the markup. The ::after sits
+ * above the fill; content stays legible because the sweep is narrow and
+ * screen-blended (a passing glint, not a wash). */
+.gold-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  /* Gentle "breathing" pulse. Driven by filter: drop-shadow (a gold glow that
+     swells and fades), NOT transform: scale — scale changes the element's
+     bounding box, which never settles under an infinite loop and makes
+     Playwright's click-stability check time out on every gold CTA. drop-shadow
+     leaves the layout box untouched (clicks stay stable) and isn't clipped by
+     our own overflow:hidden. Timing is offset from the 3.2s glint so the two
+     effects drift in and out of phase rather than beating in lockstep. */
+  animation: goldPulse 2.6s ease-in-out infinite;
+}
+@keyframes goldPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(201, 169, 110, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 9px rgba(201, 169, 110, 0.55));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gold-shine {
+    animation: none;
+  }
+}
+.gold-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 250, 236, 0.7) 48%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 250, 236, 0.7) 52%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  mix-blend-mode: screen;
+  /* alternate → the glint sweeps across in one direction, then travels back,
+     rather than hard-jumping to the start each loop. ease-in-out eases the
+     turnaround at each end. */
+  animation: shimmer 3.2s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gold-shine::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Continuous brand-palette colour cycle for hero wordmarks.
+ * Used on the welcome screen's "Violetta" — gently drifts the letter color
+ * through the cream / gold / rose / violet palette without ever leaving the
+ * brand. Reduced-motion users see a static cream color. */
+@keyframes brandHueCycle {
+  0%,
+  100% {
+    color: var(--color-text);
+  }
+  20% {
+    color: var(--color-accent-2);
+  }
+  40% {
+    color: var(--color-rose);
+  }
+  60% {
+    color: var(--color-violet);
+  }
+  80% {
+    color: var(--color-accent);
+  }
+}
+
+.text-brand-cycle {
+  animation: brandHueCycle 14s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --duration-DEFAULT: 0ms;
     --duration-fast: 0ms;
   }
-  .text-gold-shimmer {
+  .text-gold-shimmer,
+  .text-brand-cycle {
     animation: none;
   }
   .spotlight::after,
@@ -535,20 +743,22 @@ body {
     inset 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.dropcap::first-letter {
-  font-family: var(--font-display);
-  float: left;
-  font-size: 56px;
-  line-height: 0.85;
-  margin-right: 8px;
-  margin-top: 6px;
-  background: var(--gold-grad);
-  background-size: 200% 100%;
-  background-position: 25% 50%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+@media (min-width: 640px) {
+  .dropcap::first-letter {
+    font-family: var(--font-display);
+    float: left;
+    font-size: 56px;
+    line-height: 0.85;
+    margin-right: 8px;
+    margin-top: 6px;
+    background: var(--gold-grad);
+    background-size: 200% 100%;
+    background-position: 25% 50%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
 }
 
 /* Pointer-reactive spotlight surface. Consumers write --mx/--my via JS. */
@@ -645,4 +855,253 @@ body {
   ::view-transition-image-pair(*) {
     animation: none !important;
   }
+}
+
+/* === Next Wave (Phase 2) utilities === */
+
+/* Skeleton shimmer utility */
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    var(--color-skeleton-1) 0%,
+    var(--color-skeleton-2) 50%,
+    var(--color-skeleton-1) 100%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-skeleton);
+}
+
+/* Ripple — material-style touch feedback inside .ripple-host */
+.ripple-host {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.ripple {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  pointer-events: none;
+  animation: var(--animate-ripple);
+}
+
+/* When ripple and glass-specular coexist, keep ripple dots above the specular
+ * highlight and the specular ::after below the ripple layer. */
+.ripple-host.glass-specular > .ripple { z-index: 2; }
+.ripple-host.glass-specular::after   { z-index: 0; }
+
+/* === Liquid Glass utilities ===
+   Wrapped in @layer components so Tailwind position/layout utilities on the
+   consumer (sticky, fixed, absolute, border-y, …) win over these base glass
+   declarations. Without the layer these unlayered rules beat utilities and
+   silently override `position`, breaking sticky headers / right-docked panels. */
+@layer components {
+.glass {
+  position: relative;
+  isolation: isolate;
+  /* Tint lives on background-COLOR so the tint modifiers below can swap the
+     colour without wiping the diagonal sheen we set as background-IMAGE. The
+     sheen lights the top-left like light raking across a real pane. */
+  background-color: var(--color-glass-body);
+  background-image: linear-gradient(
+    158deg,
+    var(--glass-sheen-top) 0%,
+    var(--glass-sheen-soft) 30%,
+    transparent 62%
+  );
+  backdrop-filter: var(--backdrop-blur-lg);
+  -webkit-backdrop-filter: var(--backdrop-blur-lg);
+  border: 0.5px solid var(--color-glass-edge);
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 1px 0 0 var(--glass-sheen-top), /* crisp top lip */
+    inset 0 -1px 0 0 var(--glass-contact); /* bottom contact shade */
+  /* Explicit so an ancestor pointer-events:none cannot accidentally bleed through. */
+  pointer-events: auto;
+}
+
+.glass-warm  { background-color: var(--color-glass-warm);  }
+.glass-cool  { background-color: var(--color-glass-cool);  }
+.glass-clear { background-color: var(--color-glass-clear); }
+
+.glass-xs  { backdrop-filter: var(--backdrop-blur-xs);  -webkit-backdrop-filter: var(--backdrop-blur-xs);  }
+.glass-sm  { backdrop-filter: var(--backdrop-blur-sm);  -webkit-backdrop-filter: var(--backdrop-blur-sm);  }
+.glass-md  { backdrop-filter: var(--backdrop-blur-md);  -webkit-backdrop-filter: var(--backdrop-blur-md);  }
+.glass-lg  { backdrop-filter: var(--backdrop-blur-lg);  -webkit-backdrop-filter: var(--backdrop-blur-lg);  }
+.glass-xl  { backdrop-filter: var(--backdrop-blur-xl);  -webkit-backdrop-filter: var(--backdrop-blur-xl);  }
+.glass-2xl { backdrop-filter: var(--backdrop-blur-2xl); -webkit-backdrop-filter: var(--backdrop-blur-2xl); }
+
+/* Lens-edge top rim — always-rendered ::before; consumers transition its opacity. */
+.glass-rim {
+  position: relative;
+  isolation: isolate;
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 1px 0 rgba(255, 245, 214, 0.28);
+}
+.glass-rim::before {
+  content: "";
+  position: absolute;
+  left: 8%; right: 8%; top: -1px;
+  height: 22px;
+  background: radial-gradient(50% 100% at 50% 0%, var(--color-glass-rim), transparent 75%);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--rim-opacity, 1);
+  transition: opacity 240ms var(--ease-out);
+}
+
+/* Pointer-tracked specular highlight — reads --lx / --ly. */
+.glass-specular {
+  position: relative;
+  isolation: isolate;
+}
+.glass-specular::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    180px 110px at var(--lx, 50%) var(--ly, 0%),
+    rgba(255, 255, 255, 0.3),
+    transparent 62%);
+  opacity: 0;
+  transition: opacity 320ms var(--ease-out);
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+.glass-specular[data-active="true"]::after {
+  opacity: 1;
+}
+
+/* Continuous low-cost shimmer — opt-in via class. */
+.glass-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 245, 214, 0.04) 50%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: var(--animate-glass-shimmer);
+}
+
+/* Liquid press — surface scales briefly on tap. Triggered by data-active
+ * which is set by useLiquidPress on pointerdown. Scoped to .glass-press so
+ * specular-only surfaces don't accidentally scale. */
+.glass-press[data-active="true"] {
+  animation: var(--animate-liquid-press);
+}
+} /* end @layer components — Liquid Glass utilities */
+
+/* Rim-sweep — single-pass gold sweep on the active tab in TabBar (Task 10).
+ * Trigger: any element with data-rim-sweep="true". Lives globally so the
+ * widget keeps no widget-local CSS. !important on background-image so a
+ * sibling Tailwind bg-* utility doesn't silently swallow the sweep.
+ *
+ * NOTE: The selector is intentionally unqualified. Only set
+ * data-rim-sweep on elements you genuinely want the sweep on — there is
+ * no scope-fence. If consumers outside the TabBar need this, prefer
+ * scoping at the consumer site or migrate to a class-based opt-in. */
+[data-rim-sweep="true"] {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(232, 207, 153, 0.55) 30%,
+    rgba(255, 245, 214, 0.95) 50%,
+    rgba(232, 207, 153, 0.55) 70%,
+    transparent 100%) !important;
+  background-size: 200% 100%;
+  animation: var(--animate-rim-sweep);
+}
+
+/* Reduced transparency / reduced motion fallbacks */
+@media (prefers-reduced-transparency: reduce) {
+  .glass, .glass-warm, .glass-cool, .glass-clear {
+    background: var(--color-surface);
+  }
+  .glass-xs, .glass-sm, .glass-md, .glass-lg, .glass-xl, .glass-2xl {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .glass-specular::after,
+  .glass-rim::before {
+    display: none;
+  }
+  .glass-rim {
+    box-shadow: var(--shadow-glass);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-shimmer { animation: none; }
+  .glass-press[data-active="true"] { animation: none; }
+  [data-rim-sweep="true"] { animation: none; }
+}
+
+/* Tap-target visualiser (dev only — toggle via html[data-debug-hit="true"]) */
+:where(html[data-debug-hit="true"]) button,
+:where(html[data-debug-hit="true"]) a,
+:where(html[data-debug-hit="true"]) [role="button"] {
+  outline: 1px dashed rgba(232, 207, 153, 0.4);
+}
+
+/* §13 — Hand-tuned gilded focus ring on every interactive primitive. We
+ * scope to focus-visible so it never fires on mouse clicks, and we use
+ * a transparent outline + 2px box-shadow so it nests inside rounded
+ * corners without clipping. Components keep their own offset by setting
+ * outline-offset where the ring needs to sit outside the border. */
+:where(button, a, [role="button"], [role="tab"], input, select, textarea,
+       summary, details):focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-accent);
+  border-radius: inherit;
+}
+
+/* §13 — A11y skip-to-content link. Visible only on focus; reveals at the
+ * top of every page when a keyboard user tabs onto it. */
+.skip-to-content {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: -100px;
+  z-index: 200;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  border-bottom-right-radius: 12px;
+  transition: top 160ms var(--ease-out);
+}
+.skip-to-content:focus,
+.skip-to-content:focus-visible {
+  inset-block-start: 0;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* §13 — High-contrast mode: stronger text and lines for users who request
+ * it via OS settings (prefers-contrast: more). Background + accent stay
+ * brand-tuned; we only push the muted text tones closer to full white. */
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-2: rgba(244, 234, 216, 0.92);
+    --color-text-3: rgba(244, 234, 216, 0.7);
+    --color-line: rgba(243, 234, 216, 0.36);
+    --color-line-strong: rgba(243, 234, 216, 0.55);
+  }
+}
+
+/* §14 — Aurora is three large blurred radial gradients on /welcome. Mark
+ * it content-visibility:auto so it doesn't paint when scrolled out of
+ * view (cheap if it's the only thing in the section). Consumers add
+ * the .perf-isolate class to the aurora-wrapping element. */
+.perf-isolate {
+  content-visibility: auto;
+  contain-intrinsic-size: 100vw 80vh;
 }

@@ -38,10 +38,9 @@ export function ServiceCard({
   return (
     <article
       className={cn(
-        "group/service flex items-center gap-4 border-line py-[18px] transition-transform duration-fast ease-out",
+        "group/service flex items-center gap-4 border-line py-[18px]",
         "border-b-[0.5px]",
         topRule && "border-t-[0.5px] border-t-line-strong",
-        "hover:translate-x-1",
         className,
       )}
       {...rest}
@@ -58,6 +57,11 @@ export function ServiceCard({
           className="size-full"
         />
       </div>
+      {/* No hover-translate here: the previous `hover:translate-x-1` on
+        * the article clipped the price pill against the parent
+        * SpotlightCard's overflow:hidden mask (last digit + last char of
+        * the duration label both got chopped). The spotlight glow + the
+        * gilded price chip border carry the hover affordance instead. */}
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-2">
           <h3 className="shrink-0 font-display text-[22px] italic leading-tight">
@@ -67,7 +71,13 @@ export function ServiceCard({
             aria-hidden
             className="mb-1 h-0 flex-1 border-b-[0.5px] border-dotted border-line-strong"
           />
-          <span className="shrink-0 font-mono text-[13px] text-gold">
+          {/* Gold-hairline ring chip. \`text-accent\` is the *flat* gold
+            * color — \`text-gold\` would set background:linear-gradient +
+            * background-clip:text + color:transparent, which renders as
+            * invisible text inside a transparent-bg chip because the
+            * gradient layer can't paint through. Right margin so the
+            * SpotlightCard's overflow:hidden never crops the ring. */}
+          <span className="mr-1 inline-flex shrink-0 items-center rounded-full border-[0.5px] border-accent/70 px-2.5 py-0.5 font-mono text-[13px] text-accent">
             {resolvedPrice ? (
               <Price
                 resolved={resolvedPrice}

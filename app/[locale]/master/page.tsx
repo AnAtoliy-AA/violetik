@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { loadMastersForLocale } from "@/entities/master/api/load";
-import { listApprovedTestimonials } from "@/entities/testimonial";
 import { MasterPage } from "@/views/master";
 import { MastersListPage } from "@/views/masters-list";
+import { buildPageMetadata } from "@/shared/lib/page-metadata";
 import type { Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
@@ -15,7 +15,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Master" });
-  return { title: `Violetta — ${t("meta_title")}` };
+  return buildPageMetadata({
+    locale,
+    pageId: "master",
+    path: "/master",
+    fallbackTitle: `Violetta — ${t("meta_title")}`,
+  });
 }
 
 export default async function MasterRoute({
@@ -29,11 +34,8 @@ export default async function MasterRoute({
     publishedOnly: true,
   });
   if (masters.length === 1) {
-    const testimonials = await listApprovedTestimonials({
-      masterId: masters[0].id,
-      limit: 10,
-    });
-    return <MasterPage master={masters[0]} testimonials={testimonials} />;
+    // Testimonials are streamed inside MasterPage via Suspense.
+    return <MasterPage master={masters[0]} />;
   }
   return <MastersListPage masters={masters} />;
 }

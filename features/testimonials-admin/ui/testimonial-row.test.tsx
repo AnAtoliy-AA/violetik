@@ -15,6 +15,7 @@ const baseRow: AdminTestimonialRow = {
   authorUsername: "lara_k",
   authorEmail: null,
   authorPhotoUrl: null,
+  authorIsVip: false,
   masterId: "violetta",
   masterNameEn: "Violetta",
   masterNameRu: "Виолетта",
@@ -62,5 +63,16 @@ describe("TestimonialRow", () => {
     const rejected = { ...baseRow, status: "rejected" as const };
     render(<TestimonialRow row={rejected} locale="en" labels={labels} />);
     expect(screen.getByText("Rejected")).toBeInTheDocument();
+  });
+
+  it("renders a VIP badge when the author is a VIP", () => {
+    const vipRow = { ...baseRow, authorIsVip: true };
+    render(<TestimonialRow row={vipRow} locale="en" labels={labels} />);
+    expect(screen.getByLabelText("VIP member")).toBeInTheDocument();
+  });
+
+  it("does not render a VIP badge for non-VIP authors", () => {
+    render(<TestimonialRow row={baseRow} locale="en" labels={labels} />);
+    expect(screen.queryByLabelText("VIP member")).not.toBeInTheDocument();
   });
 });

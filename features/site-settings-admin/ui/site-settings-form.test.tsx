@@ -92,6 +92,25 @@ describe("SiteSettingsForm", () => {
     expect(patch.priceOverrides).toEqual({});
     expect(patch.discountPercent).toBe(0);
     expect(patch.discountActive).toBe(false);
+    expect(patch.markupPercent).toBe(0);
+    expect(patch.markupActive).toBe(false);
+  });
+
+  it("submits the markup percent and active toggle", async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    const markup = screen.getByRole("spinbutton", {
+      name: /markup percent/i,
+    }) as HTMLInputElement;
+    await user.clear(markup);
+    await user.type(markup, "10");
+    await user.click(
+      screen.getByRole("checkbox", { name: /show inflated old price/i }),
+    );
+    await user.click(screen.getByRole("button", { name: /Save/i }));
+    const patch = onSubmit.mock.calls[0][0];
+    expect(patch.markupPercent).toBe(10);
+    expect(patch.markupActive).toBe(true);
   });
 
   describe("palette live preview", () => {
