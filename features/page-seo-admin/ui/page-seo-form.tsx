@@ -18,7 +18,10 @@ export type SubmitFn = (
 ) => Promise<{ ok: true } | { ok: false; error: string }>;
 
 /** Localized translation default shown as the input placeholder. */
-export type LocaleDefaults = Record<Locale, { title: string; description: string }>;
+export type LocaleDefaults = Record<
+  Locale,
+  { title: string; heading: string; description: string }
+>;
 
 export interface PageSeoDescriptor {
   id: PageSeoId;
@@ -47,6 +50,11 @@ const TITLE_FIELD: Record<Locale, keyof PageSeoEntry> = {
   ru: "titleRu",
   by: "titleBy",
 };
+const HEADING_FIELD: Record<Locale, keyof PageSeoEntry> = {
+  en: "headingEn",
+  ru: "headingRu",
+  by: "headingBy",
+};
 const DESCRIPTION_FIELD: Record<Locale, keyof PageSeoEntry> = {
   en: "descriptionEn",
   ru: "descriptionRu",
@@ -70,9 +78,14 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
       for (const l of routing.locales) {
         const loc = l as Locale;
         const storedTitle = stored?.[TITLE_FIELD[loc]];
+        const storedHeading = stored?.[HEADING_FIELD[loc]];
         const storedDescription = stored?.[DESCRIPTION_FIELD[loc]];
         entry[TITLE_FIELD[loc]] =
           storedTitle && storedTitle.trim() ? storedTitle : page.defaults[loc].title;
+        entry[HEADING_FIELD[loc]] =
+          storedHeading && storedHeading.trim()
+            ? storedHeading
+            : page.defaults[loc].heading;
         entry[DESCRIPTION_FIELD[loc]] =
           storedDescription && storedDescription.trim()
             ? storedDescription
@@ -105,7 +118,7 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-[22px] py-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-[22px] pt-6 pb-32">
       <p className="max-w-[460px] text-[13px] text-text-2">
         {t("page_seo_intro")}
       </p>
@@ -147,6 +160,21 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
                   </label>
                   <label className="flex flex-col gap-1">
                     <span className="text-[12px] text-text-2">
+                      {t("page_seo_heading_label")}
+                    </span>
+                    <input
+                      type="text"
+                      required
+                      maxLength={120}
+                      placeholder={page.defaults[l].heading}
+                      aria-label={`${page.label} ${l.toUpperCase()} ${t("page_seo_heading_label")}`}
+                      className="rounded border border-line bg-surface px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                      value={entry[HEADING_FIELD[l]]}
+                      onChange={(ev) => setField(page.id, HEADING_FIELD[l], ev.target.value)}
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-[12px] text-text-2">
                       {t("page_seo_description_label")}
                     </span>
                     <textarea
@@ -169,7 +197,11 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
         );
       })}
 
-      <div className="sticky bottom-0 z-10 -mx-[22px] flex items-center gap-3 border-t-[0.5px] border-line bg-surface/95 px-[22px] py-4 backdrop-blur supports-[backdrop-filter]:bg-surface/80 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      {/* Float the save bar above the fixed bottom TabBar (h ~ 88px + the
+        * device safe-area inset) so the button is never hidden behind the
+        * nav. The form's pb-32 below reserves matching scroll room so the
+        * last fields clear the floating bar too. */}
+      <div className="sticky bottom-[calc(88px+env(safe-area-inset-bottom))] z-10 -mx-[22px] flex items-center gap-3 border-t-[0.5px] border-line bg-surface/95 px-[22px] py-4 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
         <button
           type="submit"
           disabled={isPending}

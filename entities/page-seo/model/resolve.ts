@@ -7,6 +7,12 @@ const TITLE_FIELD: Record<Locale, keyof PageSeoEntry> = {
   by: "titleBy",
 };
 
+const HEADING_FIELD: Record<Locale, keyof PageSeoEntry> = {
+  en: "headingEn",
+  ru: "headingRu",
+  by: "headingBy",
+};
+
 const DESCRIPTION_FIELD: Record<Locale, keyof PageSeoEntry> = {
   en: "descriptionEn",
   ru: "descriptionRu",
@@ -14,9 +20,10 @@ const DESCRIPTION_FIELD: Record<Locale, keyof PageSeoEntry> = {
 };
 
 /**
- * Resolve a stored override to a locale-specific title/description.
- * Blank (or whitespace-only) values are treated as "no override" and
- * omitted, so the caller falls back to its translation default.
+ * Resolve a stored override to a locale-specific SEO title / visible
+ * heading / description. Blank (or whitespace-only) values are treated as
+ * "no override" and omitted, so the caller falls back to its translation
+ * default.
  */
 export function resolvePageSeoEntry(
   entry: PageSeoEntry | undefined,
@@ -24,9 +31,11 @@ export function resolvePageSeoEntry(
 ): ResolvedPageSeo {
   if (!entry) return {};
   const title = entry[TITLE_FIELD[locale]]?.trim();
+  const heading = entry[HEADING_FIELD[locale]]?.trim();
   const description = entry[DESCRIPTION_FIELD[locale]]?.trim();
   return {
     ...(title ? { title } : {}),
+    ...(heading ? { heading } : {}),
     ...(description ? { description } : {}),
   };
 }

@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import {
   PAGE_SEO_BY_ID,
-  resolvePageHeading,
+  resolvePageMeta,
   type PageSeoId,
 } from "@/entities/page-seo";
 import { getPageSeoServer } from "./page-seo-server";
@@ -47,7 +47,7 @@ export async function buildPageMetadata(
   const translate = (ns: string, key: string) =>
     ns === "Site" ? tSite(key) : tPage(key);
 
-  const { title, description } = resolvePageHeading({
+  const { title, description } = resolvePageMeta({
     pageId,
     locale: locale as Locale,
     overrides,
