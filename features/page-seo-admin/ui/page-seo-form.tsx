@@ -61,7 +61,24 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
   const [state, setState] = useState<FormState>(() => {
     const next: FormState = {};
     for (const page of pages) {
-      next[page.id] = { ...EMPTY_PAGE_SEO_ENTRY, ...initial[page.id] };
+      // Prefill each field with the stored override when present, else the
+      // translation default for that locale, so the admin edits the actual
+      // effective value instead of an empty box. Required inputs then keep
+      // the fields from being submitted blank.
+      const stored = initial[page.id];
+      const entry = { ...EMPTY_PAGE_SEO_ENTRY };
+      for (const l of routing.locales) {
+        const loc = l as Locale;
+        const storedTitle = stored?.[TITLE_FIELD[loc]];
+        const storedDescription = stored?.[DESCRIPTION_FIELD[loc]];
+        entry[TITLE_FIELD[loc]] =
+          storedTitle && storedTitle.trim() ? storedTitle : page.defaults[loc].title;
+        entry[DESCRIPTION_FIELD[loc]] =
+          storedDescription && storedDescription.trim()
+            ? storedDescription
+            : page.defaults[loc].description;
+      }
+      next[page.id] = entry;
     }
     return next;
   });
@@ -119,6 +136,7 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
                     </span>
                     <input
                       type="text"
+                      required
                       maxLength={70}
                       placeholder={page.defaults[l].title}
                       aria-label={`${page.label} ${l.toUpperCase()} ${t("page_seo_title_label")}`}
@@ -133,6 +151,7 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
                     </span>
                     <textarea
                       rows={2}
+                      required
                       maxLength={200}
                       placeholder={page.defaults[l].description}
                       aria-label={`${page.label} ${l.toUpperCase()} ${t("page_seo_description_label")}`}
@@ -150,7 +169,7 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
         );
       })}
 
-      <div className="sticky bottom-4 flex items-center gap-3">
+      <div className="sticky bottom-0 z-10 -mx-[22px] flex items-center gap-3 border-t-[0.5px] border-line bg-surface/95 px-[22px] py-4 backdrop-blur supports-[backdrop-filter]:bg-surface/80 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <button
           type="submit"
           disabled={isPending}
