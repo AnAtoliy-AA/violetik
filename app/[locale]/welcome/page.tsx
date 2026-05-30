@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import {
-  setRequestLocale,
-  getTranslations,
-  getLocale,
-} from "next-intl/server";
+import { setRequestLocale, getLocale } from "next-intl/server";
 import { WelcomePage } from "@/views/welcome";
 import { resolveAtelierStatus } from "@/widgets/atelier-hours/lib/resolve-status";
 import { WEEKLY_DEFAULT_HOURS } from "@/shared/lib/google-calendar";
@@ -17,13 +13,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Welcome" });
-  return buildPageMetadata({
-    locale,
-    pageId: "welcome",
-    path: "/welcome",
-    fallbackTitle: `Violetta — ${t("cta_enter")}`,
-  });
+  return buildPageMetadata({ locale, pageId: "welcome", path: "/welcome" });
 }
 
 export default async function WelcomeRoute({

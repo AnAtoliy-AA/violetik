@@ -1,19 +1,17 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
-import { resolvePageSeo, type PageSeoId } from "@/entities/page-seo";
+import {
+  PAGE_SEO_BY_ID,
+  resolvePageHeading,
+  type PageSeoId,
+} from "@/entities/page-seo";
 import { getPageSeoServer } from "./page-seo-server";
 
 export interface BuildPageMetadataOptions {
   locale: string;
   /** Page id from PAGE_SEO_PAGES — the override lookup key. */
   pageId: PageSeoId;
-  /** Title used when no admin override exists for this locale. */
-  fallbackTitle: string;
-  /**
-   * Description used when no admin override exists for this locale.
-   * Defaults to the site-wide description (`Site.description`).
-   */
-  fallbackDescription?: string;
   /**
    * Route path, e.g. "/home". Accepted for call-site clarity but not
    * used here — canonical + hreflang are owned by the locale layout.
@@ -22,34 +20,39 @@ export interface BuildPageMetadataOptions {
 }
 
 /**
- * Builds a page's `Metadata` by layering an admin SEO override (from the
- * `page_seo` table) over the translation default.
+ * Builds a page's `Metadata` from the single source of truth shared with the
+ * on-page hero (`usePageHeading`): the admin SEO override when set, otherwise
+ * the flat hero copy (title keys joined + lede paragraph). Meta tag and
+ * visible heading therefore always render identical title/description.
  *
- * Only the document title and meta description are set here — these are
- * the two fields an admin can edit per page. OpenGraph, Twitter, the
- * file-convention `og:image`, the canonical URL, and the hreflang
- * alternates are all supplied by the locale layout
- * (`app/[locale]/layout.tsx`) and inherited unchanged, so this builder
- * never strips them (setting an `openGraph` object here would drop the
+ * Only the document title and meta description are set here. OpenGraph,
+ * Twitter, the file-convention `og:image`, the canonical URL, and the
+ * hreflang alternates are all supplied by the locale layout
+ * (`app/[locale]/layout.tsx`) and inherited unchanged, so this builder never
+ * strips them (setting an `openGraph` object here would drop the
  * auto-injected `og:image`).
  */
 export async function buildPageMetadata(
   opts: BuildPageMetadataOptions,
 ): Promise<Metadata> {
-  const { locale, pageId, fallbackTitle } = opts;
+  const { locale, pageId } = opts;
+  const { namespace } = PAGE_SEO_BY_ID[pageId];
 
-  const overrides = await getPageSeoServer();
-  const override = resolvePageSeo(overrides, pageId, locale as Locale);
+  const [overrides, tPage, tSite] = await Promise.all([
+    getPageSeoServer(),
+    getTranslations({ locale, namespace }),
+    getTranslations({ locale, namespace: "Site" }),
+  ]);
 
-  // Title is always set (override or per-page fallback), matching prior
-  // behaviour. Description is only set when an admin override exists or a
-  // page supplies an explicit fallback — otherwise it's left unset so the
-  // locale layout's description (which may be city-templated for SEO)
-  // inherits through unchanged.
-  const description = override.description ?? opts.fallbackDescription;
+  const translate = (ns: string, key: string) =>
+    ns === "Site" ? tSite(key) : tPage(key);
 
-  return {
-    title: override.title ?? fallbackTitle,
-    ...(description ? { description } : {}),
-  };
+  const { title, description } = resolvePageHeading({
+    pageId,
+    locale: locale as Locale,
+    overrides,
+    translate,
+  });
+
+  return { title, description };
 }

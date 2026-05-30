@@ -1,14 +1,13 @@
 "use client";
 
-import { useRef } from "react";
 import {
   m,
-  useInView,
   useReducedMotion,
   useScroll,
   useTransform,
 } from "motion/react";
 import { useTranslations } from "next-intl";
+import { usePageHeading } from "@/entities/page-seo";
 import { Link } from "@/i18n/navigation";
 import { buttonClassName } from "@/shared/ui/button";
 import { Eyebrow } from "@/shared/ui/eyebrow";
@@ -18,6 +17,7 @@ import { FlameMonogram } from "@/shared/ui/flame-monogram";
 
 export function HomeHero() {
   const t = useTranslations("Home");
+  const heading = usePageHeading("home");
   const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
 
@@ -32,11 +32,6 @@ export function HomeHero() {
   const styledFan = reduceMotion
     ? { opacity: 0.65 }
     : { y: fanY, opacity: fanOpacity };
-
-  const wordRef = useRef<HTMLSpanElement>(null);
-  // `once: true` latches the boolean after the first intersection, so it acts
-  // as a one-way reveal flag without a separate piece of state.
-  const wordRevealed = useInView(wordRef, { amount: 0.6, once: true });
 
   return (
     <div className="relative">
@@ -53,22 +48,11 @@ export function HomeHero() {
       >
         <Eyebrow>—— {t("hero_cover_story")}</Eyebrow>
         <h1 className="mt-4 font-display text-h1 font-light italic leading-[0.92] tracking-[-0.025em] sm:leading-[0.94]">
-          {t("hero_title_line_1")}
-          <br />
-          <span className="font-normal not-italic text-text-2">
-            {t("hero_title_lead")}{" "}
-          </span>
-          <span
-            ref={wordRef}
-            data-revealed={wordRevealed ? "true" : undefined}
-            className="stroke-draw text-gold-shimmer font-normal"
-          >
-            {t("hero_title_word")}
-          </span>
+          {heading.title}
         </h1>
         <LetterpressRule className="mt-5 max-w-[440px]" />
         <p className="dropcap mt-6 max-w-[540px] text-[14.5px] leading-[1.55] text-text-2">
-          {t("hero_paragraph")}
+          {heading.description}
         </p>
         <div className="mt-7 flex gap-2.5">
           <MagneticButton>

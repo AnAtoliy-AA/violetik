@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { MembershipPage } from "@/views/membership";
 import { buildPageMetadata } from "@/shared/lib/page-metadata";
 
@@ -11,13 +11,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Membership" });
-  return buildPageMetadata({
-    locale,
-    pageId: "membership",
-    path: "/membership",
-    fallbackTitle: `Violetta — ${t("meta_title")}`,
-  });
+  return buildPageMetadata({ locale, pageId: "membership", path: "/membership" });
 }
 
 export default async function MembershipRoute({
