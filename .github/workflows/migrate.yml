@@ -1,0 +1,57 @@
+name: DB migrate
+
+# Apply Drizzle migrations after a merge/push lands on develop or main and
+# its CI run (lint · Vitest · build) goes green. develop migrates the staging
+# database, main migrates production — each selected via a GitHub Environment
+# of the same name, whose `DIRECT_URL` secret points at the Supabase direct
+# (port 5432) connection string. See
+# docs/superpowers/specs/2026-05-30-ci-db-migrate-on-merge-design.md.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+# Match ci.yml: force JavaScript actions onto Node 24 until the v5 actions land.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  migrate:
+    name: Apply Drizzle migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Only after CI passed, and only for the post-merge push — never for the
+    # pull_request CI run (which also satisfies workflow_run).
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
+    # develop -> staging, main -> production. Referencing the environment makes
+    # secrets.DIRECT_URL resolve to that environment's secret.
+    environment: ${{ github.event.workflow_run.head_branch == 'main' && 'production' || 'staging' }}
+    steps:
+      - name: Checkout merged commit
+        uses: actions/checkout@v4
+        with:
+          # Migrate the exact commit CI validated, not the branch tip.
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # drizzle-kit migrate applies pending migrations to DIRECT_URL. It's a
+      # no-op (exit 0) when nothing is pending. drizzle.config.ts falls back to
+      # process.env.DIRECT_URL when .env.local is absent, as it is in CI.
+      - name: Apply migrations
+        run: npm run db:migrate
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
