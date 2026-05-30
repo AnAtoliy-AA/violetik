@@ -1,24 +1,12 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
-import { routing, LOCALE_TO_LANG, type Locale } from "@/i18n/routing";
+import type { Locale } from "@/i18n/routing";
 import { resolvePageSeo, type PageSeoId } from "@/entities/page-seo";
 import { getPageSeoServer } from "./page-seo-server";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://violetta.example.com";
-
-const OG_LOCALE: Record<string, string> = {
-  en: "en_US",
-  ru: "ru_RU",
-  by: "be_BY",
-};
 
 export interface BuildPageMetadataOptions {
   locale: string;
   /** Page id from PAGE_SEO_PAGES — the override lookup key. */
   pageId: PageSeoId;
-  /** Route path, e.g. "/home" — used for canonical + hreflang URLs. */
-  path: string;
   /** Title used when no admin override exists for this locale. */
   fallbackTitle: string;
   /**
@@ -26,53 +14,42 @@ export interface BuildPageMetadataOptions {
    * Defaults to the site-wide description (`Site.description`).
    */
   fallbackDescription?: string;
+  /**
+   * Route path, e.g. "/home". Accepted for call-site clarity but not
+   * used here — canonical + hreflang are owned by the locale layout.
+   */
+  path?: string;
 }
 
 /**
- * Builds a page's `Metadata`, layering an admin SEO override (from the
- * `page_seo` table) over the translation default. Always emits a
- * per-page canonical URL, hreflang alternates, and OpenGraph/Twitter
- * cards so each route is fully addressable for crawlers — previously
- * pages only set a bare `title` and inherited the rest from the layout.
+ * Builds a page's `Metadata` by layering an admin SEO override (from the
+ * `page_seo` table) over the translation default.
+ *
+ * Only the document title and meta description are set here — these are
+ * the two fields an admin can edit per page. OpenGraph, Twitter, the
+ * file-convention `og:image`, the canonical URL, and the hreflang
+ * alternates are all supplied by the locale layout
+ * (`app/[locale]/layout.tsx`) and inherited unchanged, so this builder
+ * never strips them (setting an `openGraph` object here would drop the
+ * auto-injected `og:image`).
  */
 export async function buildPageMetadata(
   opts: BuildPageMetadataOptions,
 ): Promise<Metadata> {
-  const { locale, pageId, path, fallbackTitle } = opts;
-  const typedLocale = locale as Locale;
+  const { locale, pageId, fallbackTitle } = opts;
 
-  const [overrides, tSite] = await Promise.all([
-    getPageSeoServer(),
-    getTranslations({ locale, namespace: "Site" }),
-  ]);
+  const overrides = await getPageSeoServer();
+  const override = resolvePageSeo(overrides, pageId, locale as Locale);
 
-  const override = resolvePageSeo(overrides, pageId, typedLocale);
-  const title = override.title ?? fallbackTitle;
-  const description =
-    override.description ?? opts.fallbackDescription ?? tSite("description");
-  const url = `${SITE_URL}/${locale}${path}`;
+  // Title is always set (override or per-page fallback), matching prior
+  // behaviour. Description is only set when an admin override exists or a
+  // page supplies an explicit fallback — otherwise it's left unset so the
+  // locale layout's description (which may be city-templated for SEO)
+  // inherits through unchanged.
+  const description = override.description ?? opts.fallbackDescription;
 
   return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      siteName: tSite("name"),
-      locale: OG_LOCALE[locale] ?? OG_LOCALE.en,
-      url,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
-    alternates: {
-      canonical: url,
-      languages: Object.fromEntries(
-        routing.locales.map((l) => [LOCALE_TO_LANG[l], `${SITE_URL}/${l}${path}`]),
-      ),
-    },
+    title: override.title ?? fallbackTitle,
+    ...(description ? { description } : {}),
   };
 }
