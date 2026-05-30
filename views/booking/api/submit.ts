@@ -232,6 +232,7 @@ export async function submitBooking(
         start: scheduledFor,
         end,
         timeZone: tz,
+        status: "tentative",
       });
       await setBookingGcalEventId(booking.id, eventId);
       await updateLastRefresh(token.userId);

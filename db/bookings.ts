@@ -3,6 +3,14 @@ import { and, asc, desc, eq, gte, inArray, ne, sql } from "drizzle-orm";
 import { db, schema } from "./index";
 import { activeVipSubquery } from "./vip-requests";
 
+/**
+ * Bookings created before this date predate the tentative-on-create
+ * behaviour; their GCal events default to "confirmed" in Google, so the
+ * confirm-sync cron must ignore them to avoid mass auto-confirmation.
+ * Set to the feature ship date.
+ */
+export const GCAL_SYNC_CUTOFF = new Date("2026-05-30T00:00:00Z");
+
 export interface NewBookingInput {
   userId: string;
   serviceId: string;
@@ -193,9 +201,9 @@ export interface UserBookingRow extends schema.Booking {
 }
 
 /**
- * Bookings for one user, excluding cancelled rows. Sorted ascending
- * by scheduledFor; the view buckets into upcoming / history using a
- * single `now` captured server-side.
+ * All bookings for one user (all statuses, including cancelled). Sorted
+ * ascending by scheduledFor; the view buckets into upcoming / history
+ * using a single `now` captured server-side.
  */
 export async function listUserBookings(
   userId: string,
@@ -214,12 +222,7 @@ export async function listUserBookings(
       schema.masters,
       eq(schema.bookings.masterId, schema.masters.id),
     )
-    .where(
-      and(
-        eq(schema.bookings.userId, userId),
-        ne(schema.bookings.status, "cancelled"),
-      ),
-    )
+    .where(eq(schema.bookings.userId, userId))
     .orderBy(asc(schema.bookings.scheduledFor));
   return rows.map((r) => ({
     ...r.booking,
@@ -251,6 +254,29 @@ export async function cancelBookingIfOpen(
     )
     .returning();
   return rows[0] ?? null;
+}
+
+/**
+ * Pending, future bookings that have a GCal event and were created on or
+ * after GCAL_SYNC_CUTOFF. Backs the daily confirm-sync cron: it reads
+ * each event and promotes the row to confirmed when the admin marked the
+ * calendar event confirmed.
+ */
+export async function listPendingBookingsWithGcalEvent(
+  cutoff: Date = GCAL_SYNC_CUTOFF,
+): Promise<schema.Booking[]> {
+  if (!db) return [];
+  return db
+    .select()
+    .from(schema.bookings)
+    .where(
+      and(
+        eq(schema.bookings.status, "pending"),
+        gte(schema.bookings.createdAt, cutoff),
+        gte(schema.bookings.scheduledFor, new Date()),
+        sql`${schema.bookings.gcalEventId} IS NOT NULL`,
+      ),
+    );
 }
 
 /**

@@ -9,6 +9,7 @@ import {
   CancelBookingButton,
   ContactMasterLink,
 } from "@/features/booking-cancel";
+import { BookingStatusBadge } from "@/shared/ui/booking-status-badge";
 import { Eyebrow } from "@/shared/ui/eyebrow";
 import { NailFan } from "@/shared/ui/nail-fan";
 import { SpotlightCard } from "@/shared/ui/spotlight-card";
@@ -50,6 +51,9 @@ export async function UpcomingBookings({
   const next = upcoming[0];
   const otherUpcoming = upcoming.slice(1);
   const studioTelegram = settings.telegramUsername ?? null;
+
+  const statusLabel = (row: UserBookingRow): string =>
+    t(`booking_status.${row.status}`);
 
   const serviceName = (id: string): string => {
     const s = services.find((row) => row.id === id);
@@ -98,7 +102,10 @@ export async function UpcomingBookings({
           <NailFan palette={profile.palette} count={4} lift={4} />
         </div>
         <Eyebrow>{t("next_visit_eyebrow")}</Eyebrow>
-        <p className="mt-3 font-display text-[26px] font-normal italic leading-tight">
+        <div className="mt-3 flex items-center gap-2">
+          <BookingStatusBadge status={next.status} label={statusLabel(next)} />
+        </div>
+        <p className="mt-2 font-display text-[26px] font-normal italic leading-tight">
           {serviceName(next.serviceId)}
         </p>
         <p className="mt-1.5 text-[13px] text-text-2">
@@ -131,6 +138,12 @@ export async function UpcomingBookings({
                 <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-3">
                   {formatDateTime(row.scheduledFor, locale)}
                 </p>
+                <div className="mt-1">
+                  <BookingStatusBadge
+                    status={row.status}
+                    label={statusLabel(row)}
+                  />
+                </div>
                 {masterNameInLocale(row) ? (
                   <p className="mt-0.5 text-[12px] text-text-3">
                     {t("with_master", {

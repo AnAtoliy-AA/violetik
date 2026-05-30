@@ -336,6 +336,12 @@
     "badge_pending_vip": "VIP в обработке",
     "joined": "Присоединилась в {year}",
     "next_visit_eyebrow": "Следующий визит",
+    "booking_status": {
+      "pending": "Ожидает",
+      "confirmed": "Подтверждено",
+      "cancelled": "Отменено",
+      "completed": "Завершено"
+    },
     "countdown": {
       "today": "Сегодня",
       "tomorrow": "Завтра",
