@@ -30,7 +30,15 @@ import {
 const ORIGINAL_ENV = process.env;
 beforeEach(() => {
   vi.resetAllMocks();
-  process.env = { ...ORIGINAL_ENV, NODE_ENV: "development" };
+  // The route early-returns "no_gcal_token" when these creds are absent.
+  // They're present in local .env.local but NOT in CI, so set them
+  // explicitly to keep the confirm-path test deterministic everywhere.
+  process.env = {
+    ...ORIGINAL_ENV,
+    NODE_ENV: "development",
+    GOOGLE_CLIENT_ID: "test-client-id",
+    GOOGLE_CLIENT_SECRET: "test-client-secret",
+  };
 });
 
 function makeReq(headers: Record<string, string> = {}): Request {
