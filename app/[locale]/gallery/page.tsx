@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { loadGallery } from "@/entities/gallery/api/load";
 import { GalleryPage } from "@/views/gallery";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
@@ -14,13 +14,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Gallery" });
-  return buildPageMetadata({
-    locale,
-    pageId: "gallery",
-    path: "/gallery",
-    fallbackTitle: `Violetta — ${t("meta_title")}`,
-  });
+  return buildPageMetadata({ locale, pageId: "gallery", path: "/gallery" });
 }
 
 export default async function GalleryRoute({

@@ -32,7 +32,20 @@ export async function updatePageSeoAction(
     };
   }
 
-  await updatePageSeo(parsed.data, updatedBy);
+  // A failed write (e.g. the `page_seo` table not yet migrated, or a
+  // transient pool error) must surface as an in-form error, not an
+  // unhandled 500. The read path already degrades gracefully; mirror that
+  // here so the editor stays usable and the admin sees what went wrong.
+  try {
+    await updatePageSeo(parsed.data, updatedBy);
+  } catch (error) {
+    console.error("[page-seo] save failed:", error);
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+
   revalidatePath("/", "layout");
   return { ok: true };
 }

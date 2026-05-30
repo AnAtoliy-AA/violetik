@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { OnboardingPage } from "@/views/onboarding";
 import { loadOnboardingSlides } from "@/entities/onboarding/api/load";
 import { buildPageMetadata } from "@/shared/lib/page-metadata";
@@ -13,13 +13,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Onboarding" });
-  return buildPageMetadata({
-    locale,
-    pageId: "onboarding",
-    path: "/onboarding",
-    fallbackTitle: `Violetta — ${t("meta_title")}`,
-  });
+  return buildPageMetadata({ locale, pageId: "onboarding", path: "/onboarding" });
 }
 
 export default async function OnboardingRoute({

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { listPublishedCategories } from "@/db/services";
 import { loadServicesForLocale } from "@/entities/service/api/load";
 import type { ServiceCategoryRef } from "@/entities/service";
@@ -24,13 +24,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Services" });
-  return buildPageMetadata({
-    locale,
-    pageId: "services",
-    path: "/services",
-    fallbackTitle: `Violetta — ${t("meta_title")}`,
-  });
+  return buildPageMetadata({ locale, pageId: "services", path: "/services" });
 }
 
 export default async function ServicesRoute({

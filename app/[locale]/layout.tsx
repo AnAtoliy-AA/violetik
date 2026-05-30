@@ -7,6 +7,8 @@ import { routing, LOCALE_TO_LANG } from "@/i18n/routing";
 import type { Locale } from "@/i18n/routing";
 import { cityForLocale } from "@/entities/site-settings";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import { getPageSeoServer } from "@/shared/lib/page-seo-server";
+import { PageSeoProvider } from "@/entities/page-seo";
 import { LocalBusinessJsonLd } from "@/shared/ui/local-business-jsonld";
 import { ServiceWorkerRegistrar } from "@/shared/lib/pwa/service-worker-registrar";
 import { SiteFooter } from "@/widgets/site-footer";
@@ -133,7 +135,10 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const tSite = await getTranslations({ locale, namespace: "Site" });
-  const settings = await getSiteSettingsServer();
+  const [settings, pageSeoOverrides] = await Promise.all([
+    getSiteSettingsServer(),
+    getPageSeoServer(),
+  ]);
 
   return (
     <html
@@ -152,13 +157,15 @@ export default async function LocaleLayout({
           {tSite("skip_to_content")}
         </a>
         <NextIntlClientProvider>
-          <LazyMotionRoot>
-            <ToastProvider>
-              <ServiceWorkerRegistrar />
-              <main id="main-content">{children}</main>
-              <SiteFooter />
-            </ToastProvider>
-          </LazyMotionRoot>
+          <PageSeoProvider overrides={pageSeoOverrides}>
+            <LazyMotionRoot>
+              <ToastProvider>
+                <ServiceWorkerRegistrar />
+                <main id="main-content">{children}</main>
+                <SiteFooter />
+              </ToastProvider>
+            </LazyMotionRoot>
+          </PageSeoProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { loadMastersForLocale } from "@/entities/master/api/load";
 import { MasterPage } from "@/views/master";
 import { MastersListPage } from "@/views/masters-list";
@@ -14,13 +14,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Master" });
-  return buildPageMetadata({
-    locale,
-    pageId: "master",
-    path: "/master",
-    fallbackTitle: `Violetta — ${t("meta_title")}`,
-  });
+  return buildPageMetadata({ locale, pageId: "master", path: "/master" });
 }
 
 export default async function MasterRoute({
