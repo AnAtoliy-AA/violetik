@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { m, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
+import { usePageHeading } from "@/entities/page-seo";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/features/locale-switcher";
 import { Aurora } from "@/shared/ui/aurora";
@@ -29,6 +30,7 @@ export function WelcomePage({
   status = { state: "no-hours" },
 }: WelcomePageProps = {}) {
   const t = useTranslations("Welcome");
+  const heading = usePageHeading("welcome");
   const reduceMotion = useReducedMotion();
 
   const statusLabel =
@@ -133,7 +135,7 @@ export function WelcomePage({
             className="mx-auto mt-8 max-w-[320px] font-display text-[22px] font-light italic leading-[1.3] text-text-2"
             {...rise(2.2)}
           >
-            {t("tagline")}
+            {heading.title}
           </m.p>
 
           {statusLabel && (

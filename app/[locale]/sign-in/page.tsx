@@ -7,6 +7,7 @@ import { TelegramLogin } from "@/features/telegram-login";
 import { GoogleSignInButton } from "@/features/google-sign-in";
 import { AppHeader } from "@/widgets/app-header";
 import { buildPageMetadata } from "@/shared/lib/page-metadata";
+import { getPageHeadingServer } from "@/shared/lib/page-heading-server";
 
 type Params = { locale: string };
 
@@ -16,13 +17,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "SignIn" });
-  return buildPageMetadata({
-    locale,
-    pageId: "sign-in",
-    path: "/sign-in",
-    fallbackTitle: `Violetta — ${t("meta_title")}`,
-  });
+  return buildPageMetadata({ locale, pageId: "sign-in", path: "/sign-in" });
 }
 
 export default async function SignInPage({
@@ -33,6 +28,7 @@ export default async function SignInPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("SignIn");
+  const heading = await getPageHeadingServer("sign-in", locale);
   const botUsername = process.env.TELEGRAM_BOT_USERNAME;
   const googleEnabled = Boolean(
     process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
@@ -48,10 +44,10 @@ export default async function SignInPage({
         <Wordmark size="sm" className="mb-10" />
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>
         <h1 className="my-4 max-w-[420px] font-display text-[40px] font-light italic leading-tight tracking-[-0.02em]">
-          {t("title")}
+          {heading.title}
         </h1>
         <p className="mb-9 max-w-md text-[14px] leading-relaxed text-text-2">
-          {t("paragraph")}
+          {heading.description}
         </p>
 
         {!eitherConfigured ? (

@@ -14,13 +14,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Gallery" });
-  return buildPageMetadata({
-    locale,
-    pageId: "gallery",
-    path: "/gallery",
-    fallbackTitle: `Violetta — ${t("meta_title")}`,
-  });
+  return buildPageMetadata({ locale, pageId: "gallery", path: "/gallery" });
 }
 
 export default async function GalleryRoute({

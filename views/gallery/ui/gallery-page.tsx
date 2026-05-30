@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
+import { usePageHeading } from "@/entities/page-seo";
 import type {
   GalleryCategoryView,
   GalleryItemView,
@@ -31,6 +32,7 @@ export function GalleryPage({
   showAdmin = false,
 }: GalleryPageProps = {}) {
   const t = useTranslations("Gallery");
+  const heading = usePageHeading("gallery");
   const [active, setActive] = useState<TagFilterValue>("All");
   const [openId, setOpenId] = useState<string | null>(null);
   // §9.3 — tapping a palette dot filters the grid to other cards that
@@ -82,11 +84,11 @@ export function GalleryPage({
             </span>
           </div>
           <h1 className="mt-3 font-display text-h1 font-light italic leading-[0.95] tracking-[-0.025em]">
-            {t("hero_title")}
+            {heading.title}
           </h1>
           <LetterpressRule className="mt-3.5 max-w-[440px]" />
           <p className="dropcap mt-4 max-w-[540px] text-[14px] text-text-2">
-            {t("hero_paragraph")}
+            {heading.description}
           </p>
         </div>
       </section>
