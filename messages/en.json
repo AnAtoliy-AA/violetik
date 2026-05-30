@@ -617,7 +617,8 @@
     "divider_or": "or",
     "not_configured": "SIGN-IN NOT YET CONFIGURED",
     "cta_sign_out": "Sign out",
-    "signed_in_as": "Signed in as"
+    "signed_in_as": "Signed in as",
+    "signing_in": "Signing you in…"
   },
   "AdminBookings": {
     "meta_title": "Bookings",

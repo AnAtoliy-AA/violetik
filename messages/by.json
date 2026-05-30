@@ -617,7 +617,8 @@
     "divider_or": "або",
     "not_configured": "УВАХОД ЯШЧЭ НЕ НАЛАДЖАНЫ",
     "cta_sign_out": "Выйсці",
-    "signed_in_as": "Вы ўвайшлі як"
+    "signed_in_as": "Вы ўвайшлі як",
+    "signing_in": "Выконваем уваход…"
   },
   "AdminBookings": {
     "meta_title": "Запісы",

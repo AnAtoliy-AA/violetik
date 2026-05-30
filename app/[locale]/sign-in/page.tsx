@@ -69,7 +69,11 @@ export default async function SignInPage({
             ) : null}
 
             {botUsername ? (
-              <TelegramLogin botUsername={botUsername} />
+              <TelegramLogin
+                botUsername={botUsername}
+                authPath={`/${locale}/auth/telegram`}
+                callbackUrl={`/${locale}/profile`}
+              />
             ) : null}
           </div>
         )}
