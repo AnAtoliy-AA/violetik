@@ -118,7 +118,7 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-[22px] py-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-[22px] pt-6 pb-32">
       <p className="max-w-[460px] text-[13px] text-text-2">
         {t("page_seo_intro")}
       </p>
@@ -197,7 +197,11 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
         );
       })}
 
-      <div className="sticky bottom-0 z-10 -mx-[22px] flex items-center gap-3 border-t-[0.5px] border-line bg-surface/95 px-[22px] py-4 backdrop-blur supports-[backdrop-filter]:bg-surface/80 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      {/* Float the save bar above the fixed bottom TabBar (h ~ 88px + the
+        * device safe-area inset) so the button is never hidden behind the
+        * nav. The form's pb-32 below reserves matching scroll room so the
+        * last fields clear the floating bar too. */}
+      <div className="sticky bottom-[calc(88px+env(safe-area-inset-bottom))] z-10 -mx-[22px] flex items-center gap-3 border-t-[0.5px] border-line bg-surface/95 px-[22px] py-4 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
         <button
           type="submit"
           disabled={isPending}
