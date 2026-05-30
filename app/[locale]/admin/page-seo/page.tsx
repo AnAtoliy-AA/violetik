@@ -3,7 +3,11 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { requireAdmin } from "@/shared/lib/auth-server";
 import { getAllPageSeo } from "@/db/page-seo";
-import { PAGE_SEO_PAGES } from "@/entities/page-seo";
+import {
+  PAGE_SEO_PAGES,
+  resolvePageMeta,
+  resolvePageHeading,
+} from "@/entities/page-seo";
 import { routing, type Locale } from "@/i18n/routing";
 import { AppHeader } from "@/widgets/app-header";
 import {
@@ -45,8 +49,9 @@ export default async function AdminPageSeoRoute({
   const t = await getTranslations("Admin");
   const overrides = await getAllPageSeo();
 
-  // Build the translation default (placeholder) for every page × locale so
-  // the admin sees what's shown when a field is left blank.
+  // Build the translation default (placeholder) for every page × locale,
+  // using the same resolvers the site renders with so the admin's
+  // placeholders exactly match what's shown when a field is left blank.
   const pages: PageSeoDescriptor[] = await Promise.all(
     PAGE_SEO_PAGES.map(async (page) => {
       const defaults = {} as LocaleDefaults;
@@ -56,9 +61,24 @@ export default async function AdminPageSeoRoute({
             getTranslations({ locale: l, namespace: page.namespace }),
             getTranslations({ locale: l, namespace: "Site" }),
           ]);
+          const translate = (ns: string, key: string) =>
+            ns === "Site" ? tSite(key) : tns(key);
+          const meta = resolvePageMeta({
+            pageId: page.id,
+            locale: l as Locale,
+            overrides: {},
+            translate,
+          });
+          const heading = resolvePageHeading({
+            pageId: page.id,
+            locale: l as Locale,
+            overrides: {},
+            translate,
+          });
           defaults[l as Locale] = {
-            title: `Violetta — ${tns(page.titleKey)}`,
-            description: tSite("description"),
+            title: meta.title,
+            heading: heading.title,
+            description: meta.description,
           };
         }),
       );

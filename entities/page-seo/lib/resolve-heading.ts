@@ -8,7 +8,7 @@ import type { PageSeoOverrides } from "../model/types";
  * pre-fetched `getTranslations` instances; client callers build it over
  * `useTranslations`. Keeping the resolver agnostic of *how* translation
  * happens lets the same override-layering logic feed both `generateMetadata`
- * (meta tags) and the on-page heroes, so they always render identical copy.
+ * (meta tags) and the on-page heroes.
  */
 export type Translate = (namespace: string, key: string) => string;
 
@@ -17,36 +17,60 @@ export interface ResolvedHeading {
   description: string;
 }
 
-/**
- * Resolves a page's effective heading: the admin SEO override when present,
- * otherwise the flat translation default rebuilt from the hero's title keys
- * (joined by a space) and its lede paragraph. Pages without an editorial
- * paragraph fall back to the site-wide `Site.description`.
- *
- * Blank/whitespace overrides are treated as "no override" (see
- * `resolvePageSeoEntry`), so an empty admin field falls through to the
- * default instead of rendering an empty title.
- */
-export function resolvePageHeading(args: {
+interface ResolveArgs {
   pageId: PageSeoId;
   locale: Locale;
   overrides: PageSeoOverrides;
   translate: Translate;
-}): ResolvedHeading {
-  const { pageId, locale, overrides, translate } = args;
+}
+
+/**
+ * The description is shared by meta and the visible lede: the admin
+ * override, else the page's lede paragraph, else the site-wide
+ * `Site.description`.
+ */
+function resolveDescription(
+  pageId: PageSeoId,
+  override: { description?: string },
+  translate: Translate,
+): string {
   const page = PAGE_SEO_BY_ID[pageId];
-
-  const override = resolvePageSeoEntry(overrides[pageId], locale);
-
-  const defaultTitle = page.headingTitleKeys
-    .map((key) => translate(page.namespace, key))
-    .join(" ");
-  const defaultDescription = page.headingDescriptionKey
+  const fallback = page.headingDescriptionKey
     ? translate(page.namespace, page.headingDescriptionKey)
     : translate("Site", "description");
+  return override.description ?? fallback;
+}
 
+/**
+ * SEO meta: the `<title>` + meta description. Title default comes from the
+ * page's short `titleKey` (kept under the 70-char SEO cap); override is the
+ * admin's `title*` field. Used by `buildPageMetadata`.
+ */
+export function resolvePageMeta(args: ResolveArgs): ResolvedHeading {
+  const { pageId, locale, overrides, translate } = args;
+  const page = PAGE_SEO_BY_ID[pageId];
+  const override = resolvePageSeoEntry(overrides[pageId], locale);
+  const defaultTitle = translate(page.namespace, page.titleKey);
   return {
     title: override.title ?? defaultTitle,
-    description: override.description ?? defaultDescription,
+    description: resolveDescription(pageId, override, translate),
+  };
+}
+
+/**
+ * Visible hero: the on-page H1 + lede. Heading default is rebuilt flat from
+ * the hero's `headingTitleKeys` (joined by a space); override is the admin's
+ * `heading*` field. Used by `usePageHeading` / `getPageHeadingServer`.
+ */
+export function resolvePageHeading(args: ResolveArgs): ResolvedHeading {
+  const { pageId, locale, overrides, translate } = args;
+  const page = PAGE_SEO_BY_ID[pageId];
+  const override = resolvePageSeoEntry(overrides[pageId], locale);
+  const defaultHeading = page.headingTitleKeys
+    .map((key) => translate(page.namespace, key))
+    .join(" ");
+  return {
+    title: override.heading ?? defaultHeading,
+    description: resolveDescription(pageId, override, translate),
   };
 }

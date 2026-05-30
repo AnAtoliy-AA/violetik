@@ -291,15 +291,20 @@ export const siteSettings = pgTable(
 
 /**
  * Per-page SEO overrides. One row per public page (id = page slug, see
- * entities/page-seo PAGE_SEO_PAGES), with a localized title + meta
- * description column per locale. A blank string means "use the
- * translation default" — rows only exist for pages an admin has touched.
+ * entities/page-seo PAGE_SEO_PAGES). Two distinct localized title columns:
+ * `title_*` is the SEO <title>/meta title (short, ≤70), `heading_*` is the
+ * visible on-page H1 (may be longer). `description_*` feeds both meta and
+ * the visible lede. A blank string means "use the translation default" —
+ * rows only exist for pages an admin has touched.
  */
 export const pageSeo = pgTable("page_seo", {
   id: text("id").primaryKey(),
   titleEn: text("title_en").notNull().default(""),
   titleRu: text("title_ru").notNull().default(""),
   titleBy: text("title_by").notNull().default(""),
+  headingEn: text("heading_en").notNull().default(""),
+  headingRu: text("heading_ru").notNull().default(""),
+  headingBy: text("heading_by").notNull().default(""),
   descriptionEn: text("description_en").notNull().default(""),
   descriptionRu: text("description_ru").notNull().default(""),
   descriptionBy: text("description_by").notNull().default(""),

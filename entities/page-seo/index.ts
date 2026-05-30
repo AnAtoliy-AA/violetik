@@ -13,7 +13,7 @@ export type {
 } from "./model/types";
 
 export { resolvePageSeo, resolvePageSeoEntry } from "./model/resolve";
-export { resolvePageHeading } from "./lib/resolve-heading";
+export { resolvePageHeading, resolvePageMeta } from "./lib/resolve-heading";
 export type { ResolvedHeading, Translate } from "./lib/resolve-heading";
 
 export { PageSeoProvider, usePageHeading } from "./ui/page-seo-context";
