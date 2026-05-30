@@ -72,10 +72,11 @@ export const PAGE_SEO_PAGES = [
     id: "welcome",
     path: "/welcome",
     namespace: "Welcome",
-    titleKey: "tagline",
+    // Short meta title (the tagline is 73–80 chars — too long for <title>).
+    titleKey: "meta_title",
     // The welcome splash has no editorial h1 — the wordmark "Violetta" plus
-    // the tagline line carry it. The tagline is the one overridable string;
-    // there's no separate paragraph, so description falls to Site.description.
+    // the tagline line carry it, so the tagline is the visible heading.
+    // No separate paragraph, so description falls to Site.description.
     headingTitleKeys: ["tagline"],
     headingDescriptionKey: undefined,
   },
@@ -101,7 +102,8 @@ export const PAGE_SEO_PAGES = [
     id: "sign-in",
     path: "/sign-in",
     namespace: "SignIn",
-    titleKey: "title",
+    // Short meta title ("Sign in"); the visible h1 is the longer "Step inside."
+    titleKey: "meta_title",
     headingTitleKeys: ["title"],
     headingDescriptionKey: "paragraph",
   },

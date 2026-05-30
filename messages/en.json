@@ -240,6 +240,7 @@
     "membership_body": "Become a member or VIP for two visits a month, priority access, and the after-hours calendar."
   },
   "Welcome": {
+    "meta_title": "Welcome",
     "tagline": "A private nail atelier — one chair, one hour, one quiet ritual at a time.",
     "cta_enter": "I'm new here",
     "cta_main": "Main",
@@ -457,7 +458,8 @@
     "inbox_page_seo_caption": "Titles & descriptions",
     "page_seo_plate_title": "Page SEO",
     "page_seo_intro": "Edit the search-engine title and meta description for each public page, per language. Leave a field blank to use the default shown.",
-    "page_seo_title_label": "Title",
+    "page_seo_title_label": "SEO title",
+    "page_seo_heading_label": "Page heading",
     "page_seo_description_label": "Description",
     "page_seo_save": "Save",
     "page_seo_saved": "Saved",
