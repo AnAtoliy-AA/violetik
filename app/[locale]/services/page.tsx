@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { listPublishedCategories } from "@/db/services";
 import { loadServicesForLocale } from "@/entities/service/api/load";
 import type { ServiceCategoryRef } from "@/entities/service";

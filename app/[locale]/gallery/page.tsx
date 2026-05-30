@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { loadGallery } from "@/entities/gallery/api/load";
 import { GalleryPage } from "@/views/gallery";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
