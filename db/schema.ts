@@ -289,6 +289,26 @@ export const siteSettings = pgTable(
   }),
 );
 
+/**
+ * Per-page SEO overrides. One row per public page (id = page slug, see
+ * entities/page-seo PAGE_SEO_PAGES), with a localized title + meta
+ * description column per locale. A blank string means "use the
+ * translation default" — rows only exist for pages an admin has touched.
+ */
+export const pageSeo = pgTable("page_seo", {
+  id: text("id").primaryKey(),
+  titleEn: text("title_en").notNull().default(""),
+  titleRu: text("title_ru").notNull().default(""),
+  titleBy: text("title_by").notNull().default(""),
+  descriptionEn: text("description_en").notNull().default(""),
+  descriptionRu: text("description_ru").notNull().default(""),
+  descriptionBy: text("description_by").notNull().default(""),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  updatedBy: text("updated_by").references(() => users.id),
+});
+
 export const serviceCategories = pgTable(
   "service_categories",
   {
@@ -661,6 +681,8 @@ export type GoogleOauthToken = typeof googleOauthTokens.$inferSelect;
 export type NewGoogleOauthToken = typeof googleOauthTokens.$inferInsert;
 export type SiteSettingsRow = typeof siteSettings.$inferSelect;
 export type NewSiteSettingsRow = typeof siteSettings.$inferInsert;
+export type PageSeoRow = typeof pageSeo.$inferSelect;
+export type NewPageSeoRow = typeof pageSeo.$inferInsert;
 export type StudioPhotoRow = typeof studioPhotos.$inferSelect;
 export type NewStudioPhotoRow = typeof studioPhotos.$inferInsert;
 export type PhotoSlotKind = (typeof photoSlotKind.enumValues)[number];

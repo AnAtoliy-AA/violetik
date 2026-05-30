@@ -7,6 +7,7 @@ import {
 import { WelcomePage } from "@/views/welcome";
 import { resolveAtelierStatus } from "@/widgets/atelier-hours/lib/resolve-status";
 import { WEEKLY_DEFAULT_HOURS } from "@/shared/lib/google-calendar";
+import { buildPageMetadata } from "@/shared/lib/page-metadata";
 
 type Params = { locale: string };
 
@@ -17,7 +18,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Welcome" });
-  return { title: `Violetta — ${t("cta_enter")}` };
+  return buildPageMetadata({
+    locale,
+    pageId: "welcome",
+    path: "/welcome",
+    fallbackTitle: `Violetta — ${t("cta_enter")}`,
+  });
 }
 
 export default async function WelcomeRoute({
