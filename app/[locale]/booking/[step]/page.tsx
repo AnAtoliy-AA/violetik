@@ -15,6 +15,8 @@ import {
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { bookingTimeZoneFromSettings } from "@/shared/lib/google-calendar";
 
+export const dynamic = "force-dynamic";
+
 type Params = { locale: string; step: string };
 
 function isLocale(value: string): value is Locale {
