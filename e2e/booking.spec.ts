@@ -65,7 +65,7 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
 test("Continue is disabled until a ritual is chosen", async ({ page }) => {
   await page.goto("/en/booking/service");
   await expect(
-    page.getByRole("link", { name: /Pick a ritual/i }),
+    page.getByText("Pick a ritual"),
   ).toBeVisible();
 });
 
