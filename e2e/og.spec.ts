@@ -78,7 +78,7 @@ test("the dynamic OG image responds with image/png", async ({
     .first()
     .getAttribute("content");
   expect(url).toBeTruthy();
-  const res = await request.get(url!);
+  const res = await request.get(new URL(url!).pathname);
   expect(res.status()).toBe(200);
   expect(res.headers()["content-type"]).toMatch(/image\/png/);
 });
