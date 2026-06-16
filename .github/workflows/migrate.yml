@@ -51,7 +51,18 @@ jobs:
       # drizzle-kit migrate applies pending migrations to DIRECT_URL. It's a
       # no-op (exit 0) when nothing is pending. drizzle.config.ts falls back to
       # process.env.DIRECT_URL when .env.local is absent, as it is in CI.
+      - name: Debug connection string
+        run: |
+          if [ -z "$DIRECT_URL" ]; then
+            echo "::error::DIRECT_URL secret is empty or not set for the staging environment"
+            exit 1
+          fi
+          # Print host + port only (redact password)
+          echo "Connecting to: $(echo "$DIRECT_URL" | sed 's/:[^@]*@/:***@/')"
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+
       - name: Apply migrations
-        run: npm run db:migrate
+        run: npx drizzle-kit migrate --verbose 2>&1
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
