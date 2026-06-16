@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Link, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import type { CurrencyCode } from "@/db/schema";
 import type { Master } from "@/entities/master";
 import type { Service } from "@/entities/service";
@@ -169,19 +169,31 @@ export function BookingPage({
     router.push("/services");
   };
 
-  const telegramSelfLink = (() => {
+  const telegramSelfLink = useMemo(() => {
     if (typeof window === "undefined") return null;
     const url = window.location.href;
     return `https://t.me/share/url?url=${encodeURIComponent(url)}`;
-  })();
+  }, []);
 
   // §6.1 — collapse the visible step list. Solo studios drop the master
   // step entirely; the /booking/master URL still resolves so the legacy
   // route doesn't 404 mid-session.
-  const effectiveSteps = effectiveBookingSteps(masters.length);
-  const stepIndex = indexOfStep(step, effectiveSteps);
-  const back = prevStep(step, effectiveSteps);
-  const next = nextStep(step, effectiveSteps);
+  const effectiveSteps = useMemo(
+    () => effectiveBookingSteps(masters.length),
+    [masters.length],
+  );
+  const stepIndex = useMemo(
+    () => indexOfStep(step, effectiveSteps),
+    [step, effectiveSteps],
+  );
+  const back = useMemo(
+    () => prevStep(step, effectiveSteps),
+    [step, effectiveSteps],
+  );
+  const next = useMemo(
+    () => nextStep(step, effectiveSteps),
+    [step, effectiveSteps],
+  );
 
   const labels = effectiveSteps.map((s) => tSteps(s));
 
@@ -309,9 +321,8 @@ export function BookingPage({
             </MagneticButton>
           </>
         ) : (
-          <Link
-            href={`/booking/${step}`}
-            aria-disabled
+          <span
+            aria-disabled="true"
             className={buttonClassName({
               variant: "outline",
               size: "lg",
@@ -324,7 +335,7 @@ export function BookingPage({
               : step === "date"
                 ? t("cta_pick_date")
                 : t("cta_pick_time")}
-          </Link>
+          </span>
         )}
       </div>
 

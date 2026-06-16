@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { m, useReducedMotion, type PanInfo } from "motion/react";
 import type { GalleryItemView } from "@/entities/gallery";
@@ -50,23 +50,61 @@ export function GalleryLightbox({
   const reduceMotion = useReducedMotion();
   const { push } = useToast();
   const [shareOpen, setShareOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const lastFocused = useRef<HTMLElement | null>(null);
+
+  const FOCUSABLE =
+    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
   useEffect(() => {
+    lastFocused.current = document.activeElement as HTMLElement | null;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
       if (onNavigate && (e.key === "ArrowRight" || e.key === "PageDown")) {
         onNavigate(1);
       }
       if (onNavigate && (e.key === "ArrowLeft" || e.key === "PageUp")) {
         onNavigate(-1);
       }
+      if (e.key === "Tab") {
+        const node = dialogRef.current;
+        if (!node) return;
+        const focusable = Array.from(
+          node.querySelectorAll<HTMLElement>(FOCUSABLE),
+        ).filter((el) => !el.hasAttribute("aria-hidden"));
+        if (focusable.length === 0) {
+          e.preventDefault();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Move focus into the dialog.
+    const id = window.setTimeout(() => {
+      const node = dialogRef.current;
+      if (!node) return;
+      const first = node.querySelector<HTMLElement>(FOCUSABLE);
+      (first ?? node).focus();
+    }, 0);
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
+      clearTimeout(id);
+      lastFocused.current?.focus();
     };
   }, [onClose, onNavigate]);
 
@@ -128,9 +166,11 @@ export function GalleryLightbox({
 
   return createPortal(
     <m.div
+      ref={dialogRef}
       role="dialog"
       aria-modal
       aria-label={labels.title}
+      tabIndex={-1}
       initial={reduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={reduceMotion ? undefined : { opacity: 0 }}
@@ -209,6 +249,54 @@ export function GalleryLightbox({
               <circle cx="18" cy="6" r="2.4" />
               <circle cx="18" cy="18" r="2.4" />
               <path d="M8.2 10.8 15.8 7.2M8.2 13.2l7.6 3.6" />
+            </svg>
+          </button>
+        ) : null}
+        {onNavigate && labels.prevLabel ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNavigate(-1);
+            }}
+            aria-label={labels.prevLabel}
+            className="absolute -left-3 top-1/2 -translate-y-1/2 inline-flex size-11 items-center justify-center rounded-full border-none bg-text/20 text-text backdrop-blur-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+          >
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              width={16}
+              height={16}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+        ) : null}
+        {onNavigate && labels.nextLabel ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNavigate(1);
+            }}
+            aria-label={labels.nextLabel}
+            className="absolute -right-3 top-1/2 -translate-y-1/2 inline-flex size-11 items-center justify-center rounded-full border-none bg-text/20 text-text backdrop-blur-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+          >
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              width={16}
+              height={16}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+            >
+              <path d="M9 18l6-6-6-6" />
             </svg>
           </button>
         ) : null}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { m, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { usePageHeading } from "@/entities/page-seo";
@@ -47,17 +47,23 @@ export function WelcomePage({
     emitAnalytics("welcome_landed");
   }, []);
 
-  const fade = (delay: number) => ({
-    initial: reduceMotion ? false : { opacity: 0 },
-    animate: { opacity: 1 },
-    transition: { duration: reduceMotion ? 0 : 0.8, ease: EASE_OUT, delay },
-  });
+  const fade = useCallback(
+    (delay: number) => ({
+      initial: reduceMotion ? false : { opacity: 0 },
+      animate: { opacity: 1 },
+      transition: { duration: reduceMotion ? 0 : 0.8, ease: EASE_OUT, delay },
+    }),
+    [reduceMotion],
+  );
 
-  const rise = (delay: number) => ({
-    initial: reduceMotion ? false : { opacity: 0, y: 24 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: reduceMotion ? 0 : 1.1, ease: EASE_OUT, delay },
-  });
+  const rise = useCallback(
+    (delay: number) => ({
+      initial: reduceMotion ? false : { opacity: 0, y: 24 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: reduceMotion ? 0 : 1.1, ease: EASE_OUT, delay },
+    }),
+    [reduceMotion],
+  );
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-[22px]">
