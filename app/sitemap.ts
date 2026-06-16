@@ -23,7 +23,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/profile",
   ] as const;
 
-  const services = await listPublishedServices();
+  let services: { id: string }[] = [];
+  try {
+    services = await listPublishedServices();
+  } catch {
+    // DB unavailable at build time (e.g. Vercel) — omit dynamic service paths
+  }
   const servicePaths = services.map((s) => `/services/${s.id}`);
   const allPaths = [...PUBLIC_PATHS, ...servicePaths];
 
