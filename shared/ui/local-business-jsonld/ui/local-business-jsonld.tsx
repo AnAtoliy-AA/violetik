@@ -7,13 +7,22 @@ export interface LocalBusinessJsonLdProps {
   locale: Locale;
   siteUrl: string;
   name: string;
+  description?: string;
 }
+
+const CURRENCY_SYMBOL: Record<string, string> = {
+  EUR: "€",
+  USD: "$",
+  BYN: "Br",
+  RUB: "₽",
+};
 
 export function LocalBusinessJsonLd({
   settings,
   locale,
   siteUrl,
   name,
+  description,
 }: LocalBusinessJsonLdProps) {
   const street = addressForLocale(settings, locale);
   const city = cityForLocale(settings, locale);
@@ -23,7 +32,17 @@ export function LocalBusinessJsonLd({
     "@type": "BeautySalon",
     name,
     url: `${siteUrl}/${locale}`,
+    image: `${siteUrl}/opengraph-image`,
   };
+
+  if (description) {
+    data.description = description;
+  }
+
+  const symbol = CURRENCY_SYMBOL[settings.currency];
+  if (symbol) {
+    data.priceRange = symbol;
+  }
 
   if (street && settings.country) {
     data.address = {
@@ -40,6 +59,17 @@ export function LocalBusinessJsonLd({
       latitude: settings.latitude,
       longitude: settings.longitude,
     };
+  }
+
+  if (city) {
+    data.areaServed = {
+      "@type": "City",
+      name: city,
+    };
+  }
+
+  if (settings.telegramUsername) {
+    data.sameAs = [`https://t.me/${settings.telegramUsername}`];
   }
 
   // Escape `<` so a string containing `</script>` can't break out of the

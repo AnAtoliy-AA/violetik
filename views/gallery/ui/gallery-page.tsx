@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
 import { usePageHeading } from "@/entities/page-seo";
@@ -64,11 +64,14 @@ export function GalleryPage({
   const openItem = openIndex >= 0 ? items[openIndex]! : null;
   const setNumber = openItem ? openIndex + 1 : 0;
 
-  const navigateLightbox = (direction: 1 | -1) => {
-    if (openIndex < 0 || items.length === 0) return;
-    const next = items[(openIndex + direction + items.length) % items.length];
-    if (next) setOpenId(next.id);
-  };
+  const navigateLightbox = useCallback(
+    (direction: 1 | -1) => {
+      if (openIndex < 0 || items.length === 0) return;
+      const next = items[(openIndex + direction + items.length) % items.length];
+      if (next) setOpenId(next.id);
+    },
+    [openIndex, items],
+  );
 
   return (
     <div className="pb-28">

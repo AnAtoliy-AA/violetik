@@ -23,21 +23,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/profile",
   ] as const;
 
-  let services: { id: string }[] = [];
+  let services: { id: string; updatedAt: Date | null }[] = [];
   try {
     services = await listPublishedServices();
   } catch {
     // DB unavailable at build time (e.g. Vercel) — omit dynamic service paths
   }
-  const servicePaths = services.map((s) => `/services/${s.id}`);
-  const allPaths = [...PUBLIC_PATHS, ...servicePaths];
 
-  return routing.locales.flatMap((locale) =>
-    allPaths.map((path) => ({
+  const now = new Date();
+
+  const staticEntries = routing.locales.flatMap((locale) =>
+    PUBLIC_PATHS.map((path) => ({
       url: `${base}/${locale}${path}`,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: "monthly" as const,
       priority: path === "/welcome" || path === "/home" ? 0.9 : 0.7,
     })),
   );
+
+  const serviceEntries = routing.locales.flatMap((locale) =>
+    services.map((s) => ({
+      url: `${base}/${locale}/services/${s.id}`,
+      lastModified: s.updatedAt ?? now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+  );
+
+  return [...staticEntries, ...serviceEntries];
 }

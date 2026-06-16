@@ -21,7 +21,7 @@ export async function ProfileNotificationsPage({
   const vapid = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-6 py-12">
+    <section className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-6 py-12">
       {!vapid && (
         <p className="rounded-md border border-line bg-surface/60 px-4 py-3 text-sm text-text-2">
           {t("vapid_missing")}
@@ -32,6 +32,6 @@ export async function ProfileNotificationsPage({
         initialPreferences={prefs as Partial<Record<NotificationCategory, boolean>>}
         vapidPublicKey={vapid}
       />
-    </main>
+    </section>
   );
 }

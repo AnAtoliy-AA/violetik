@@ -10,7 +10,7 @@
   --color-surface-2: #2a1432;
   --color-text: #fbf4e6;
   --color-text-2: rgba(250, 244, 230, 0.86);
-  --color-text-3: rgba(250, 244, 230, 0.66);
+  --color-text-3: rgba(250, 244, 230, 0.72);
   --color-accent: #c9a96e;
   --color-accent-2: #e8cf99;
   --color-plum: #7d3a6f;
@@ -1091,7 +1091,7 @@ body {
 @media (prefers-contrast: more) {
   :root {
     --color-text-2: rgba(244, 234, 216, 0.92);
-    --color-text-3: rgba(244, 234, 216, 0.7);
+    --color-text-3: rgba(244, 234, 216, 0.82);
     --color-line: rgba(243, 234, 216, 0.36);
     --color-line-strong: rgba(243, 234, 216, 0.55);
   }
