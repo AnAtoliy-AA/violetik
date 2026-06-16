@@ -94,9 +94,9 @@ export function WelcomePage({
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
         <div className="py-8 text-center">
-          <div className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)] text-brand-cycle">
+          <h1 className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)] text-brand-cycle">
             <LetterReveal text="Violetta" />
-          </div>
+          </h1>
 
           <m.div
             className="mt-[14px] font-mono text-[11px] uppercase tracking-[0.48em] text-gold-shimmer"
