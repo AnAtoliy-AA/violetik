@@ -21,10 +21,14 @@ function isLocale(value: string): value is Locale {
 }
 
 export async function generateStaticParams() {
-  const ids = await loadPublishedServiceIds();
-  return routing.locales.flatMap((locale) =>
-    ids.map((id) => ({ locale, id })),
-  );
+  try {
+    const ids = await loadPublishedServiceIds();
+    return routing.locales.flatMap((locale) =>
+      ids.map((id) => ({ locale, id })),
+    );
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

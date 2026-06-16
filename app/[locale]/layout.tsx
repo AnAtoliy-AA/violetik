@@ -93,6 +93,14 @@ export async function generateMetadata({
     description,
     keywords,
     manifest: "/manifest.webmanifest",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+      },
+    },
     openGraph: {
       title,
       description,
@@ -100,11 +108,21 @@ export async function generateMetadata({
       siteName: baseName,
       locale: OG_LOCALE[locale] ?? OG_LOCALE.en,
       url: `${SITE_URL}/${locale}`,
+      images: [
+        {
+          url: `${SITE_URL}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          type: "image/png",
+          alt: baseName,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [`${SITE_URL}/opengraph-image`],
     },
     icons: {
       icon: [
@@ -152,6 +170,7 @@ export default async function LocaleLayout({
           locale={locale as Locale}
           siteUrl={SITE_URL}
           name={tSite("name")}
+          description={tSite("description")}
         />
         <a href="#main-content" className="skip-to-content sr-only focus:not-sr-only">
           {tSite("skip_to_content")}

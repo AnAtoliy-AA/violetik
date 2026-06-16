@@ -108,7 +108,7 @@ export function GalleryCard({
             <button
               type="button"
               key={`${color}-${i}`}
-              aria-label={color}
+              aria-label={`${item.categoryName} — color ${i + 1}`}
               aria-pressed={isActive}
               onClick={() => onPaletteSelect?.(color)}
               className={cn(

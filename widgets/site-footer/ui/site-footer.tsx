@@ -11,7 +11,7 @@ export function SiteFooter() {
       <a
         href="https://arcadeum.games"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener noreferrer nofollow"
         className="underline-offset-2 hover:underline focus-visible:underline focus-visible:outline-none"
       >
         Arcadeum Games Studio

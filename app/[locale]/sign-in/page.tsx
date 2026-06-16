@@ -40,7 +40,7 @@ export default async function SignInPage({
       <Aurora intensity="vivid" />
       <AppHeader back="/welcome" title={t("plate_title")} />
 
-      <main className="relative z-10 flex min-h-[60vh] flex-col items-center justify-center px-[22px] text-center">
+      <section className="relative z-10 flex min-h-[60vh] flex-col items-center justify-center px-[22px] text-center">
         <Wordmark size="sm" className="mb-10" />
         <Eyebrow gold>{t("eyebrow")}</Eyebrow>
         <h1 className="my-4 max-w-[420px] font-display text-[40px] font-light italic leading-tight tracking-[-0.02em]">
@@ -79,7 +79,7 @@ export default async function SignInPage({
             ) : null}
           </div>
         )}
-      </main>
+      </section>
     </div>
   );
 }
