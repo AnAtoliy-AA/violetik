@@ -112,56 +112,65 @@ function NavList({
   pathname,
   onSelect,
   t,
+  sectionLabel,
 }: {
   entries: readonly NavEntry[];
   pathname: string;
   onSelect: () => void;
   t: (key: string) => string;
+  sectionLabel?: string;
 }) {
   return (
-    <ul className="flex flex-col">
-      {entries.map(({ key, href, Icon, isActive }) => {
-        const active = isActive(pathname);
-        return (
-          <li key={key}>
-            <Link
-              href={href}
-              onClick={onSelect}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "flex items-center gap-4 rounded-xl px-3 py-3",
-                "transition-colors duration-fast ease-out",
-                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-                active
-                  ? "bg-surface-2 text-text"
-                  : "text-text hover:bg-surface-2/60",
-              )}
-            >
-              <span
-                aria-hidden
+    <div>
+      {sectionLabel && (
+        <span className="block px-3 pb-2 font-mono text-[9px] uppercase tracking-[0.32em] text-text-3">
+          {sectionLabel}
+        </span>
+      )}
+      <ul className="flex flex-col">
+        {entries.map(({ key, href, Icon, isActive }) => {
+          const active = isActive(pathname);
+          return (
+            <li key={key}>
+              <Link
+                href={href}
+                onClick={onSelect}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex size-9 items-center justify-center rounded-full border-[0.5px]",
+                  "flex items-center gap-4 rounded-xl px-3 py-3",
+                  "transition-colors duration-fast ease-out",
+                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                   active
-                    ? "border-accent text-text"
-                    : "border-line text-text-2",
+                    ? "bg-surface-2 text-text"
+                    : "text-text-2 hover:bg-surface-2/60 hover:text-text",
                 )}
               >
-                <Icon width={16} height={16} strokeWidth={1.5} />
-              </span>
-              <span className="font-mono text-[11px] uppercase tracking-[0.32em]">
-                {t(`${key}.label`)}
-              </span>
-              {active ? (
                 <span
                   aria-hidden
-                  className="ml-auto inline-block size-1.5 rounded-full bg-accent motion-safe:animate-soft-pulse"
-                />
-              ) : null}
-            </Link>
-          </li>
-        );
-      })}
-    </ul>
+                  className={cn(
+                    "inline-flex size-9 items-center justify-center rounded-full border-[0.5px]",
+                    active
+                      ? "border-accent text-text"
+                      : "border-line text-text-3",
+                  )}
+                >
+                  <Icon width={16} height={16} strokeWidth={1.5} />
+                </span>
+                <span className="font-mono text-[11px] uppercase tracking-[0.32em]">
+                  {t(`${key}.label`)}
+                </span>
+                {active ? (
+                  <span
+                    aria-hidden
+                    className="ml-auto inline-block size-1.5 rounded-full bg-accent motion-safe:animate-soft-pulse"
+                  />
+                ) : null}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
@@ -323,13 +332,14 @@ export function NavSheet() {
                   </div>
                   <nav
                     aria-label={t("aria_label")}
-                    className="flex flex-1 flex-col gap-4 overflow-y-auto px-3 pt-2"
+                    className="flex flex-1 flex-col gap-3 overflow-y-auto px-3 pt-2"
                   >
                     <NavList
                       entries={PRIMARY}
                       pathname={pathname}
                       onSelect={close}
                       t={t}
+                      sectionLabel={t("section_explore")}
                     />
                     <div aria-hidden className="mx-3 h-px bg-line/60" />
                     <NavList
@@ -337,6 +347,7 @@ export function NavSheet() {
                       pathname={pathname}
                       onSelect={close}
                       t={t}
+                      sectionLabel={t("section_visit")}
                     />
                   </nav>
                   <div className="mt-4 flex items-center justify-between gap-3 border-t border-line/60 px-5 pt-4">

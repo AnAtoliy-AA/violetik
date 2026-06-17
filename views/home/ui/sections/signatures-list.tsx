@@ -54,12 +54,12 @@ export async function SignaturesList() {
     ((settings as { currency?: CurrencyCode }).currency ?? "EUR");
   const pricedServices = priceServices(services, settings);
   return (
-    <section className="px-[22px] pb-6 pt-12">
+    <section className="px-[22px] pb-8 pt-14">
       <div className="mb-3 flex items-end justify-between">
         <Plate folio number={1} label={t("plate_menu").toUpperCase()} />
         <Link
           href="/services"
-          className="inline-flex items-center gap-1.5 pb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-accent"
+          className="inline-flex items-center gap-1.5 pb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-accent transition-opacity duration-fast ease-out hover:opacity-80"
         >
           {t("signatures_all_link", { n: all.length })} <ArrowRight />
         </Link>
@@ -69,8 +69,6 @@ export async function SignaturesList() {
       </h2>
       <LetterpressRule className="mb-[22px] mt-3" />
 
-      {/* Same ServiceMenuItem used on /services so the menu reads as one
-        * coherent surface across home + catalog. */}
       <div className="flex flex-col">
         {services.map((service, i) => (
           <SpotlightCard key={service.id} className="rounded-none">

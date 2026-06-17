@@ -256,6 +256,8 @@
     "aria_label": "Навігацыя па атэлье",
     "title": "Атэлье",
     "description": "Знайдзіце залу, рытуал або свой профіль.",
+    "section_explore": "Агляд",
+    "section_visit": "Візіт",
     "home": {
       "label": "Галоўная"
     },

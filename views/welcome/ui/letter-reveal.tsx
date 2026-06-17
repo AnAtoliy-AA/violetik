@@ -37,8 +37,8 @@ export function LetterReveal({
             key={`${char}-${i}`}
             aria-hidden
             className="inline-block"
-            initial={reduceMotion ? false : { y: "110%", opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            initial={reduceMotion ? false : { y: "120%", opacity: 0, rotateX: -40 }}
+            animate={{ y: 0, opacity: 1, rotateX: 0 }}
             transition={{
               duration: reduceMotion ? 0 : ENTRANCE_DURATION,
               ease: EASE,
