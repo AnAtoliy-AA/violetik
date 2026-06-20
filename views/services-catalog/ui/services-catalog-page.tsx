@@ -100,24 +100,26 @@ export function ServicesCatalogPage({
             </p>
           </div>
         ) : (
-          filtered.map((service, i) => (
-            <SpotlightCard key={service.id} className="rounded-none">
-              <Link
-                href={`/services/${service.id}`}
-                className="block transition-transform duration-fast ease-out"
-              >
-                <ServiceMenuItem
-                  service={service}
-                  plateNumber={i + 1}
-                  variant={(i % 6) as NailTileVariant}
-                  topRule={i === 0}
-                  resolvedPrice={pricedServices?.[service.id]}
-                  currency={currency}
-                  locale={locale}
-                />
-              </Link>
-            </SpotlightCard>
-          ))
+          <div className="stagger-reveal flex flex-col">
+            {filtered.map((service, i) => (
+              <SpotlightCard key={service.id} className="rounded-none">
+                <Link
+                  href={`/services/${service.id}`}
+                  className="block transition-transform duration-fast ease-out"
+                >
+                  <ServiceMenuItem
+                    service={service}
+                    plateNumber={i + 1}
+                    variant={(i % 6) as NailTileVariant}
+                    topRule={i === 0}
+                    resolvedPrice={pricedServices?.[service.id]}
+                    currency={currency}
+                    locale={locale}
+                  />
+                </Link>
+              </SpotlightCard>
+            ))}
+          </div>
         )}
       </div>
       <TabBar showAdmin={showAdmin} />

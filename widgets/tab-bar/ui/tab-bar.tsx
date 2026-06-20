@@ -78,17 +78,12 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
                 aria-current={isActive ? "page" : undefined}
                 data-rim-sweep={isActive ? "true" : undefined}
                 className={cn(
-                  // Compact base padding: five tabs (with the Admin tab) at the
-                  // old px-5 overran the rounded-full pill and clipped the last
-                  // label in the corner. The active tab gets extra width so its
-                  // gilded thumb reads as an expanded pill; inactive tabs stay
-                  // tight so all five still clear the corner radius.
                   "relative flex items-center justify-center rounded-full py-2",
                   "transition-[color,opacity,padding] duration-fast ease-out",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                   isActive
                     ? "px-4 text-text opacity-100"
-                    : "px-2 text-text-3 opacity-50 hover:text-text-2 hover:opacity-100",
+                    : "px-2 text-text-3 opacity-45 hover:text-text-2 hover:opacity-85",
                 )}
               >
                 {isActive ? (
@@ -100,7 +95,7 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
                       transition={
                         reduceMotion
                           ? { duration: 0 }
-                          : { type: "spring", stiffness: 380, damping: 32 }
+                          : { type: "spring", stiffness: 420, damping: 34, mass: 0.45 }
                       }
                     />
                     <m.span
@@ -109,9 +104,9 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
                       initial={reduceMotion ? false : { opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{
-                        duration: reduceMotion ? 0 : 0.32,
+                        duration: reduceMotion ? 0 : 0.28,
                         ease: [0.22, 1, 0.36, 1],
-                        delay: reduceMotion ? 0 : 0.1,
+                        delay: reduceMotion ? 0 : 0.08,
                       }}
                     />
                   </>
@@ -123,7 +118,10 @@ export function TabBar({ showAdmin = false }: TabBarProps = {}) {
                     height={18}
                     strokeWidth={1.5}
                   />
-                  <span className="font-mono text-[9px] uppercase tracking-[0.18em]">
+                  <span className={cn(
+                    "font-mono text-[9px] uppercase tracking-[0.18em]",
+                    isActive && "font-medium",
+                  )}>
                     {t(`${key}.label`)}
                   </span>
                 </span>

@@ -256,6 +256,8 @@
     "aria_label": "Atelier navigation",
     "title": "Atelier",
     "description": "Find a room, a ritual, or your own thread.",
+    "section_explore": "Explore",
+    "section_visit": "Visit",
     "home": {
       "label": "Home"
     },

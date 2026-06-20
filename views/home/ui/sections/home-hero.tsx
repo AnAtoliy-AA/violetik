@@ -35,26 +35,19 @@ export function HomeHero() {
 
   return (
     <div className="relative">
-      {/* Aurora + PaperGrain live on the parent <section> now so they bleed
-       * to the section's full width (including the padding zone) rather than
-       * being clipped to this inner content box. */}
-      {/* Text block stays in a narrow column on the left so the title +
-       * paragraph remain readable on wide viewports. The FlameMonogram below
-       * anchors to this full-width relative container so its `-right-10` puts
-       * it at the section's right edge (inset by the section's padding). */}
       <m.div
-        className="relative z-10 mt-9 max-w-[760px]"
+        className="relative z-10 mt-10 max-w-[760px]"
         style={styledHero}
       >
         <Eyebrow>—— {t("hero_cover_story")}</Eyebrow>
-        <h1 className="mt-4 font-display text-h1 font-light italic leading-[0.92] tracking-[-0.025em] sm:leading-[0.94]">
+        <h1 className="mt-4 font-display text-h1 font-light italic leading-[0.92] tracking-[-0.03em] sm:leading-[0.94] text-display-shadow">
           {heading.title}
         </h1>
         <LetterpressRule className="mt-5 max-w-[440px]" />
         <p className="dropcap mt-6 max-w-[540px] text-[14.5px] leading-[1.55] text-text-2">
           {heading.description}
         </p>
-        <div className="mt-7 flex gap-2.5">
+        <div className="mt-8 flex gap-2.5">
           <MagneticButton>
             <Link
               href="/services"

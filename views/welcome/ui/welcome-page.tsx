@@ -71,8 +71,8 @@ export function WelcomePage({
       <PaperGrain />
 
       <m.div
-        className="absolute top-4 right-[22px] z-20 flex items-center gap-2"
-        {...fade(0.4)}
+        className="absolute top-5 right-[22px] z-20 flex items-center gap-2"
+        {...fade(0.2)}
       >
         <Link
           href="/home"
@@ -99,22 +99,22 @@ export function WelcomePage({
       </m.div>
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-[420px] flex-col justify-between">
-        <div className="py-8 text-center">
-          <h1 className="font-display italic font-light tracking-[-0.025em] text-[clamp(72px,22vw,110px)] text-brand-cycle">
+        <div className="pt-12 pb-8 text-center">
+          <h1 className="font-display italic font-light tracking-[-0.03em] text-[clamp(72px,22vw,110px)] text-brand-cycle text-display-shadow">
             <LetterReveal text="Violetta" />
           </h1>
 
           <m.div
-            className="mt-[14px] font-mono text-[11px] uppercase tracking-[0.48em] text-gold-shimmer"
+            className="mt-4 font-mono text-[11px] uppercase tracking-[0.48em] text-gold-shimmer"
             {...fade(0.9)}
           >
             B · E · A · U · T · Y
           </m.div>
 
           <m.div
-            className="mx-auto mt-[34px] overflow-hidden"
+            className="mx-auto mt-8 overflow-hidden"
             initial={reduceMotion ? false : { width: 0 }}
-            animate={{ width: 180 }}
+            animate={{ width: 160 }}
             transition={{
               duration: reduceMotion ? 0 : 1.5,
               ease: EASE_OUT,
@@ -125,29 +125,29 @@ export function WelcomePage({
           </m.div>
 
           <m.div
-            className="mx-auto mt-[30px] h-[250px] w-[190px]"
-            initial={reduceMotion ? false : { opacity: 0, y: 30 }}
-            animate={{ opacity: 0.92, y: 0 }}
+            className="mx-auto mt-6 h-[220px] w-[170px]"
+            initial={reduceMotion ? false : { opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 0.92, scale: 1 }}
             transition={{
-              duration: reduceMotion ? 0 : 1.2,
+              duration: reduceMotion ? 0 : 1.4,
               ease: EASE_OUT,
-              delay: 1.9,
+              delay: 1.5,
             }}
           >
             <FlameMonogram letter="V" className="size-full" />
           </m.div>
 
           <m.p
-            className="mx-auto mt-8 max-w-[320px] font-display text-[22px] font-light italic leading-[1.3] text-text-2"
-            {...rise(2.2)}
+            className="mx-auto mt-7 max-w-[300px] font-display text-[20px] font-light italic leading-[1.35] text-text-2"
+            {...rise(2.0)}
           >
             {heading.title}
           </m.p>
 
           {statusLabel && (
             <m.div
-              className="mt-6 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-[0.32em] text-text-2"
-              {...fade(2.6)}
+              className="mt-5 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-[0.32em] text-text-3"
+              {...fade(2.4)}
             >
               <span
                 aria-hidden
@@ -160,7 +160,7 @@ export function WelcomePage({
           )}
         </div>
 
-        <m.div className="flex flex-col gap-3 pb-20" {...rise(2.4)}>
+        <m.div className="flex flex-col gap-3 pb-24" {...rise(2.2)}>
           <MagneticButton className="block w-full">
             <Link
               href="/onboarding"

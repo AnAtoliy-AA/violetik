@@ -85,20 +85,19 @@ export function AppHeader({
       blur="xl"
       elevation={2}
       className={cn(
-        "sticky top-0 z-40",
+        "sticky top-0 z-40 transition-[backdrop-filter] duration-300",
         className,
       )}
       {...rest}
     >
-      <div className="flex items-center gap-2 px-[22px] pb-2 pt-[10px]">
+      <div className="flex items-center gap-2 px-[22px] pb-2.5 pt-[10px]">
         <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
           {left}
           {admin ? (
             <span
               data-testid="app-header-admin"
-              className="font-mono text-[9px] uppercase tracking-[0.32em] text-text-2"
+              className="font-mono text-[9px] uppercase tracking-[0.32em] text-text-3"
             >
-              {/* Compact glyph on mobile — full label returns at sm. */}
               <span aria-hidden className="sm:hidden">·</span>
               <span aria-hidden className="hidden sm:inline">· ADMIN ·</span>
               <span className="sr-only sm:hidden">Admin</span>
@@ -120,7 +119,7 @@ export function AppHeader({
       {admin ? (
         <div
           aria-hidden
-          className="mx-[22px] mt-1 h-px bg-line-strong"
+          className="mx-[22px] h-px bg-line-strong"
         />
       ) : null}
     </GlassSurface>

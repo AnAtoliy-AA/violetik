@@ -1097,6 +1097,76 @@ body {
   }
 }
 
+/* §15 — Refined stagger-reveal utility for sections that enter on scroll.
+ * Each child is hidden initially and fades + slides in with a cascading
+ * delay set via --stagger-index (defaults to 0). */
+.stagger-reveal > * {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: staggerReveal 700ms var(--ease-out) forwards;
+}
+.stagger-reveal > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-reveal > *:nth-child(2) { animation-delay: 70ms; }
+.stagger-reveal > *:nth-child(3) { animation-delay: 140ms; }
+.stagger-reveal > *:nth-child(4) { animation-delay: 210ms; }
+.stagger-reveal > *:nth-child(5) { animation-delay: 280ms; }
+.stagger-reveal > *:nth-child(6) { animation-delay: 350ms; }
+.stagger-reveal > *:nth-child(7) { animation-delay: 420ms; }
+.stagger-reveal > *:nth-child(8) { animation-delay: 490ms; }
+@keyframes staggerReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* §15 — Breathing glow: a soft ambient pulse applied to gold CTAs. */
+@keyframes breatheGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(201, 169, 110, 0), 0 4px 12px -4px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 24px 2px rgba(201, 169, 110, 0.2), 0 4px 12px -4px rgba(0, 0, 0, 0.3);
+  }
+}
+.breathe-glow {
+  animation: breatheGlow 3s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .breathe-glow { animation: none; }
+}
+
+/* §15 — Progress bar fill animation for booking stepper. */
+@keyframes progressFill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.progress-fill {
+  transform-origin: left;
+  animation: progressFill 600ms var(--ease-out) both;
+}
+
+/* §15 — Refined text-shadow for display headings on dark backgrounds. */
+.text-display-shadow {
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4), 0 0 60px rgba(0, 0, 0, 0.15);
+}
+
+/* §15 — Smooth page-level transitions via View Transitions API. */
+@supports (view-transition-name: none) {
+  ::view-transition-old(hero) {
+    animation: fadeSlideOut 280ms var(--ease-out) both;
+  }
+  ::view-transition-new(hero) {
+    animation: fadeSlideIn 360ms var(--ease-out) both;
+  }
+  @keyframes fadeSlideOut {
+    to { opacity: 0; transform: translateY(-8px); }
+  }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+  }
+}
+
 /* §14 — Aurora is three large blurred radial gradients on /welcome. Mark
  * it content-visibility:auto so it doesn't paint when scrolled out of
  * view (cheap if it's the only thing in the section). Consumers add
