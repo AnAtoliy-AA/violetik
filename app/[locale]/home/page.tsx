@@ -3,7 +3,9 @@ import { setRequestLocale } from "next-intl/server";
 import { HomePage } from "@/views/home";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
 import { buildPageMetadata } from "@/shared/lib/page-metadata";
-import type { Locale } from "@/i18n/routing";
+import { cityForLocale } from "@/entities/site-settings";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import { type Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
 
@@ -13,7 +15,9 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return buildPageMetadata({ locale, pageId: "home", path: "/home" });
+  const settings = await getSiteSettingsServer();
+  const city = cityForLocale(settings, locale as Locale);
+  return buildPageMetadata({ locale, pageId: "home", path: "/home", city });
 }
 
 export default async function HomeRoute({

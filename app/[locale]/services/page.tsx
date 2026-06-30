@@ -4,7 +4,7 @@ import { listPublishedCategories } from "@/db/services";
 import { loadServicesForLocale } from "@/entities/service/api/load";
 import type { ServiceCategoryRef } from "@/entities/service";
 import type { CurrencyCode } from "@/db/schema";
-import { priceServices } from "@/entities/site-settings";
+import { priceServices, cityForLocale } from "@/entities/site-settings";
 import { ServicesCatalogPage } from "@/views/services-catalog";
 import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
 import { getCurrentSessionUser } from "@/shared/lib/auth-server";
@@ -24,7 +24,9 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return buildPageMetadata({ locale, pageId: "services", path: "/services" });
+  const settings = await getSiteSettingsServer();
+  const city = cityForLocale(settings, locale as Locale);
+  return buildPageMetadata({ locale, pageId: "services", path: "/services", city });
 }
 
 export default async function ServicesRoute({
