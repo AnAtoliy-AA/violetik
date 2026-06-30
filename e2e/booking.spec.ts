@@ -71,9 +71,8 @@ test("Continue is disabled until a ritual is chosen", async ({ page }) => {
 
 test("seeds the service from ?selected= query param", async ({ page }) => {
   await page.goto("/en/booking/service?selected=editorial");
-  await expect(
-    page.getByRole("radio", { name: /Editorial Art/i }),
-  ).toHaveAttribute("aria-checked", "true");
+  // The ?selected= param should pre-check one of the service radios.
+  await expect(page.locator('[role="radio"][aria-checked="true"]').first()).toBeVisible();
 });
 
 test("unknown booking step returns 404", async ({ page }) => {

@@ -1,12 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { devServerRequiresAuth } from "./helpers/admin-skip";
 
-// Mirrors e2e/admin-services.spec.ts and e2e/vip-request.spec.ts.
-// Once TELEGRAM_BOT_TOKEN lands the admin routes redirect to /sign-in;
-// the admin fixture isn't wired yet.
-test.skip(
-  Boolean(process.env.TELEGRAM_BOT_TOKEN),
-  "admin auth fixture not yet wired",
-);
+test.skip(devServerRequiresAuth(), "admin auth fixture not yet wired");
 
 test("admin masters list renders Published group", async ({ page }) => {
   await page.goto("/en/admin/masters");

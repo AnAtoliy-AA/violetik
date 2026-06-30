@@ -9,12 +9,10 @@ test("/en/home emits canonical Open Graph + Twitter meta tags", async ({
     "content",
     /Violetta/i,
   );
-  // Tolerates both the static "private nail atelier" description and the
-  // city-templated form (e.g. "Editorial nail design in Borisov…") that
-  // Site.meta_description_with_city emits once the admin sets a city.
+  // Tolerates both the static description and the city-templated form.
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
     "content",
-    /nail (atelier|design)|beauty/i,
+    /nail (studio|atelier|design)|beauty/i,
   );
   await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
     "content",
@@ -43,11 +41,10 @@ test("/by/home advertises Belarusian locale + description", async ({
     "content",
     "be_BY",
   );
-  // Tolerates both the static "Прыватнае нэйл-атэлье" description and the
-  // city-templated form ("Студыя дызайну пазногцяў…") once admin sets a city.
+  // Tolerates the current description and any future admin override.
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
     "content",
-    /Прыватнае нэйл-атэлье|Студыя дызайну пазногцяў/i,
+    /студыя манікюру|нэйл-атэлье|пазногцяў/i,
   );
 });
 

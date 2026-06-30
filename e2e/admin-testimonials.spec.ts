@@ -1,13 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { devServerRequiresAuth } from "./helpers/admin-skip";
 
-// Same posture as e2e/admin-services.spec.ts: when TELEGRAM_BOT_TOKEN
-// is unset the admin routes are open and these specs run; once the
-// token lands they redirect to /sign-in and we'd need an admin fixture
-// (not wired yet).
-test.skip(
-  Boolean(process.env.TELEGRAM_BOT_TOKEN),
-  "admin auth fixture not yet wired",
-);
+test.skip(devServerRequiresAuth(), "admin auth fixture not yet wired");
 
 test("admin testimonials page renders all three buckets", async ({ page }) => {
   await page.goto("/en/admin/testimonials");
