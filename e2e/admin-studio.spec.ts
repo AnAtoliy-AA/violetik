@@ -39,5 +39,5 @@ test("admin can configure the studio location and the home page reflects it", as
     page.locator("iframe[src*='openstreetmap.org/export/embed.html']"),
   ).toBeVisible();
   // City appears in the address line.
-  await expect(page.getByText(/Borisov/)).toBeVisible();
+  await expect(page.getByText(/Borisov/).first()).toBeVisible();
 });

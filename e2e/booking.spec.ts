@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test("walks the booking flow from service to confirmation", async ({ page }) => {
   await page.goto("/en/booking/service");
   await expect(
-    page.getByRole("heading", { level: 2, name: /Choose your ritual/i }),
+    page.getByRole("heading", { level: 2, name: /Choose your service/i }),
   ).toBeVisible();
 
   // Pick the first ritual and capture its name dynamically. Hardcoding a
@@ -65,7 +65,7 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
 test("Continue is disabled until a ritual is chosen", async ({ page }) => {
   await page.goto("/en/booking/service");
   await expect(
-    page.getByText("Pick a ritual"),
+    page.getByText("Pick one"),
   ).toBeVisible();
 });
 
