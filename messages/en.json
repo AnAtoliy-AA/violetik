@@ -470,6 +470,8 @@
     "page_seo_reset_all": "Reset all",
     "page_seo_confirm_reset": "Reset override for this page? It will revert to the translation default.",
     "page_seo_confirm_reset_all": "Reset all SEO overrides? Every page will revert to its translation default.",
+    "page_seo_confirm_cancel": "Cancel",
+    "page_seo_confirm_proceed": "Yes, reset",
     "page_seo_page_home": "Home",
     "page_seo_page_services": "Services",
     "page_seo_page_gallery": "Gallery",

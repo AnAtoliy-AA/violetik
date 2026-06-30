@@ -470,6 +470,8 @@
     "page_seo_reset_all": "Скінуць усе",
     "page_seo_confirm_reset": "Скінуць перавызначэнне для гэтай старонкі? Вернуцца значэнні па змаўчанні.",
     "page_seo_confirm_reset_all": "Скінуць усе перавызначэнні SEO? Усе старонкі вернуцца да значэнняў па змаўчанні.",
+    "page_seo_confirm_cancel": "Адмена",
+    "page_seo_confirm_proceed": "Так, скінуць",
     "page_seo_page_home": "Галоўная",
     "page_seo_page_services": "Паслугі",
     "page_seo_page_gallery": "Галерэя",

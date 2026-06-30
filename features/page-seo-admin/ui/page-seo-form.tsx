@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
 import type { FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { createPortal } from "react-dom";
 import { routing, type Locale } from "@/i18n/routing";
 import {
   EMPTY_PAGE_SEO_ENTRY,
@@ -55,6 +56,11 @@ type Status =
   | { kind: "saved" }
   | { kind: "error"; message: string };
 
+type ConfirmDialog = {
+  message: string;
+  onConfirm: () => void;
+};
+
 const TITLE_FIELD: Record<Locale, keyof PageSeoEntry> = {
   en: "titleEn",
   ru: "titleRu",
@@ -81,6 +87,9 @@ export function PageSeoForm({
   const t = useTranslations("Admin");
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialog | null>(null);
+
+  const closeConfirm = useCallback(() => setConfirmDialog(null), []);
 
   const [state, setState] = useState<FormState>(() => {
     const next: FormState = {};
@@ -117,13 +126,12 @@ export function PageSeoForm({
     setStatus({ kind: "idle" });
   }
 
-  function handleResetAll() {
-    if (!confirm(t("page_seo_confirm_reset_all"))) return;
+  function executeResetAll() {
+    setConfirmDialog(null);
     setStatus({ kind: "idle" });
     startTransition(async () => {
       const result = await onResetAll();
       if (result.ok) {
-        // Clear all overrides from local state — fields revert to defaults
         const next: FormState = {};
         for (const page of pages) {
           const entry = { ...EMPTY_PAGE_SEO_ENTRY };
@@ -143,13 +151,12 @@ export function PageSeoForm({
     });
   }
 
-  function handleResetPage(pageId: string) {
-    if (!confirm(t("page_seo_confirm_reset"))) return;
+  function executeResetPage(pageId: string) {
+    setConfirmDialog(null);
     setStatus({ kind: "idle" });
     startTransition(async () => {
       const result = await onReset(pageId);
       if (result.ok) {
-        // Revert this page's fields to translation defaults
         const page = pages.find((p) => p.id === pageId);
         if (page) {
           const entry = { ...EMPTY_PAGE_SEO_ENTRY };
@@ -193,7 +200,12 @@ export function PageSeoForm({
         <button
           type="button"
           disabled={isPending}
-          onClick={handleResetAll}
+          onClick={() =>
+            setConfirmDialog({
+              message: t("page_seo_confirm_reset_all"),
+              onConfirm: executeResetAll,
+            })
+          }
           className="shrink-0 rounded border border-line px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-text-2 transition-colors hover:border-rose hover:text-rose disabled:opacity-50"
         >
           {t("page_seo_reset_all")}
@@ -215,7 +227,12 @@ export function PageSeoForm({
               <button
                 type="button"
                 disabled={isPending}
-                onClick={() => handleResetPage(page.id)}
+                onClick={() =>
+                  setConfirmDialog({
+                    message: t("page_seo_confirm_reset"),
+                    onConfirm: () => executeResetPage(page.id),
+                  })
+                }
                 className="ml-auto font-mono text-[10px] uppercase tracking-[0.1em] text-text-3 transition-colors hover:text-rose disabled:opacity-50"
               >
                 {t("page_seo_reset")}
@@ -304,6 +321,43 @@ export function PageSeoForm({
           </span>
         ) : null}
       </div>
+
+      {confirmDialog &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            role="dialog"
+            aria-modal="true"
+            onClick={closeConfirm}
+          >
+            <div
+              className="mx-4 flex w-full max-w-[340px] flex-col gap-5 rounded-2xl border-[0.5px] border-line bg-surface p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="text-[14px] leading-snug text-text-1">
+                {confirmDialog.message}
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={closeConfirm}
+                  className="rounded border border-line px-4 py-2 font-mono text-[11px] uppercase tracking-[0.1em] text-text-2 transition-colors hover:bg-white/5"
+                >
+                  {t("page_seo_confirm_cancel")}
+                </button>
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={confirmDialog.onConfirm}
+                  className="rounded border border-rose/60 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.1em] text-rose transition-colors hover:bg-rose/10 disabled:opacity-50"
+                >
+                  {t("page_seo_confirm_proceed")}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </form>
   );
 }

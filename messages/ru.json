@@ -470,6 +470,8 @@
     "page_seo_reset_all": "Сбросить все",
     "page_seo_confirm_reset": "Сбросить переопределение для этой страницы? Вернутся значения по умолчанию.",
     "page_seo_confirm_reset_all": "Сбросить все переопределения SEO? Все страницы вернутся к значениям по умолчанию.",
+    "page_seo_confirm_cancel": "Отмена",
+    "page_seo_confirm_proceed": "Да, сбросить",
     "page_seo_page_home": "Главная",
     "page_seo_page_services": "Услуги",
     "page_seo_page_gallery": "Галерея",
