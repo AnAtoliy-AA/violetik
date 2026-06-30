@@ -1,11 +1,11 @@
 {
   "Home": {
-    "meta_title": "Руки — это портрет",
+    "meta_title": "Маникюр Борисов — Violetta",
     "hero_cover_story": "Кавер-стори",
     "hero_title_line_1": "Руки —",
     "hero_title_lead": "это",
     "hero_title_word": "портрет.",
-    "hero_paragraph": "Ателье Виолетты — частная студия на одно кресло в Борисове. Каждая пара рук получает девяносто минут тишины и внимания. Запись по воскресеньям в 20:00 — не опаздывайте.",
+    "hero_paragraph": "Студия Виолетты — частная студия на одно кресло в Борисове. Каждая пара рук получает девяносто минут тишины и внимания. Запись по воскресеньям в 20:00 — не опаздывайте.",
     "cta_book": "Записаться",
     "address_copy_label": "Скопировать адрес",
     "address_maps_label": "Открыть на карте",
@@ -313,7 +313,7 @@
     "palette_filter_clear": "Сбросить",
     "lightbox_eyebrow": "Сет {number} · {tag}",
     "lightbox_title": "Этюд: {tag}.",
-    "lightbox_caption": "Сделано Виолетой — финиш {tag}.",
+    "lightbox_caption": "Сделано Виолеттой — финиш {tag}.",
     "lightbox_close": "Закрыть",
     "lightbox_share_label": "Поделиться",
     "lightbox_share_sheet_title": "Поделиться этим сетом",
