@@ -1,12 +1,10 @@
 import { test, expect } from "@playwright/test";
+import { devServerRequiresAuth } from "./helpers/admin-skip";
 
-// When TELEGRAM_BOT_TOKEN is unset (default CI + local dev), the /admin/*
-// routes are open and these specs run normally. Once the token lands,
-// requireAdmin() redirects to /sign-in (same posture as e2e/admin-services).
-test.skip(
-  Boolean(process.env.TELEGRAM_BOT_TOKEN),
-  "admin auth fixture not yet wired",
-);
+// When the dev server requires auth (TELEGRAM_BOT_TOKEN in .env.local or
+// shell env), admin routes redirect to /sign-in. Skip until the admin
+// auth fixture is wired.
+test.skip(devServerRequiresAuth(), "admin auth fixture not yet wired");
 
 test("admin gallery list renders both sections", async ({ page }) => {
   await page.goto("/en/admin/gallery");

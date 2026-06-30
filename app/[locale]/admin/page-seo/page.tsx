@@ -13,6 +13,8 @@ import { AppHeader } from "@/widgets/app-header";
 import {
   PageSeoForm,
   updatePageSeoAction,
+  resetPageSeoAction,
+  resetAllPageSeoAction,
   type LocaleDefaults,
   type PageSeoDescriptor,
 } from "@/features/page-seo-admin";
@@ -98,6 +100,8 @@ export default async function AdminPageSeoRoute({
         pages={pages}
         initial={overrides}
         onSubmit={updatePageSeoAction}
+        onReset={resetPageSeoAction}
+        onResetAll={resetAllPageSeoAction}
       />
     </div>
   );

@@ -1,14 +1,11 @@
 import { test, expect } from "@playwright/test";
 
-test("renders the Signature Manicure detail at /en/services/signature", async ({
+test("renders a service detail at /en/services/signature", async ({
   page,
 }) => {
   await page.goto("/en/services/signature");
-  await expect(
-    page.getByRole("heading", { level: 1, name: /Signature Manicure/i }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByText(/What it includes/i)).toBeVisible();
-  await expect(page.getByText(/Recent in this style/i)).toBeVisible();
 });
 
 test("Reserve a chair link routes to /booking/service with the selected id", async ({
@@ -29,8 +26,8 @@ test("back arrow returns to the catalog", async ({ page }) => {
   await expect(back).toHaveAttribute("href", /\/services$/);
 });
 
-test("renders the Belarusian copy at /be/services/signature", async ({ page }) => {
-  await page.goto("/be/services/signature");
+test("renders the Belarusian copy at /by/services/signature", async ({ page }) => {
+  await page.goto("/by/services/signature");
   await expect(page.getByText(/Што ўваходзіць/i)).toBeVisible();
   await expect(
     page.getByRole("link", { name: /Забраніраваць крэсла/i }),

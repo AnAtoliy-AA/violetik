@@ -8,7 +8,7 @@ test("/ redirects to the default-locale welcome screen", async ({ page }) => {
 
 test("renders the English tagline and CTAs at /en/welcome", async ({ page }) => {
   await page.goto("/en/welcome");
-  await expect(page.getByText(/A private nail atelier/i)).toBeVisible();
+  await expect(page.getByText(/A quiet studio, one chair/i)).toBeVisible();
   await expect(
     page.getByRole("link", { name: /^I'm new here$/i }),
   ).toBeVisible();
@@ -18,5 +18,5 @@ test("renders the English tagline and CTAs at /en/welcome", async ({ page }) => 
 
 test("renders the Belarusian tagline at /be/welcome", async ({ page }) => {
   await page.goto("/be/welcome");
-  await expect(page.getByText(/Прыватнае атэлье манікюру/i)).toBeVisible();
+  await expect(page.getByText(/Ціхая студыя/)).toBeVisible();
 });

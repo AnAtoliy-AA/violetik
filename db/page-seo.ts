@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { db, schema } from "./index";
 import {
   pageSeoPatchSchema,
@@ -73,4 +74,22 @@ export async function updatePageSeo(
       .values({ id: entry.id, ...values })
       .onConflictDoUpdate({ target: schema.pageSeo.id, set: values });
   }
+}
+
+/**
+ * Deletes a single page-SEO override by page id. No-op when the DB isn't
+ * configured. After deletion the page falls back to its translation defaults.
+ */
+export async function deletePageSeo(id: string): Promise<void> {
+  if (!db) return;
+  await db.delete(schema.pageSeo).where(eq(schema.pageSeo.id, id));
+}
+
+/**
+ * Deletes all page-SEO overrides. No-op when the DB isn't configured.
+ * After deletion every page falls back to its translation defaults.
+ */
+export async function deleteAllPageSeo(): Promise<void> {
+  if (!db) return;
+  await db.delete(schema.pageSeo);
 }

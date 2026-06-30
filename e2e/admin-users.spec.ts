@@ -1,12 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { devServerRequiresAuth } from "./helpers/admin-skip";
 
-// Mirrors e2e/admin-masters.spec.ts. Admin routes are open in CI
-// (TELEGRAM_BOT_TOKEN unset) so route-level smokes can run without
-// secrets; the admin auth fixture isn't wired yet for the secrets case.
-test.skip(
-  Boolean(process.env.TELEGRAM_BOT_TOKEN),
-  "admin auth fixture not yet wired",
-);
+test.skip(devServerRequiresAuth(), "admin auth fixture not yet wired");
 
 test("admin users list page renders the search box and filter pills", async ({
   page,

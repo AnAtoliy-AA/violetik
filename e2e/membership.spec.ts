@@ -16,9 +16,15 @@ test("renders the membership hero and two tier cards at /en/membership", async (
 
 test("annual toggle multiplies the prices by 10", async ({ page }) => {
   await page.goto("/en/membership");
-  await expect(page.getByText("€180")).toBeVisible();
+  // Find the VIP card's current (non-strikethrough) price.
+  const vipCard = page.getByRole("article").filter({ hasText: "VIP" });
+  const priceLocator = vipCard.locator("span").filter({ hasText: /^€\d+$/ }).first();
+  await expect(priceLocator).toBeVisible();
+  const monthlyPrice = await priceLocator.innerText();
   await page.getByRole("tab", { name: /Annual/i }).click();
-  await expect(page.getByText("€1800")).toBeVisible();
+  // Annual price should be 10× the monthly price.
+  const expectedAnnual = monthlyPrice.replace(/\d+/, (m) => String(Number(m) * 10));
+  await expect(page.getByText(expectedAnnual)).toBeVisible();
 });
 
 test("renders the Belarusian membership eyebrow at /be/membership", async ({

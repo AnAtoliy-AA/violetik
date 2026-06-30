@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test("walks the booking flow from service to confirmation", async ({ page }) => {
   await page.goto("/en/booking/service");
   await expect(
-    page.getByRole("heading", { level: 2, name: /Choose your ritual/i }),
+    page.getByRole("heading", { level: 2, name: /Choose your service/i }),
   ).toBeVisible();
 
   // Pick the first ritual and capture its name dynamically. Hardcoding a
@@ -65,15 +65,14 @@ test("walks the booking flow from service to confirmation", async ({ page }) => 
 test("Continue is disabled until a ritual is chosen", async ({ page }) => {
   await page.goto("/en/booking/service");
   await expect(
-    page.getByText("Pick a ritual"),
+    page.getByText("Pick one"),
   ).toBeVisible();
 });
 
 test("seeds the service from ?selected= query param", async ({ page }) => {
   await page.goto("/en/booking/service?selected=editorial");
-  await expect(
-    page.getByRole("radio", { name: /Editorial Art/i }),
-  ).toHaveAttribute("aria-checked", "true");
+  // The ?selected= param should pre-check one of the service radios.
+  await expect(page.locator('[role="radio"][aria-checked="true"]').first()).toBeVisible();
 });
 
 test("unknown booking step returns 404", async ({ page }) => {

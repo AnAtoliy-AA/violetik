@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
 import type { FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { createPortal } from "react-dom";
 import { routing, type Locale } from "@/i18n/routing";
 import {
   EMPTY_PAGE_SEO_ENTRY,
@@ -16,6 +17,14 @@ import { buttonClassName } from "@/shared/ui/button";
 export type SubmitFn = (
   patch: PageSeoPatch,
 ) => Promise<{ ok: true } | { ok: false; error: string }>;
+
+export type ResetFn = (
+  pageId: string,
+) => Promise<{ ok: true } | { ok: false; error: string }>;
+
+export type ResetAllFn = () => Promise<
+  { ok: true } | { ok: false; error: string }
+>;
 
 /** Localized translation default shown as the input placeholder. */
 export type LocaleDefaults = Record<
@@ -36,6 +45,8 @@ export interface PageSeoFormProps {
   pages: PageSeoDescriptor[];
   initial: PageSeoOverrides;
   onSubmit: SubmitFn;
+  onReset: ResetFn;
+  onResetAll: ResetAllFn;
 }
 
 type FormState = Record<string, PageSeoEntry>;
@@ -44,6 +55,11 @@ type Status =
   | { kind: "idle" }
   | { kind: "saved" }
   | { kind: "error"; message: string };
+
+type ConfirmDialog = {
+  message: string;
+  onConfirm: () => void;
+};
 
 const TITLE_FIELD: Record<Locale, keyof PageSeoEntry> = {
   en: "titleEn",
@@ -61,10 +77,19 @@ const DESCRIPTION_FIELD: Record<Locale, keyof PageSeoEntry> = {
   by: "descriptionBy",
 };
 
-export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormProps) {
+export function PageSeoForm({
+  pages,
+  initial,
+  onSubmit: submit,
+  onReset,
+  onResetAll,
+}: PageSeoFormProps) {
   const t = useTranslations("Admin");
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialog | null>(null);
+
+  const closeConfirm = useCallback(() => setConfirmDialog(null), []);
 
   const [state, setState] = useState<FormState>(() => {
     const next: FormState = {};
@@ -101,6 +126,55 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
     setStatus({ kind: "idle" });
   }
 
+  function executeResetAll() {
+    setConfirmDialog(null);
+    setStatus({ kind: "idle" });
+    startTransition(async () => {
+      const result = await onResetAll();
+      if (result.ok) {
+        const next: FormState = {};
+        for (const page of pages) {
+          const entry = { ...EMPTY_PAGE_SEO_ENTRY };
+          for (const l of routing.locales) {
+            const loc = l as Locale;
+            entry[TITLE_FIELD[loc]] = page.defaults[loc].title;
+            entry[HEADING_FIELD[loc]] = page.defaults[loc].heading;
+            entry[DESCRIPTION_FIELD[loc]] = page.defaults[loc].description;
+          }
+          next[page.id] = entry;
+        }
+        setState(next);
+        setStatus({ kind: "saved" });
+      } else {
+        setStatus({ kind: "error", message: result.error });
+      }
+    });
+  }
+
+  function executeResetPage(pageId: string) {
+    setConfirmDialog(null);
+    setStatus({ kind: "idle" });
+    startTransition(async () => {
+      const result = await onReset(pageId);
+      if (result.ok) {
+        const page = pages.find((p) => p.id === pageId);
+        if (page) {
+          const entry = { ...EMPTY_PAGE_SEO_ENTRY };
+          for (const l of routing.locales) {
+            const loc = l as Locale;
+            entry[TITLE_FIELD[loc]] = page.defaults[loc].title;
+            entry[HEADING_FIELD[loc]] = page.defaults[loc].heading;
+            entry[DESCRIPTION_FIELD[loc]] = page.defaults[loc].description;
+          }
+          setState((prev) => ({ ...prev, [pageId]: entry }));
+        }
+        setStatus({ kind: "saved" });
+      } else {
+        setStatus({ kind: "error", message: result.error });
+      }
+    });
+  }
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setStatus({ kind: "idle" });
@@ -119,9 +193,24 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-[22px] pt-6 pb-32">
-      <p className="max-w-[460px] text-[13px] text-text-2">
-        {t("page_seo_intro")}
-      </p>
+      <div className="flex items-start justify-between gap-4">
+        <p className="max-w-[460px] text-[13px] text-text-2">
+          {t("page_seo_intro")}
+        </p>
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={() =>
+            setConfirmDialog({
+              message: t("page_seo_confirm_reset_all"),
+              onConfirm: executeResetAll,
+            })
+          }
+          className="shrink-0 rounded border border-line px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-text-2 transition-colors hover:border-rose hover:text-rose disabled:opacity-50"
+        >
+          {t("page_seo_reset_all")}
+        </button>
+      </div>
 
       {pages.map((page) => {
         const entry = state[page.id];
@@ -135,6 +224,19 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
               <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-3">
                 {page.path}
               </span>
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() =>
+                  setConfirmDialog({
+                    message: t("page_seo_confirm_reset"),
+                    onConfirm: () => executeResetPage(page.id),
+                  })
+                }
+                className="ml-auto font-mono text-[10px] uppercase tracking-[0.1em] text-text-3 transition-colors hover:text-rose disabled:opacity-50"
+              >
+                {t("page_seo_reset")}
+              </button>
             </legend>
 
             <div className="mt-2 flex flex-col gap-5">
@@ -219,6 +321,43 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
           </span>
         ) : null}
       </div>
+
+      {confirmDialog &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            role="dialog"
+            aria-modal="true"
+            onClick={closeConfirm}
+          >
+            <div
+              className="mx-4 flex w-full max-w-[340px] flex-col gap-5 rounded-2xl border-[0.5px] border-line bg-surface p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="text-[14px] leading-snug text-text-1">
+                {confirmDialog.message}
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={closeConfirm}
+                  className="rounded border border-line px-4 py-2 font-mono text-[11px] uppercase tracking-[0.1em] text-text-2 transition-colors hover:bg-white/5"
+                >
+                  {t("page_seo_confirm_cancel")}
+                </button>
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={confirmDialog.onConfirm}
+                  className="rounded border border-rose/60 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.1em] text-rose transition-colors hover:bg-rose/10 disabled:opacity-50"
+                >
+                  {t("page_seo_confirm_proceed")}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </form>
   );
 }

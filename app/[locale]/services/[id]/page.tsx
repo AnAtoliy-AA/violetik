@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { resolvePrice } from "@/entities/site-settings";
+import { resolvePrice, cityForLocale } from "@/entities/site-settings";
 import {
   loadPublishedServiceIds,
   loadServiceByIdForLocale,
@@ -41,7 +41,22 @@ export async function generateMetadata({
   const service = await loadServiceByIdForLocale(id, locale);
   if (!service) return { title: "Violetta" };
   const t = await getTranslations({ locale, namespace: "ServiceDetail" });
-  return { title: `Violetta — ${service.name} · ${t("meta_subtitle")}` };
+  const settings = await getSiteSettingsServer();
+  const city = cityForLocale(settings, locale as Locale);
+
+  const title = city
+    ? `${service.name} · ${t("meta_subtitle")} — маникюр ${city}`
+    : `Violetta — ${service.name} · ${t("meta_subtitle")}`;
+
+  const description = city
+    ? `${service.name} в ${city}. ${t("meta_subtitle")} — запись в нейл-ателье Violetta.`
+    : `${service.name} — ${t("meta_subtitle")} в нейл-ателье Violetta.`;
+
+  const keywords = city
+    ? `${service.name} ${city}, маникюр ${city}, ${service.name.toLowerCase()} запись ${city}`
+    : undefined;
+
+  return { title, description, keywords };
 }
 
 export default async function ServiceDetailRoute({
