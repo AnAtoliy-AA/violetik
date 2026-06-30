@@ -1,9 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { devServerRequiresAuth } from "./helpers/admin-skip";
 
-test.skip(
-  Boolean(process.env.TELEGRAM_BOT_TOKEN),
-  "admin auth fixture not yet wired",
-);
+test.skip(devServerRequiresAuth(), "admin auth fixture not yet wired");
 
 test("admin onboarding list renders the slides section", async ({ page }) => {
   await page.goto("/en/admin/onboarding");
