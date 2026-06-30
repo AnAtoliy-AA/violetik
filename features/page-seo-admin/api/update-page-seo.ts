@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { pageSeoPatchSchema } from "@/entities/page-seo";
 import { requireAdmin } from "@/shared/lib/auth-server";
-import { updatePageSeo } from "@/db/page-seo";
+import { updatePageSeo, deletePageSeo, deleteAllPageSeo } from "@/db/page-seo";
 
 export type UpdatePageSeoResult = { ok: true } | { ok: false; error: string };
 
@@ -40,6 +40,58 @@ export async function updatePageSeoAction(
     await updatePageSeo(parsed.data, updatedBy);
   } catch (error) {
     console.error("[page-seo] save failed:", error);
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+/**
+ * Deletes a single page's SEO override, reverting it to translation defaults.
+ */
+export async function resetPageSeoAction(
+  pageId: string,
+): Promise<UpdatePageSeoResult> {
+  const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
+
+  if (AUTH_REQUIRED) {
+    const gate = await requireAdmin();
+    if (!gate.ok) return { ok: false, error: gate.reason };
+  }
+
+  try {
+    await deletePageSeo(pageId);
+  } catch (error) {
+    console.error("[page-seo] reset failed:", error);
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+/**
+ * Deletes ALL page SEO overrides, reverting every page to translation defaults.
+ */
+export async function resetAllPageSeoAction(): Promise<UpdatePageSeoResult> {
+  const AUTH_REQUIRED = Boolean(process.env.TELEGRAM_BOT_TOKEN);
+
+  if (AUTH_REQUIRED) {
+    const gate = await requireAdmin();
+    if (!gate.ok) return { ok: false, error: gate.reason };
+  }
+
+  try {
+    await deleteAllPageSeo();
+  } catch (error) {
+    console.error("[page-seo] reset all failed:", error);
     return {
       ok: false,
       error: error instanceof Error ? error.message : "Unknown error",

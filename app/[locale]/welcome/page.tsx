@@ -4,6 +4,9 @@ import { WelcomePage } from "@/views/welcome";
 import { resolveAtelierStatus } from "@/widgets/atelier-hours/lib/resolve-status";
 import { WEEKLY_DEFAULT_HOURS } from "@/shared/lib/google-calendar";
 import { buildPageMetadata } from "@/shared/lib/page-metadata";
+import { cityForLocale } from "@/entities/site-settings";
+import { getSiteSettingsServer } from "@/shared/lib/site-settings-server";
+import { type Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
 
@@ -13,7 +16,9 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return buildPageMetadata({ locale, pageId: "welcome", path: "/welcome" });
+  const settings = await getSiteSettingsServer();
+  const city = cityForLocale(settings, locale as Locale);
+  return buildPageMetadata({ locale, pageId: "welcome", path: "/welcome", city });
 }
 
 export default async function WelcomeRoute({

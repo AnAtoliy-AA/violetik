@@ -13,7 +13,7 @@ test("Forward advances to the second slide, the last slide shows Step inside", a
 }) => {
   await page.goto("/en/onboarding");
   await page.getByRole("button", { name: /^Forward$/i }).click();
-  await expect(page.getByText("Designed like couture")).toBeVisible();
+  await expect(page.getByText("Made with care")).toBeVisible();
   await expect(
     page.getByRole("link", { name: /^Step inside$/i }),
   ).toHaveAttribute("href", /\/home$/);

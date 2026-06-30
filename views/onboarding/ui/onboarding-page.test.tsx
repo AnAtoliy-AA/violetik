@@ -43,7 +43,7 @@ describe("OnboardingPage", () => {
     const user = userEvent.setup();
     renderWithIntl();
     await user.click(screen.getByRole("button", { name: /^Forward$/i }));
-    expect(screen.getByText("Designed like couture")).toBeInTheDocument();
+    expect(screen.getByText("Made with care")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /^Forward$/i })).toBeNull();
     expect(
       screen.getByRole("link", { name: /^Step inside$/i }),
@@ -58,7 +58,7 @@ describe("OnboardingPage", () => {
     expect(dots[0]).toHaveAttribute("aria-selected", "true");
     await user.click(dots[1]);
     expect(dots[1]).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("Designed like couture")).toBeInTheDocument();
+    expect(screen.getByText("Made with care")).toBeInTheDocument();
   });
 
   it("Skip-equivalent link points at /home", () => {

@@ -17,6 +17,14 @@ export type SubmitFn = (
   patch: PageSeoPatch,
 ) => Promise<{ ok: true } | { ok: false; error: string }>;
 
+export type ResetFn = (
+  pageId: string,
+) => Promise<{ ok: true } | { ok: false; error: string }>;
+
+export type ResetAllFn = () => Promise<
+  { ok: true } | { ok: false; error: string }
+>;
+
 /** Localized translation default shown as the input placeholder. */
 export type LocaleDefaults = Record<
   Locale,
@@ -36,6 +44,8 @@ export interface PageSeoFormProps {
   pages: PageSeoDescriptor[];
   initial: PageSeoOverrides;
   onSubmit: SubmitFn;
+  onReset: ResetFn;
+  onResetAll: ResetAllFn;
 }
 
 type FormState = Record<string, PageSeoEntry>;
@@ -61,7 +71,13 @@ const DESCRIPTION_FIELD: Record<Locale, keyof PageSeoEntry> = {
   by: "descriptionBy",
 };
 
-export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormProps) {
+export function PageSeoForm({
+  pages,
+  initial,
+  onSubmit: submit,
+  onReset,
+  onResetAll,
+}: PageSeoFormProps) {
   const t = useTranslations("Admin");
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -101,6 +117,57 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
     setStatus({ kind: "idle" });
   }
 
+  function handleResetAll() {
+    if (!confirm(t("page_seo_confirm_reset_all"))) return;
+    setStatus({ kind: "idle" });
+    startTransition(async () => {
+      const result = await onResetAll();
+      if (result.ok) {
+        // Clear all overrides from local state — fields revert to defaults
+        const next: FormState = {};
+        for (const page of pages) {
+          const entry = { ...EMPTY_PAGE_SEO_ENTRY };
+          for (const l of routing.locales) {
+            const loc = l as Locale;
+            entry[TITLE_FIELD[loc]] = page.defaults[loc].title;
+            entry[HEADING_FIELD[loc]] = page.defaults[loc].heading;
+            entry[DESCRIPTION_FIELD[loc]] = page.defaults[loc].description;
+          }
+          next[page.id] = entry;
+        }
+        setState(next);
+        setStatus({ kind: "saved" });
+      } else {
+        setStatus({ kind: "error", message: result.error });
+      }
+    });
+  }
+
+  function handleResetPage(pageId: string) {
+    if (!confirm(t("page_seo_confirm_reset"))) return;
+    setStatus({ kind: "idle" });
+    startTransition(async () => {
+      const result = await onReset(pageId);
+      if (result.ok) {
+        // Revert this page's fields to translation defaults
+        const page = pages.find((p) => p.id === pageId);
+        if (page) {
+          const entry = { ...EMPTY_PAGE_SEO_ENTRY };
+          for (const l of routing.locales) {
+            const loc = l as Locale;
+            entry[TITLE_FIELD[loc]] = page.defaults[loc].title;
+            entry[HEADING_FIELD[loc]] = page.defaults[loc].heading;
+            entry[DESCRIPTION_FIELD[loc]] = page.defaults[loc].description;
+          }
+          setState((prev) => ({ ...prev, [pageId]: entry }));
+        }
+        setStatus({ kind: "saved" });
+      } else {
+        setStatus({ kind: "error", message: result.error });
+      }
+    });
+  }
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setStatus({ kind: "idle" });
@@ -119,9 +186,19 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-[22px] pt-6 pb-32">
-      <p className="max-w-[460px] text-[13px] text-text-2">
-        {t("page_seo_intro")}
-      </p>
+      <div className="flex items-start justify-between gap-4">
+        <p className="max-w-[460px] text-[13px] text-text-2">
+          {t("page_seo_intro")}
+        </p>
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={handleResetAll}
+          className="shrink-0 rounded border border-line px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-text-2 transition-colors hover:border-rose hover:text-rose disabled:opacity-50"
+        >
+          {t("page_seo_reset_all")}
+        </button>
+      </div>
 
       {pages.map((page) => {
         const entry = state[page.id];
@@ -135,6 +212,14 @@ export function PageSeoForm({ pages, initial, onSubmit: submit }: PageSeoFormPro
               <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-3">
                 {page.path}
               </span>
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => handleResetPage(page.id)}
+                className="ml-auto font-mono text-[10px] uppercase tracking-[0.1em] text-text-3 transition-colors hover:text-rose disabled:opacity-50"
+              >
+                {t("page_seo_reset")}
+              </button>
             </legend>
 
             <div className="mt-2 flex flex-col gap-5">

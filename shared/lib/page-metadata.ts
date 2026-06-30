@@ -17,6 +17,12 @@ export interface BuildPageMetadataOptions {
    * used here — canonical + hreflang are owned by the locale layout.
    */
   path?: string;
+  /**
+   * City name for the current locale. When provided and the resolved title
+   * doesn't already contain it, a " — маникюр {city}" suffix is appended
+   * to boost local SEO (e.g. "маникюр Борисов").
+   */
+  city?: string;
 }
 
 /**
@@ -32,10 +38,16 @@ export interface BuildPageMetadataOptions {
  * strips them (setting an `openGraph` object here would drop the
  * auto-injected `og:image`).
  */
+const CITY_SUFFIX: Record<string, string> = {
+  en: " — nails {city}",
+  ru: " — маникюр {city}",
+  by: " — манікюр {city}",
+};
+
 export async function buildPageMetadata(
   opts: BuildPageMetadataOptions,
 ): Promise<Metadata> {
-  const { locale, pageId } = opts;
+  const { locale, pageId, city } = opts;
   const { namespace } = PAGE_SEO_BY_ID[pageId];
 
   const [overrides, tPage, tSite] = await Promise.all([
@@ -47,12 +59,18 @@ export async function buildPageMetadata(
   const translate = (ns: string, key: string) =>
     ns === "Site" ? tSite(key) : tPage(key);
 
-  const { title, description } = resolvePageMeta({
+  const { title: rawTitle, description } = resolvePageMeta({
     pageId,
     locale: locale as Locale,
     overrides,
     translate,
   });
+
+  let title = rawTitle;
+  if (city && !title.toLowerCase().includes(city.toLowerCase())) {
+    const suffix = CITY_SUFFIX[locale] ?? CITY_SUFFIX.en;
+    title = `${title} ${suffix.replace("{city}", city)}`;
+  }
 
   return { title, description };
 }
